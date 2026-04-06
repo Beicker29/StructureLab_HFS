@@ -1,0 +1,27 @@
+{
+    "section_name": "L6X6X1_2",
+    "design_method": "LRFD",
+    "material": {
+        "Fy": 250.0,
+        "Fu": 400.0,
+        "E": 200000.0
+    },
+    "loads": {
+        "Pu": 100.0,
+        "Mux": 15.0,
+        "Muy": 10.0,
+        "Vu": 5.0
+    },
+    "lengths": {
+        "Lx": 3000.0,
+        "Ly": 3000.0,
+        "Lb": 3000.0
+    },
+    "factors": {
+        "Kx": 1.0,
+        "Ky": 1.0
+    },
+    "connection": {
+        "Ae": 2500.0
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "section_name": "HSS10X10X1_2",
+    "design_method": "LRFD",
+    "material": {
+        "Fy": 317.0,
+        "Fu": 400.0,
+        "E": 200000.0
+    },
+    "loads": {
+        "Pu": 800.0,
+        "Mux": 200.0,
+        "Muy": 50.0,
+        "Vu": 10.0
+    },
+    "lengths": {
+        "Lx": 5000.0,
+        "Ly": 5000.0,
+        "Lb": 5000.0
+    },
+    "factors": {
+        "Kx": 1.0,
+        "Ky": 1.0
+    },
+    "connection": {
+        "Ae": 10000.0
+    }
+}
