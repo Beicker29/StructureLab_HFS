@@ -10,7 +10,7 @@ class FlexureRule:
         """
         Calculates the DCR for flexure and returns a CheckResult.
         """
-        demand = case.loads.Mux
+        demand = abs(case.loads.Mux)
         capacity = self.evaluator.evaluate(case, section)
         
         dcr = demand / capacity if capacity > 0 else float('inf')
