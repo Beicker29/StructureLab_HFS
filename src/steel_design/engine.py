@@ -3,7 +3,7 @@ from .models import SteelCase, CheckStatus
 from .results_model import EngineResult
 from .sections.repository import SectionRepository
 from .domain.validation import validate_case
-from .domain.errors import SectionNotFoundError
+from .domain.errors import SectionNotFoundError, ValidationError
 from .domain.routing.profile_router import ProfileRouter
 
 class SteelDesignEngine:
@@ -26,9 +26,19 @@ class SteelDesignEngine:
         section = self.repository.get(case.section_name)
         if not section:
             raise SectionNotFoundError(f"Section {case.section_name} not found in database.")
+
+        if case.connection.Ae is not None and case.connection.Ae > section.area:
+            raise ValidationError(
+                "Effective net area Ae cannot exceed gross area Ag.",
+                details={
+                    "section": section.name,
+                    "Ae": case.connection.Ae,
+                    "Ag": section.area,
+                },
+            )
             
         # 3. Get rules dynamically
-        rules = self.router.get_rules(section)
+        rules = self.router.get_rules(case, section)
         
         # 4. Run checks
         checks = []

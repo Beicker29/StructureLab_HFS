@@ -7,8 +7,8 @@ class AxialE3Rule:
     Flexural Buckling of Members without Slender Elements (E3).
     """
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        # Ignore if it's tension (negative Pu)
-        if case.loads.Pu < 0:
+        # Ignore if there is no compressive demand.
+        if case.loads.Pu <= 0:
             return CheckResult(name="Axial Compression E3", clause="E3", demand=0.0, capacity=0.0, dcr=0.0, status=CheckStatus.PASS)
 
         demand = case.loads.Pu
