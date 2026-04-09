@@ -1,4 +1,3 @@
-from typing import List
 from .models import SteelCase, CheckStatus
 from .results_model import EngineResult
 from .sections.repository import SectionRepository
@@ -35,6 +34,12 @@ class SteelDesignEngine:
                     "Ae": case.connection.Ae,
                     "Ag": section.area,
                 },
+            )
+
+        if section.type.upper() == "SINGLE_ANGLE" and case.loads.Pu > 0 and case.connection.angle_compression_mode is None:
+            raise ValidationError(
+                "angle_compression_mode is required for single-angle compression (E5).",
+                details={"section": section.name, "required_field": "connection.angle_compression_mode"},
             )
             
         # 3. Get rules dynamically

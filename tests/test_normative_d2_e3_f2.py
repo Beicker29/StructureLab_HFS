@@ -22,6 +22,7 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             Zy=1.0,
             rx=90.0,
             ry=55.0,
+            **{"bf/2tf": 4.0, "h/tw": 25.0},
             J=1.0,
             Cw=1.0,
         )
@@ -35,8 +36,8 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             section_name="W14X90",
             material=Material(Fy=345.0, Fu=450.0, E=200000.0),
             loads=Loads(Pu=-150.0, Mux=0.0, Muy=0.0, Vu=0.0),
-            lengths=Lengths(Lx=3000.0, Ly=3000.0, Lb=3000.0),
-            factors=Factors(),
+            lengths=Lengths(Lx=3000.0, Ly=3000.0, Lz=3000.0, Lb=3000.0),
+            factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0),
             connection=Connection(Ae=15000.0),
         )
         result = TensionRule().check(case, self._section())
@@ -56,8 +57,8 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             section_name="W14X90",
             material=Material(Fy=345.0, Fu=450.0, E=200000.0),
             loads=Loads(Pu=300.0, Mux=0.0, Muy=0.0, Vu=0.0),
-            lengths=Lengths(Lx=3000.0, Ly=3000.0, Lb=3000.0),
-            factors=Factors(),
+            lengths=Lengths(Lx=3000.0, Ly=3000.0, Lz=3000.0, Lb=3000.0),
+            factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0),
             connection=Connection(),
         )
         result = AxialE3Rule().check(case, self._section())
@@ -74,8 +75,8 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             section_name="W14X90",
             material=Material(Fy=345.0, Fu=450.0, E=200000.0),
             loads=Loads(Pu=0.0, Mux=-120.0, Muy=0.0, Vu=0.0),
-            lengths=Lengths(Lx=3000.0, Ly=3000.0, Lb=3000.0),
-            factors=Factors(),
+            lengths=Lengths(Lx=3000.0, Ly=3000.0, Lz=3000.0, Lb=3000.0),
+            factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0),
             connection=Connection(),
         )
         result = FlexureRule().check(case, self._section())

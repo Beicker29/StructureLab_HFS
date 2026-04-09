@@ -1,5 +1,5 @@
 {
-    "section_name": "HSS10X10X1_2",
+    "section_name": "PTE50X30X2mm",
     "design_method": "LRFD",
     "material": {
         "Fy": 317.0,
@@ -7,21 +7,26 @@
         "E": 200000.0
     },
     "loads": {
-        "Pu": 800.0,
-        "Mux": 200.0,
-        "Muy": 50.0,
-        "Vu": 10.0
+        "Pu": 80.0,
+        "Mux": 0.0,
+        "Muy": 0.0,
+        "Vu": 0.0
     },
     "lengths": {
-        "Lx": 5000.0,
-        "Ly": 5000.0,
-        "Lb": 5000.0
+        "Lx": 3000.0,
+        "Ly": 3000.0,
+        "Lz": 3000.0,
+        "Lb": 3000.0
     },
     "factors": {
         "Kx": 1.0,
-        "Ky": 1.0
+        "Ky": 1.0,
+        "Kz": 1.0,
+        "Cb": 1.0,
+        "xa": 0.0,
+        "ya": 0.0
     },
     "connection": {
-        "Ae": 10000.0
+        "Ae": 200.0
     }
 }

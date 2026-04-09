@@ -3,7 +3,7 @@ from ...sections.models import Section
 from ...codes.aisc_360_22 import flexure_calc
 
 class FlexureEvaluator:
-    def evaluate(self, case: SteelCase, section: Section) -> float:
+    def evaluate(self, case: SteelCase, section: Section) -> dict:
         """
         Evaluates the available flexural strength in kip-ft.
         """
@@ -14,6 +14,13 @@ class FlexureEvaluator:
         Mn = flexure_calc.calculate_Mn_F2(Mp)
         
         # Calculate available moment based on LRFD/ASD
-        phi_Mn = flexure_calc.calculate_available_flexural_strength(Mn, case.design_method)
+        available = flexure_calc.calculate_available_flexural_strength(Mn, case.design_method)
         
-        return phi_Mn
+        return {
+            "capacity": available,
+            "Mp_Nmm": Mp,
+            "Mn_Nmm": Mn,
+            "Zx_mm3": section.zx,
+            "Fy_mpa": case.material.Fy,
+            "design_method": str(case.design_method),
+        }

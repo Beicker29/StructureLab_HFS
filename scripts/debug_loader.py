@@ -1,9 +1,18 @@
-import openpyxl
+from collections import Counter
 
-wb = openpyxl.load_workbook('data/sections.xlsx', data_only=True)
-ws = wb.active
-headers = [cell.value for cell in ws[1]]
-for row in ws.iter_rows(min_row=2, values_only=True):
-    if not row[0]: continue
-    row_data = dict(zip(headers, row))
-    print(row_data)
+from src.steel_design.sections.loader import load_sections_from_excel
+
+
+def main() -> None:
+    sections = load_sections_from_excel("data/sections.xlsx")
+    print(f"Loaded sections: {len(sections)}")
+    type_counter = Counter(section.type for section in sections)
+    for profile_type, count in sorted(type_counter.items()):
+        print(f"{profile_type}: {count}")
+    print("First five sections:")
+    for section in sections[:5]:
+        print(section.name, section.type)
+
+
+if __name__ == "__main__":
+    main()

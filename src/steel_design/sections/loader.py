@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import openpyxl
 
@@ -7,55 +7,174 @@ from ..domain.errors import CatalogSchemaError
 from .models import Section
 
 
-def _normalize_header(header: str) -> str:
-    return re.sub(r"[^a-z0-9]", "", str(header or "").strip().lower())
+PLACEHOLDER_VALUES = {
+    "",
+    "-",
+    "–",
+    "—",
+    "N/A",
+    "NA",
+    "NONE",
+    "NULL",
+    "#DIV/0!",
+    "#N/A",
+    "#VALUE!",
+    "#REF!",
+    "#NUM!",
+    "#NAME?",
+    "#NULL!",
+}
 
+UNIT_SCALE_BY_VARIABLE = {
+    "Ix": 1e6,
+    "Iy": 1e6,
+    "Iz": 1e6,
+    "Iw": 1e6,
+    "Sw1": 1e6,
+    "Sw2": 1e6,
+    "Sw3": 1e6,
+    "Zx": 1e3,
+    "Zy": 1e3,
+    "Sx": 1e3,
+    "Sy": 1e3,
+    "Sz": 1e3,
+    "SwA": 1e3,
+    "SwB": 1e3,
+    "SwC": 1e3,
+    "SzA": 1e3,
+    "SzB": 1e3,
+    "SzC": 1e3,
+    "Qf": 1e3,
+    "Qw": 1e3,
+    "C": 1e3,
+    "J": 1e3,
+    "Cw": 1e9,
+}
 
-CANONICAL_HEADER_ALIASES = {
-    "shape": {"shape", "name", "section", "sectionname", "designation"},
-    "area": {"a", "ag", "area", "areamm2"},
-    "ix": {"ix", "ixmm4"},
-    "iy": {"iy", "iymm4"},
-    "sx": {"sx", "sxmm3"},
-    "sy": {"sy", "symm3"},
-    "zx": {"zx", "zxmm3"},
-    "zy": {"zy", "zymm3"},
-    "rx": {"rx", "rxmm"},
-    "ry": {"ry", "rymm"},
-    "j": {"j", "jmm4"},
-    "cw": {"cw", "cwmm6"},
+FIELD_HEADER_CANDIDATES: Dict[str, Sequence[str]] = {
+    "shape": ("shape", "name", "section", "section_name", "designation"),
+    "area": ("A", "area [mm2]", "area", "Ag"),
+    "d": ("d",),
+    "h": ("h",),
+    "bf": ("bf",),
+    "b": ("b",),
+    "od": ("OD",),
+    "id": ("ID",),
+    "tf": ("tf",),
+    "t": ("t", "tnom"),
+    "tdes": ("tdes",),
+    "tw": ("tw",),
+    "ix": ("Ix", "Ix [mm4]"),
+    "iy": ("Iy", "Iy [mm4]"),
+    "sx": ("Sx", "Sx [mm3]"),
+    "sy": ("Sy", "Sy [mm3]"),
+    "zx": ("Zx", "Zx [mm3]"),
+    "zy": ("Zy", "Zy [mm3]"),
+    "rx": ("rx", "rx [mm]"),
+    "ry": ("ry", "ry [mm]"),
+    "j": ("J", "J [mm4]"),
+    "cw": ("Cw", "Cw [mm6]"),
+    "ro": ("ro", "ro [mm]"),
+    "H": ("H",),
+    "x": ("x", "Xc [mm]"),
+    "y": ("y", "Yc [mm]"),
+    "eo": ("eo",),
+    "bf_2tf_ratio": ("bf/2tf",),
+    "b_t_ratio": ("b/t",),
+    "b_tdes_ratio": ("b/tdes",),
+    "h_tw_ratio": ("h/tw",),
+    "h_tdes_ratio": ("h/tdes",),
+    "d_t_ratio": ("D/t",),
 }
 
 
-def _build_header_index(headers: List[object]) -> Dict[str, int]:
-    normalized_to_index = {_normalize_header(h): i for i, h in enumerate(headers) if h is not None}
-    canonical_to_index: Dict[str, int] = {}
+def _normalize_header(header: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", header.lower())
 
-    for canonical, aliases in CANONICAL_HEADER_ALIASES.items():
-        for alias in aliases:
-            if alias in normalized_to_index:
-                canonical_to_index[canonical] = normalized_to_index[alias]
-                break
 
-    missing_required = [k for k in ("shape", "area") if k not in canonical_to_index]
-    if missing_required:
-        raise CatalogSchemaError(
-            "Catalog is missing required headers for strict loading.",
-            details={"missing_headers": missing_required, "headers": [str(h) for h in headers]},
-        )
+def _clean_value(value: object) -> object:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.upper() in PLACEHOLDER_VALUES:
+            return None
+        return stripped
+    return value
 
-    return canonical_to_index
+
+def _build_header_indexes(headers: Iterable[object]) -> Tuple[Dict[str, int], Dict[str, int]]:
+    exact: Dict[str, int] = {}
+    normalized: Dict[str, int] = {}
+    for idx, raw in enumerate(headers):
+        if raw is None:
+            continue
+        text = str(raw).strip()
+        if text:
+            exact[text] = idx
+            normalized[_normalize_header(text)] = idx
+    return exact, normalized
+
+
+def _find_column_index(
+    exact_headers: Dict[str, int],
+    normalized_headers: Dict[str, int],
+    candidates: Sequence[str],
+) -> Optional[int]:
+    for candidate in candidates:
+        if candidate in exact_headers:
+            return exact_headers[candidate]
+    for candidate in candidates:
+        normalized = _normalize_header(candidate)
+        if normalized in normalized_headers:
+            return normalized_headers[normalized]
+    return None
+
+
+def _resolve_profile_type(shape_name: str, sheet_name: str) -> str:
+    normalized_shape = shape_name.upper().strip()
+    normalized_sheet = sheet_name.upper().strip()
+
+    if normalized_sheet == "C":
+        return "CHANNEL"
+    if normalized_sheet == "2L":
+        return "DOUBLE_ANGLE"
+    if normalized_sheet == "L":
+        return "SINGLE_ANGLE"
+    if normalized_sheet == "PTE_RECT":
+        return "RECTANGULAR_HSS"
+    if normalized_sheet == "PTE_RED":
+        return "CIRCULAR_HSS"
+
+    if normalized_shape.startswith("W"):
+        return "W"
+    if normalized_shape.startswith("DBL_L") or normalized_shape.startswith("2L"):
+        return "DOUBLE_ANGLE"
+    if normalized_shape.startswith("L"):
+        return "SINGLE_ANGLE"
+    if normalized_shape.startswith("C"):
+        return "CHANNEL"
+    if "HSS" in normalized_shape or "PTE" in normalized_shape:
+        if normalized_shape.count("X") >= 2:
+            return "RECTANGULAR_HSS"
+        return "CIRCULAR_HSS"
+
+    raise CatalogSchemaError(
+        "Cannot resolve section profile type from shape name.",
+        details={"shape": shape_name, "sheet": sheet_name},
+    )
 
 
 def _coerce_float(
-    value: object,
+    raw_value: object,
     *,
-    field_name: str,
     section_name: str,
-    required: bool,
+    field_name: str,
     row_number: int,
+    required: bool,
 ) -> Optional[float]:
-    if value is None or (isinstance(value, str) and value.strip() == ""):
+    value = _clean_value(raw_value)
+    if value is None:
         if required:
             raise CatalogSchemaError(
                 "Required numeric value is missing in catalog row.",
@@ -67,8 +186,11 @@ def _coerce_float(
             )
         return None
 
-    try:
+    if isinstance(value, (int, float)):
         return float(value)
+
+    try:
+        return float(str(value).replace(",", ""))
     except (TypeError, ValueError):
         raise CatalogSchemaError(
             "Catalog value cannot be parsed as float.",
@@ -81,94 +203,155 @@ def _coerce_float(
         )
 
 
-def _resolve_profile_type(shape_name: str) -> str:
-    normalized = shape_name.upper().strip()
-
-    if normalized.startswith("WT"):
-        return "WT"
-    if normalized.startswith("W"):
-        return "W"
-    if normalized.startswith("DBL_L") or normalized.startswith("2L"):
-        return "DOUBLE_ANGLE"
-    if normalized.startswith("L"):
-        return "SINGLE_ANGLE"
-
-    is_tube = ("HSS" in normalized) or ("PTE" in normalized)
-    if is_tube and normalized.count("X") >= 2:
-        return "RECTANGULAR_HSS"
-    if is_tube:
-        return "CIRCULAR_HSS"
-
-    raise CatalogSchemaError(
-        "Cannot resolve section profile type from shape name.",
-        details={"shape": shape_name},
-    )
-
-
-def _get_optional_float(
+def _scaled_float(
     row: tuple,
-    header_index: Dict[str, int],
-    canonical_key: str,
+    *,
+    column_index: Optional[int],
     section_name: str,
+    field_name: str,
     row_number: int,
+    required: bool,
+    source_header: Optional[str],
 ) -> Optional[float]:
-    if canonical_key not in header_index:
+    if column_index is None:
+        if required:
+            raise CatalogSchemaError(
+                "Required column is missing from catalog.",
+                details={"section": section_name, "field": field_name},
+            )
         return None
-    return _coerce_float(
-        row[header_index[canonical_key]],
-        field_name=canonical_key,
+
+    value = _coerce_float(
+        row[column_index],
         section_name=section_name,
-        required=False,
+        field_name=field_name,
         row_number=row_number,
+        required=required,
     )
+    if value is None:
+        return None
+
+    scale = 1.0
+    if source_header is not None:
+        source_header_clean = source_header.strip()
+        scale = UNIT_SCALE_BY_VARIABLE.get(source_header_clean, 1.0)
+    return value * scale
 
 
 def load_sections_from_excel(filepath: str) -> List[Section]:
     """
-    Loads steel sections from an Excel file and returns a list of Section models.
-    Strict mode: schema issues are raised as CatalogSchemaError.
+    Loads sections from all profile sheets in sections.xlsx.
+    Strict mode: schema and parsing issues raise CatalogSchemaError.
     """
     workbook = openpyxl.load_workbook(filepath, data_only=True)
-    sheet = workbook.active
-    headers = [cell.value for cell in sheet[1]]
-    header_index = _build_header_index(headers)
+    profile_sheets = [sheet for sheet in workbook.sheetnames if sheet.strip().upper() != "README"]
+    if not profile_sheets:
+        raise CatalogSchemaError(
+            "No profile sheets found in catalog workbook.",
+            details={"workbook": filepath, "sheetnames": workbook.sheetnames},
+        )
 
     sections: List[Section] = []
-    for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-        shape_raw = row[header_index["shape"]]
-        if shape_raw is None or str(shape_raw).strip() == "":
-            continue
+    for sheet_name in profile_sheets:
+        sheet = workbook[sheet_name]
+        headers = [cell.value for cell in sheet[1]]
+        exact_headers, normalized_headers = _build_header_indexes(headers)
 
-        section_name = str(shape_raw).strip().upper()
-        section_type = _resolve_profile_type(section_name)
+        required_columns = {
+            key: _find_column_index(exact_headers, normalized_headers, candidates)
+            for key, candidates in FIELD_HEADER_CANDIDATES.items()
+        }
 
-        area = _coerce_float(
-            row[header_index["area"]],
-            field_name="area",
-            section_name=section_name,
-            required=True,
-            row_number=row_number,
-        )
+        if required_columns["shape"] is None or required_columns["area"] is None:
+            raise CatalogSchemaError(
+                "Catalog sheet is missing required columns (shape/area).",
+                details={"sheet": sheet_name, "headers": [str(h) for h in headers]},
+            )
 
-        section = Section(
-            name=section_name,
-            type=section_type,
-            A=area,
-            d=None,
-            bf=None,
-            tf=None,
-            tw=None,
-            Ix=_get_optional_float(row, header_index, "ix", section_name, row_number),
-            Iy=_get_optional_float(row, header_index, "iy", section_name, row_number),
-            Sx=_get_optional_float(row, header_index, "sx", section_name, row_number),
-            Sy=_get_optional_float(row, header_index, "sy", section_name, row_number),
-            Zx=_get_optional_float(row, header_index, "zx", section_name, row_number),
-            Zy=_get_optional_float(row, header_index, "zy", section_name, row_number),
-            rx=_get_optional_float(row, header_index, "rx", section_name, row_number),
-            ry=_get_optional_float(row, header_index, "ry", section_name, row_number),
-            J=_get_optional_float(row, header_index, "j", section_name, row_number),
-            Cw=_get_optional_float(row, header_index, "cw", section_name, row_number),
-        )
-        sections.append(section)
+        for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+            shape_index = required_columns["shape"]
+            raw_shape = _clean_value(row[shape_index]) if shape_index is not None else None
+            if raw_shape is None:
+                continue
+
+            section_name = str(raw_shape).upper()
+            # WT profiles are intentionally excluded from this repository scope.
+            if section_name.startswith("WT"):
+                continue
+            section_type = _resolve_profile_type(section_name, sheet_name)
+
+            field_values: Dict[str, Optional[float]] = {}
+            for field_name, column_index in required_columns.items():
+                if field_name == "shape":
+                    continue
+                header_name = headers[column_index] if column_index is not None else None
+                field_values[field_name] = _scaled_float(
+                    row,
+                    column_index=column_index,
+                    section_name=section_name,
+                    field_name=field_name,
+                    row_number=row_number,
+                    required=(field_name == "area"),
+                    source_header=str(header_name) if header_name is not None else None,
+                )
+
+            # Derive ratios that can be obtained from geometric properties when missing in source rows.
+            if (field_values["bf_2tf_ratio"] is None) and (field_values["bf"] is not None) and (field_values["tf"] not in (None, 0.0)):
+                field_values["bf_2tf_ratio"] = field_values["bf"] / (2.0 * field_values["tf"])
+            if (field_values["b_t_ratio"] is None) and (field_values["b"] is not None) and (field_values["t"] not in (None, 0.0)):
+                field_values["b_t_ratio"] = field_values["b"] / field_values["t"]
+            if (field_values["b_tdes_ratio"] is None) and (field_values["b"] is not None) and (field_values["tdes"] not in (None, 0.0)):
+                field_values["b_tdes_ratio"] = field_values["b"] / field_values["tdes"]
+            if (field_values["h_tw_ratio"] is None) and (field_values["h"] is not None) and (field_values["tw"] not in (None, 0.0)):
+                field_values["h_tw_ratio"] = field_values["h"] / field_values["tw"]
+            if (field_values["h_tdes_ratio"] is None) and (field_values["h"] is not None) and (field_values["tdes"] not in (None, 0.0)):
+                field_values["h_tdes_ratio"] = field_values["h"] / field_values["tdes"]
+            if field_values["d_t_ratio"] is None:
+                diameter = field_values["id"] if field_values["id"] not in (None, 0.0) else field_values["od"]
+                if (diameter is not None) and (field_values["tdes"] not in (None, 0.0)):
+                    field_values["d_t_ratio"] = diameter / field_values["tdes"]
+                elif (diameter is not None) and (field_values["t"] not in (None, 0.0)):
+                    field_values["d_t_ratio"] = diameter / field_values["t"]
+
+            section = Section(
+                name=section_name,
+                type=section_type,
+                A=field_values["area"],
+                d=field_values["d"],
+                h=field_values["h"],
+                bf=field_values["bf"],
+                b=field_values["b"],
+                OD=field_values["od"],
+                ID=field_values["id"],
+                tf=field_values["tf"],
+                t=field_values["t"],
+                tdes=field_values["tdes"],
+                tw=field_values["tw"],
+                Ix=field_values["ix"],
+                Iy=field_values["iy"],
+                Sx=field_values["sx"],
+                Sy=field_values["sy"],
+                Zx=field_values["zx"],
+                Zy=field_values["zy"],
+                rx=field_values["rx"],
+                ry=field_values["ry"],
+                J=field_values["j"],
+                Cw=field_values["cw"],
+                ro=field_values["ro"],
+                H=field_values["H"],
+                x=field_values["x"],
+                y=field_values["y"],
+                eo=field_values["eo"],
+                **{
+                    "bf/2tf": field_values["bf_2tf_ratio"],
+                    "b/t": field_values["b_t_ratio"],
+                    "b/tdes": field_values["b_tdes_ratio"],
+                    "h/tw": field_values["h_tw_ratio"],
+                    "h/tdes": field_values["h_tdes_ratio"],
+                    "D/t": field_values["d_t_ratio"],
+                },
+            )
+            sections.append(section)
 
     return sections
+
