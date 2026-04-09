@@ -38,5 +38,25 @@ class TensionRule:
             demand=demand,
             capacity=capacity,
             dcr=round(dcr, 3),
-            status=status
+            status=status,
+            details={
+                "memory": {
+                    "clause": "D2",
+                    "inputs": {
+                        "Fy_mpa": case.material.Fy,
+                        "Fu_mpa": case.material.Fu,
+                        "Ag_mm2": evaluation["Ag_mm2"],
+                        "Ae_mm2": evaluation["Ae_mm2"],
+                        "Pu_tension_kn": demand,
+                    },
+                    "intermediate": {
+                        "Pn_y_N": evaluation["Pn_y_N"],
+                        "Pn_r_N": evaluation["Pn_r_N"],
+                        "yielding_capacity_kn": evaluation["yielding_capacity"],
+                        "rupture_capacity_kn": evaluation["rupture_capacity"],
+                        "governing_limit_state": evaluation["governing_limit_state"],
+                    },
+                    "capacity_kn": capacity,
+                }
+            },
         )

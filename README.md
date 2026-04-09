@@ -1,51 +1,67 @@
-# StructureLab HFS: Steel Design Engine
+# StructureLab HFS
 
-Este repositorio contiene un motor de diseño estructural en acero estricto y de nivel de producción, fundamentado en la especificación AISC 360-22. Está construido en Python siguiendo un esquema riguroso de arquitectura en capas (Layered / Domain-Driven Architecture).
+Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 
-## Estructura del Repositorio
+## Estado actual
 
-La arquitectura asegura que las reglas del negocio y cálculos matemáticos puros estén separados completamente de los casos de uso, repositorios de datos y mecanismos de entrada/salida de la aplicación:
+- Arquitectura por capas (`codes`, `domain`, `sections`, `engine`).
+- Capitulo D (tension) y F2 (flexion mayor) implementados.
+- Capitulo E (compresion) implementado para E3, E4, E5 y E7.
+- Politica estricta: si una regla aplicable no puede evaluarse por datos faltantes, el caso falla con error estructurado.
+- Los checks axiales reportan clasificacion de elementos (`non_slender`/`slender`) en `checks[].details.element_classification`.
+
+## Estructura
 
 ```text
-├── a360-22w.pdf                 # Especificación original AISC 360-22.
-├── data/
-│   └── sections.xlsx            # Base de datos de perfiles en acero (W, HSS, etc.)
-├── examples/
-│   └── case_001.json            # Ejemplo de payload (cargas, material, dimensiones)
-├── src/
-│   └── steel_design/
-│       ├── codes/               # Fórmulas de ingeniería puras agnósticas a negocio (AISC 360-22)
-│       ├── domain/              # Reglas de validación, evaluación de DCRs y excepciones
-│       ├── sections/            # Lógica de persistencia, lectura del Excel y Modelos Geométricos
-│       ├── engine.py            # Orquestador del pipeline (no hace cálculos directos)
-│       ├── models.py            # Modelos Pydantic (SteelCase, CheckResult)
-│       └── run.py               # Ejecutable CLI
-└── requirements.txt             # Dependencias del proyecto (Pydantic, Openpyxl)
+data/sections.xlsx               Catalogo de perfiles
+examples/*.json                  Casos CLI de referencia
+src/steel_design/codes           Formulas normativas puras
+src/steel_design/domain          Reglas, validaciones, enrutamiento, errores
+src/steel_design/sections        Carga y modelos de secciones
+src/steel_design/engine.py       Pipeline principal
+src/steel_design/run.py          CLI
+tests/                           Suite unitaria e integracion
+docs/aisc_360_22_traceability.md Matriz de trazabilidad normativa
 ```
 
-## Flujo de Trabajo (Pipeline)
+## Instalacion
 
-El orquestador central (`engine.py`) asegura que cualquier caso de diseño fluya direccionalmente sin saltarse pasos:
-1. **Validation**: Revisa la integridad física de las variables de entrada usando `domain/validation.py`.
-2. **Repository Fetch**: Extrae el perfil mediante el `sections/repository.py` el cual usa en el backend la lectura del Excel estructurado.
-3. **Execution**: Lanza una lista de reglas registradas (`FlexureRule`, `AxialRule`, etc.) que internamente invocan a `evaluators` correspondientes y luego a los cálculos base provistos en `codes/`.
-4. **Aggregation**: Convierte los resultados en respuestas formateadas indicando Capacidad, Demanda, DCR y Estado (PASS/FAIL).
-
-## Instalación y Ejecución
-
-Primero, instala las dependencias usando el entorno virtual:
 ```bash
-# Windows
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Para ejecutar el motor desde la consola a modo de prueba:
+## Uso CLI
+
 ```bash
-python -m src.steel_design.run examples/case_001.json
+python -m src.steel_design.run examples/w_shape_case.json
 ```
 
----
+Salida por consola: resumen de checks (sin `details`).
 
-*Nota: Los modelos subyacentes se encuentran en pleno desarrollo. El motor ha sido diseñado para mapear fielmente los lineamientos del `a360-22w.pdf` incluido en los entregables base.*
+Salida detallada por ejecucion: se genera automaticamente un JSON en `results/<TIPO_PERFIL>/`.
+Incluye `input`, `output` completo y `memory` tipo memoria de calculo:
+- `memory.global_summary`: capacidad global gobernante (minima entre clausulas) y clausulas criticas.
+- `memory.clause_results`: desarrollo por clausula con variables intermedias, factores de diseno y capacidad.
+
+## Ejemplos
+
+Casos actualmente ejecutables (exit code 0):
+
+- `examples/w_shape_case.json`
+- `examples/channel_case.json`
+- `examples/single_angle_case.json`
+- `examples/rectangular_hss_case.json`
+- `examples/circular_hss_case.json`
+
+Casos de error esperado (exit code != 0):
+
+- `examples/double_angle_case.json` (faltan `J` y `Cw` en hoja `2L` para E4)
+
+## Nota de entrada para E4
+
+En `factors` se pueden incluir offsets de arriostramiento:
+
+- `xa` (mm): bracing offset distance along x-axis
+- `ya` (mm): bracing offset distance along y-axis

@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "generated_at_utc": "20260409T200411247952Z",
+    "profile_type": "CHANNEL",
+    "section_name": "C15X50",
+    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\examples\\channel_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "input": {
+    "section_name": "C15X50",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 300.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 4200.0,
+      "Ly": 4200.0,
+      "Lz": 4200.0,
+      "Lb": 4200.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 25.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "Ae": 9000.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 300.0,
+        "capacity": 405.254,
+        "dcr": 0.74,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "CHANNEL",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "flange": {
+                "ratio": 5.72,
+                "lambda_r": 13.483215545606152,
+                "classification": "non_slender"
+              },
+              "web": {
+                "ratio": 17.3,
+                "lambda_r": 35.874984219559224,
+                "classification": "non_slender"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 300.0,
+        "capacity": 402.473,
+        "dcr": 0.745,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "CHANNEL",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "flange": {
+                "ratio": 5.72,
+                "lambda_r": 13.483215545606152,
+                "classification": "non_slender"
+              },
+              "web": {
+                "ratio": 17.3,
+                "lambda_r": 35.874984219559224,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "bracing_offsets_mm": {
+            "xa": 25.0,
+            "ya": 0.0
+          }
+        }
+      }
+    ],
+    "status": "PASS"
+  }
+}

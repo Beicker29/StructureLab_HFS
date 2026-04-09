@@ -1,5 +1,5 @@
 {
-    "section_name": "DBL_L12X12X1_3_8",
+    "section_name": "2L12X12X1-3/8",
     "design_method": "LRFD",
     "material": {
         "Fy": 345.0,
@@ -7,19 +7,26 @@
         "E": 200000.0
     },
     "loads": {
-        "Pu": 150.0,
-        "Mux": 300.0,
-        "Muy": 50.0,
-        "Vu": 30.0
+        "Pu": 250.0,
+        "Mux": 0.0,
+        "Muy": 0.0,
+        "Vu": 0.0
     },
     "lengths": {
         "Lx": 4500.0,
         "Ly": 4500.0,
+        "Lz": 4500.0,
         "Lb": 4500.0
     },
     "factors": {
         "Kx": 1.0,
         "Ky": 1.0,
-        "Cb": 1.0
+        "Kz": 1.0,
+        "Cb": 1.0,
+        "xa": 20.0,
+        "ya": 0.0
+    },
+    "connection": {
+        "Ae": 30000.0
     }
 }

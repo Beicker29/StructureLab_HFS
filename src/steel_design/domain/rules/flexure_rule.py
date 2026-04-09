@@ -11,7 +11,8 @@ class FlexureRule:
         Calculates the DCR for flexure and returns a CheckResult.
         """
         demand = abs(case.loads.Mux)
-        capacity = self.evaluator.evaluate(case, section)
+        evaluation = self.evaluator.evaluate(case, section)
+        capacity = evaluation["capacity"]
         
         dcr = demand / capacity if capacity > 0 else float('inf')
         status = CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL
@@ -22,5 +23,21 @@ class FlexureRule:
             demand=demand,
             capacity=capacity,
             dcr=round(dcr, 3),
-            status=status
+            status=status,
+            details={
+                "memory": {
+                    "clause": "F2",
+                    "inputs": {
+                        "Fy_mpa": evaluation["Fy_mpa"],
+                        "Zx_mm3": evaluation["Zx_mm3"],
+                        "Mux_kn_m": demand,
+                    },
+                    "intermediate": {
+                        "Mp_Nmm": evaluation["Mp_Nmm"],
+                        "Mn_Nmm": evaluation["Mn_Nmm"],
+                    },
+                    "capacity_kn_m": capacity,
+                    "design_method": evaluation["design_method"],
+                }
+            },
         )

@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "generated_at_utc": "20260409T194324164682Z",
+    "profile_type": "CIRCULAR_HSS",
+    "section_name": "PTER114.3X2.5mm",
+    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\examples\\circular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "input": {
+    "section_name": "PTER114.3X2.5mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 290.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 180.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3500.0,
+      "Ly": 3500.0,
+      "Lz": 3500.0,
+      "Lb": 3500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "Ae": 500.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 180.0,
+        "capacity": 132.037,
+        "dcr": 1.363,
+        "status": "FAIL",
+        "details": {
+          "element_classification": {
+            "profile_type": "CIRCULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall": {
+                "ratio": 47.16129032258064,
+                "lambda_r": 75.86206896551725,
+                "classification": "non_slender"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 180.0,
+        "capacity": 213.133,
+        "dcr": 0.845,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "CIRCULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall": {
+                "ratio": 47.16129032258064,
+                "lambda_r": 75.86206896551725,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "bracing_offsets_mm": {
+            "xa": 0.0,
+            "ya": 0.0
+          }
+        }
+      }
+    ],
+    "status": "FAIL"
+  }
+}

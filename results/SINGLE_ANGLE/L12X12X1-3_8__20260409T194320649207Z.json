@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "generated_at_utc": "20260409T194320649207Z",
+    "profile_type": "SINGLE_ANGLE",
+    "section_name": "L12X12X1-3/8",
+    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\examples\\single_angle_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "input": {
+    "section_name": "L12X12X1-3/8",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 250.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 220.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3200.0,
+      "Ly": 3200.0,
+      "Lz": 3200.0,
+      "Lb": 3200.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0
+    },
+    "connection": {
+      "Ae": 20000.0,
+      "angle_compression_mode": "one_leg"
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 220.0,
+        "capacity": 4244.497,
+        "dcr": 0.052,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "SINGLE_ANGLE",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "leg": {
+                "ratio": 8.7,
+                "lambda_r": 12.727922061357857,
+                "classification": "non_slender"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Axial Compression (Single Angle)",
+        "code": "AISC 360-22",
+        "clause": "E5-1a",
+        "demand": 220.0,
+        "capacity": 2719.691,
+        "dcr": 0.081,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "SINGLE_ANGLE",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "leg": {
+                "ratio": 8.7,
+                "lambda_r": 12.727922061357857,
+                "classification": "non_slender"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "status": "PASS"
+  }
+}

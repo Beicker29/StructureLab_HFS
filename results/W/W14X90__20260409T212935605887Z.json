@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "generated_at_utc": "20260409T212935605887Z",
+    "profile_type": "W",
+    "section_name": "W14X90",
+    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\tests\\.tmp_tests\\cli_7f72b683d1004dec9c9b15bdad21fcbd\\case.json",
+    "sections_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\tests\\.tmp_tests\\cli_7f72b683d1004dec9c9b15bdad21fcbd\\sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 465.75,
+      "governing_clauses": [
+        "F2-1"
+      ],
+      "governing_check_names": [
+        "Flexure Major F2"
+      ],
+      "overall_status": "PASS"
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "F2-1",
+        "name": "Flexure Major F2",
+        "calculations": {
+          "clause": "F2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "Zx_mm3": 1500000.0,
+            "Mux_kn_m": 200.0
+          },
+          "intermediate": {
+            "Mp_Nmm": 517500000.0,
+            "Mn_Nmm": 517500000.0
+          },
+          "capacity_kn_m": 465.75,
+          "design_method": "DesignMethod.LRFD"
+        }
+      }
+    ]
+  },
+  "input": {
+    "section_name": "W14X90",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 0.0,
+      "Mux": 200.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0
+    },
+    "connection": {
+      "Ae": null
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Flexure Major F2",
+        "code": "AISC 360-22",
+        "clause": "F2-1",
+        "demand": 200.0,
+        "capacity": 465.75,
+        "dcr": 0.429,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS"
+  }
+}

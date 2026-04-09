@@ -1,5 +1,5 @@
 {
-    "section_name": "L6X6X1_2",
+    "section_name": "L12X12X1-3/8",
     "design_method": "LRFD",
     "material": {
         "Fy": 250.0,
@@ -7,21 +7,25 @@
         "E": 200000.0
     },
     "loads": {
-        "Pu": 100.0,
-        "Mux": 15.0,
-        "Muy": 10.0,
-        "Vu": 5.0
+        "Pu": 220.0,
+        "Mux": 0.0,
+        "Muy": 0.0,
+        "Vu": 0.0
     },
     "lengths": {
-        "Lx": 3000.0,
-        "Ly": 3000.0,
-        "Lb": 3000.0
+        "Lx": 3200.0,
+        "Ly": 3200.0,
+        "Lz": 3200.0,
+        "Lb": 3200.0
     },
     "factors": {
         "Kx": 1.0,
-        "Ky": 1.0
+        "Ky": 1.0,
+        "Kz": 1.0,
+        "Cb": 1.0
     },
     "connection": {
-        "Ae": 2500.0
+        "Ae": 20000.0,
+        "angle_compression_mode": "one_leg"
     }
 }

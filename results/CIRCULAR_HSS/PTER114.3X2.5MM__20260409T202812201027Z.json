@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "generated_at_utc": "20260409T202812201027Z",
+    "profile_type": "CIRCULAR_HSS",
+    "section_name": "PTER114.3X2.5mm",
+    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\examples\\circular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 132.037,
+      "governing_clauses": [
+        "E3-1"
+      ],
+      "governing_check_names": [
+        "Axial Compression (Flexural Buckling)"
+      ],
+      "overall_status": "FAIL"
+    },
+    "clause_results": [
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "demand": 180.0,
+        "capacity": 132.037,
+        "dcr": 1.363,
+        "status": "FAIL",
+        "details": {
+          "element_classification": {
+            "profile_type": "CIRCULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall": {
+                "ratio": 47.16129032258064,
+                "lambda_r": 75.86206896551725,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "memory": {
+            "clause": "E3",
+            "inputs": {
+              "Fy_mpa": 290.0,
+              "E_mpa": 200000.0,
+              "Ag_mm2": 817.8881219217939,
+              "Kx": 1.0,
+              "Ky": 1.0,
+              "Lx_mm": 3500.0,
+              "Ly_mm": 3500.0,
+              "rx_mm": 39.597673937366565,
+              "ry_mm": 39.597673937366565
+            },
+            "intermediate": {
+              "fe_x_mpa": 252.6579701457391,
+              "fe_y_mpa": 252.6579701457391,
+              "fe_governing_mpa": 252.6579701457391,
+              "governing_axis": "y",
+              "fcr_mpa": 179.37349374718607,
+              "pn_n": 146707.44992343665,
+              "pn_kn": 146.70744992343666
+            },
+            "design_factor": {
+              "design_method": "LRFD",
+              "phi": 0.9,
+              "omega": null,
+              "capacity_expression": "phi*Pn"
+            },
+            "capacity_kn": 132.036704931093
+          }
+        }
+      },
+      {
+        "clause": "E4-1",
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "demand": 180.0,
+        "capacity": 213.133,
+        "dcr": 0.845,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "CIRCULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall": {
+                "ratio": 47.16129032258064,
+                "lambda_r": 75.86206896551725,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "bracing_offsets_mm": {
+            "xa": 0.0,
+            "ya": 0.0
+          },
+          "memory": {
+            "clause": "E4",
+            "inputs": {
+              "Fy_mpa": 290.0,
+              "E_mpa": 200000.0,
+              "G_mpa": 77200.0,
+              "Ag_mm2": 817.8881219217939,
+              "Kz": 1.0,
+              "Lz_mm": 3500.0,
+              "Ky": 1.0,
+              "Ly_mm": 3500.0,
+              "ry_mm": 39.597673937366565,
+              "J_mm4": 2564857.5338908387,
+              "Cw_mm6": 0.0,
+              "H": null
+            },
+            "intermediate": {
+              "ro_mm": 55.99956752065143,
+              "ro_source": "derived_from_ix_iy_ag",
+              "fe_y_mpa": 252.6579701457391,
+              "fe_z_mpa": 77199.99999999999,
+              "fe_governing_mpa": 77199.99999999999,
+              "e4_mode": "torsional",
+              "fcr_mpa": 289.54439861871265,
+              "pn_n": 236814.92439923412,
+              "pn_kn": 236.81492439923412
+            },
+            "design_factor": {
+              "design_method": "LRFD",
+              "phi": 0.9,
+              "omega": null,
+              "capacity_expression": "phi*Pn"
+            },
+            "capacity_kn": 213.1334319593107
+          }
+        }
+      }
+    ]
+  },
+  "input": {
+    "section_name": "PTER114.3X2.5mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 290.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 180.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3500.0,
+      "Ly": 3500.0,
+      "Lz": 3500.0,
+      "Lb": 3500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "Ae": 500.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 180.0,
+        "capacity": 132.037,
+        "dcr": 1.363,
+        "status": "FAIL",
+        "details": {
+          "element_classification": {
+            "profile_type": "CIRCULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall": {
+                "ratio": 47.16129032258064,
+                "lambda_r": 75.86206896551725,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "memory": {
+            "clause": "E3",
+            "inputs": {
+              "Fy_mpa": 290.0,
+              "E_mpa": 200000.0,
+              "Ag_mm2": 817.8881219217939,
+              "Kx": 1.0,
+              "Ky": 1.0,
+              "Lx_mm": 3500.0,
+              "Ly_mm": 3500.0,
+              "rx_mm": 39.597673937366565,
+              "ry_mm": 39.597673937366565
+            },
+            "intermediate": {
+              "fe_x_mpa": 252.6579701457391,
+              "fe_y_mpa": 252.6579701457391,
+              "fe_governing_mpa": 252.6579701457391,
+              "governing_axis": "y",
+              "fcr_mpa": 179.37349374718607,
+              "pn_n": 146707.44992343665,
+              "pn_kn": 146.70744992343666
+            },
+            "design_factor": {
+              "design_method": "LRFD",
+              "phi": 0.9,
+              "omega": null,
+              "capacity_expression": "phi*Pn"
+            },
+            "capacity_kn": 132.036704931093
+          }
+        }
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 180.0,
+        "capacity": 213.133,
+        "dcr": 0.845,
+        "status": "PASS",
+        "details": {
+          "element_classification": {
+            "profile_type": "CIRCULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall": {
+                "ratio": 47.16129032258064,
+                "lambda_r": 75.86206896551725,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "bracing_offsets_mm": {
+            "xa": 0.0,
+            "ya": 0.0
+          },
+          "memory": {
+            "clause": "E4",
+            "inputs": {
+              "Fy_mpa": 290.0,
+              "E_mpa": 200000.0,
+              "G_mpa": 77200.0,
+              "Ag_mm2": 817.8881219217939,
+              "Kz": 1.0,
+              "Lz_mm": 3500.0,
+              "Ky": 1.0,
+              "Ly_mm": 3500.0,
+              "ry_mm": 39.597673937366565,
+              "J_mm4": 2564857.5338908387,
+              "Cw_mm6": 0.0,
+              "H": null
+            },
+            "intermediate": {
+              "ro_mm": 55.99956752065143,
+              "ro_source": "derived_from_ix_iy_ag",
+              "fe_y_mpa": 252.6579701457391,
+              "fe_z_mpa": 77199.99999999999,
+              "fe_governing_mpa": 77199.99999999999,
+              "e4_mode": "torsional",
+              "fcr_mpa": 289.54439861871265,
+              "pn_n": 236814.92439923412,
+              "pn_kn": 236.81492439923412
+            },
+            "design_factor": {
+              "design_method": "LRFD",
+              "phi": 0.9,
+              "omega": null,
+              "capacity_expression": "phi*Pn"
+            },
+            "capacity_kn": 213.1334319593107
+          }
+        }
+      }
+    ],
+    "status": "FAIL"
+  }
+}

@@ -1,21 +1,24 @@
-# Steel Design Base Engine 
+# Steel Design Engine (Core)
 
-Motor estructural AISC para análisis de elementos bajo AISC 360-22 (a360-22w.pdf).
+Base del motor AISC 360-22.
 
-## Reglas Estrictas de Modificación
+## Reglas de contribucion
 
-Si vas a contribuir o añadir un nuevo estado límite a este motor de cálculo, es **obligatorio** cumplir esta estructura:
+1. `codes/`: funciones matematicas puras, sin dependencias de modelos de aplicacion.
+2. `domain/`: reglas de negocio, validaciones y evaluacion de DCR.
+3. `sections/`: lectura de catalogo y modelo de propiedades geometricas.
+4. `engine.py`: orquesta validacion -> seccion -> reglas -> agregacion.
+5. `domain/routing/profile_router.py`: punto unico para registrar reglas por tipo de perfil.
 
-1. **(No mezclar capas) `codes/`**: Este directorio aloja cálculos matemáticos de la norma en crudo.
-   - Las funciones aquí deben recibir datos flotantes puros (por ejemplo: `calculate_shear(Fy: float, Aw: float, ...)`).
-   - No pueden conocer ni importar a `SteelCase` o `Section`. Son agnósticas al programa principal.
-   
-2. **(Reglas de Negocio) `domain/`**:
-   - `evaluators/`: Aquí tomas el `SteelCase` y el `Section`, extraes las variables como área y base del patín, y llamas a la función que escribiste en `codes/`.
-   - `rules/`: Tomas el evaluador, tomas las cargas actuantes del Payload como demanda, computas el índice de Demanda/Capacidad (DCR) y armas el diccionario `CheckResult` con el STATUS final (`PASS`/`FAIL`).
+## Contrato principal del caso (`SteelCase`)
 
-3. **(Pipeline) `engine.py`**:
-   - Si creaste un nuevo Rule, repórtalo en el array `self.rules` dentro de `engine.py`. El orquestador se encargará del resto de manera automática.
+- `material.E` debe ser `200000` MPa.
+- Para compresion capitulo E:
+  - `lengths` requiere `Lx`, `Ly`, `Lz`, `Lb`.
+  - `factors` requiere `Kx`, `Ky`, `Kz` (`Cb` para flexion) y admite `xa`, `ya` para E4.
+  - Angulo simple en compresion requiere `connection.angle_compression_mode`.
 
-## Fichas y Formato
-El motor leerá la información de catálogo (Ix, Iy, Zx, variables elásticas y geométricas) directamente del cargador de Excel en la capa de datos (`sections/`). Si necesitas nuevas propiedades geométricas, modifíca el modelo Pydantic `sections/models.py`.
+## Politica de seguridad
+
+- Fail-hard ante datos insuficientes de una regla aplicable.
+- Errores estructurados en CLI (`type`, `code`, `message`, `details`, `stage`).

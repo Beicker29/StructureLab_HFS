@@ -29,13 +29,20 @@ class TensionEvaluator:
         if avail_y <= avail_r:
             governing_capacity = avail_y
             governing_clause = "D2-1 (Yielding)"
+            governing_limit_state = "yielding"
         else:
             governing_capacity = avail_r
             governing_clause = "D2-2 (Rupture)"
+            governing_limit_state = "rupture"
             
         return {
             "capacity": governing_capacity,
             "clause": governing_clause,
+            "governing_limit_state": governing_limit_state,
+            "Ag_mm2": Ag,
+            "Ae_mm2": Ae,
+            "Pn_y_N": Pn_y,
+            "Pn_r_N": Pn_r,
             "yielding_capacity": avail_y,
-            "rupture_capacity": avail_r
+            "rupture_capacity": avail_r,
         }

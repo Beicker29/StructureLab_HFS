@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "generated_at_utc": "20260409T194322375683Z",
+    "profile_type": "RECTANGULAR_HSS",
+    "section_name": "PTE50X30X2mm",
+    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\examples\\rectangular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "input": {
+    "section_name": "PTE50X30X2mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 317.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 80.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "Ae": 200.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 80.0,
+        "capacity": 7.027,
+        "dcr": 11.385,
+        "status": "FAIL",
+        "details": {
+          "element_classification": {
+            "profile_type": "RECTANGULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall_b": {
+                "ratio": 13.129032258064516,
+                "lambda_r": 35.165225151232974,
+                "classification": "non_slender"
+              },
+              "wall_h": {
+                "ratio": 23.881720430107528,
+                "lambda_r": 35.165225151232974,
+                "classification": "non_slender"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 80.0,
+        "capacity": 78.223,
+        "dcr": 1.023,
+        "status": "FAIL",
+        "details": {
+          "element_classification": {
+            "profile_type": "RECTANGULAR_HSS",
+            "overall": "non_slender",
+            "is_slender": false,
+            "elements": {
+              "wall_b": {
+                "ratio": 13.129032258064516,
+                "lambda_r": 35.165225151232974,
+                "classification": "non_slender"
+              },
+              "wall_h": {
+                "ratio": 23.881720430107528,
+                "lambda_r": 35.165225151232974,
+                "classification": "non_slender"
+              }
+            }
+          },
+          "bracing_offsets_mm": {
+            "xa": 0.0,
+            "ya": 0.0
+          }
+        }
+      }
+    ],
+    "status": "FAIL"
+  }
+}
