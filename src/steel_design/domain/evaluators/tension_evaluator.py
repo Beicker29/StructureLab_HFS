@@ -8,10 +8,10 @@ class TensionEvaluator:
         Evaluates the available tensile strength (kips) and returns a dict with details
         for both limit states: yielding and rupture.
         """
-        # Section area
         Ag = section.area
-        # Effective area
-        Ae = case.connection.Ae if case.connection.Ae is not None else Ag
+        an = case.connection.An or 0.0
+        u_factor = case.connection.U or 0.0
+        ae = u_factor * an
         
         # 1. Tensile Yielding
         Pn_y = tension_calc.calculate_Pn_yielding(case.material.Fy, Ag)
@@ -20,7 +20,7 @@ class TensionEvaluator:
         )
         
         # 2. Tensile Rupture
-        Pn_r = tension_calc.calculate_Pn_rupture(case.material.Fu, Ae)
+        Pn_r = tension_calc.calculate_Pn_rupture(case.material.Fu, ae)
         avail_r = tension_calc.calculate_available_tensile_strength(
             Pn_r, case.design_method, limit_state="rupture"
         )
@@ -40,7 +40,9 @@ class TensionEvaluator:
             "clause": governing_clause,
             "governing_limit_state": governing_limit_state,
             "Ag_mm2": Ag,
-            "Ae_mm2": Ae,
+            "An_mm2": an,
+            "U_factor": u_factor,
+            "Ae_mm2": ae,
             "Pn_y_N": Pn_y,
             "Pn_r_N": Pn_r,
             "yielding_capacity": avail_y,

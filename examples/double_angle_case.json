@@ -26,7 +26,5 @@
         "xa": 20.0,
         "ya": 0.0
     },
-    "connection": {
-        "Ae": 30000.0
-    }
+    "connection": {}
 }

@@ -170,8 +170,11 @@ def main():
     # Run
     try:
         result = engine.run(case)
-        section = repo.get(case.section_name)
-        profile_type = section.type if section is not None else "UNKNOWN"
+        if case.custom_section is not None:
+            profile_type = case.custom_section.type.value
+        else:
+            section = repo.get(case.section_name)
+            profile_type = section.type if section is not None else "UNKNOWN"
         _write_detailed_results_file(
             result=result,
             case=case,

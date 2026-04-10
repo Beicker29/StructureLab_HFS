@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generated_at_utc": "20260409T213030096106Z",
+    "generated_at_utc": "20260410T005739790581Z",
     "profile_type": "W",
     "section_name": "W14X90",
-    "input_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\tests\\.tmp_tests\\cli_16f95b3e08e1447aaab8d0a119ca5ead\\case.json",
-    "sections_file": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\tests\\.tmp_tests\\cli_16f95b3e08e1447aaab8d0a119ca5ead\\sections.xlsx"
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\.tmp_tests\\cli_2ace0349e98345149637dbc36333c0c2\\case.json",
+    "sections_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\.tmp_tests\\cli_2ace0349e98345149637dbc36333c0c2\\sections.xlsx"
   },
   "memory": {
     "global_summary": {
@@ -65,9 +65,7 @@
       "Kz": 1.0,
       "Cb": 1.0
     },
-    "connection": {
-      "Ae": null
-    }
+    "connection": {}
   },
   "output": {
     "checks": [

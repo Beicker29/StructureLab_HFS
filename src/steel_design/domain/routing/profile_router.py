@@ -17,8 +17,10 @@ class ProfileType:
     RECTANGULAR_HSS = "RECTANGULAR_HSS"
     CIRCULAR_HSS = "CIRCULAR_HSS"
     SINGLE_ANGLE = "SINGLE_ANGLE"
-    FILLED_RECTANGULAR = "FILLED_RECTANGULAR"
-    FILLED_CIRCULAR = "FILLED_CIRCULAR"
+    SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
+    SOLID_CIRCULAR = "SOLID_CIRCULAR"
+    FILLED_RECTANGULAR = "FILLED_RECTANGULAR"  # Backward compatibility alias
+    FILLED_CIRCULAR = "FILLED_CIRCULAR"  # Backward compatibility alias
 
 
 @dataclass(frozen=True)
@@ -80,8 +82,10 @@ PROFILE_RULE_MAP = {
     ProfileType.RECTANGULAR_HSS: ["D2", "E3", "E4", "E7", "F7", "G4", "H1"],
     ProfileType.CIRCULAR_HSS: ["D2", "E3", "E4", "E7", "F8", "G5", "H1"],
     ProfileType.SINGLE_ANGLE: ["D2", "E3", "E5", "E7", "F10", "G2", "H1"],
-    ProfileType.FILLED_RECTANGULAR: ["E3", "E4", "E7", "H1", "I2"],
-    ProfileType.FILLED_CIRCULAR: ["E3", "E4", "E7", "H1", "I2"],
+    ProfileType.SOLID_RECTANGULAR: ["D2", "E3"],
+    ProfileType.SOLID_CIRCULAR: ["D2", "E3"],
+    ProfileType.FILLED_RECTANGULAR: ["D2", "E3"],
+    ProfileType.FILLED_CIRCULAR: ["D2", "E3"],
 }
 
 

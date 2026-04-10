@@ -25,7 +25,6 @@
         "Cb": 1.0
     },
     "connection": {
-        "Ae": 20000.0,
         "angle_compression_mode": "one_leg"
     }
 }

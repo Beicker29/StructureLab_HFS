@@ -16,7 +16,7 @@ def _compression_case(section_name: str, pu: float, *, e: float = 200000.0, mode
         loads=Loads(Pu=pu, Mux=0.0, Muy=0.0, Vu=0.0),
         lengths=Lengths(Lx=3000.0, Ly=3000.0, Lz=3000.0, Lb=3000.0),
         factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0, xa=xa, ya=ya),
-        connection=Connection(Ae=1000.0, angle_compression_mode=mode),
+        connection=Connection(angle_compression_mode=mode),
     )
 
 

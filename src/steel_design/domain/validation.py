@@ -22,3 +22,19 @@ def validate_case(case: SteelCase):
         raise ValidationError("Cb must be > 0.")
     if case.factors.xa < 0 or case.factors.ya < 0:
         raise ValidationError("Bracing offsets xa and ya must be >= 0.")
+    if case.loads.Pu < 0.0:
+        if case.connection.An is None or case.connection.An <= 0.0:
+            raise ValidationError(
+                "connection.An is required and must be > 0 for tension cases.",
+                details={"required_field": "connection.An"},
+            )
+        if case.connection.U is None:
+            raise ValidationError(
+                "connection.U is required for tension cases.",
+                details={"required_field": "connection.U"},
+            )
+        if case.connection.U <= 0.0 or case.connection.U > 1.0:
+            raise ValidationError(
+                "connection.U must satisfy 0 < U <= 1 for tension cases.",
+                details={"U_received": case.connection.U},
+            )

@@ -52,7 +52,7 @@ def _write_case(path: Path, *, pu: float, mux: float, muy: float, vu: float):
         "loads": {"Pu": pu, "Mux": mux, "Muy": muy, "Vu": vu},
         "lengths": {"Lx": 3000.0, "Ly": 3000.0, "Lz": 3000.0, "Lb": 3000.0},
         "factors": {"Kx": 1.0, "Ky": 1.0, "Kz": 1.0, "Cb": 1.0},
-        "connection": {"Ae": None},
+        "connection": {},
     }
     path.write_text(json.dumps(payload), encoding="utf-8")
 

@@ -7,6 +7,8 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 - Arquitectura por capas (`codes`, `domain`, `sections`, `engine`).
 - Capitulo D (tension) y F2 (flexion mayor) implementados.
 - Capitulo E (compresion) implementado para E3, E4, E5 y E7.
+- Traccion con D3 estricto (`Ae = U*An`) para todos los perfiles.
+- Secciones macizas custom por JSON (`SOLID_CIRCULAR`, `SOLID_RECTANGULAR`) con alcance axial (D2/E3).
 - Politica estricta: si una regla aplicable no puede evaluarse por datos faltantes, el caso falla con error estructurado.
 - Los checks axiales reportan clasificacion de elementos (`non_slender`/`slender`) en `checks[].details.element_classification`.
 
@@ -54,6 +56,8 @@ Casos actualmente ejecutables (exit code 0):
 - `examples/single_angle_case.json`
 - `examples/rectangular_hss_case.json`
 - `examples/circular_hss_case.json`
+- `examples/solid_circular_case.json`
+- `examples/solid_rectangular_case.json`
 
 Casos de error esperado (exit code != 0):
 
@@ -65,3 +69,12 @@ En `factors` se pueden incluir offsets de arriostramiento:
 
 - `xa` (mm): bracing offset distance along x-axis
 - `ya` (mm): bracing offset distance along y-axis
+
+## Nota de entrada para traccion (D3 estricto)
+
+Si `loads.Pu < 0`, en `connection` se requiere:
+
+- `An` (mm2)
+- `U` (0 < U <= 1)
+
+El motor calcula `Ae = U*An` y valida que `Ae <= Ag`.

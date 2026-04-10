@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generated_at_utc": "20260409T212621741522Z",
+    "generated_at_utc": "20260410T005741723168Z",
     "profile_type": "W",
     "section_name": "W12X26",
-    "input_file": "examples/w_shape_case.json",
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\w_shape_case.json",
     "sections_file": "data/sections.xlsx"
   },
   "memory": {
@@ -18,6 +18,25 @@
         "Axial Compression (Slender Elements)"
       ],
       "overall_status": "FAIL"
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "W",
+        "overall": "slender",
+        "is_slender": true,
+        "elements": {
+          "flange": {
+            "ratio": 8.54,
+            "lambda_r": 13.483215545606152,
+            "classification": "non_slender"
+          },
+          "web": {
+            "ratio": 47.2,
+            "lambda_r": 35.874984219559224,
+            "classification": "slender"
+          }
+        }
+      }
     },
     "clause_results": [
       {
@@ -58,25 +77,6 @@
             "capacity_expression": "phi*Pn"
           },
           "capacity_kn": 315.25264624576397
-        },
-        "context": {
-          "element_classification": {
-            "profile_type": "W",
-            "overall": "slender",
-            "is_slender": true,
-            "elements": {
-              "flange": {
-                "ratio": 8.54,
-                "lambda_r": 13.483215545606152,
-                "classification": "non_slender"
-              },
-              "web": {
-                "ratio": 47.2,
-                "lambda_r": 35.874984219559224,
-                "classification": "slender"
-              }
-            }
-          }
         }
       },
       {
@@ -131,25 +131,6 @@
             "capacity_expression": "phi*Pn"
           },
           "capacity_kn": 749.9864746684226
-        },
-        "context": {
-          "element_classification": {
-            "profile_type": "W",
-            "overall": "slender",
-            "is_slender": true,
-            "elements": {
-              "flange": {
-                "ratio": 8.54,
-                "lambda_r": 13.483215545606152,
-                "classification": "non_slender"
-              },
-              "web": {
-                "ratio": 47.2,
-                "lambda_r": 35.874984219559224,
-                "classification": "slender"
-              }
-            }
-          }
         }
       },
       {
@@ -196,25 +177,6 @@
             "capacity_expression": "phi*Pn"
           },
           "capacity_kn": 315.25264624576397
-        },
-        "context": {
-          "element_classification": {
-            "profile_type": "W",
-            "overall": "slender",
-            "is_slender": true,
-            "elements": {
-              "flange": {
-                "ratio": 8.54,
-                "lambda_r": 13.483215545606152,
-                "classification": "non_slender"
-              },
-              "web": {
-                "ratio": 47.2,
-                "lambda_r": 35.874984219559224,
-                "classification": "slender"
-              }
-            }
-          }
         }
       }
     ]
@@ -247,9 +209,7 @@
       "xa": 0.0,
       "ya": 0.0
     },
-    "connection": {
-      "Ae": 1000.0
-    }
+    "connection": {}
   },
   "output": {
     "checks": [

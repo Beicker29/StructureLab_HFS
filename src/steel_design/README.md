@@ -13,10 +13,18 @@ Base del motor AISC 360-22.
 ## Contrato principal del caso (`SteelCase`)
 
 - `material.E` debe ser `200000` MPa.
+- `section_name` es obligatorio incluso para secciones custom.
+- `custom_section` es opcional para definir secciones macizas sin catalogo:
+  - `type`: `SOLID_CIRCULAR` con `diameter`
+  - `type`: `SOLID_RECTANGULAR` con `H` y `B`
 - Para compresion capitulo E:
   - `lengths` requiere `Lx`, `Ly`, `Lz`, `Lb`.
   - `factors` requiere `Kx`, `Ky`, `Kz` (`Cb` para flexion) y admite `xa`, `ya` para E4.
   - Angulo simple en compresion requiere `connection.angle_compression_mode`.
+- Para traccion (`Pu < 0`) se exige D3 estricto:
+  - `connection.An > 0`
+  - `0 < connection.U <= 1`
+  - `Ae = U*An` (sin fallback a `Ae`).
 
 ## Politica de seguridad
 
