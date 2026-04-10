@@ -32,7 +32,27 @@ Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda
 - `lengths.Lx`, `Ly`, `Lz`, `Lb`: `mm`
 - `factors.Kx`, `Ky`, `Kz`, `Cb`: adimensional
 - `factors.xa`, `factors.ya`: `mm` (offset de arriostramiento para E4)
-- `connection.Ae`: `mm2`
+- `connection.An`: `mm2` (traccion, D3)
+- `connection.U`: adimensional (traccion, D3)
+- `custom_section.diameter`, `custom_section.H`, `custom_section.B`: `mm`
+
+### 3.1) Convencion de ejes y factores de estabilidad
+
+- `Lx` (`mm`): longitud no arriostrada para pandeo flexional respecto al eje `x` (eje fuerte).
+- `Ly` (`mm`): longitud no arriostrada para pandeo flexional respecto al eje `y` (eje debil).
+- `Lz` (`mm`): longitud no arriostrada para pandeo torsional o flexo-torsional.
+- `Lb` (`mm`): longitud no arriostrada para pandeo lateral-torsional en flexion.
+- `Kx` (adimensional): factor de longitud efectiva asociado a `Lx`.
+- `Ky` (adimensional): factor de longitud efectiva asociado a `Ly`.
+- `Kz` (adimensional): factor de longitud efectiva asociado a `Lz`.
+- `xa` (`mm`): offset de arriostramiento en direccion del eje `x` (usado en E4).
+- `ya` (`mm`): offset de arriostramiento en direccion del eje `y` (usado en E4).
+
+Reglas de ingreso:
+
+- `Lx`, `Ly`, `Lz`, `Lb` deben ser mayores que `0`.
+- `Kx`, `Ky`, `Kz` deben ser mayores que `0`.
+- `xa`, `ya` se ingresan como magnitudes no negativas (`>= 0`).
 
 ## 4) Constantes normativas usadas por el codigo
 

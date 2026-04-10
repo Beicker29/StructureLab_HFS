@@ -13,7 +13,7 @@ def _build_case(*, pu: float, mux: float, muy: float, vu: float) -> SteelCase:
         loads=Loads(Pu=pu, Mux=mux, Muy=muy, Vu=vu),
         lengths=Lengths(Lx=3000.0, Ly=3000.0, Lz=3000.0, Lb=3000.0),
         factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0),
-        connection=Connection(Ae=None),
+        connection=Connection(),
     )
 
 
@@ -113,6 +113,38 @@ class ProfileRouterTests(unittest.TestCase):
         rules = ProfileRouter.get_rules(case, section)
         rule_names = {rule.__class__.__name__ for rule in rules}
         self.assertIn("AxialE7Rule", rule_names)
+
+    def test_router_uses_only_e3_for_solid_rectangular_compression(self):
+        case = _build_case(pu=600.0, mux=0.0, muy=0.0, vu=0.0)
+        section = Section(
+            name="SR200X100",
+            type="SOLID_RECTANGULAR",
+            A=20000.0,
+            Ix=66.6666667e6,
+            Iy=16.6666667e6,
+            rx=57.7350269,
+            ry=28.8675135,
+        )
+
+        rules = ProfileRouter.get_rules(case, section)
+        self.assertEqual(1, len(rules))
+        self.assertEqual("AxialE3Rule", rules[0].__class__.__name__)
+
+    def test_router_uses_only_d2_for_solid_circular_tension(self):
+        case = _build_case(pu=-250.0, mux=0.0, muy=0.0, vu=0.0)
+        section = Section(
+            name="SC150",
+            type="SOLID_CIRCULAR",
+            A=17671.4587,
+            Ix=24.852272e6,
+            Iy=24.852272e6,
+            rx=37.5,
+            ry=37.5,
+        )
+
+        rules = ProfileRouter.get_rules(case, section)
+        self.assertEqual(1, len(rules))
+        self.assertEqual("TensionRule", rules[0].__class__.__name__)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Any, Dict, Optional
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, Field, model_validator
 
 class DesignMethod(str, Enum):
     LRFD = "LRFD"
@@ -31,8 +32,37 @@ class AngleCompressionMode(str, Enum):
     ONE_LEG = "one_leg"
     BOTH_LEGS = "both_legs"
 
+
+class CustomSectionType(str, Enum):
+    SOLID_CIRCULAR = "SOLID_CIRCULAR"
+    SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
+
+
+class CustomSection(BaseModel):
+    type: CustomSectionType
+    diameter: Optional[float] = Field(None, description="Diameter for solid circular section (mm)")
+    H: Optional[float] = Field(None, description="Height for solid rectangular section (mm)")
+    B: Optional[float] = Field(None, description="Width for solid rectangular section (mm)")
+
+    @model_validator(mode="after")
+    def validate_dimensions(self):
+        if self.type == CustomSectionType.SOLID_CIRCULAR:
+            if self.diameter is None or self.diameter <= 0.0:
+                raise ValueError("custom_section.diameter must be > 0 for SOLID_CIRCULAR.")
+            if self.H is not None or self.B is not None:
+                raise ValueError("custom_section.H and custom_section.B are only valid for SOLID_RECTANGULAR.")
+            return self
+
+        if self.H is None or self.H <= 0.0 or self.B is None or self.B <= 0.0:
+            raise ValueError("custom_section.H and custom_section.B must be > 0 for SOLID_RECTANGULAR.")
+        if self.diameter is not None:
+            raise ValueError("custom_section.diameter is only valid for SOLID_CIRCULAR.")
+        return self
+
+
 class Connection(BaseModel):
-    Ae: Optional[float] = Field(None, description="Effective net area (mm^2). If None, defaults to Ag.")
+    An: Optional[float] = Field(None, description="Net area for tension rupture (mm^2)")
+    U: Optional[float] = Field(None, description="Shear lag factor for tension rupture (0 < U <= 1)")
     angle_compression_mode: Optional[AngleCompressionMode] = Field(
         None,
         description="Connection mode for single-angle compression (E5).",
@@ -53,6 +83,10 @@ class SteelCase(BaseModel):
     lengths: Lengths
     factors: Factors = Field(default_factory=Factors)
     connection: Connection = Field(default_factory=Connection)
+    custom_section: Optional[CustomSection] = Field(
+        None,
+        description="Optional custom solid section defined directly in input.",
+    )
     design_method: DesignMethod = DesignMethod.LRFD
 
 class CheckResult(BaseModel):

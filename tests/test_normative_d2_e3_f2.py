@@ -38,13 +38,15 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             loads=Loads(Pu=-150.0, Mux=0.0, Muy=0.0, Vu=0.0),
             lengths=Lengths(Lx=3000.0, Ly=3000.0, Lz=3000.0, Lb=3000.0),
             factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0),
-            connection=Connection(Ae=15000.0),
+            connection=Connection(An=18000.0, U=0.8),
         )
         result = TensionRule().check(case, self._section())
 
         self.assertTrue(result.clause.startswith("D2-"))
         self.assertGreater(result.capacity, 0.0)
         self.assertEqual(150.0, result.demand)
+        self.assertAlmostEqual(14400.0, result.details["memory"]["inputs"]["Ae_mm2"])
+        self.assertEqual("Ae = U*An", result.details["memory"]["intermediate"]["d3_effective_net_area_expression"])
 
     def test_E3_axial_rule_returns_clause_and_positive_capacity_kN(self):
         fe = axial_calc.calculate_Fe_flexural(200000.0, 1.0, 3000.0, 90.0)
