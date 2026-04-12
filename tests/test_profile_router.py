@@ -127,8 +127,9 @@ class ProfileRouterTests(unittest.TestCase):
         )
 
         rules = ProfileRouter.get_rules(case, section)
+        rule_names = {rule.__class__.__name__ for rule in rules}
         self.assertEqual(1, len(rules))
-        self.assertEqual("AxialE3Rule", rules[0].__class__.__name__)
+        self.assertIn("AxialE3Rule", rule_names)
 
     def test_router_uses_only_d2_for_solid_circular_tension(self):
         case = _build_case(pu=-250.0, mux=0.0, muy=0.0, vu=0.0)
@@ -143,8 +144,10 @@ class ProfileRouterTests(unittest.TestCase):
         )
 
         rules = ProfileRouter.get_rules(case, section)
-        self.assertEqual(1, len(rules))
-        self.assertEqual("TensionRule", rules[0].__class__.__name__)
+        rule_names = {rule.__class__.__name__ for rule in rules}
+        self.assertEqual(2, len(rules))
+        self.assertIn("TensionRule", rule_names)
+        self.assertIn("TensionRuptureRule", rule_names)
 
 
 if __name__ == "__main__":

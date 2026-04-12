@@ -158,6 +158,18 @@ class EngineCliIntegrationTests(unittest.TestCase):
             stdout_payload = json.loads(completed.stdout)
             self.assertIn("checks", stdout_payload)
             self.assertNotIn("details", completed.stdout)
+            self.assertIn("admissibility", stdout_payload)
+            self.assertIn("short", stdout_payload["admissibility"])
+            self.assertEqual("D.1:NO | E.2:SI", stdout_payload["admissibility"]["short"])
+            self.assertIn("D1", stdout_payload["admissibility"])
+            self.assertIn("E2", stdout_payload["admissibility"])
+            self.assertFalse(stdout_payload["admissibility"]["D1"]["applicable"])
+            self.assertFalse(stdout_payload["admissibility"]["D1"]["admissible"])
+            self.assertTrue(stdout_payload["admissibility"]["E2"]["applicable"])
+            self.assertTrue(stdout_payload["admissibility"]["E2"]["admissible"])
+            clauses = {check["clause"] for check in stdout_payload["checks"]}
+            self.assertNotIn("D2-1", clauses)
+            self.assertNotIn("D2-2", clauses)
 
             detailed_files = list((results_dir / "W").glob("*.json"))
             self.assertGreater(len(detailed_files), 0)
@@ -168,10 +180,34 @@ class EngineCliIntegrationTests(unittest.TestCase):
             self.assertIn("clause_results", detailed_payload["memory"])
             self.assertIn("input", detailed_payload)
             self.assertIn("output", detailed_payload)
+            self.assertIn("admissibility", detailed_payload)
+            self.assertEqual("D.1:NO | E.2:SI", detailed_payload["admissibility"]["short"])
+            self.assertIn("inputs", detailed_payload["admissibility"])
+            self.assertIn("limits", detailed_payload["admissibility"])
+            self.assertIn("admissibility", detailed_payload["memory"]["global_summary"])
             self.assertIn("calculations", json.dumps(detailed_payload))
             self.assertNotIn('"details":', json.dumps(detailed_payload["output"]))
             self.assertIn("element_classification", detailed_payload["memory"]["shared_context"])
             self.assertTrue(all("context" not in clause for clause in detailed_payload["memory"]["clause_results"]))
+
+    def test_cli_reports_e2_not_admissible_when_klr_exceeds_200(self):
+        with _temporary_test_dir() as tmp:
+            sections_path = tmp / "sections.xlsx"
+            case_path = tmp / "case.json"
+            _write_excel(
+                sections_path,
+                headers=["shape", "A", "rx", "ry", "Ix", "Iy", "J", "Cw", "bf/2tf", "h/tw"],
+                rows=[["W14X90", 17000.0, 10.0, 10.0, 100.0, 50.0, 3.0, 4.0, 6.0, 20.0]],
+            )
+            _write_case(case_path, pu=300.0, mux=0.0, muy=0.0, vu=0.0)
+
+            completed = self._run_cli(case_path, sections_path)
+
+            self.assertEqual(0, completed.returncode)
+            stdout_payload = json.loads(completed.stdout)
+            self.assertFalse(stdout_payload["admissibility"]["E2"]["admissible"])
+            self.assertTrue(stdout_payload["admissibility"]["E2"]["applicable"])
+            self.assertEqual("D.1:NO | E.2:NO", stdout_payload["admissibility"]["short"])
 
 
 if __name__ == "__main__":

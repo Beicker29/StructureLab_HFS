@@ -1,8 +1,8 @@
 {
-    "section_name": "PTER114.3X2.5mm",
+    "section_name": "PTER4\"X6.00mm",
     "design_method": "LRFD",
     "material": {
-        "Fy": 290.0,
+        "Fy": 241.0,
         "Fu": 400.0,
         "E": 200000.0
     },

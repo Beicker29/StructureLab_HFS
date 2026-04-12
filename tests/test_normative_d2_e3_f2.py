@@ -3,7 +3,7 @@ import unittest
 from src.steel_design.codes.aisc_360_22 import axial_calc, flexure_calc, tension_calc
 from src.steel_design.domain.rules.axial_rules import AxialE3Rule
 from src.steel_design.domain.rules.flexure_rule import FlexureRule
-from src.steel_design.domain.rules.tension_rule import TensionRule
+from src.steel_design.domain.rules.tension_rule import TensionRuptureRule, TensionRule
 from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
 from src.steel_design.sections.models import Section
 
@@ -40,13 +40,21 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             factors=Factors(Kx=1.0, Ky=1.0, Kz=1.0, Cb=1.0),
             connection=Connection(An=18000.0, U=0.8),
         )
-        result = TensionRule().check(case, self._section())
+        result_yield = TensionRule().check(case, self._section())
+        result_rupture = TensionRuptureRule().check(case, self._section())
 
-        self.assertTrue(result.clause.startswith("D2-"))
-        self.assertGreater(result.capacity, 0.0)
-        self.assertEqual(150.0, result.demand)
-        self.assertAlmostEqual(14400.0, result.details["memory"]["inputs"]["Ae_mm2"])
-        self.assertEqual("Ae = U*An", result.details["memory"]["intermediate"]["d3_effective_net_area_expression"])
+        self.assertEqual("D2-1", result_yield.clause)
+        self.assertGreater(result_yield.capacity, 0.0)
+        self.assertEqual(150.0, result_yield.demand)
+
+        self.assertEqual("D2-2", result_rupture.clause)
+        self.assertGreater(result_rupture.capacity, 0.0)
+        self.assertEqual(150.0, result_rupture.demand)
+        self.assertAlmostEqual(14400.0, result_rupture.details["memory"]["inputs"]["Ae_mm2"])
+        self.assertEqual(
+            "Ae = U*An",
+            result_rupture.details["memory"]["intermediate"]["d3_effective_net_area_expression"],
+        )
 
     def test_E3_axial_rule_returns_clause_and_positive_capacity_kN(self):
         fe = axial_calc.calculate_Fe_flexural(200000.0, 1.0, 3000.0, 90.0)

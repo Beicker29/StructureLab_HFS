@@ -2,11 +2,13 @@ import json
 import argparse
 import sys
 import re
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .models import SteelCase
+from .models import CustomSectionType, SteelCase
 from .engine import SteelDesignEngine
+from .sections.models import Section
 from .sections.loader import load_sections_from_excel
 from .sections.repository import SectionRepository
 from .domain.errors import SteelDesignError
@@ -53,10 +55,107 @@ def _build_global_summary(result) -> dict:
     }
 
 
+def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | None:
+    if case.custom_section is None:
+        return repo.get(case.section_name)
+
+    custom = case.custom_section
+    if custom.type == CustomSectionType.SOLID_CIRCULAR:
+        diameter = custom.diameter or 0.0
+        area = math.pi * (diameter**2) / 4.0
+        inertia = math.pi * (diameter**4) / 64.0
+        radius_of_gyration = diameter / 4.0
+        return Section(
+            name=case.section_name,
+            type=custom.type.value,
+            A=area,
+            OD=diameter,
+            Ix=inertia,
+            Iy=inertia,
+            rx=radius_of_gyration,
+            ry=radius_of_gyration,
+        )
+
+    height = custom.H or 0.0
+    width = custom.B or 0.0
+    area = width * height
+    inertia_x = width * (height**3) / 12.0
+    inertia_y = height * (width**3) / 12.0
+    radius_of_gyration_x = math.sqrt(inertia_x / area) if area > 0.0 else 0.0
+    radius_of_gyration_y = math.sqrt(inertia_y / area) if area > 0.0 else 0.0
+    return Section(
+        name=case.section_name,
+        type=custom.type.value,
+        A=area,
+        h=height,
+        b=width,
+        Ix=inertia_x,
+        Iy=inertia_y,
+        rx=radius_of_gyration_x,
+        ry=radius_of_gyration_y,
+    )
+
+
+def _safe_klr(k: float, length: float, radius: float | None) -> float | None:
+    if radius is None or radius <= 0.0 or k <= 0.0 or length <= 0.0:
+        return None
+    return (k * length) / radius
+
+
+def _build_chapter_admissibility(case: SteelCase, section: Section | None) -> dict:
+    pure_axial = abs(case.loads.Mux) <= 1e-9 and abs(case.loads.Muy) <= 1e-9 and abs(case.loads.Vu) <= 1e-9
+    klr_x = _safe_klr(case.factors.Kx, case.lengths.Lx, section.rx if section else None)
+    klr_y = _safe_klr(case.factors.Ky, case.lengths.Ly, section.ry if section else None)
+    valid_klr = [value for value in (klr_x, klr_y) if value is not None]
+    max_klr = max(valid_klr) if valid_klr else None
+    governing_axis = None
+    if max_klr is not None:
+        governing_axis = "x" if klr_x is not None and abs(klr_x - max_klr) <= 1e-9 else "y"
+
+    d1_applicable = pure_axial and case.loads.Pu < 0.0
+    e2_applicable = pure_axial and case.loads.Pu > 0.0
+    d1 = bool(d1_applicable and max_klr is not None and max_klr <= 300.0)
+    e2 = bool(e2_applicable and max_klr is not None and max_klr <= 200.0)
+    return {
+        "D1": d1,
+        "E2": e2,
+        "short": f"D.1:{'SI' if d1 else 'NO'} | E.2:{'SI' if e2 else 'NO'}",
+        "inputs": {
+            "KL_over_r_x": klr_x,
+            "KL_over_r_y": klr_y,
+            "KL_over_r_governing": max_klr,
+            "governing_axis": governing_axis,
+        },
+        "limits": {
+            "D1_max": 300.0,
+            "E2_max": 200.0,
+        },
+        "applicability": {
+            "D1": d1_applicable,
+            "E2": e2_applicable,
+        },
+    }
+
+
+def _build_compact_admissibility(admissibility: dict) -> dict:
+    return {
+        "short": admissibility["short"],
+        "D1": {
+            "applicable": admissibility["applicability"]["D1"],
+            "admissible": admissibility["D1"],
+        },
+        "E2": {
+            "applicable": admissibility["applicability"]["E2"],
+            "admissible": admissibility["E2"],
+        },
+    }
+
+
 def _extract_shared_context(clause_results: list[dict]) -> dict:
-    contexts = [entry.get("context", {}) for entry in clause_results if "context" in entry]
-    if len(contexts) != len(clause_results) or not contexts:
+    entries_with_context = [entry for entry in clause_results if "context" in entry]
+    if not entries_with_context:
         return {}
+    contexts = [entry.get("context", {}) for entry in entries_with_context]
 
     shared_keys = set(contexts[0].keys())
     for context in contexts[1:]:
@@ -71,7 +170,7 @@ def _extract_shared_context(clause_results: list[dict]) -> dict:
     if not shared_context:
         return {}
 
-    for entry in clause_results:
+    for entry in entries_with_context:
         context = entry.get("context", {})
         for key in shared_context:
             context.pop(key, None)
@@ -90,15 +189,18 @@ def _write_detailed_results_file(
     sections_file: str,
     profile_type: str,
     results_dir: str,
+    section: Section | None,
 ) -> Path:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     safe_section = _sanitize_filename(case.section_name.upper())
     safe_profile = _sanitize_filename((profile_type or "UNKNOWN").upper())
+    admissibility = _build_chapter_admissibility(case, section)
 
     output_dir = Path(results_dir) / safe_profile
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"{safe_section}__{timestamp}.json"
     output_summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
+    output_summary["admissibility"] = admissibility
 
     clause_results = []
     for check in result.checks:
@@ -126,10 +228,12 @@ def _write_detailed_results_file(
             "global_summary": {
                 **_build_global_summary(result),
                 "overall_status": result.status.value,
+                "admissibility": admissibility,
             },
             "shared_context": shared_context,
             "clause_results": clause_results,
         },
+        "admissibility": admissibility,
         "input": input_payload,
         "output": output_summary,
     }
@@ -170,10 +274,10 @@ def main():
     # Run
     try:
         result = engine.run(case)
+        section = _build_case_section(case, repo)
         if case.custom_section is not None:
             profile_type = case.custom_section.type.value
         else:
-            section = repo.get(case.section_name)
             profile_type = section.type if section is not None else "UNKNOWN"
         _write_detailed_results_file(
             result=result,
@@ -183,10 +287,12 @@ def main():
             sections_file=args.sections,
             profile_type=profile_type,
             results_dir=args.results_dir,
+            section=section,
         )
 
         # Keep CLI summary output compact: hide internal check details in stdout.
         summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
+        summary["admissibility"] = _build_compact_admissibility(_build_chapter_admissibility(case, section))
         print(json.dumps(summary, indent=2))
         
     except Exception as e:

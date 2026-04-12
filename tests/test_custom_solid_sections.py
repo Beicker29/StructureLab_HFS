@@ -16,7 +16,7 @@ def _base_case_kwargs() -> dict:
 
 
 class CustomSolidSectionsTests(unittest.TestCase):
-    def test_custom_solid_circular_compression_routes_to_e3(self):
+    def test_custom_solid_circular_compression_routes_to_e3_only(self):
         engine = SteelDesignEngine(SectionRepository())
         case = SteelCase(
             section_name="SC200",
@@ -30,8 +30,10 @@ class CustomSolidSectionsTests(unittest.TestCase):
 
         self.assertEqual("PASS", result.status.value)
         self.assertEqual(1, len(result.checks))
-        self.assertEqual("E3-1", result.checks[0].clause)
-        self.assertGreater(result.checks[0].capacity, 0.0)
+        clauses = {check.clause for check in result.checks}
+        self.assertIn("E3-1", clauses)
+        compression_check = next(check for check in result.checks if check.clause == "E3-1")
+        self.assertGreater(compression_check.capacity, 0.0)
 
     def test_custom_solid_rectangular_tension_uses_d2_with_d3_effective_area(self):
         engine = SteelDesignEngine(SectionRepository())
@@ -46,9 +48,12 @@ class CustomSolidSectionsTests(unittest.TestCase):
         result = engine.run(case)
 
         self.assertEqual("PASS", result.status.value)
-        self.assertEqual(1, len(result.checks))
-        self.assertTrue(result.checks[0].clause.startswith("D2-"))
-        self.assertAlmostEqual(12750.0, result.checks[0].details["memory"]["inputs"]["Ae_mm2"])
+        self.assertEqual(2, len(result.checks))
+        clauses = {check.clause for check in result.checks}
+        self.assertIn("D2-1", clauses)
+        self.assertIn("D2-2", clauses)
+        rupture_check = next(check for check in result.checks if check.clause == "D2-2")
+        self.assertAlmostEqual(12750.0, rupture_check.details["memory"]["inputs"]["Ae_mm2"])
 
     def test_custom_solid_sections_reject_non_axial_actions(self):
         engine = SteelDesignEngine(SectionRepository())
