@@ -38,6 +38,8 @@ pip install -r requirements.txt
 
 ```bash
 python -m src.steel_design.run examples/w_shape_case.json
+python -m src.steel_design.run examples/rectangular_hss_case.json
+python -m src.steel_design.run examples/circular_hss_case.json
 ```
 
 Salida por consola: resumen de checks (sin `details`).

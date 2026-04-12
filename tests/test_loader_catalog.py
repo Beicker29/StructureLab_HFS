@@ -122,6 +122,24 @@ class CatalogLoaderTests(unittest.TestCase):
             sections = load_sections_from_excel(str(excel_path))
             self.assertEqual("CHANNEL", sections[0].type)
 
+    def test_catalog_loader_classifies_ipe_profile_as_w_family(self):
+        with _temporary_test_dir() as tmp:
+            excel_path = tmp / "sections.xlsx"
+            workbook = openpyxl.Workbook()
+            try:
+                default_sheet = workbook.active
+                workbook.remove(default_sheet)
+                sheet = workbook.create_sheet("W_IPE_HEA_HEB")
+                sheet.append(["shape", "A", "rx", "ry"])
+                sheet.append(["IPE 80", 764.0, 31.0, 11.0])
+                workbook.save(excel_path)
+            finally:
+                workbook.close()
+
+            sections = load_sections_from_excel(str(excel_path))
+            self.assertEqual(1, len(sections))
+            self.assertEqual("W", sections[0].type)
+
     def test_catalog_loader_derives_slenderness_ratios_when_missing(self):
         with _temporary_test_dir() as tmp:
             excel_path = tmp / "sections.xlsx"

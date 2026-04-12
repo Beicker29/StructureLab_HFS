@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T120048090912Z",
+    "profile_type": "SOLID_RECTANGULAR",
+    "section_name": "SR200X100",
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\solid_rectangular_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 4303.125,
+      "governing_clauses": [
+        "D2-2 (Rupture)"
+      ],
+      "governing_check_names": [
+        "Tensile Strength (D2-D3)"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": true,
+        "E2": false,
+        "short": "D.1:SI | E.2:NO"
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "D2-2 (Rupture)",
+        "name": "Tensile Strength (D2-D3)",
+        "calculations": {
+          "clause": "D2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "Fu_mpa": 450.0,
+            "Ag_mm2": 20000.0,
+            "An_mm2": 15000.0,
+            "U_factor": 0.85,
+            "Ae_mm2": 12750.0,
+            "Pu_tension_kn": 120.0
+          },
+          "intermediate": {
+            "Pn_y_N": 6900000.0,
+            "Pn_r_N": 5737500.0,
+            "d3_effective_net_area_expression": "Ae = U*An",
+            "yielding_capacity_kn": 6210.0,
+            "rupture_capacity_kn": 4303.125,
+            "governing_limit_state": "rupture"
+          },
+          "capacity_kn": 4303.125
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": true,
+    "E2": false,
+    "short": "D.1:SI | E.2:NO"
+  },
+  "input": {
+    "section_name": "SR200X100",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": -120.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "An": 15000.0,
+      "U": 0.85
+    },
+    "custom_section": {
+      "type": "SOLID_RECTANGULAR",
+      "H": 200.0,
+      "B": 100.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Tensile Strength (D2-D3)",
+        "code": "AISC 360-22",
+        "clause": "D2-2 (Rupture)",
+        "demand": 120.0,
+        "capacity": 4303.125,
+        "dcr": 0.028,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": true,
+      "E2": false,
+      "short": "D.1:SI | E.2:NO"
+    }
+  }
+}

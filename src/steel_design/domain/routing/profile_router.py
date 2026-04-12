@@ -7,7 +7,7 @@ from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
 from ..rules.flexure_rule import FlexureRule
-from ..rules.tension_rule import TensionRule
+from ..rules.tension_rule import TensionRuptureRule, TensionRule
 
 
 class ProfileType:
@@ -57,7 +57,8 @@ def _has_interaction(case: SteelCase, section: Section) -> bool:
 
 
 RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
-    "D2": RuleDefinition("D2", TensionRule, True, ("area",), _has_tension),
+    "D2-1": RuleDefinition("D2-1", TensionRule, True, ("area",), _has_tension),
+    "D2-2": RuleDefinition("D2-2", TensionRuptureRule, True, ("area",), _has_tension),
     "E3": RuleDefinition("E3", AxialE3Rule, True, ("area", "rx", "ry"), _has_compression),
     "E4": RuleDefinition("E4", AxialE4Rule, True, tuple(), _has_compression),
     "E5": RuleDefinition("E5", AxialE5Rule, True, ("area", "rx", "ry", "b_t_ratio"), _has_compression),
@@ -76,16 +77,16 @@ RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
 
 
 PROFILE_RULE_MAP = {
-    ProfileType.W_SHAPE: ["D2", "E3", "E4", "E7", "F2", "G2", "H1"],
-    ProfileType.CHANNEL: ["D2", "E3", "E4", "E7", "G2", "H1"],
-    ProfileType.DOUBLE_ANGLE: ["D2", "E3", "E4", "E7", "F9", "G2", "H1"],
-    ProfileType.RECTANGULAR_HSS: ["D2", "E3", "E4", "E7", "F7", "G4", "H1"],
-    ProfileType.CIRCULAR_HSS: ["D2", "E3", "E4", "E7", "F8", "G5", "H1"],
-    ProfileType.SINGLE_ANGLE: ["D2", "E3", "E5", "E7", "F10", "G2", "H1"],
-    ProfileType.SOLID_RECTANGULAR: ["D2", "E3"],
-    ProfileType.SOLID_CIRCULAR: ["D2", "E3"],
-    ProfileType.FILLED_RECTANGULAR: ["D2", "E3"],
-    ProfileType.FILLED_CIRCULAR: ["D2", "E3"],
+    ProfileType.W_SHAPE: ["D2-1", "D2-2", "E3", "E4", "E7", "F2", "G2", "H1"],
+    ProfileType.CHANNEL: ["D2-1", "D2-2", "E3", "E4", "E7", "G2", "H1"],
+    ProfileType.DOUBLE_ANGLE: ["D2-1", "D2-2", "E3", "E4", "E7", "F9", "G2", "H1"],
+    ProfileType.RECTANGULAR_HSS: ["D2-1", "D2-2", "E3", "E4", "E7", "F7", "G4", "H1"],
+    ProfileType.CIRCULAR_HSS: ["D2-1", "D2-2", "E3", "E4", "E7", "F8", "G5", "H1"],
+    ProfileType.SINGLE_ANGLE: ["D2-1", "D2-2", "E3", "E5", "E7", "F10", "G2", "H1"],
+    ProfileType.SOLID_RECTANGULAR: ["D2-1", "D2-2", "E3"],
+    ProfileType.SOLID_CIRCULAR: ["D2-1", "D2-2", "E3"],
+    ProfileType.FILLED_RECTANGULAR: ["D2-1", "D2-2", "E3"],
+    ProfileType.FILLED_CIRCULAR: ["D2-1", "D2-2", "E3"],
 }
 
 

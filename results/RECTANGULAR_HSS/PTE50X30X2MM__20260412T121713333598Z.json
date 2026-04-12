@@ -1,0 +1,204 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T121713333598Z",
+    "profile_type": "RECTANGULAR_HSS",
+    "section_name": "PTE50X30X2mm",
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\rectangular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 15.811,
+      "governing_clauses": [
+        "E3-1"
+      ],
+      "governing_check_names": [
+        "Axial Compression (Flexural Buckling)"
+      ],
+      "overall_status": "FAIL",
+      "admissibility": {
+        "D1": false,
+        "E2": true,
+        "short": "D.1:NO | E.2:SI"
+      }
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "RECTANGULAR_HSS",
+        "overall": "non_slender",
+        "is_slender": false,
+        "elements": {
+          "wall_b": {
+            "ratio": 13.129032258064516,
+            "lambda_r": 33.70803886401537,
+            "classification": "non_slender"
+          },
+          "wall_h": {
+            "ratio": 23.881720430107528,
+            "lambda_r": 33.70803886401537,
+            "classification": "non_slender"
+          }
+        }
+      }
+    },
+    "clause_results": [
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "calculations": {
+          "clause": "E3",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 274.85236183307757,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 2000.0,
+            "Ly_mm": 2000.0,
+            "rx_mm": 18.096238323035283,
+            "ry_mm": 12.152659471615847
+          },
+          "intermediate": {
+            "KL_over_r_x": 110.52020670252423,
+            "KL_over_r_y": 164.5730306745833,
+            "governing_axis": "y",
+            "Fex_mpa": 161.60186333791188,
+            "Fey_mpa": 72.88067851358097,
+            "Fe_mpa": 72.88067851358097,
+            "fy_over_fe": 4.7337649296954725,
+            "branch": "elastic_E3_3",
+            "fcr_mpa": 63.91635505641052,
+            "pn_n": 17567.561147016,
+            "pn_kn": 17.567561147016,
+            "be_mm": null,
+            "be_note": "Not required in current E3 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 15.8108050323144
+        }
+      },
+      {
+        "clause": "E4-1",
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "calculations": {
+          "clause": "E4",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "G_mpa": 77200.0,
+            "Ag_mm2": 274.85236183307757,
+            "Kz": 1.0,
+            "Lz_mm": 2000.0,
+            "Ky": 1.0,
+            "Ly_mm": 2000.0,
+            "ry_mm": 12.152659471615847,
+            "J_mm4": 91485.40252360507,
+            "Cw_mm6": null,
+            "H": null,
+            "xa_mm": 0.0,
+            "ya_mm": 0.0
+          },
+          "intermediate": {
+            "KL_over_r_x": 110.52020670252423,
+            "KL_over_r_y": 164.5730306745833,
+            "KL_over_r_z": 91.75074807012231,
+            "ro_mm": 21.798187394302886,
+            "ro_source": "derived_from_ix_iy_ag",
+            "Fex_mpa": 161.60186333791188,
+            "Fey_mpa": 72.88067851358097,
+            "Fez_mpa": 54079.026706928205,
+            "Fe_mpa": 54079.026706928205,
+            "e4_mode": "torsional",
+            "warping_term_n": null,
+            "stvenant_term_n": 7062673074.822311,
+            "torsional_stiffness_n": null,
+            "torsional_denominator_mm4": 130599.11586606817,
+            "flexural_torsional_terms": null,
+            "fy_over_fe": 0.0063795526844384045,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 344.08002221446344,
+            "pn_n": 94571.20676522308,
+            "pn_kn": 94.57120676522308,
+            "be_mm": null,
+            "be_note": "be is not explicitly modeled in current E4 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 85.11408608870077
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": true,
+    "short": "D.1:NO | E.2:SI"
+  },
+  "input": {
+    "section_name": "PTE50X30X2mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 80.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 2000.0,
+      "Ly": 2000.0,
+      "Lz": 2000.0,
+      "Lb": 2000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {}
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 80.0,
+        "capacity": 15.811,
+        "dcr": 5.06,
+        "status": "FAIL"
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 80.0,
+        "capacity": 85.114,
+        "dcr": 0.94,
+        "status": "PASS"
+      }
+    ],
+    "status": "FAIL",
+    "admissibility": {
+      "D1": false,
+      "E2": true,
+      "short": "D.1:NO | E.2:SI"
+    }
+  }
+}

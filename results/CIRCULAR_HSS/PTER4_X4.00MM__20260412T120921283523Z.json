@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T120921283523Z",
+    "profile_type": "CIRCULAR_HSS",
+    "section_name": "PTER4\"X4.00MM",
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\circular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 206.169,
+      "governing_clauses": [
+        "E3-1"
+      ],
+      "governing_check_names": [
+        "Axial Compression (Flexural Buckling)"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": true,
+        "short": "D.1:NO | E.2:SI"
+      }
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "CIRCULAR_HSS",
+        "overall": "non_slender",
+        "is_slender": false,
+        "elements": {
+          "wall": {
+            "ratio": 28.7258064516129,
+            "lambda_r": 75.86206896551725,
+            "classification": "non_slender"
+          }
+        }
+      }
+    },
+    "clause_results": [
+      {
+        "clause": "D2-1",
+        "name": "Tension Yielding (D2-1)",
+        "calculations": null
+      },
+      {
+        "clause": "D2-2",
+        "name": "Tension Rupture (D2-2/D3)",
+        "calculations": null
+      },
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "calculations": {
+          "clause": "E3",
+          "inputs": {
+            "Fy_mpa": 290.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 1292.3180141583282,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 3500.0,
+            "Ly_mm": 3500.0,
+            "rx_mm": 39.11805018146993,
+            "ry_mm": 39.11805018146993
+          },
+          "intermediate": {
+            "KL_over_r_x": 89.47276215873194,
+            "KL_over_r_y": 89.47276215873194,
+            "governing_axis": "y",
+            "Fex_mpa": 246.57443763923425,
+            "Fey_mpa": 246.57443763923425,
+            "Fe_mpa": 246.57443763923425,
+            "fy_over_fe": 1.1761154269539578,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 177.25996824106244,
+            "pn_n": 229076.25014705813,
+            "pn_kn": 229.07625014705815,
+            "be_mm": null,
+            "be_note": "Not required in current E3 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 206.16862513235233
+        }
+      },
+      {
+        "clause": "E4-1",
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "calculations": {
+          "clause": "E4",
+          "inputs": {
+            "Fy_mpa": 290.0,
+            "E_mpa": 200000.0,
+            "G_mpa": 77200.0,
+            "Ag_mm2": 1292.3180141583282,
+            "Kz": 1.0,
+            "Lz_mm": 3500.0,
+            "Ky": 1.0,
+            "Ly_mm": 3500.0,
+            "ry_mm": 39.11805018146993,
+            "J_mm4": 3955066.5248273658,
+            "Cw_mm6": 10000000000.0,
+            "H": null,
+            "xa_mm": 0.0,
+            "ya_mm": 0.0
+          },
+          "intermediate": {
+            "KL_over_r_x": 89.47276215873194,
+            "KL_over_r_y": 89.47276215873194,
+            "KL_over_r_z": 63.26679685393047,
+            "ro_mm": 55.32127710022609,
+            "ro_source": "derived_from_ix_iy_ag",
+            "Fex_mpa": 246.57443763923425,
+            "Fey_mpa": 246.57443763923425,
+            "Fez_mpa": 77607.41766889031,
+            "Fe_mpa": 77607.41766889031,
+            "e4_mode": "torsional",
+            "warping_term_n": 1611363983.8513238,
+            "stvenant_term_n": 305331135716.6726,
+            "torsional_stiffness_n": 306942499700.5239,
+            "torsional_denominator_mm4": 3955066.524827366,
+            "flexural_torsional_terms": null,
+            "fy_over_fe": 0.0037367562110786393,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 289.54678853116076,
+            "pn_n": 374186.53076051106,
+            "pn_kn": 374.18653076051106,
+            "be_mm": null,
+            "be_note": "be is not explicitly modeled in current E4 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 336.76787768445996
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": true,
+    "short": "D.1:NO | E.2:SI"
+  },
+  "input": {
+    "section_name": "PTER4\"X4.00MM",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 290.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 180.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3500.0,
+      "Ly": 3500.0,
+      "Lz": 3500.0,
+      "Lb": 3500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {}
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Tension Yielding (D2-1)",
+        "code": "AISC 360-22",
+        "clause": "D2-1",
+        "demand": 0.0,
+        "capacity": 0.0,
+        "dcr": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Tension Rupture (D2-2/D3)",
+        "code": "AISC 360-22",
+        "clause": "D2-2",
+        "demand": 0.0,
+        "capacity": 0.0,
+        "dcr": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 180.0,
+        "capacity": 206.169,
+        "dcr": 0.873,
+        "status": "PASS"
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 180.0,
+        "capacity": 336.768,
+        "dcr": 0.534,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": true,
+      "short": "D.1:NO | E.2:SI"
+    }
+  }
+}

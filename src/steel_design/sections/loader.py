@@ -135,6 +135,8 @@ def _resolve_profile_type(shape_name: str, sheet_name: str) -> str:
     normalized_shape = shape_name.upper().strip()
     normalized_sheet = sheet_name.upper().strip()
 
+    if normalized_sheet == "W_IPE_HEA_HEB":
+        return "W"
     if normalized_sheet == "C":
         return "CHANNEL"
     if normalized_sheet == "2L":
@@ -147,6 +149,8 @@ def _resolve_profile_type(shape_name: str, sheet_name: str) -> str:
         return "CIRCULAR_HSS"
 
     if normalized_shape.startswith("W"):
+        return "W"
+    if normalized_shape.startswith(("IPE", "IPN", "HEA", "HEB", "HEM")):
         return "W"
     if normalized_shape.startswith("DBL_L") or normalized_shape.startswith("2L"):
         return "DOUBLE_ANGLE"
