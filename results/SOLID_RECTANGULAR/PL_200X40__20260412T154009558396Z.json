@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T154009558396Z",
+    "profile_type": "SOLID_RECTANGULAR",
+    "section_name": "PL_200x40",
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\solid_rectangular_flexure_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 83.494,
+      "governing_clauses": [
+        "F11"
+      ],
+      "governing_check_names": [
+        "Flexure Solid Bar/Round F11"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 51.96152422706632,
+          "KL_over_r_y": 259.80762113533154,
+          "KL_over_r_governing": 259.80762113533154,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "F11",
+        "name": "Flexure Solid Bar/Round F11",
+        "calculations": {
+          "chapter_f_selection": "F11",
+          "inputs": {
+            "axis": "x",
+            "Fy_mpa": 250.0,
+            "E_mpa": 200000.0,
+            "Cb": 1.0,
+            "Lb_mm": 3000.0,
+            "Mux_kn_m": 10.0,
+            "Muy_kn_m": 0.0,
+            "section_type": "SOLID_RECTANGULAR",
+            "h_mm": 200.0,
+            "b_mm": 40.0,
+            "d_mm": null
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 100000000.0,
+            "lateral_torsional_buckling_Mn_Nmm": 92770833.33333334
+          },
+          "intermediate": {
+            "axis": "x",
+            "ltb_note": "Inelastic LTB branch (F11-3).",
+            "slenderness_parameter": 375.0,
+            "Fcr_mpa": 347.890625
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 92770833.33333334,
+          "capacity_kn_m": 83.49375000000002
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 51.96152422706632,
+      "KL_over_r_y": 259.80762113533154,
+      "KL_over_r_governing": 259.80762113533154,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "PL_200x40",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 250.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 0.0,
+      "Mux": 10.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0
+    },
+    "connection": {},
+    "custom_section": {
+      "type": "SOLID_RECTANGULAR",
+      "H": 200.0,
+      "B": 40.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Flexure Solid Bar/Round F11",
+        "code": "AISC 360-22",
+        "clause": "F11",
+        "demand": 10.0,
+        "capacity": 83.494,
+        "dcr": 0.12,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 51.96152422706632,
+        "KL_over_r_y": 259.80762113533154,
+        "KL_over_r_governing": 259.80762113533154,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

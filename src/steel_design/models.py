@@ -20,7 +20,15 @@ class Loads(BaseModel):
     Pu: float = Field(0.0, description="Required axial strength (kN). Positive is compression.")
     Mux: float = Field(0.0, description="Required flexural strength, major-axis (kN-m)")
     Muy: float = Field(0.0, description="Required flexural strength, minor-axis (kN-m)")
-    Vu: float = Field(0.0, description="Required shear strength (kN)")
+    Vux: float = Field(0.0, description="Required shear strength about x direction (kN)")
+    Vuy: float = Field(0.0, description="Required shear strength about y direction (kN)")
+    Vu: float = Field(0.0, description="Legacy resultant shear strength (kN)")
+
+    @model_validator(mode="after")
+    def normalize_shear(self):
+        if abs(self.Vux) > 0.0 or abs(self.Vuy) > 0.0:
+            self.Vu = (self.Vux**2 + self.Vuy**2) ** 0.5
+        return self
 
 class Lengths(BaseModel):
     Lx: float = Field(..., description="Unbraced length for strong axis buckling (mm)")
@@ -31,6 +39,22 @@ class Lengths(BaseModel):
 class AngleCompressionMode(str, Enum):
     ONE_LEG = "one_leg"
     BOTH_LEGS = "both_legs"
+
+
+class AngleFlexureAxis(str, Enum):
+    MAJOR_PRINCIPAL = "major_principal"
+    GEOMETRIC_AXIS = "geometric_axis"
+
+
+class AngleLtbRestraint(str, Enum):
+    CONTINUOUS = "continuous"
+    DISCRETE_UNBRACED = "discrete_unbraced"
+    MAX_MOMENT_ONLY = "max_moment_only"
+
+
+class AngleMaxTensionLocation(str, Enum):
+    TOE = "toe"
+    HEEL = "heel"
 
 
 class CustomSectionType(str, Enum):
@@ -66,6 +90,18 @@ class Connection(BaseModel):
     angle_compression_mode: Optional[AngleCompressionMode] = Field(
         None,
         description="Connection mode for single-angle compression (E5).",
+    )
+    angle_flexure_axis: Optional[AngleFlexureAxis] = Field(
+        None,
+        description="Single-angle flexure axis definition for F10.",
+    )
+    angle_ltb_restraint: Optional[AngleLtbRestraint] = Field(
+        None,
+        description="Lateral-torsional restraint condition for F10.",
+    )
+    angle_max_tension_location: Optional[AngleMaxTensionLocation] = Field(
+        None,
+        description="Location of maximum tension for geometric-axis bending in F10.",
     )
 
 class Factors(BaseModel):

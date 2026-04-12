@@ -1,0 +1,1 @@
+{"section_name": "W14X90", "design_method": "LRFD", "material": {"Fy": 345.0, "Fu": 450.0, "E": 200000.0}, "loads": {"Pu": 0.0, "Mux": 200.0, "Muy": 0.0, "Vu": 0.0}, "lengths": {"Lx": 3000.0, "Ly": 3000.0, "Lz": 3000.0, "Lb": 3000.0}, "factors": {"Kx": 1.0, "Ky": 1.0, "Kz": 1.0, "Cb": 1.0}, "connection": {}}

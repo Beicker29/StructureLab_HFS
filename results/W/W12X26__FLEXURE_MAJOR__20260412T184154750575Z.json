@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T184154750575Z",
+    "profile_type": "W",
+    "section_name": "W12X26",
+    "case_tag": "flexure_major",
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\w_shape_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 55.912,
+      "governing_clauses": [
+        "F2"
+      ],
+      "governing_check_names": [
+        "Flexure Major F2"
+      ],
+      "overall_status": "FAIL",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 57.25190839694657,
+          "KL_over_r_y": 195.3125,
+          "KL_over_r_governing": 195.3125,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "F2",
+        "name": "Flexure Major F2",
+        "calculations": {
+          "chapter_f_selection": "F2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Cb": 1.0,
+            "Lb_mm": 7500.0,
+            "Mux_kn_m": 80.0,
+            "Zx_mm3": 610000.0,
+            "Sx_mm3": 547000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 210450000.0,
+            "ltb_Mn_Nmm": 62124934.24216762
+          },
+          "intermediate": {
+            "Lp_mm": 1627.2314989897252,
+            "Lr_mm": 4530.467287841678,
+            "Fcr_mpa": 113.57392000396274,
+            "rts_mm": 44.4,
+            "c_factor": 1.0
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 62124934.24216762,
+          "capacity_kn_m": 55.91244081795086
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 57.25190839694657,
+      "KL_over_r_y": 195.3125,
+      "KL_over_r_governing": 195.3125,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "W12X26",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "lengths": {
+      "Lx": 7500.0,
+      "Ly": 7500.0,
+      "Lz": 7500.0,
+      "Lb": 7500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "An": 150.0,
+      "U": 0.85
+    },
+    "loads": {
+      "Pu": 0.0,
+      "Mux": 80.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Flexure Major F2",
+        "code": "AISC 360-22",
+        "clause": "F2",
+        "demand": 80.0,
+        "capacity": 55.912,
+        "dcr": 1.431,
+        "status": "FAIL"
+      }
+    ],
+    "status": "FAIL",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 57.25190839694657,
+        "KL_over_r_y": 195.3125,
+        "KL_over_r_governing": 195.3125,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

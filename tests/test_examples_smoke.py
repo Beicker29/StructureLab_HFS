@@ -39,8 +39,12 @@ class ExampleSmokeTests(unittest.TestCase):
                 completed = self._run_example(example)
                 self.assertEqual(0, completed.returncode)
                 payload = json.loads(completed.stdout)
-                self.assertIn("checks", payload)
                 self.assertIn("status", payload)
+                if payload.get("bundle") is True:
+                    self.assertIn("cases", payload)
+                    self.assertGreater(len(payload["cases"]), 0)
+                else:
+                    self.assertIn("checks", payload)
 
     def test_negative_examples_fail_with_structured_error(self):
         negative_examples = {

@@ -14,17 +14,18 @@ class NormativeD2E3F2Tests(unittest.TestCase):
             name="W14X90",
             type="W",
             A=17000.0,
-            Ix=1.0,
-            Iy=1.0,
-            Sx=1.0,
-            Sy=1.0,
+            Ix=2500.0e6,
+            Iy=350.0e6,
+            Sx=1800.0e3,
+            Sy=500.0e3,
             Zx=1500000.0,
-            Zy=1.0,
+            Zy=700.0e3,
             rx=90.0,
             ry=55.0,
+            ho=300.0,
             **{"bf/2tf": 4.0, "h/tw": 25.0},
-            J=1.0,
-            Cw=1.0,
+            J=4000.0e3,
+            Cw=20000.0e9,
         )
 
     def test_D2_tension_capacity_in_kN_and_clause(self):
@@ -77,8 +78,8 @@ class NormativeD2E3F2Tests(unittest.TestCase):
         self.assertGreater(result.capacity, 0.0)
 
     def test_F2_flexure_rule_uses_kN_m_and_absolute_demand(self):
-        mp = flexure_calc.calculate_Mp(345.0, 1000000.0)
-        available = flexure_calc.calculate_available_flexural_strength(mp, "LRFD")
+        mp = 345.0 * 1000000.0
+        available = flexure_calc.available_flexural_strength_lrfd(mp)
         self.assertAlmostEqual(310.5, available, places=3)
 
         case = SteelCase(
@@ -91,7 +92,7 @@ class NormativeD2E3F2Tests(unittest.TestCase):
         )
         result = FlexureRule().check(case, self._section())
 
-        self.assertEqual("F2-1", result.clause)
+        self.assertEqual("F2", result.clause)
         self.assertEqual(120.0, result.demand)
         self.assertGreater(result.capacity, 0.0)
 

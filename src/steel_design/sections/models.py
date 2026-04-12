@@ -21,22 +21,30 @@ class Section(BaseModel):
     # Moment of inertia
     ix: Optional[float] = Field(None, alias="Ix", description="Moment of inertia about x-axis (mm^4)")
     iy: Optional[float] = Field(None, alias="Iy", description="Moment of inertia about y-axis (mm^4)")
+    iz: Optional[float] = Field(None, alias="Iz", description="Moment of inertia about z/principal axis (mm^4)")
+    iw: Optional[float] = Field(None, alias="Iw", description="Warping-related property from catalog (mm^4)")
     
     # Section modulus
     sx: Optional[float] = Field(None, alias="Sx", description="Elastic section modulus about x-axis (mm^3)")
     sy: Optional[float] = Field(None, alias="Sy", description="Elastic section modulus about y-axis (mm^3)")
+    sz: Optional[float] = Field(None, alias="Sz", description="Elastic section modulus about z/principal axis (mm^3)")
     zx: Optional[float] = Field(None, alias="Zx", description="Plastic section modulus about x-axis (mm^3)")
     zy: Optional[float] = Field(None, alias="Zy", description="Plastic section modulus about y-axis (mm^3)")
     
     # Radius of gyration
     rx: Optional[float] = Field(None, description="Radius of gyration about x-axis (mm)")
     ry: Optional[float] = Field(None, description="Radius of gyration about y-axis (mm)")
+    rz: Optional[float] = Field(None, description="Radius of gyration about z/principal axis (mm)")
     
     # Torsional properties
     j: Optional[float] = Field(None, alias="J", description="Torsional constant (mm^4)")
     cw: Optional[float] = Field(None, alias="Cw", description="Warping constant (mm^6)")
+    c: Optional[float] = Field(None, alias="C", description="Torsional property C from catalog (mm^3)")
     ro: Optional[float] = Field(None, alias="ro", description="Polar radius of gyration about shear center (mm)")
     H: Optional[float] = Field(None, alias="H", description="Flexural-torsional constant (dimensionless)")
+    rts: Optional[float] = Field(None, alias="rts", description="Effective radius for LTB (mm)")
+    ho: Optional[float] = Field(None, alias="ho", description="Distance between flange centroids (mm)")
+    tan_alpha: Optional[float] = Field(None, alias="tan_alpha", description="tan(alpha) from catalog for angles")
 
     # Shear-center / centroid variables
     x: Optional[float] = Field(None, alias="x", description="Centroid distance x (mm)")

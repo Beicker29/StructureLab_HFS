@@ -55,7 +55,7 @@ class CustomSolidSectionsTests(unittest.TestCase):
         rupture_check = next(check for check in result.checks if check.clause == "D2-2")
         self.assertAlmostEqual(12750.0, rupture_check.details["memory"]["inputs"]["Ae_mm2"])
 
-    def test_custom_solid_sections_reject_non_axial_actions(self):
+    def test_custom_solid_sections_allow_axial_and_flexure_in_single_case(self):
         engine = SteelDesignEngine(SectionRepository())
         case = SteelCase(
             section_name="SC160",
@@ -65,8 +65,10 @@ class CustomSolidSectionsTests(unittest.TestCase):
             **_base_case_kwargs(),
         )
 
-        with self.assertRaises(ValidationError):
-            engine.run(case)
+        result = engine.run(case)
+        clauses = {check.clause for check in result.checks}
+        self.assertIn("E3-1", clauses)
+        self.assertIn("F11", clauses)
 
     def test_tension_requires_an_and_u(self):
         engine = SteelDesignEngine(SectionRepository())

@@ -5,12 +5,14 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 ## Estado actual
 
 - Arquitectura por capas (`codes`, `domain`, `sections`, `engine`).
-- Capitulo D (tension) y F2 (flexion mayor) implementados.
+- Capitulo D (tension) implementado.
 - Capitulo E (compresion) implementado para E3, E4, E5 y E7.
+- Capitulo F implementado para F2, F3, F4, F5, F6, F7, F8, F10 y F11.
 - Traccion con D3 estricto (`Ae = U*An`) para todos los perfiles.
 - Secciones macizas custom por JSON (`SOLID_CIRCULAR`, `SOLID_RECTANGULAR`) con alcance axial (D2/E3).
 - Politica estricta: si una regla aplicable no puede evaluarse por datos faltantes, el caso falla con error estructurado.
 - Los checks axiales reportan clasificacion de elementos (`non_slender`/`slender`) en `checks[].details.element_classification`.
+- Flexion en alcance actual: solo `LRFD` y flexion simple (no biaxial).
 
 ## Estructura
 
@@ -80,3 +82,14 @@ Si `loads.Pu < 0`, en `connection` se requiere:
 - `U` (0 < U <= 1)
 
 El motor calcula `Ae = U*An` y valida que `Ae <= Ag`.
+
+## Nota de entrada para flexion (Capitulo F)
+
+Para evaluar flexion (`Mux` o `Muy`):
+
+- `design_method` debe ser `LRFD`.
+- no se admite flexion biaxial (`Mux` y `Muy` simultaneos).
+- para angulo simple (`F10`) en `connection` se requiere:
+  - `angle_flexure_axis`
+  - `angle_ltb_restraint`
+  - `angle_max_tension_location` cuando `angle_flexure_axis = geometric_axis`.

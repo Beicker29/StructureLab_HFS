@@ -1,0 +1,168 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T153845296001Z",
+    "profile_type": "RECTANGULAR_HSS",
+    "section_name": "PTE50X30X2mm",
+    "input_file": "examples/rectangular_hss_flexure_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 0.783,
+      "governing_clauses": [
+        "F7"
+      ],
+      "governing_check_names": [
+        "Flexure HSS Rectangular F7"
+      ],
+      "overall_status": "FAIL",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 138.15025837815529,
+          "KL_over_r_y": 205.7162883432291,
+          "KL_over_r_governing": 205.7162883432291,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "F7",
+        "name": "Flexure HSS Rectangular F7",
+        "calculations": {
+          "chapter_f_selection": "F7",
+          "inputs": {
+            "axis": "x",
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Cb": 1.0,
+            "Lb_mm": 2500.0,
+            "Mux_kn_m": 18.0,
+            "Muy_kn_m": 0.0,
+            "b_tdes_ratio": 13.129032258064516,
+            "h_tdes_ratio": 23.881720430107528
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1538183.809553724,
+            "flange_local_buckling_Mn_Nmm": 1538183.809553724,
+            "web_local_buckling_Mn_Nmm": 1538183.809553724,
+            "lateral_torsional_buckling_Mn_Nmm": 869467.2216163753
+          },
+          "intermediate": {
+            "axis": "x",
+            "lambda_f": 13.129032258064516,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 23.881720430107528,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "Conservative LTB branch for rectangular HSS in current scope."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 869467.2216163753,
+          "capacity_kn_m": 0.7825204994547378
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 138.15025837815529,
+      "KL_over_r_y": 205.7162883432291,
+      "KL_over_r_governing": 205.7162883432291,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "PTE50X30X2mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 0.0,
+      "Mux": 18.0,
+      "Muy": 0.0,
+      "Vu": 0.0
+    },
+    "lengths": {
+      "Lx": 2500.0,
+      "Ly": 2500.0,
+      "Lz": 2500.0,
+      "Lb": 2500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {}
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Flexure HSS Rectangular F7",
+        "code": "AISC 360-22",
+        "clause": "F7",
+        "demand": 18.0,
+        "capacity": 0.783,
+        "dcr": 23.003,
+        "status": "FAIL"
+      }
+    ],
+    "status": "FAIL",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 138.15025837815529,
+        "KL_over_r_y": 205.7162883432291,
+        "KL_over_r_governing": 205.7162883432291,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}
