@@ -3,6 +3,7 @@ import argparse
 import sys
 import re
 import math
+import copy
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -65,6 +66,8 @@ def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | N
         area = math.pi * (diameter**2) / 4.0
         inertia = math.pi * (diameter**4) / 64.0
         radius_of_gyration = diameter / 4.0
+        elastic_modulus = math.pi * (diameter**3) / 32.0
+        plastic_modulus = (diameter**3) / 6.0
         return Section(
             name=case.section_name,
             type=custom.type.value,
@@ -72,6 +75,10 @@ def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | N
             OD=diameter,
             Ix=inertia,
             Iy=inertia,
+            Sx=elastic_modulus,
+            Sy=elastic_modulus,
+            Zx=plastic_modulus,
+            Zy=plastic_modulus,
             rx=radius_of_gyration,
             ry=radius_of_gyration,
         )
@@ -83,6 +90,10 @@ def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | N
     inertia_y = height * (width**3) / 12.0
     radius_of_gyration_x = math.sqrt(inertia_x / area) if area > 0.0 else 0.0
     radius_of_gyration_y = math.sqrt(inertia_y / area) if area > 0.0 else 0.0
+    section_modulus_x = width * (height**2) / 6.0
+    section_modulus_y = height * (width**2) / 6.0
+    plastic_modulus_x = width * (height**2) / 4.0
+    plastic_modulus_y = height * (width**2) / 4.0
     return Section(
         name=case.section_name,
         type=custom.type.value,
@@ -91,6 +102,10 @@ def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | N
         b=width,
         Ix=inertia_x,
         Iy=inertia_y,
+        Sx=section_modulus_x,
+        Sy=section_modulus_y,
+        Zx=plastic_modulus_x,
+        Zy=plastic_modulus_y,
         rx=radius_of_gyration_x,
         ry=radius_of_gyration_y,
     )
@@ -103,7 +118,13 @@ def _safe_klr(k: float, length: float, radius: float | None) -> float | None:
 
 
 def _build_chapter_admissibility(case: SteelCase, section: Section | None) -> dict:
-    pure_axial = abs(case.loads.Mux) <= 1e-9 and abs(case.loads.Muy) <= 1e-9 and abs(case.loads.Vu) <= 1e-9
+    pure_axial = (
+        abs(case.loads.Mux) <= 1e-9
+        and abs(case.loads.Muy) <= 1e-9
+        and abs(case.loads.Vu) <= 1e-9
+        and abs(case.loads.Vux) <= 1e-9
+        and abs(case.loads.Vuy) <= 1e-9
+    )
     klr_x = _safe_klr(case.factors.Kx, case.lengths.Lx, section.rx if section else None)
     klr_y = _safe_klr(case.factors.Ky, case.lengths.Ly, section.ry if section else None)
     valid_klr = [value for value in (klr_x, klr_y) if value is not None]
@@ -190,15 +211,20 @@ def _write_detailed_results_file(
     profile_type: str,
     results_dir: str,
     section: Section | None,
+    case_tag: str | None = None,
 ) -> Path:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     safe_section = _sanitize_filename(case.section_name.upper())
     safe_profile = _sanitize_filename((profile_type or "UNKNOWN").upper())
+    safe_case_tag = _sanitize_filename(case_tag.upper()) if case_tag else None
     admissibility = _build_chapter_admissibility(case, section)
 
     output_dir = Path(results_dir) / safe_profile
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / f"{safe_section}__{timestamp}.json"
+    if safe_case_tag:
+        output_path = output_dir / f"{safe_section}__{safe_case_tag}__{timestamp}.json"
+    else:
+        output_path = output_dir / f"{safe_section}__{timestamp}.json"
     output_summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
     output_summary["admissibility"] = admissibility
 
@@ -221,6 +247,7 @@ def _write_detailed_results_file(
             "generated_at_utc": timestamp,
             "profile_type": safe_profile,
             "section_name": case.section_name,
+            "case_tag": case_tag,
             "input_file": str(input_file),
             "sections_file": str(sections_file),
         },
@@ -239,6 +266,56 @@ def _write_detailed_results_file(
     }
     output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return output_path
+
+
+def _merge_case_payload(base_payload: dict, override_payload: dict) -> dict:
+    merged = copy.deepcopy(base_payload)
+    for key, value in override_payload.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = _merge_case_payload(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def _run_single_case(
+    *,
+    engine: SteelDesignEngine,
+    repo: SectionRepository,
+    case: SteelCase,
+    input_payload: dict,
+    input_file: str,
+    sections_file: str,
+    results_dir: str,
+    case_tag: str | None = None,
+) -> dict:
+    result = engine.run(case)
+    section = _build_case_section(case, repo)
+    if case.custom_section is not None:
+        profile_type = case.custom_section.type.value
+    else:
+        profile_type = section.type if section is not None else "UNKNOWN"
+    _write_detailed_results_file(
+        result=result,
+        case=case,
+        input_payload=input_payload,
+        input_file=input_file,
+        sections_file=sections_file,
+        profile_type=profile_type,
+        results_dir=results_dir,
+        section=section,
+        case_tag=case_tag,
+    )
+
+    raw_summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
+    organized_summary = {
+        "status": raw_summary.get("status"),
+        "admissibility": _build_compact_admissibility(_build_chapter_admissibility(case, section)),
+        "checks": raw_summary.get("checks", []),
+    }
+    if case_tag is not None:
+        return {"case": case_tag, **organized_summary}
+    return organized_summary
 
 
 def main():
@@ -266,35 +343,62 @@ def main():
     try:
         with open(args.input_file, "r", encoding="utf-8") as f:
             payload = json.load(f)
-            case = SteelCase(**payload)
     except Exception as e:
         _print_structured_error(e, stage="parse_input")
         sys.exit(1)
-        
+
     # Run
     try:
-        result = engine.run(case)
-        section = _build_case_section(case, repo)
-        if case.custom_section is not None:
-            profile_type = case.custom_section.type.value
-        else:
-            profile_type = section.type if section is not None else "UNKNOWN"
-        _write_detailed_results_file(
-            result=result,
-            case=case,
-            input_payload=payload,
-            input_file=args.input_file,
-            sections_file=args.sections,
-            profile_type=profile_type,
-            results_dir=args.results_dir,
-            section=section,
-        )
+        if isinstance(payload, dict) and isinstance(payload.get("cases"), list):
+            case_definitions = payload.get("cases", [])
+            base_payload = {key: value for key, value in payload.items() if key != "cases"}
+            summaries = []
+            aggregate_pass = True
+            for index, case_definition in enumerate(case_definitions):
+                if not isinstance(case_definition, dict):
+                    raise ValueError(f"cases[{index}] must be an object.")
+                case_tag = str(case_definition.get("name") or f"case_{index+1}")
+                case_override = {k: v for k, v in case_definition.items() if k != "name"}
+                merged_payload = _merge_case_payload(base_payload, case_override)
+                case = SteelCase(**merged_payload)
+                summary = _run_single_case(
+                    engine=engine,
+                    repo=repo,
+                    case=case,
+                    input_payload=merged_payload,
+                    input_file=args.input_file,
+                    sections_file=args.sections,
+                    results_dir=args.results_dir,
+                    case_tag=case_tag,
+                )
+                summaries.append(summary)
+                if summary.get("status") != "PASS":
+                    aggregate_pass = False
 
-        # Keep CLI summary output compact: hide internal check details in stdout.
-        summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
-        summary["admissibility"] = _build_compact_admissibility(_build_chapter_admissibility(case, section))
-        print(json.dumps(summary, indent=2))
-        
+            print(
+                json.dumps(
+                    {
+                        "bundle": True,
+                        "total_cases": len(summaries),
+                        "status": "PASS" if aggregate_pass else "FAIL",
+                        "cases": summaries,
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            case = SteelCase(**payload)
+            summary = _run_single_case(
+                engine=engine,
+                repo=repo,
+                case=case,
+                input_payload=payload,
+                input_file=args.input_file,
+                sections_file=args.sections,
+                results_dir=args.results_dir,
+            )
+            print(json.dumps(summary, indent=2))
+
     except Exception as e:
         _print_structured_error(e, stage="run_engine")
         sys.exit(1)

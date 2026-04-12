@@ -101,8 +101,21 @@ class EngineCliIntegrationTests(unittest.TestCase):
             case_path = tmp / "case.json"
             _write_excel(
                 sections_path,
-                headers=["shape", "area [mm2]", "Zx [mm3]", "rx [mm]", "ry [mm]"],
-                rows=[["W14X90", 17000.0, 1500000.0, 90.0, 55.0]],
+                headers=[
+                    "shape",
+                    "A",
+                    "Zx",
+                    "Sx",
+                    "Iy",
+                    "ry",
+                    "J",
+                    "Cw",
+                    "ho",
+                    "rx",
+                    "bf/2tf",
+                    "h/tw",
+                ],
+                rows=[["W14X90", 17000.0, 1500.0, 1300.0, 500.0, 55.0, 3.0, 4.0, 300.0, 90.0, 6.0, 20.0]],
             )
             _write_case(case_path, pu=0.0, mux=0.0, muy=0.0, vu=50.0)
 
@@ -118,8 +131,21 @@ class EngineCliIntegrationTests(unittest.TestCase):
             case_path = tmp / "case.json"
             _write_excel(
                 sections_path,
-                headers=["shape", "area [mm2]", "Zx [mm3]", "rx [mm]", "ry [mm]"],
-                rows=[["W14X90", 17000.0, 1500000.0, 90.0, 55.0]],
+                headers=[
+                    "shape",
+                    "A",
+                    "Zx",
+                    "Sx",
+                    "Iy",
+                    "ry",
+                    "J",
+                    "Cw",
+                    "ho",
+                    "rx",
+                    "bf/2tf",
+                    "h/tw",
+                ],
+                rows=[["W14X90", 17000.0, 1500.0, 1300.0, 500.0, 55.0, 3.0, 4.0, 300.0, 90.0, 6.0, 20.0]],
             )
             _write_case(case_path, pu=0.0, mux=200.0, muy=0.0, vu=0.0)
 

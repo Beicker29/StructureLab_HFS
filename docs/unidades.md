@@ -28,12 +28,16 @@ Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda
 - `material.Fy`, `material.Fu`, `material.E`: `MPa`
 - `loads.Pu`: `kN` (positivo compresion, negativo tension)
 - `loads.Mux`, `loads.Muy`: `kN-m`
-- `loads.Vu`: `kN`
+- `loads.Vux`, `loads.Vuy`: `kN`
+- `loads.Vu`: `kN` (legacy, derivado automaticamente de `Vux` y `Vuy` cuando se proveen)
 - `lengths.Lx`, `Ly`, `Lz`, `Lb`: `mm`
 - `factors.Kx`, `Ky`, `Kz`, `Cb`: adimensional
 - `factors.xa`, `factors.ya`: `mm` (offset de arriostramiento para E4)
 - `connection.An`: `mm2` (traccion, D3)
 - `connection.U`: adimensional (traccion, D3)
+- `connection.angle_flexure_axis`: adimensional (selector para F10)
+- `connection.angle_ltb_restraint`: adimensional (selector para F10)
+- `connection.angle_max_tension_location`: adimensional (selector para F10 en eje geometrico)
 - `custom_section.diameter`, `custom_section.H`, `custom_section.B`: `mm`
 
 ### 3.1) Convencion de ejes y factores de estabilidad

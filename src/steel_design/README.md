@@ -25,6 +25,13 @@ Base del motor AISC 360-22.
   - `connection.An > 0`
   - `0 < connection.U <= 1`
   - `Ae = U*An` (sin fallback a `Ae`).
+- Para flexion (Capitulo F):
+  - solo se admite `LRFD`.
+  - solo se admite flexion simple (`Mux` o `Muy`, no ambos).
+  - para angulo simple en flexion (`F10`) se requiere:
+    - `connection.angle_flexure_axis`
+    - `connection.angle_ltb_restraint`
+    - `connection.angle_max_tension_location` cuando `angle_flexure_axis = geometric_axis`.
 
 ## Politica de seguridad
 

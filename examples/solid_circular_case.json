@@ -1,34 +1,38 @@
 {
-    "section_name": "SC150",
-    "design_method": "LRFD",
-    "material": {
-        "Fy": 345.0,
-        "Fu": 450.0,
-        "E": 200000.0
-    },
-    "loads": {
-        "Pu": 250.0,
-        "Mux": 0.0,
-        "Muy": 0.0,
-        "Vu": 0.0
-    },
-    "lengths": {
-        "Lx": 3000.0,
-        "Ly": 3000.0,
-        "Lz": 3000.0,
-        "Lb": 3000.0
-    },
-    "factors": {
-        "Kx": 1.0,
-        "Ky": 1.0,
-        "Kz": 1.0,
-        "Cb": 1.0,
-        "xa": 0.0,
-        "ya": 0.0
-    },
-    "connection": {},
-    "custom_section": {
-        "type": "SOLID_CIRCULAR",
-        "diameter": 150.0
-    }
+  "section_name": "SC150",
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 345.0,
+    "Fu": 450.0,
+    "E": 200000.0
+  },
+  "loads": {
+    "Pu": 120.0,
+    "Mux": 5.0,
+    "Muy": 0.0,
+    "Vux": 0.0,
+    "Vuy": 0.0
+  },
+  "lengths": {
+    "Lx": 3000.0,
+    "Ly": 3000.0,
+    "Lz": 3000.0,
+    "Lb": 3000.0
+  },
+  "factors": {
+    "Kx": 1.0,
+    "Ky": 1.0,
+    "Kz": 1.0,
+    "Cb": 1.0,
+    "xa": 0.0,
+    "ya": 0.0
+  },
+  "connection": {
+    "An": 12000.0,
+    "U": 0.85
+  },
+  "custom_section": {
+    "type": "SOLID_CIRCULAR",
+    "diameter": 150.0
+  }
 }

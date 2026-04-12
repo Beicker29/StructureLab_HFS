@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Tuple, Type
 
@@ -6,7 +7,17 @@ from ...models import SteelCase
 from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
-from ..rules.flexure_rule import FlexureRule
+from ..rules.flexure_rule import (
+    FlexureF10Rule,
+    FlexureF11Rule,
+    FlexureF3Rule,
+    FlexureF4Rule,
+    FlexureF5Rule,
+    FlexureF6Rule,
+    FlexureF7Rule,
+    FlexureF8Rule,
+    FlexureRule,
+)
 from ..rules.tension_rule import TensionRuptureRule, TensionRule
 
 
@@ -44,16 +55,109 @@ def _has_major_flexure(case: SteelCase, _: Section) -> bool:
     return abs(case.loads.Mux) > 0.0
 
 
+def _has_minor_flexure(case: SteelCase, _: Section) -> bool:
+    return abs(case.loads.Muy) > 0.0
+
+
 def _has_any_flexure(case: SteelCase, _: Section) -> bool:
     return abs(case.loads.Mux) > 0.0 or abs(case.loads.Muy) > 0.0
 
 
 def _has_shear(case: SteelCase, _: Section) -> bool:
-    return abs(case.loads.Vu) > 0.0
+    return abs(case.loads.Vu) > 0.0 or abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0
 
 
 def _has_interaction(case: SteelCase, section: Section) -> bool:
-    return abs(case.loads.Pu) > 0.0 and _has_any_flexure(case, section)
+    # H1/I2 are still blocked in this scope; do not force fail-hard for combined Pu+M.
+    return False
+
+
+def _safe_ratio(value: Optional[float]) -> float:
+    return float(value) if isinstance(value, (int, float)) and value > 0.0 else 0.0
+
+
+def _classify_element(value: float, compact_limit: float, noncompact_limit: float) -> str:
+    if value <= compact_limit:
+        return "compact"
+    if value <= noncompact_limit:
+        return "noncompact"
+    return "slender"
+
+
+def _w_or_channel_flexure_selection(case: SteelCase, section: Section) -> Optional[str]:
+    if _has_minor_flexure(case, section):
+        return "F6"
+    if not _has_major_flexure(case, section):
+        return None
+
+    fy = case.material.Fy
+    e = case.material.E
+    sqrt_ratio = math.sqrt(e / fy) if min(e, fy) > 0.0 else 0.0
+    flange_ratio = _safe_ratio(section.bf_2tf_ratio)
+    web_ratio = _safe_ratio(section.h_tw_ratio)
+    if min(flange_ratio, web_ratio) <= 0.0:
+        return "F2"
+
+    flange_class = _classify_element(flange_ratio, 0.38 * sqrt_ratio, 1.0 * sqrt_ratio)
+    web_class = _classify_element(web_ratio, 3.76 * sqrt_ratio, 5.70 * sqrt_ratio)
+    profile = section.type.upper()
+
+    if profile == "CHANNEL":
+        if flange_class == "compact" and web_class == "compact":
+            return "F2"
+        return None
+
+    if web_class == "compact" and flange_class == "compact":
+        return "F2"
+    if web_class == "compact" and flange_class in {"noncompact", "slender"}:
+        return "F3"
+    if web_class == "noncompact":
+        return "F4"
+    if web_class == "slender":
+        return "F5"
+    return None
+
+
+def _is_f2_applicable(case: SteelCase, section: Section) -> bool:
+    return _w_or_channel_flexure_selection(case, section) == "F2"
+
+
+def _is_f3_applicable(case: SteelCase, section: Section) -> bool:
+    return _w_or_channel_flexure_selection(case, section) == "F3"
+
+
+def _is_f4_applicable(case: SteelCase, section: Section) -> bool:
+    return _w_or_channel_flexure_selection(case, section) == "F4"
+
+
+def _is_f5_applicable(case: SteelCase, section: Section) -> bool:
+    return _w_or_channel_flexure_selection(case, section) == "F5"
+
+
+def _is_f6_applicable(case: SteelCase, section: Section) -> bool:
+    profile = section.type.upper()
+    return profile in {"W", "CHANNEL"} and _has_minor_flexure(case, section)
+
+
+def _is_f7_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "RECTANGULAR_HSS" and _has_any_flexure(case, section)
+
+
+def _is_f8_applicable(case: SteelCase, section: Section) -> bool:
+    if section.type.upper() != "CIRCULAR_HSS" or not _has_any_flexure(case, section):
+        return False
+    ratio = _safe_ratio(section.d_t_ratio)
+    if ratio <= 0.0:
+        return False
+    return ratio < 0.45 * case.material.E / case.material.Fy
+
+
+def _is_f10_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "SINGLE_ANGLE" and _has_any_flexure(case, section)
+
+
+def _is_f11_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR", "FILLED_RECTANGULAR", "FILLED_CIRCULAR"} and _has_any_flexure(case, section)
 
 
 RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
@@ -63,11 +167,16 @@ RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
     "E4": RuleDefinition("E4", AxialE4Rule, True, tuple(), _has_compression),
     "E5": RuleDefinition("E5", AxialE5Rule, True, ("area", "rx", "ry", "b_t_ratio"), _has_compression),
     "E7": RuleDefinition("E7", AxialE7Rule, True, tuple(), _has_compression),
-    "F2": RuleDefinition("F2", FlexureRule, True, ("zx",), _has_major_flexure),
-    "F7": RuleDefinition("F7", None, False, ("zx",), _has_any_flexure),
-    "F8": RuleDefinition("F8", None, False, ("zx",), _has_any_flexure),
+    "F2": RuleDefinition("F2", FlexureRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho"), _is_f2_applicable),
+    "F3": RuleDefinition("F3", FlexureF3Rule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho", "bf_2tf_ratio", "h_tw_ratio"), _is_f3_applicable),
+    "F4": RuleDefinition("F4", FlexureF4Rule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f4_applicable),
+    "F5": RuleDefinition("F5", FlexureF5Rule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f5_applicable),
+    "F6": RuleDefinition("F6", FlexureF6Rule, True, ("zy", "sy", "bf_2tf_ratio"), _is_f6_applicable),
+    "F7": RuleDefinition("F7", FlexureF7Rule, True, ("zx", "zy", "sx", "sy", "b", "h"), _is_f7_applicable),
+    "F8": RuleDefinition("F8", FlexureF8Rule, True, ("zx", "zy", "sx", "sy", "d_t_ratio"), _is_f8_applicable),
     "F9": RuleDefinition("F9", None, False, ("zx",), _has_any_flexure),
-    "F10": RuleDefinition("F10", None, False, ("zx",), _has_any_flexure),
+    "F10": RuleDefinition("F10", FlexureF10Rule, True, ("b_t_ratio", "b", "t"), _is_f10_applicable),
+    "F11": RuleDefinition("F11", FlexureF11Rule, True, ("zx", "zy", "sx", "sy"), _is_f11_applicable),
     "G2": RuleDefinition("G2", None, False, ("tw", "d"), _has_shear),
     "G4": RuleDefinition("G4", None, False, ("tw", "d"), _has_shear),
     "G5": RuleDefinition("G5", None, False, ("d",), _has_shear),
@@ -77,16 +186,16 @@ RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
 
 
 PROFILE_RULE_MAP = {
-    ProfileType.W_SHAPE: ["D2-1", "D2-2", "E3", "E4", "E7", "F2", "G2", "H1"],
-    ProfileType.CHANNEL: ["D2-1", "D2-2", "E3", "E4", "E7", "G2", "H1"],
+    ProfileType.W_SHAPE: ["D2-1", "D2-2", "E3", "E4", "E7", "F2", "F3", "F4", "F5", "F6", "G2", "H1"],
+    ProfileType.CHANNEL: ["D2-1", "D2-2", "E3", "E4", "E7", "F2", "F6", "G2", "H1"],
     ProfileType.DOUBLE_ANGLE: ["D2-1", "D2-2", "E3", "E4", "E7", "F9", "G2", "H1"],
     ProfileType.RECTANGULAR_HSS: ["D2-1", "D2-2", "E3", "E4", "E7", "F7", "G4", "H1"],
     ProfileType.CIRCULAR_HSS: ["D2-1", "D2-2", "E3", "E4", "E7", "F8", "G5", "H1"],
     ProfileType.SINGLE_ANGLE: ["D2-1", "D2-2", "E3", "E5", "E7", "F10", "G2", "H1"],
-    ProfileType.SOLID_RECTANGULAR: ["D2-1", "D2-2", "E3"],
-    ProfileType.SOLID_CIRCULAR: ["D2-1", "D2-2", "E3"],
-    ProfileType.FILLED_RECTANGULAR: ["D2-1", "D2-2", "E3"],
-    ProfileType.FILLED_CIRCULAR: ["D2-1", "D2-2", "E3"],
+    ProfileType.SOLID_RECTANGULAR: ["D2-1", "D2-2", "E3", "F11"],
+    ProfileType.SOLID_CIRCULAR: ["D2-1", "D2-2", "E3", "F11"],
+    ProfileType.FILLED_RECTANGULAR: ["D2-1", "D2-2", "E3", "F11"],
+    ProfileType.FILLED_CIRCULAR: ["D2-1", "D2-2", "E3", "F11"],
 }
 
 
@@ -166,18 +275,14 @@ class ProfileRouter:
             )
 
     @staticmethod
-    def _raise_not_implemented(rule_id: str, section: Section) -> None:
-        raise RuleNotImplementedError(
-            "Applicable AISC clause is not implemented.",
-            details={"section": section.name, "profile_type": section.type, "rule_id": rule_id},
-        )
+    def _raise_not_implemented(rule_id: str, section: Section, *, extra: Optional[dict] = None) -> None:
+        details = {"section": section.name, "profile_type": section.type, "rule_id": rule_id}
+        if extra:
+            details.update(extra)
+        raise RuleNotImplementedError("Applicable AISC clause is not implemented.", details=details)
 
     @classmethod
     def _is_e7_applicable(cls, case: SteelCase, section: Section) -> bool:
-        """
-        Returns True when section has slender compression elements and must be checked by E7.
-        Missing data required for this decision triggers fail-hard.
-        """
         if case.loads.Pu <= 0.0:
             return False
 
@@ -194,6 +299,30 @@ class ProfileRouter:
         return bool(classification.get("is_slender"))
 
     @classmethod
+    def _validate_flexure_selection(cls, case: SteelCase, section: Section, selected_rule_ids: List[str]) -> None:
+        if not _has_any_flexure(case, section):
+            return
+        flexure_rules = {"F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11"}
+        selected_f = [rule_id for rule_id in selected_rule_ids if rule_id in flexure_rules]
+        if selected_f:
+            return
+
+        profile = section.type.upper()
+        if profile == "CHANNEL" and _has_major_flexure(case, section):
+            cls._raise_not_implemented(
+                "ChapterFSelection",
+                section,
+                extra={"reason": "Channel major-axis flexure outside compact F2 scope."},
+            )
+        if profile == "CIRCULAR_HSS":
+            cls._raise_not_implemented(
+                "F8",
+                section,
+                extra={"reason": "Round HSS exceeds F8 applicability limit D/t < 0.45E/Fy or lacks D/t."},
+            )
+        cls._raise_not_implemented("ChapterFSelection", section, extra={"reason": "No Chapter F rule selected."})
+
+    @classmethod
     def get_rules(cls, case: SteelCase, section: Section) -> List:
         profile_type = section.type.upper()
         if profile_type not in PROFILE_RULE_MAP:
@@ -203,6 +332,7 @@ class ProfileRouter:
             )
 
         active_rules = []
+        active_rule_ids: List[str] = []
         e7_applicable = cls._is_e7_applicable(case, section)
         for rule_id in PROFILE_RULE_MAP[profile_type]:
             definition = RULE_DEFINITIONS.get(rule_id)
@@ -221,5 +351,7 @@ class ProfileRouter:
             required_fields = cls._required_fields(section, rule_id, definition)
             cls._validate_section_fields(section, rule_id, required_fields)
             active_rules.append(definition.rule_class())
+            active_rule_ids.append(rule_id)
 
+        cls._validate_flexure_selection(case, section, active_rule_ids)
         return active_rules

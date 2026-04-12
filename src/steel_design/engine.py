@@ -19,6 +19,8 @@ def _build_custom_section(case: SteelCase) -> Section:
         area = math.pi * (diameter**2) / 4.0
         inertia = math.pi * (diameter**4) / 64.0
         radius_of_gyration = diameter / 4.0
+        elastic_modulus = math.pi * (diameter**3) / 32.0
+        plastic_modulus = (diameter**3) / 6.0
         return Section(
             name=case.section_name,
             type=custom.type.value,
@@ -26,6 +28,10 @@ def _build_custom_section(case: SteelCase) -> Section:
             OD=diameter,
             Ix=inertia,
             Iy=inertia,
+            Sx=elastic_modulus,
+            Sy=elastic_modulus,
+            Zx=plastic_modulus,
+            Zy=plastic_modulus,
             rx=radius_of_gyration,
             ry=radius_of_gyration,
         )
@@ -37,6 +43,10 @@ def _build_custom_section(case: SteelCase) -> Section:
     inertia_y = height * (width**3) / 12.0
     radius_of_gyration_x = math.sqrt(inertia_x / area) if area > 0.0 else 0.0
     radius_of_gyration_y = math.sqrt(inertia_y / area) if area > 0.0 else 0.0
+    section_modulus_x = width * (height**2) / 6.0
+    section_modulus_y = height * (width**2) / 6.0
+    plastic_modulus_x = width * (height**2) / 4.0
+    plastic_modulus_y = height * (width**2) / 4.0
     return Section(
         name=case.section_name,
         type=custom.type.value,
@@ -45,6 +55,10 @@ def _build_custom_section(case: SteelCase) -> Section:
         b=width,
         Ix=inertia_x,
         Iy=inertia_y,
+        Sx=section_modulus_x,
+        Sy=section_modulus_y,
+        Zx=plastic_modulus_x,
+        Zy=plastic_modulus_y,
         rx=radius_of_gyration_x,
         ry=radius_of_gyration_y,
     )
@@ -91,16 +105,18 @@ class SteelDesignEngine:
                 )
 
         if section.type.upper() in {"SOLID_CIRCULAR", "SOLID_RECTANGULAR"} and (
-            abs(case.loads.Mux) > 0.0 or abs(case.loads.Muy) > 0.0 or abs(case.loads.Vu) > 0.0
+            abs(case.loads.Vu) > 0.0 or abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0
         ):
             raise ValidationError(
-                "Solid custom sections currently support axial-only design (Pu).",
+                "Solid custom sections currently do not support shear checks (Vu).",
                 details={
                     "section": section.name,
                     "profile_type": section.type,
                     "Mux": case.loads.Mux,
                     "Muy": case.loads.Muy,
                     "Vu": case.loads.Vu,
+                    "Vux": case.loads.Vux,
+                    "Vuy": case.loads.Vuy,
                 },
             )
 
