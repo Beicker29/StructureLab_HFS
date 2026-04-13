@@ -8,6 +8,24 @@ from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
 from ..rules.combined_hss_rules import CombinedH1HssRule, HssCombinedH3_2Rule, HssTorsionH3_1Rule
+from ..rules.composite_rules import (
+    CompositeI1Rule,
+    CompositeI2EncasedCompressionRule,
+    CompositeI2EncasedTensionRule,
+    CompositeI2FilledCompressionRule,
+    CompositeI2FilledTensionRule,
+    CompositeI3_1aRule,
+    CompositeI3_1bRule,
+    CompositeI3_1cRule,
+    CompositeI3_3Rule,
+    CompositeI3_4Rule,
+    CompositeI4_1EncasedGoverningRule,
+    CompositeI4_1FilledRule,
+    CompositeI4_1aEncasedRule,
+    CompositeI4_1bEncasedRule,
+    CompositeI4_1cEncasedRule,
+    CompositeI4_3BeamDeckSteelOnlyRule,
+)
 from ..rules.flexure_rule import (
     FlexureF2LtbRule,
     FlexureF2YieldRule,
@@ -646,7 +664,103 @@ class ProfileRouter:
         cls._raise_not_implemented("ChapterFSelection", section, extra={"reason": "No Chapter F rule selected."})
 
     @classmethod
+    def _validate_composite_scope(cls, case: SteelCase, section: Section) -> None:
+        composite = case.composite
+        if composite is None:
+            return
+        role = composite.role.value
+        method = composite.nominal_strength_method.value
+        profile_type = section.type.upper()
+
+        if method not in {"PLASTIC", "ELASTIC"}:
+            cls._raise_not_implemented(
+                "I1.2",
+                section,
+                extra={
+                    "reason": "Only PLASTIC and ELASTIC methods are implemented in current Chapter I scope.",
+                    "nominal_strength_method": method,
+                },
+            )
+
+        if role == "ENCASED_MEMBER" and profile_type != "W":
+            cls._raise_not_implemented(
+                "I2",
+                section,
+                extra={"reason": "Encased member scope is limited to W steel cores.", "role": role},
+            )
+        if role == "FILLED_MEMBER" and profile_type not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"}:
+            cls._raise_not_implemented(
+                "I2",
+                section,
+                extra={"reason": "Filled member scope is limited to rectangular and round HSS.", "role": role},
+            )
+        if role == "COMPOSITE_BEAM" and profile_type != "W":
+            cls._raise_not_implemented(
+                "I3",
+                section,
+                extra={"reason": "Composite beam scope is limited to W steel beams.", "role": role},
+            )
+        if abs(case.loads.Tu) > 0.0:
+            cls._raise_not_implemented(
+                "ChapterI-Torsion",
+                section,
+                extra={"reason": "Composite Chapter I torsion provisions are outside current scope."},
+            )
+
+    @classmethod
+    def _get_composite_rules(cls, case: SteelCase, section: Section) -> List:
+        cls._validate_composite_scope(case, section)
+        role = case.composite.role.value
+        rules: List = [CompositeI1Rule()]
+
+        if role == "ENCASED_MEMBER":
+            if case.loads.Pu > 0.0:
+                rules.append(CompositeI2EncasedCompressionRule())
+            elif case.loads.Pu < 0.0:
+                rules.append(CompositeI2EncasedTensionRule())
+            rules.append(CompositeI3_3Rule())
+            if _has_shear(case, section):
+                rules.extend(
+                    [
+                        CompositeI4_1aEncasedRule(),
+                        CompositeI4_1bEncasedRule(),
+                        CompositeI4_1cEncasedRule(),
+                        CompositeI4_1EncasedGoverningRule(),
+                    ]
+                )
+            return rules
+
+        if role == "FILLED_MEMBER":
+            if case.loads.Pu > 0.0:
+                rules.append(CompositeI2FilledCompressionRule())
+            elif case.loads.Pu < 0.0:
+                rules.append(CompositeI2FilledTensionRule())
+            rules.append(CompositeI3_4Rule())
+            if _has_shear(case, section):
+                rules.append(CompositeI4_1FilledRule())
+            return rules
+
+        if role == "COMPOSITE_BEAM":
+            if case.loads.Pu != 0.0:
+                cls._raise_not_implemented(
+                    "I2",
+                    section,
+                    extra={"reason": "Composite beam axial design is outside current Chapter I implementation."},
+                )
+            if _has_any_flexure(case, section):
+                rules.extend([CompositeI3_1aRule(), CompositeI3_1bRule(), CompositeI3_1cRule()])
+            if _has_shear(case, section):
+                rules.append(CompositeI4_3BeamDeckSteelOnlyRule())
+            return rules
+
+        cls._raise_not_implemented("ChapterI", section, extra={"reason": "Unknown composite role.", "role": role})
+        return rules
+
+    @classmethod
     def get_rules(cls, case: SteelCase, section: Section) -> List:
+        if case.composite is not None:
+            return cls._get_composite_rules(case, section)
+
         profile_type = section.type.upper()
         if profile_type not in PROFILE_RULE_MAP:
             raise RuleNotImplementedError(

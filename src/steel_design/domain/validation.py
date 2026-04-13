@@ -22,7 +22,7 @@ def validate_case(case: SteelCase):
         raise ValidationError("Cb must be > 0.")
     if case.factors.xa < 0 or case.factors.ya < 0:
         raise ValidationError("Bracing offsets xa and ya must be >= 0.")
-    if case.loads.Pu < 0.0:
+    if case.loads.Pu < 0.0 and case.composite is None:
         if case.connection.An is None or case.connection.An <= 0.0:
             raise ValidationError(
                 "connection.An is required and must be > 0 for tension cases.",
@@ -45,3 +45,56 @@ def validate_case(case: SteelCase):
             "Chapter F flexural checks are implemented only for LRFD in the current scope.",
             details={"design_method_received": case.design_method.value, "design_method_required": "LRFD"},
         )
+    if case.composite is not None:
+        if case.design_method.value != "LRFD":
+            raise ValidationError(
+                "Chapter I composite checks are implemented only for LRFD in the current scope.",
+                details={"design_method_received": case.design_method.value, "design_method_required": "LRFD"},
+            )
+
+        concrete = case.composite.concrete
+        if concrete.fc <= 0.0 or concrete.wc <= 0.0:
+            raise ValidationError(
+                "composite.concrete.fc and composite.concrete.wc must be > 0.",
+                details={"fc": concrete.fc, "wc": concrete.wc},
+            )
+
+        role = case.composite.role.value
+        if role == "ENCASED_MEMBER":
+            if case.composite.geometry.B is None or case.composite.geometry.B <= 0.0:
+                raise ValidationError(
+                    "composite.geometry.B is required for ENCASED_MEMBER.",
+                    details={"required_field": "composite.geometry.B"},
+                )
+            if case.composite.geometry.H is None or case.composite.geometry.H <= 0.0:
+                raise ValidationError(
+                    "composite.geometry.H is required for ENCASED_MEMBER.",
+                    details={"required_field": "composite.geometry.H"},
+                )
+            if case.composite.geometry.cover is None or case.composite.geometry.cover <= 0.0:
+                raise ValidationError(
+                    "composite.geometry.cover is required for ENCASED_MEMBER.",
+                    details={"required_field": "composite.geometry.cover"},
+                )
+            if not case.composite.reinforcement.longitudinal_bars:
+                raise ValidationError(
+                    "composite.reinforcement.longitudinal_bars is required for ENCASED_MEMBER.",
+                    details={"required_field": "composite.reinforcement.longitudinal_bars"},
+                )
+            if case.composite.reinforcement.transverse is None:
+                raise ValidationError(
+                    "composite.reinforcement.transverse is required for ENCASED_MEMBER.",
+                    details={"required_field": "composite.reinforcement.transverse"},
+                )
+
+        if role == "COMPOSITE_BEAM":
+            if case.composite.geometry.slab_effective_width is None or case.composite.geometry.slab_effective_width <= 0.0:
+                raise ValidationError(
+                    "composite.geometry.slab_effective_width is required for COMPOSITE_BEAM.",
+                    details={"required_field": "composite.geometry.slab_effective_width"},
+                )
+            if case.composite.geometry.slab_thickness is None or case.composite.geometry.slab_thickness <= 0.0:
+                raise ValidationError(
+                    "composite.geometry.slab_thickness is required for COMPOSITE_BEAM.",
+                    details={"required_field": "composite.geometry.slab_thickness"},
+                )

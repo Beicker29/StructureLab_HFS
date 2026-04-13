@@ -88,7 +88,7 @@ class SteelDesignEngine:
             if not section:
                 raise SectionNotFoundError(f"Section {case.section_name} not found in database.")
 
-        if case.loads.Pu < 0.0:
+        if case.loads.Pu < 0.0 and case.composite is None:
             an = case.connection.An or 0.0
             u_factor = case.connection.U or 0.0
             ae = an * u_factor
@@ -120,13 +120,18 @@ class SteelDesignEngine:
                 },
             )
 
-        if section.type.upper() == "SINGLE_ANGLE" and case.loads.Pu > 0 and case.connection.angle_compression_mode is None:
+        if (
+            section.type.upper() == "SINGLE_ANGLE"
+            and case.loads.Pu > 0
+            and case.connection.angle_compression_mode is None
+            and case.composite is None
+        ):
             raise ValidationError(
                 "angle_compression_mode is required for single-angle compression (E5).",
                 details={"section": section.name, "required_field": "connection.angle_compression_mode"},
             )
 
-        if abs(case.loads.Tu) > 0.0 and section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"}:
+        if abs(case.loads.Tu) > 0.0 and section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"} and case.composite is None:
             raise RuleNotImplementedError(
                 "Torsion is implemented only for round and rectangular HSS in current scope (H3.1/H3.2).",
                 details={"section": section.name, "profile_type": section.type, "requested_clause": "H3.3"},

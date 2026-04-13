@@ -1,0 +1,569 @@
+{
+  "meta": {
+    "generated_at_utc": "20260413T022055230009Z",
+    "profile_type": "W",
+    "section_name": "W12X26",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\composite_beam_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 1.0,
+      "governing_clauses": [
+        "I1"
+      ],
+      "governing_check_names": [
+        "Composite General Provisions I1"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 45.80152671755725,
+          "KL_over_r_y": 156.25,
+          "KL_over_r_governing": 156.25,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "I1",
+        "name": "Composite General Provisions I1",
+        "calculations": {
+          "clause": "I1",
+          "inputs": {
+            "role": "COMPOSITE_BEAM",
+            "nominal_strength_method": "PLASTIC",
+            "fc_mpa": 28.0,
+            "wc_kg_m3": 2400.0,
+            "section": "W12X26",
+            "profile_type": "W"
+          },
+          "intermediate": {
+            "Ec_mpa": 26752.497603027645,
+            "section_components": {
+              "As_mm2": 4940.0,
+              "Asr_mm2": 0.0,
+              "Ac_mm2": 264000.0,
+              "Ag_mm2": 268940.0,
+              "Is_x_mm4": 84900000.0,
+              "Is_y_mm4": 7200000.0,
+              "Isr_x_mm4": 0.0,
+              "Isr_y_mm4": 0.0,
+              "Ic_x_mm4": 316800000.0,
+              "Ic_y_mm4": 316800000.0,
+              "Fysr_mpa": 0.0,
+              "slab_effective_width_mm": 2200.0,
+              "slab_thickness_mm": 120.0
+            },
+            "local_buckling_classification": {},
+            "i1_2_supported_methods": [
+              "PLASTIC",
+              "ELASTIC"
+            ]
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "capacity_expression": "config_validity"
+          },
+          "capacity": 1.0
+        },
+        "check_summary": {
+          "demand": 1.0,
+          "capacity": 1.0,
+          "dcr": 1.0,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = config_validity",
+              "value_used_for_dcr": 1.0,
+              "value_reported_in_check": 1.0,
+              "value_from_rule_memory": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1.000000 / 1.000000",
+              "value_raw": 1.0,
+              "value_rounded_3dec": 1.0,
+              "value_reported_in_check": 1.0,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I3-1a",
+        "name": "Load Transfer Concrete Crushing I3-1a",
+        "calculations": {
+          "clause": "I3-1a",
+          "inputs": {
+            "fc_mpa": 28.0,
+            "Ac_effective_mm2": 264000.0
+          },
+          "intermediate": {
+            "V_required_kN": 1704.3,
+            "V_concrete_kN": 6283.2
+          },
+          "capacity_kn": 6283.2
+        },
+        "check_summary": {
+          "demand": 1704.3,
+          "capacity": 6283.2,
+          "dcr": 0.271,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1704.3,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = rule_capacity",
+              "value_used_for_dcr": 6283.2,
+              "value_reported_in_check": 6283.2,
+              "value_from_rule_memory": 6283.2,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1704.300000 / 6283.200000",
+              "value_raw": 0.2712471352177235,
+              "value_rounded_3dec": 0.271,
+              "value_reported_in_check": 0.271,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I3-1b",
+        "name": "Load Transfer Steel Yielding I3-1b",
+        "calculations": {
+          "clause": "I3-1b",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "As_mm2": 4940.0
+          },
+          "intermediate": {
+            "V_required_kN": 1704.3,
+            "V_steel_kN": 1704.3
+          },
+          "capacity_kn": 1704.3
+        },
+        "check_summary": {
+          "demand": 1704.3,
+          "capacity": 1704.3,
+          "dcr": 1.0,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1704.3,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = rule_capacity",
+              "value_used_for_dcr": 1704.3,
+              "value_reported_in_check": 1704.3,
+              "value_from_rule_memory": 1704.3,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1704.300000 / 1704.300000",
+              "value_raw": 1.0,
+              "value_rounded_3dec": 1.0,
+              "value_reported_in_check": 1.0,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I3-1c",
+        "name": "Load Transfer Steel Anchors I3-1c",
+        "calculations": {
+          "clause": "I3-1c",
+          "inputs": {
+            "anchors_segment": "positive",
+            "groups_count": 2
+          },
+          "intermediate": {
+            "V_required_kN": 1704.3,
+            "sum_Qn_kN": 2879.0168702652236,
+            "anchor_groups": [
+              {
+                "type": "STUD",
+                "count": 20,
+                "segment": "positive",
+                "Qn_one_n": 92021.54775079983,
+                "Qn_group_n": 1840430.9550159965,
+                "Asa_mm2": 283.5287369864788,
+                "Q_concrete_n": 92021.54775079983,
+                "Q_steel_n": 127587.93164391546,
+                "Rg": 1.0,
+                "Rp": 0.75
+              },
+              {
+                "type": "CHANNEL",
+                "count": 4,
+                "segment": "positive",
+                "Qn_one_n": 259646.47881230674,
+                "Qn_group_n": 1038585.915249227
+              }
+            ]
+          },
+          "capacity_kn": 2879.0168702652236
+        },
+        "check_summary": {
+          "demand": 1704.3,
+          "capacity": 2879.017,
+          "dcr": 0.592,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1704.3,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = rule_capacity",
+              "value_used_for_dcr": 2879.0168702652236,
+              "value_reported_in_check": 2879.017,
+              "value_from_rule_memory": 2879.0168702652236,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1704.300000 / 2879.016870",
+              "value_raw": 0.5919729118652212,
+              "value_rounded_3dec": 0.592,
+              "value_reported_in_check": 0.592,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I4-3",
+        "name": "Composite Beam Shear Steel Only I4-3",
+        "calculations": {
+          "clause": "I4-3",
+          "inputs": {
+            "Vu_kN": 80.0,
+            "deck_present": true
+          },
+          "intermediate": {
+            "Vn_n": 374752.8,
+            "phiVn_kN": 337.27752000000004,
+            "h_over_tw": 53.08219178082192,
+            "Aw_mm2": 1810.3999999999999,
+            "Cv": 1.0,
+            "cv_branch": "G2-3"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.9,
+            "capacity_expression": "phi_v*Vn_steel_only"
+          },
+          "capacity_kn": 337.27752000000004
+        },
+        "check_summary": {
+          "demand": 80.0,
+          "capacity": 337.278,
+          "dcr": 0.237,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 80.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn_steel_only",
+              "value_used_for_dcr": 337.27752000000004,
+              "value_reported_in_check": 337.278,
+              "value_from_rule_memory": 337.27752000000004,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 80.000000 / 337.277520",
+              "value_raw": 0.23719339492297023,
+              "value_rounded_3dec": 0.237,
+              "value_reported_in_check": 0.237,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 45.80152671755725,
+      "KL_over_r_y": 156.25,
+      "KL_over_r_governing": 156.25,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "W12X26",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 0.0,
+      "Mux": 120.0,
+      "Muy": 0.0,
+      "Vux": 80.0,
+      "Vuy": 0.0
+    },
+    "lengths": {
+      "Lx": 6000.0,
+      "Ly": 6000.0,
+      "Lz": 6000.0,
+      "Lb": 6000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {},
+    "composite": {
+      "role": "COMPOSITE_BEAM",
+      "nominal_strength_method": "PLASTIC",
+      "concrete": {
+        "fc": 28.0,
+        "wc": 2400.0
+      },
+      "geometry": {
+        "slab_effective_width": 2200.0,
+        "slab_thickness": 120.0,
+        "deck_present": true
+      },
+      "anchors": {
+        "groups": [
+          {
+            "type": "STUD",
+            "count": 20,
+            "segment": "positive",
+            "d": 19.0,
+            "Fu": 450.0,
+            "Rg": 1.0,
+            "Rp": 0.75
+          },
+          {
+            "type": "CHANNEL",
+            "count": 4,
+            "segment": "positive",
+            "la": 100.0,
+            "tf": 8.0,
+            "tw": 6.0
+          }
+        ]
+      }
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Composite General Provisions I1",
+        "code": "AISC 360-22",
+        "clause": "I1",
+        "demand": 1.0,
+        "capacity": 1.0,
+        "dcr": 1.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Load Transfer Concrete Crushing I3-1a",
+        "code": "AISC 360-22",
+        "clause": "I3-1a",
+        "demand": 1704.3,
+        "capacity": 6283.2,
+        "dcr": 0.271,
+        "status": "PASS"
+      },
+      {
+        "name": "Load Transfer Steel Yielding I3-1b",
+        "code": "AISC 360-22",
+        "clause": "I3-1b",
+        "demand": 1704.3,
+        "capacity": 1704.3,
+        "dcr": 1.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Load Transfer Steel Anchors I3-1c",
+        "code": "AISC 360-22",
+        "clause": "I3-1c",
+        "demand": 1704.3,
+        "capacity": 2879.017,
+        "dcr": 0.592,
+        "status": "PASS"
+      },
+      {
+        "name": "Composite Beam Shear Steel Only I4-3",
+        "code": "AISC 360-22",
+        "clause": "I4-3",
+        "demand": 80.0,
+        "capacity": 337.278,
+        "dcr": 0.237,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 45.80152671755725,
+        "KL_over_r_y": 156.25,
+        "KL_over_r_governing": 156.25,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

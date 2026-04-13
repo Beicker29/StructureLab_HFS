@@ -1,0 +1,984 @@
+{
+  "meta": {
+    "generated_at_utc": "20260413T022108202304Z",
+    "profile_type": "W",
+    "section_name": "W12X26",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\w_shape_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 41.607,
+      "governing_clauses": [
+        "F6-1",
+        "F6-2"
+      ],
+      "governing_check_names": [
+        "Flexure F6-1 - Yielding (Minor Axis)",
+        "Flexure F6-2 - Flange Local Buckling (Minor Axis)"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 57.25190839694657,
+          "KL_over_r_y": 195.3125,
+          "KL_over_r_governing": 195.3125,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "W",
+        "overall": "slender",
+        "is_slender": true,
+        "elements": {
+          "flange": {
+            "ratio": 8.54,
+            "lambda_r": 13.483215545606152,
+            "classification": "non_slender"
+          },
+          "web": {
+            "ratio": 47.2,
+            "lambda_r": 35.874984219559224,
+            "classification": "slender"
+          }
+        }
+      }
+    },
+    "clause_results": [
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "calculations": {
+          "clause": "E3",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 4940.0,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 7500.0,
+            "Ly_mm": 7500.0,
+            "rx_mm": 131.0,
+            "ry_mm": 38.4
+          },
+          "intermediate": {
+            "KL_over_r_x": 57.25190839694657,
+            "KL_over_r_y": 195.3125,
+            "governing_axis": "y",
+            "Fex_mpa": 602.212555118558,
+            "Fey_mpa": 51.745151522383374,
+            "Fe_mpa": 51.745151522383374,
+            "fy_over_fe": 6.667291327782923,
+            "branch": "elastic_E3_3",
+            "fcr_mpa": 45.38049788513022,
+            "pn_n": 224179.65955254328,
+            "pn_kn": 224.17965955254328,
+            "be_mm": null,
+            "be_note": "Not required in current E3 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 201.76169359728897
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 201.762,
+          "dcr": 0.892,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi*Pn",
+              "value_used_for_dcr": 201.76169359728897,
+              "value_reported_in_check": 201.762,
+              "value_from_rule_memory": 201.76169359728897,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 201.761694",
+              "value_raw": 0.892141599283337,
+              "value_rounded_3dec": 0.892,
+              "value_reported_in_check": 0.892,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "E4-1",
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "calculations": {
+          "clause": "E4",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "G_mpa": 77200.0,
+            "Ag_mm2": 4940.0,
+            "Kz": 1.0,
+            "Lz_mm": 7500.0,
+            "Ky": 1.0,
+            "Ly_mm": 7500.0,
+            "ry_mm": 38.4,
+            "J_mm4": 125000.0,
+            "Cw_mm6": 163000000000.0,
+            "H": null,
+            "xa_mm": 0.0,
+            "ya_mm": 0.0
+          },
+          "intermediate": {
+            "KL_over_r_x": 57.25190839694657,
+            "KL_over_r_y": 195.3125,
+            "KL_over_r_z": 54.92814376254396,
+            "ro_mm": 136.54202538543316,
+            "ro_source": "derived_from_ix_iy_ag",
+            "Fex_mpa": 602.212555118558,
+            "Fey_mpa": 51.745151522383374,
+            "Fez_mpa": 166.8836488793366,
+            "Fe_mpa": 166.8836488793366,
+            "e4_mode": "torsional",
+            "warping_term_n": 5719984061.7869,
+            "stvenant_term_n": 9650000000.0,
+            "torsional_stiffness_n": 15369984061.7869,
+            "torsional_denominator_mm4": 92100000.0,
+            "flexural_torsional_terms": null,
+            "fy_over_fe": 2.067308584853921,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 145.22317398837868,
+            "pn_n": 717402.4795025906,
+            "pn_kn": 717.4024795025906,
+            "be_mm": null,
+            "be_note": "be is not explicitly modeled in current E4 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 645.6622315523316
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 645.662,
+          "dcr": 0.279,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi*Pn",
+              "value_used_for_dcr": 645.6622315523316,
+              "value_reported_in_check": 645.662,
+              "value_from_rule_memory": 645.6622315523316,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 645.662232",
+              "value_raw": 0.27878353604056333,
+              "value_rounded_3dec": 0.279,
+              "value_reported_in_check": 0.279,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "E7-1",
+        "name": "Axial Compression (Slender Elements)",
+        "calculations": {
+          "clause": "E7",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 4940.0,
+            "slenderness_ratios": {
+              "bf_2tf_ratio": 8.54,
+              "b_t_ratio": null,
+              "b_tdes_ratio": null,
+              "h_tw_ratio": 47.2,
+              "h_tdes_ratio": null,
+              "d_t_ratio": null
+            }
+          },
+          "intermediate": {
+            "KL_over_r_x": 57.25190839694657,
+            "KL_over_r_y": 195.3125,
+            "Fex_mpa": 602.212555118558,
+            "Fey_mpa": 51.745151522383374,
+            "Fez_mpa": 166.8836488793366,
+            "Fe_mpa": 51.745151522383374,
+            "fe_e3_mpa": 51.745151522383374,
+            "fe_e4_mpa": 166.8836488793366,
+            "q_factor": 0.7600632249906615,
+            "qFy_mpa": 262.2218126217782,
+            "fy_over_fe": 5.067562948546958,
+            "branch": "elastic_E3_3",
+            "fcr_mpa": 45.38049788513022,
+            "pn_n": 224179.65955254328,
+            "pn_kn": 224.17965955254328,
+            "be_mm": null,
+            "be_note": "be is not explicitly modeled in current E7 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 201.76169359728897
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 201.762,
+          "dcr": 0.892,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi*Pn",
+              "value_used_for_dcr": 201.76169359728897,
+              "value_reported_in_check": 201.762,
+              "value_from_rule_memory": 201.76169359728897,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 201.761694",
+              "value_raw": 0.892141599283337,
+              "value_rounded_3dec": 0.892,
+              "value_reported_in_check": 0.892,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F2-1",
+        "name": "Flexure F2-1 - Yielding (Major Axis)",
+        "calculations": {
+          "chapter_f_selection": "F2-1",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Cb": 1.0,
+            "Lb_mm": 7500.0,
+            "Mux_kn_m": 45.0,
+            "Zx_mm3": 610000.0,
+            "Sx_mm3": 547000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 210450000.0,
+            "ltb_Mn_Nmm": 62124934.24216762
+          },
+          "intermediate": {
+            "Lp_mm": 1627.2314989897252,
+            "Lr_mm": 4530.467287841678,
+            "Fcr_mpa": 113.57392000396274,
+            "rts_mm": 44.4,
+            "c_factor": 1.0,
+            "reported_limit_state": "yielding"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 210450000.0,
+          "capacity_kn_m": 189.405
+        },
+        "check_summary": {
+          "demand": 45.0,
+          "capacity": 189.405,
+          "dcr": 0.238,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 45.0,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 189.405,
+              "value_reported_in_check": 189.405,
+              "value_from_rule_memory": 189.405,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 45.000000 / 189.405000",
+              "value_raw": 0.23758612497030174,
+              "value_rounded_3dec": 0.238,
+              "value_reported_in_check": 0.238,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F2-2",
+        "name": "Flexure F2-2 - Lateral-Torsional Buckling (Major Axis)",
+        "calculations": {
+          "chapter_f_selection": "F2-2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Cb": 1.0,
+            "Lb_mm": 7500.0,
+            "Mux_kn_m": 45.0,
+            "Zx_mm3": 610000.0,
+            "Sx_mm3": 547000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 210450000.0,
+            "ltb_Mn_Nmm": 62124934.24216762
+          },
+          "intermediate": {
+            "Lp_mm": 1627.2314989897252,
+            "Lr_mm": 4530.467287841678,
+            "Fcr_mpa": 113.57392000396274,
+            "rts_mm": 44.4,
+            "c_factor": 1.0,
+            "reported_limit_state": "lateral_torsional_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 62124934.24216762,
+          "capacity_kn_m": 55.91244081795086
+        },
+        "check_summary": {
+          "demand": 45.0,
+          "capacity": 55.912,
+          "dcr": 0.805,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 45.0,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 55.91244081795086,
+              "value_reported_in_check": 55.912,
+              "value_from_rule_memory": 55.91244081795086,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 45.000000 / 55.912441",
+              "value_raw": 0.804829825736254,
+              "value_rounded_3dec": 0.805,
+              "value_reported_in_check": 0.805,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F6-1",
+        "name": "Flexure F6-1 - Yielding (Minor Axis)",
+        "calculations": {
+          "chapter_f_selection": "F6-1",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Muy_kn_m": 2.0,
+            "Zy_mm3": 134000.0,
+            "Sy_mm3": 87500.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 46230000.0,
+            "flange_local_buckling_Mn_Nmm": 46230000.0
+          },
+          "intermediate": {
+            "lambda_f": 8.54,
+            "lambda_pf": 9.14932483451846,
+            "lambda_rf": 24.07717061715384,
+            "flange_class": "compact",
+            "reported_limit_state": "yielding"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 46230000.0,
+          "capacity_kn_m": 41.607
+        },
+        "check_summary": {
+          "demand": 2.0,
+          "capacity": 41.607,
+          "dcr": 0.048,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 2.0,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 41.607,
+              "value_reported_in_check": 41.607,
+              "value_from_rule_memory": 41.607,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 2.000000 / 41.607000",
+              "value_raw": 0.04806883457110583,
+              "value_rounded_3dec": 0.048,
+              "value_reported_in_check": 0.048,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F6-2",
+        "name": "Flexure F6-2 - Flange Local Buckling (Minor Axis)",
+        "calculations": {
+          "chapter_f_selection": "F6-2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Muy_kn_m": 2.0,
+            "bf_2tf_ratio": 8.54
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 46230000.0,
+            "flange_local_buckling_Mn_Nmm": 46230000.0
+          },
+          "intermediate": {
+            "lambda_f": 8.54,
+            "lambda_pf": 9.14932483451846,
+            "lambda_rf": 24.07717061715384,
+            "flange_class": "compact",
+            "reported_limit_state": "flange_local_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 46230000.0,
+          "capacity_kn_m": 41.607
+        },
+        "check_summary": {
+          "demand": 2.0,
+          "capacity": 41.607,
+          "dcr": 0.048,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 2.0,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 41.607,
+              "value_reported_in_check": 41.607,
+              "value_from_rule_memory": 41.607,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 2.000000 / 41.607000",
+              "value_raw": 0.04806883457110583,
+              "value_rounded_3dec": 0.048,
+              "value_reported_in_check": 0.048,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "G2-1",
+        "name": "Shear G2-1 - Web Shear (Major Axis Vy)",
+        "calculations": {
+          "clause": "G2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Vux_kn": 1.0,
+            "tw_mm": 5.84,
+            "d_mm": 310.0,
+            "h_over_tw": 47.2,
+            "Aw_mm2": 1810.3999999999999,
+            "kv": 5.34
+          },
+          "intermediate": {
+            "Cv1": 1.0,
+            "Cv1_branch": "G2-3",
+            "Cv1_limit_g2_3": 61.20244382730794,
+            "g2_1a_limit_2_24_sqrtE_over_Fy": 53.93286218242461,
+            "design_branch": "G2-2",
+            "Vn_N": 374752.8,
+            "Vn_kN": 374.7528
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 1.0,
+            "omega_v": 1.5,
+            "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)"
+          },
+          "capacity_kn": 374.7528
+        },
+        "check_summary": {
+          "demand": 1.0,
+          "capacity": 374.753,
+          "dcr": 0.003,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
+              "value_used_for_dcr": 374.7528,
+              "value_reported_in_check": 374.753,
+              "value_from_rule_memory": 374.7528,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1.000000 / 374.752800",
+              "value_raw": 0.0026684256928834155,
+              "value_rounded_3dec": 0.003,
+              "value_reported_in_check": 0.003,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "G6-1",
+        "name": "Shear G6-1 - Minor-Axis Shear (Minor Axis Vx)",
+        "calculations": {
+          "clause": "G6",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Vuy_kn": 5.0,
+            "bf_mm": 165.0,
+            "tf_mm": 9.65,
+            "shear_elements": 2.0,
+            "bf_over_effective_tf": 8.54,
+            "kv": 1.2
+          },
+          "intermediate": {
+            "Cv2": 1.0,
+            "Cv2_branch": "G2-9",
+            "Cv2_limit_g2_9": 29.012740829414632,
+            "Cv2_limit_g2_10": 36.13404994208913,
+            "Aw_mm2": 3184.5,
+            "Vn_N": 659191.5,
+            "Vn_kN": 659.1915
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.9,
+            "omega_v": 1.67,
+            "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)"
+          },
+          "capacity_kn": 593.27235
+        },
+        "check_summary": {
+          "demand": 5.0,
+          "capacity": 593.272,
+          "dcr": 0.008,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 5.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
+              "value_used_for_dcr": 593.27235,
+              "value_reported_in_check": 593.272,
+              "value_from_rule_memory": 593.27235,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 5.000000 / 593.272350",
+              "value_raw": 0.00842783251233603,
+              "value_rounded_3dec": 0.008,
+              "value_reported_in_check": 0.008,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 57.25190839694657,
+      "KL_over_r_y": 195.3125,
+      "KL_over_r_governing": 195.3125,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "W12X26",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 180.0,
+      "Mux": 45.0,
+      "Muy": 2.0,
+      "Vux": 1.0,
+      "Vuy": 5.0
+    },
+    "lengths": {
+      "Lx": 7500.0,
+      "Ly": 7500.0,
+      "Lz": 7500.0,
+      "Lb": 7500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "An": 150.0,
+      "U": 0.85
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 180.0,
+        "capacity": 201.762,
+        "dcr": 0.892,
+        "status": "PASS"
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 180.0,
+        "capacity": 645.662,
+        "dcr": 0.279,
+        "status": "PASS"
+      },
+      {
+        "name": "Axial Compression (Slender Elements)",
+        "code": "AISC 360-22",
+        "clause": "E7-1",
+        "demand": 180.0,
+        "capacity": 201.762,
+        "dcr": 0.892,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F2-1 - Yielding (Major Axis)",
+        "code": "AISC 360-22",
+        "clause": "F2-1",
+        "demand": 45.0,
+        "capacity": 189.405,
+        "dcr": 0.238,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F2-2 - Lateral-Torsional Buckling (Major Axis)",
+        "code": "AISC 360-22",
+        "clause": "F2-2",
+        "demand": 45.0,
+        "capacity": 55.912,
+        "dcr": 0.805,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F6-1 - Yielding (Minor Axis)",
+        "code": "AISC 360-22",
+        "clause": "F6-1",
+        "demand": 2.0,
+        "capacity": 41.607,
+        "dcr": 0.048,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F6-2 - Flange Local Buckling (Minor Axis)",
+        "code": "AISC 360-22",
+        "clause": "F6-2",
+        "demand": 2.0,
+        "capacity": 41.607,
+        "dcr": 0.048,
+        "status": "PASS"
+      },
+      {
+        "name": "Shear G2-1 - Web Shear (Major Axis Vy)",
+        "code": "AISC 360-22",
+        "clause": "G2-1",
+        "demand": 1.0,
+        "capacity": 374.753,
+        "dcr": 0.003,
+        "status": "PASS"
+      },
+      {
+        "name": "Shear G6-1 - Minor-Axis Shear (Minor Axis Vx)",
+        "code": "AISC 360-22",
+        "clause": "G6-1",
+        "demand": 5.0,
+        "capacity": 593.272,
+        "dcr": 0.008,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 57.25190839694657,
+        "KL_over_r_y": 195.3125,
+        "KL_over_r_governing": 195.3125,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

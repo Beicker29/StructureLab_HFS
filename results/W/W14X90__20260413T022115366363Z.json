@@ -1,0 +1,749 @@
+{
+  "meta": {
+    "generated_at_utc": "20260413T022115366363Z",
+    "profile_type": "W",
+    "section_name": "W14X90",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\composite_encased_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 0.013,
+      "governing_clauses": [
+        "I3-3"
+      ],
+      "governing_check_names": [
+        "Minimum Reinforcement Ratio I3-3"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 19.23076923076923,
+          "KL_over_r_y": 31.914893617021278,
+          "KL_over_r_governing": 31.914893617021278,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "I1",
+        "name": "Composite General Provisions I1",
+        "calculations": {
+          "clause": "I1",
+          "inputs": {
+            "role": "ENCASED_MEMBER",
+            "nominal_strength_method": "PLASTIC",
+            "fc_mpa": 35.0,
+            "wc_kg_m3": 2400.0,
+            "section": "W14X90",
+            "profile_type": "W"
+          },
+          "intermediate": {
+            "Ec_mpa": 29910.201604134996,
+            "section_components": {
+              "As_mm2": 17100.0,
+              "Asr_mm2": 3926.9908169872415,
+              "Ac_mm2": 281473.00918301276,
+              "Ag_mm2": 302500.0,
+              "Is_x_mm4": 416000000.0,
+              "Is_y_mm4": 151000000.0,
+              "Isr_x_mm4": 157079632.67948967,
+              "Isr_y_mm4": 157079632.67948967,
+              "Ic_x_mm4": 7052441200.653843,
+              "Ic_y_mm4": 7317441200.653843,
+              "Fysr_mpa": 420.0,
+              "B_mm": 550.0,
+              "H_mm": 550.0
+            },
+            "local_buckling_classification": {},
+            "i1_2_supported_methods": [
+              "PLASTIC",
+              "ELASTIC"
+            ]
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "capacity_expression": "config_validity"
+          },
+          "capacity": 1.0
+        },
+        "check_summary": {
+          "demand": 1.0,
+          "capacity": 1.0,
+          "dcr": 1.0,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = config_validity",
+              "value_used_for_dcr": 1.0,
+              "value_reported_in_check": 1.0,
+              "value_from_rule_memory": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1.000000 / 1.000000",
+              "value_raw": 1.0,
+              "value_rounded_3dec": 1.0,
+              "value_reported_in_check": 1.0,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I2-1b",
+        "name": "Composite Axial Compression (Encased) I2",
+        "calculations": {
+          "clause": "I2-1b",
+          "inputs": {
+            "Pu_kN": 950.0,
+            "Fy_mpa": 345.0,
+            "fc_mpa": 35.0,
+            "As_mm2": 17100.0,
+            "Asr_mm2": 3926.9908169872415,
+            "Ac_mm2": 281473.00918301276,
+            "Ag_mm2": 302500.0,
+            "Fysr_mpa": 420.0,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 3000.0,
+            "Ly_mm": 3000.0
+          },
+          "intermediate": {
+            "Pno_n_I2_7": 15922658.166329272,
+            "C1_I2_6": 0.4085321403337578,
+            "effective_rigidity": {
+              "Ec_mpa": 29910.201604134996,
+              "EIx_eff_n_mm2": 200791670935016.8,
+              "EIy_eff_n_mm2": 151029779784991.94,
+              "Pe_n": 165622686.58461255,
+              "Pe_axis": "y",
+              "Pe_x_n": 220192706.573592,
+              "Pe_y_n": 165622686.58461255
+            },
+            "buckling": {
+              "Pn_n": 15294671.227269983,
+              "ratio_pno_over_pe": 0.0961381468606644,
+              "branch": "I2-2"
+            },
+            "phiPn_composite_kN": 11471.003420452487,
+            "steel_floor_kN_chapter_E": 4919.675836839474,
+            "governing_capacity_kN": 11471.003420452487
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_c": 0.75,
+            "capacity_expression": "max(phi_c*Pn_composite, steel_floor_E)"
+          },
+          "capacity_kn": 11471.003420452487
+        },
+        "check_summary": {
+          "demand": 950.0,
+          "capacity": 11471.003,
+          "dcr": 0.083,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 950.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = max(phi_c*Pn_composite, steel_floor_E)",
+              "value_used_for_dcr": 11471.003420452487,
+              "value_reported_in_check": 11471.003,
+              "value_from_rule_memory": 11471.003420452487,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 950.000000 / 11471.003420",
+              "value_raw": 0.08281751518844252,
+              "value_rounded_3dec": 0.083,
+              "value_reported_in_check": 0.083,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I3-3",
+        "name": "Minimum Reinforcement Ratio I3-3",
+        "calculations": {
+          "clause": "I3-3",
+          "inputs": {
+            "Asr_mm2": 3926.9908169872415,
+            "Ag_mm2": 302500.0
+          },
+          "intermediate": {
+            "rho_sr": 0.012981787824751212,
+            "rho_sr_min_required": 0.004
+          },
+          "capacity": 0.012981787824751212
+        },
+        "check_summary": {
+          "demand": 0.004,
+          "capacity": 0.013,
+          "dcr": 0.308,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.004,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = rule_capacity",
+              "value_used_for_dcr": 0.012981787824751212,
+              "value_reported_in_check": 0.013,
+              "value_from_rule_memory": 0.012981787824751212,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.004000 / 0.012982",
+              "value_raw": 0.3081239698259094,
+              "value_rounded_3dec": 0.308,
+              "value_reported_in_check": 0.308,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I4-1a",
+        "name": "Encased Shear Steel Only I4-1a",
+        "calculations": {
+          "clause": "I4-1a",
+          "inputs": {
+            "Vu_kN": 180.0,
+            "Fy_mpa": 345.0
+          },
+          "intermediate": {
+            "Vn_n": 825350.3999999999,
+            "phiVn_kN": 742.8153599999999,
+            "h_over_tw": 31.78571428571429,
+            "Aw_mm2": 3987.2,
+            "Cv": 1.0,
+            "cv_branch": "G2-3"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.9,
+            "capacity_expression": "phi_v*Vn_steel"
+          },
+          "capacity_kn": 742.8153599999999
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 742.815,
+          "dcr": 0.242,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn_steel",
+              "value_used_for_dcr": 742.8153599999999,
+              "value_reported_in_check": 742.815,
+              "value_from_rule_memory": 742.8153599999999,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 742.815360",
+              "value_raw": 0.24232132195004694,
+              "value_rounded_3dec": 0.242,
+              "value_reported_in_check": 0.242,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I4-1b",
+        "name": "Encased Shear RC Only I4-1b",
+        "calculations": {
+          "clause": "I4-1b",
+          "inputs": {
+            "Vu_kN": 180.0,
+            "fc_mpa": 35.0,
+            "B_mm": 550.0,
+            "H_mm": 550.0
+          },
+          "intermediate": {
+            "d_eff_mm": 440.0,
+            "Vc_n": 243387.52227671823,
+            "Vs_n": 161268.42288427602,
+            "Vn_n": 404655.94516099425
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.75,
+            "capacity_expression": "phi_v*(Vc+Vs)"
+          },
+          "capacity_kn": 303.4919588707457
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 303.492,
+          "dcr": 0.593,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*(Vc+Vs)",
+              "value_used_for_dcr": 303.4919588707457,
+              "value_reported_in_check": 303.492,
+              "value_from_rule_memory": 303.4919588707457,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 303.491959",
+              "value_raw": 0.593096438764825,
+              "value_rounded_3dec": 0.593,
+              "value_reported_in_check": 0.593,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I4-1c",
+        "name": "Encased Shear Steel+Transverse I4-1c",
+        "calculations": {
+          "clause": "I4-1c",
+          "inputs": {
+            "Vu_kN": 180.0
+          },
+          "intermediate": {
+            "Vn_steel_n": 825350.3999999999,
+            "Vs_n": 161268.42288427602,
+            "Vn_n": 986618.8228842759,
+            "steel_component": {
+              "Vn_n": 825350.3999999999,
+              "phiVn_kN": 742.8153599999999,
+              "h_over_tw": 31.78571428571429,
+              "Aw_mm2": 3987.2,
+              "Cv": 1.0,
+              "cv_branch": "G2-3"
+            }
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.75,
+            "capacity_expression": "phi_v*(Vn_steel+Vs)"
+          },
+          "capacity_kn": 739.9641171632069
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 739.964,
+          "dcr": 0.243,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*(Vn_steel+Vs)",
+              "value_used_for_dcr": 739.9641171632069,
+              "value_reported_in_check": 739.964,
+              "value_from_rule_memory": 739.9641171632069,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 739.964117",
+              "value_raw": 0.24325503875791196,
+              "value_rounded_3dec": 0.243,
+              "value_reported_in_check": 0.243,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I4-1",
+        "name": "Encased Shear Governing I4-1",
+        "calculations": {
+          "clause": "I4-1",
+          "inputs": {
+            "Vu_kN": 180.0
+          },
+          "intermediate": {
+            "subcheck_capacities_kN": {
+              "I4-1a": 742.815,
+              "I4-1b": 303.492,
+              "I4-1c": 739.964
+            },
+            "governing_subcheck": "I4-1a"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "capacity_expression": "max(I4-1a, I4-1b, I4-1c)"
+          },
+          "capacity_kn": 742.815
+        },
+        "check_summary": {
+          "demand": 180.0,
+          "capacity": 742.815,
+          "dcr": 0.242,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 180.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = max(I4-1a, I4-1b, I4-1c)",
+              "value_used_for_dcr": 742.815,
+              "value_reported_in_check": 742.815,
+              "value_from_rule_memory": 742.815,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 180.000000 / 742.815000",
+              "value_raw": 0.24232143938934997,
+              "value_rounded_3dec": 0.242,
+              "value_reported_in_check": 0.242,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 19.23076923076923,
+      "KL_over_r_y": 31.914893617021278,
+      "KL_over_r_governing": 31.914893617021278,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "W14X90",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 950.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vux": 180.0,
+      "Vuy": 0.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {},
+    "composite": {
+      "role": "ENCASED_MEMBER",
+      "nominal_strength_method": "PLASTIC",
+      "concrete": {
+        "fc": 35.0,
+        "wc": 2400.0
+      },
+      "geometry": {
+        "B": 550.0,
+        "H": 550.0,
+        "cover": 40.0
+      },
+      "reinforcement": {
+        "longitudinal_bars": [
+          {
+            "count": 8,
+            "db": 25.0,
+            "fy": 420.0,
+            "x": 200.0,
+            "y": 200.0
+          }
+        ],
+        "transverse": {
+          "db": 10.0,
+          "spacing": 180.0,
+          "fy": 420.0,
+          "type": "ties"
+        }
+      }
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Composite General Provisions I1",
+        "code": "AISC 360-22",
+        "clause": "I1",
+        "demand": 1.0,
+        "capacity": 1.0,
+        "dcr": 1.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Composite Axial Compression (Encased) I2",
+        "code": "AISC 360-22",
+        "clause": "I2-1b",
+        "demand": 950.0,
+        "capacity": 11471.003,
+        "dcr": 0.083,
+        "status": "PASS"
+      },
+      {
+        "name": "Minimum Reinforcement Ratio I3-3",
+        "code": "AISC 360-22",
+        "clause": "I3-3",
+        "demand": 0.004,
+        "capacity": 0.013,
+        "dcr": 0.308,
+        "status": "PASS"
+      },
+      {
+        "name": "Encased Shear Steel Only I4-1a",
+        "code": "AISC 360-22",
+        "clause": "I4-1a",
+        "demand": 180.0,
+        "capacity": 742.815,
+        "dcr": 0.242,
+        "status": "PASS"
+      },
+      {
+        "name": "Encased Shear RC Only I4-1b",
+        "code": "AISC 360-22",
+        "clause": "I4-1b",
+        "demand": 180.0,
+        "capacity": 303.492,
+        "dcr": 0.593,
+        "status": "PASS"
+      },
+      {
+        "name": "Encased Shear Steel+Transverse I4-1c",
+        "code": "AISC 360-22",
+        "clause": "I4-1c",
+        "demand": 180.0,
+        "capacity": 739.964,
+        "dcr": 0.243,
+        "status": "PASS"
+      },
+      {
+        "name": "Encased Shear Governing I4-1",
+        "code": "AISC 360-22",
+        "clause": "I4-1",
+        "demand": 180.0,
+        "capacity": 742.815,
+        "dcr": 0.242,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 19.23076923076923,
+        "KL_over_r_y": 31.914893617021278,
+        "KL_over_r_governing": 31.914893617021278,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

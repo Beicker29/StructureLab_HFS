@@ -16,5 +16,5 @@ Reference document: `a360-22w.pdf`.
 | H1 (HSS axial+flexion) | Implemented | `domain/rules/combined_hss_rules.py::CombinedH1HssRule.check` | `codes/aisc_360_22/combined_hss_calc.py` + capacities from D/E/F | `tests/test_chapter_h_rules.py::test_router_adds_h1_h3_for_hss_combined_actions` |
 | H3-1 / H3-2 (HSS torsion y combinaciones) | Implemented | `domain/rules/combined_hss_rules.py` | `codes/aisc_360_22/combined_hss_calc.py` | `tests/test_chapter_h_rules.py` |
 | H3-3 (Non-HSS torsion combined stress) | Blocked (Not Implemented) | `engine.py` guard + router policy | N/A | Covered by fail-hard torsion scope |
-| I2 | Blocked (Not Implemented) | `domain/routing/profile_router.py` | N/A | Covered by router fail-hard policy |
+| I1 / I2 / I3-1 / I3-3 / I3-4 / I4 (Composite members, LRFD scope) | Implemented (encased + filled + composite beam; no CPSW) | `domain/routing/profile_router.py` + `domain/rules/composite_rules.py` | `codes/aisc_360_22/composite_calc.py` + Chapter E/G helpers | `tests/test_chapter_i_rules.py` |
 | E4 for 2L without J/Cw in catalog | Blocked by data (strict policy) | `domain/routing/profile_router.py` | N/A until catalog completion | `tests/test_chapter_e_rules.py::test_engine_reports_missing_2l_e4_properties` |

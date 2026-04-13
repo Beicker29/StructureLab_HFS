@@ -40,6 +40,12 @@ Base del motor AISC 360-22.
   - `Tu` activa `H3` solo en `RECTANGULAR_HSS` y `CIRCULAR_HSS`.
   - `H1` se evalua para combinacion axial + flexion en HSS.
   - `H3-3` (no-HSS con torsion) permanece fuera de alcance y falla de forma explicita.
+- Para miembros compuestos (Capitulo I):
+  - activar con `composite.role` (`ENCASED_MEMBER`, `FILLED_MEMBER`, `COMPOSITE_BEAM`).
+  - `composite.concrete.fc` y `composite.concrete.wc` son obligatorios.
+  - `composite.nominal_strength_method`: implementados `PLASTIC` y `ELASTIC`.
+  - `STRAIN_COMPAT` y `EFFECTIVE_STRAIN` fallan en modo estricto (`RULE_NOT_IMPLEMENTED`).
+  - alcance actual excluye `CPSW` (fail-hard).
 
 ## Politica de seguridad
 

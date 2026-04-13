@@ -1,0 +1,530 @@
+{
+  "meta": {
+    "generated_at_utc": "20260413T022117395943Z",
+    "profile_type": "CIRCULAR_HSS",
+    "section_name": "PTER4\"X6.00mm",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\composite_filled_circular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 1.0,
+      "governing_clauses": [
+        "I1",
+        "I3-4"
+      ],
+      "governing_check_names": [
+        "Composite General Provisions I1",
+        "Minimum Reinforcement Ratio I3-4"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 90.93526482979823,
+          "KL_over_r_y": 90.93526482979823,
+          "KL_over_r_governing": 90.93526482979823,
+          "governing_axis": "x"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "I1",
+        "name": "Composite General Provisions I1",
+        "calculations": {
+          "clause": "I1",
+          "inputs": {
+            "role": "FILLED_MEMBER",
+            "nominal_strength_method": "PLASTIC",
+            "fc_mpa": 30.0,
+            "wc_kg_m3": 2400.0,
+            "section": "PTER4\"X6.00MM",
+            "profile_type": "CIRCULAR_HSS"
+          },
+          "intermediate": {
+            "Ec_mpa": 27691.465833357393,
+            "section_components": {
+              "As_mm2": 1905.8710594044153,
+              "Asr_mm2": 0.0,
+              "Ac_mm2": 8354.955392319915,
+              "Ag_mm2": 10260.82645172433,
+              "Is_x_mm4": 2823351.383907864,
+              "Is_y_mm4": 2823351.383907864,
+              "Isr_x_mm4": 0.0,
+              "Isr_y_mm4": 0.0,
+              "Ic_x_mm4": 5554927.651735134,
+              "Ic_y_mm4": 5554927.651735134,
+              "Fysr_mpa": 0.0,
+              "D_out_mm": 114.3
+            },
+            "local_buckling_classification": {
+              "classification_axial": "compact",
+              "classification_flexure": "compact",
+              "limits": {
+                "axial_lambda_p": 124.48132780082987,
+                "axial_lambda_r": 157.67634854771785,
+                "flexure_lambda_p": 74.68879668049793,
+                "flexure_lambda_r": 107.88381742738589,
+                "lambda_axial_used": 18.483870967741936,
+                "lambda_flexure_used": 18.483870967741936
+              }
+            },
+            "i1_2_supported_methods": [
+              "PLASTIC",
+              "ELASTIC"
+            ]
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "capacity_expression": "config_validity"
+          },
+          "capacity": 1.0
+        },
+        "check_summary": {
+          "demand": 1.0,
+          "capacity": 1.0,
+          "dcr": 1.0,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = config_validity",
+              "value_used_for_dcr": 1.0,
+              "value_reported_in_check": 1.0,
+              "value_from_rule_memory": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 1.000000 / 1.000000",
+              "value_raw": 1.0,
+              "value_rounded_3dec": 1.0,
+              "value_reported_in_check": 1.0,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I2-2",
+        "name": "Composite Axial Compression (Filled) I2",
+        "calculations": {
+          "clause": "I2-2",
+          "inputs": {
+            "Pu_kN": 220.0,
+            "profile_type": "CIRCULAR_HSS",
+            "Fy_mpa": 241.0,
+            "fc_mpa": 30.0,
+            "As_mm2": 1905.8710594044153,
+            "Asr_mm2": 0.0,
+            "Ac_mm2": 8354.955392319915,
+            "Ag_mm2": 10260.82645172433,
+            "Fysr_mpa": 0.0
+          },
+          "intermediate": {
+            "classification_I1_4": {
+              "classification_axial": "compact",
+              "classification_flexure": "compact",
+              "limits": {
+                "axial_lambda_p": 124.48132780082987,
+                "axial_lambda_r": 157.67634854771785,
+                "flexure_lambda_p": 74.68879668049793,
+                "flexure_lambda_r": 107.88381742738589,
+                "lambda_axial_used": 18.483870967741936,
+                "lambda_flexure_used": 18.483870967741936
+              }
+            },
+            "lambda_used": 18.483870967741936,
+            "Pp_n_I2_9b": 697431.1539975817,
+            "Py_n_I2_9d": 634768.9885551822,
+            "Pno_n": 697431.1539975817,
+            "Pno_branch": "I2-9a",
+            "C2": 0.95,
+            "C3_I2_13": 0.9,
+            "effective_rigidity": {
+              "Ec_mpa": 27691.465833357393,
+              "EIx_eff_n_mm2": 703111957128.8889,
+              "EIy_eff_n_mm2": 703111957128.8889,
+              "Pe_n": 566484.6421663538,
+              "Pe_axis": "x",
+              "Pe_x_n": 566484.6421663538,
+              "Pe_y_n": 566484.6421663538
+            },
+            "buckling": {
+              "Pn_n": 416590.15394620714,
+              "ratio_pno_over_pe": 1.231156331671167,
+              "branch": "I2-2"
+            },
+            "phiPn_composite_kN": 312.44261545965537,
+            "steel_floor_kN_chapter_E": 270.91485396681435,
+            "governing_capacity_kN": 312.44261545965537
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_c": 0.75,
+            "capacity_expression": "max(phi_c*Pn_composite, steel_floor_E)"
+          },
+          "capacity_kn": 312.44261545965537
+        },
+        "check_summary": {
+          "demand": 220.0,
+          "capacity": 312.443,
+          "dcr": 0.704,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 220.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = max(phi_c*Pn_composite, steel_floor_E)",
+              "value_used_for_dcr": 312.44261545965537,
+              "value_reported_in_check": 312.443,
+              "value_from_rule_memory": 312.44261545965537,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 220.000000 / 312.442615",
+              "value_raw": 0.7041292996358489,
+              "value_rounded_3dec": 0.704,
+              "value_reported_in_check": 0.704,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I3-4",
+        "name": "Minimum Reinforcement Ratio I3-4",
+        "calculations": {
+          "clause": "I3-4",
+          "inputs": {
+            "Asr_mm2": 0.0,
+            "Ag_mm2": 10260.82645172433
+          },
+          "intermediate": {
+            "rho_sr": 0.0,
+            "rho_sr_min_required_when_reinforcement_provided": 0.004,
+            "note": "Longitudinal reinforcement not provided; minimum ratio does not govern."
+          },
+          "capacity": 1.0
+        },
+        "check_summary": {
+          "demand": 0.0,
+          "capacity": 1.0,
+          "dcr": 0.0,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = rule_capacity",
+              "value_used_for_dcr": 1.0,
+              "value_reported_in_check": 1.0,
+              "value_from_rule_memory": 1.0,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.000000 / 1.000000",
+              "value_raw": 0.0,
+              "value_rounded_3dec": 0.0,
+              "value_reported_in_check": 0.0,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "I4-1",
+        "name": "Filled Shear I4-1",
+        "calculations": {
+          "clause": "I4-1",
+          "inputs": {
+            "Vu_kN": 60.0,
+            "Mu_kN_m": 30.0,
+            "Fy_mpa": 241.0,
+            "fc_mpa": 30.0,
+            "Av_mm2": 1213.3152,
+            "Ac_mm2": 8354.955392319915,
+            "d_mm": 114.3,
+            "profile_type": "CIRCULAR_HSS"
+          },
+          "intermediate": {
+            "classification_I1_4": {
+              "classification_axial": "compact",
+              "classification_flexure": "compact",
+              "limits": {
+                "axial_lambda_p": 124.48132780082987,
+                "axial_lambda_r": 157.67634854771785,
+                "flexure_lambda_p": 74.68879668049793,
+                "flexure_lambda_r": 107.88381742738589,
+                "lambda_axial_used": 18.483870967741936,
+                "lambda_flexure_used": 18.483870967741936
+              }
+            },
+            "kc_data": {
+              "Kc": 1.0,
+              "ratio_mu_over_vd": 4.374453193350831,
+              "branch": "I4-1_ratio>=0.7"
+            },
+            "Vn_n": 426094.03968959744
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.9,
+            "capacity_expression": "phi_v*Vn"
+          },
+          "capacity_kn": 383.4846357206377
+        },
+        "check_summary": {
+          "demand": 60.0,
+          "capacity": 383.485,
+          "dcr": 0.156,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 60.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn",
+              "value_used_for_dcr": 383.4846357206377,
+              "value_reported_in_check": 383.485,
+              "value_from_rule_memory": 383.4846357206377,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 60.000000 / 383.484636",
+              "value_raw": 0.15645998408058523,
+              "value_rounded_3dec": 0.156,
+              "value_reported_in_check": 0.156,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 90.93526482979823,
+      "KL_over_r_y": 90.93526482979823,
+      "KL_over_r_governing": 90.93526482979823,
+      "governing_axis": "x"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "PTER4\"X6.00mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 241.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 220.0,
+      "Mux": 30.0,
+      "Muy": 0.0,
+      "Vux": 60.0,
+      "Vuy": 0.0
+    },
+    "lengths": {
+      "Lx": 3500.0,
+      "Ly": 3500.0,
+      "Lz": 3500.0,
+      "Lb": 3500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {},
+    "composite": {
+      "role": "FILLED_MEMBER",
+      "nominal_strength_method": "PLASTIC",
+      "concrete": {
+        "fc": 30.0,
+        "wc": 2400.0
+      },
+      "reinforcement": {
+        "longitudinal_bars": []
+      }
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Composite General Provisions I1",
+        "code": "AISC 360-22",
+        "clause": "I1",
+        "demand": 1.0,
+        "capacity": 1.0,
+        "dcr": 1.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Composite Axial Compression (Filled) I2",
+        "code": "AISC 360-22",
+        "clause": "I2-2",
+        "demand": 220.0,
+        "capacity": 312.443,
+        "dcr": 0.704,
+        "status": "PASS"
+      },
+      {
+        "name": "Minimum Reinforcement Ratio I3-4",
+        "code": "AISC 360-22",
+        "clause": "I3-4",
+        "demand": 0.0,
+        "capacity": 1.0,
+        "dcr": 0.0,
+        "status": "PASS"
+      },
+      {
+        "name": "Filled Shear I4-1",
+        "code": "AISC 360-22",
+        "clause": "I4-1",
+        "demand": 60.0,
+        "capacity": 383.485,
+        "dcr": 0.156,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 90.93526482979823,
+        "KL_over_r_y": 90.93526482979823,
+        "KL_over_r_governing": 90.93526482979823,
+        "governing_axis": "x"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}
