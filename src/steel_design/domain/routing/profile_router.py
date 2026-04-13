@@ -7,16 +7,55 @@ from ...models import SteelCase
 from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
+from ..rules.combined_hss_rules import CombinedH1HssRule, HssCombinedH3_2Rule, HssTorsionH3_1Rule
 from ..rules.flexure_rule import (
-    FlexureF10Rule,
-    FlexureF11Rule,
-    FlexureF3Rule,
-    FlexureF4Rule,
-    FlexureF5Rule,
-    FlexureF6Rule,
-    FlexureF7Rule,
-    FlexureF8Rule,
-    FlexureRule,
+    FlexureF2LtbRule,
+    FlexureF2YieldRule,
+    FlexureF3FlbRule,
+    FlexureF3LtbRule,
+    FlexureF3YieldRule,
+    FlexureF4CompressionYieldRule,
+    FlexureF4FlbRule,
+    FlexureF4LtbRule,
+    FlexureF4TensionYieldRule,
+    FlexureF5CompressionYieldRule,
+    FlexureF5FlbRule,
+    FlexureF5LtbRule,
+    FlexureF5TensionYieldRule,
+    FlexureF6FlbRule,
+    FlexureF6YieldRule,
+    FlexureF7FlangeMxRule,
+    FlexureF7FlangeMyRule,
+    FlexureF7LtbMxRule,
+    FlexureF7LtbMyRule,
+    FlexureF7WebMxRule,
+    FlexureF7WebMyRule,
+    FlexureF7YieldMxRule,
+    FlexureF7YieldMyRule,
+    FlexureF8LocalBucklingMxRule,
+    FlexureF8LocalBucklingMyRule,
+    FlexureF8YieldMxRule,
+    FlexureF8YieldMyRule,
+    FlexureF10LegBucklingMxRule,
+    FlexureF10LegBucklingMyRule,
+    FlexureF10LtbMxRule,
+    FlexureF10LtbMyRule,
+    FlexureF10YieldMxRule,
+    FlexureF10YieldMyRule,
+    FlexureF11LtbMxRule,
+    FlexureF11LtbMyRule,
+    FlexureF11YieldMxRule,
+    FlexureF11YieldMyRule,
+)
+from ..rules.shear_rules import (
+    ShearG2VxRule,
+    ShearG3VxRule,
+    ShearG3VyRule,
+    ShearG4VxRule,
+    ShearG4VyRule,
+    ShearG5VxRule,
+    ShearG5VyRule,
+    ShearG6VyRule,
 )
 from ..rules.tension_rule import TensionRuptureRule, TensionRule
 
@@ -63,12 +102,43 @@ def _has_any_flexure(case: SteelCase, _: Section) -> bool:
     return abs(case.loads.Mux) > 0.0 or abs(case.loads.Muy) > 0.0
 
 
+def _has_directional_shear(case: SteelCase) -> bool:
+    return abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0
+
+
+def _has_major_shear(case: SteelCase, _: Section) -> bool:
+    if _has_directional_shear(case):
+        return abs(case.loads.Vux) > 0.0
+    return abs(case.loads.Vu) > 0.0
+
+
+def _has_minor_shear(case: SteelCase, _: Section) -> bool:
+    return _has_directional_shear(case) and abs(case.loads.Vuy) > 0.0
+
+
 def _has_shear(case: SteelCase, _: Section) -> bool:
     return abs(case.loads.Vu) > 0.0 or abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0
 
 
+def _has_torsion(case: SteelCase, _: Section) -> bool:
+    return abs(case.loads.Tu) > 0.0
+
+
+def _is_h1_hss_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"RECTANGULAR_HSS", "CIRCULAR_HSS"} and abs(case.loads.Pu) > 0.0 and _has_any_flexure(case, section)
+
+
+def _is_h3_1_hss_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"RECTANGULAR_HSS", "CIRCULAR_HSS"} and _has_torsion(case, section)
+
+
+def _is_h3_2_hss_applicable(case: SteelCase, section: Section) -> bool:
+    if section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"} or not _has_torsion(case, section):
+        return False
+    return abs(case.loads.Pu) > 0.0 or _has_any_flexure(case, section) or _has_shear(case, section)
+
+
 def _has_interaction(case: SteelCase, section: Section) -> bool:
-    # H1/I2 are still blocked in this scope; do not force fail-hard for combined Pu+M.
     return False
 
 
@@ -84,9 +154,7 @@ def _classify_element(value: float, compact_limit: float, noncompact_limit: floa
     return "slender"
 
 
-def _w_or_channel_flexure_selection(case: SteelCase, section: Section) -> Optional[str]:
-    if _has_minor_flexure(case, section):
-        return "F6"
+def _w_or_channel_major_flexure_selection(case: SteelCase, section: Section) -> Optional[str]:
     if not _has_major_flexure(case, section):
         return None
 
@@ -119,19 +187,19 @@ def _w_or_channel_flexure_selection(case: SteelCase, section: Section) -> Option
 
 
 def _is_f2_applicable(case: SteelCase, section: Section) -> bool:
-    return _w_or_channel_flexure_selection(case, section) == "F2"
+    return _w_or_channel_major_flexure_selection(case, section) == "F2"
 
 
 def _is_f3_applicable(case: SteelCase, section: Section) -> bool:
-    return _w_or_channel_flexure_selection(case, section) == "F3"
+    return _w_or_channel_major_flexure_selection(case, section) == "F3"
 
 
 def _is_f4_applicable(case: SteelCase, section: Section) -> bool:
-    return _w_or_channel_flexure_selection(case, section) == "F4"
+    return _w_or_channel_major_flexure_selection(case, section) == "F4"
 
 
 def _is_f5_applicable(case: SteelCase, section: Section) -> bool:
-    return _w_or_channel_flexure_selection(case, section) == "F5"
+    return _w_or_channel_major_flexure_selection(case, section) == "F5"
 
 
 def _is_f6_applicable(case: SteelCase, section: Section) -> bool:
@@ -139,8 +207,12 @@ def _is_f6_applicable(case: SteelCase, section: Section) -> bool:
     return profile in {"W", "CHANNEL"} and _has_minor_flexure(case, section)
 
 
-def _is_f7_applicable(case: SteelCase, section: Section) -> bool:
-    return section.type.upper() == "RECTANGULAR_HSS" and _has_any_flexure(case, section)
+def _is_f7_mx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "RECTANGULAR_HSS" and _has_major_flexure(case, section)
+
+
+def _is_f7_my_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "RECTANGULAR_HSS" and _has_minor_flexure(case, section)
 
 
 def _is_f8_applicable(case: SteelCase, section: Section) -> bool:
@@ -152,12 +224,60 @@ def _is_f8_applicable(case: SteelCase, section: Section) -> bool:
     return ratio < 0.45 * case.material.E / case.material.Fy
 
 
-def _is_f10_applicable(case: SteelCase, section: Section) -> bool:
-    return section.type.upper() == "SINGLE_ANGLE" and _has_any_flexure(case, section)
+def _is_f8_mx_applicable(case: SteelCase, section: Section) -> bool:
+    return _is_f8_applicable(case, section) and _has_major_flexure(case, section)
 
 
-def _is_f11_applicable(case: SteelCase, section: Section) -> bool:
-    return section.type.upper() in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR", "FILLED_RECTANGULAR", "FILLED_CIRCULAR"} and _has_any_flexure(case, section)
+def _is_f8_my_applicable(case: SteelCase, section: Section) -> bool:
+    return _is_f8_applicable(case, section) and _has_minor_flexure(case, section)
+
+
+def _is_f10_mx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "SINGLE_ANGLE" and _has_major_flexure(case, section)
+
+
+def _is_f10_my_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "SINGLE_ANGLE" and _has_minor_flexure(case, section)
+
+
+def _is_f11_mx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR", "FILLED_RECTANGULAR", "FILLED_CIRCULAR"} and _has_major_flexure(case, section)
+
+
+def _is_f11_my_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR", "FILLED_RECTANGULAR", "FILLED_CIRCULAR"} and _has_minor_flexure(case, section)
+
+
+def _is_g2_vx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"W", "CHANNEL"} and _has_major_shear(case, section)
+
+
+def _is_g3_vx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"SINGLE_ANGLE", "DOUBLE_ANGLE"} and _has_major_shear(case, section)
+
+
+def _is_g3_vy_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"SINGLE_ANGLE", "DOUBLE_ANGLE"} and _has_minor_shear(case, section)
+
+
+def _is_g4_vx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "RECTANGULAR_HSS" and _has_major_shear(case, section)
+
+
+def _is_g4_vy_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "RECTANGULAR_HSS" and _has_minor_shear(case, section)
+
+
+def _is_g5_vx_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "CIRCULAR_HSS" and _has_major_shear(case, section)
+
+
+def _is_g5_vy_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() == "CIRCULAR_HSS" and _has_minor_shear(case, section)
+
+
+def _is_g6_vy_applicable(case: SteelCase, section: Section) -> bool:
+    return section.type.upper() in {"W", "CHANNEL"} and _has_minor_shear(case, section)
 
 
 RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
@@ -167,35 +287,189 @@ RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
     "E4": RuleDefinition("E4", AxialE4Rule, True, tuple(), _has_compression),
     "E5": RuleDefinition("E5", AxialE5Rule, True, ("area", "rx", "ry", "b_t_ratio"), _has_compression),
     "E7": RuleDefinition("E7", AxialE7Rule, True, tuple(), _has_compression),
-    "F2": RuleDefinition("F2", FlexureRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho"), _is_f2_applicable),
-    "F3": RuleDefinition("F3", FlexureF3Rule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho", "bf_2tf_ratio", "h_tw_ratio"), _is_f3_applicable),
-    "F4": RuleDefinition("F4", FlexureF4Rule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f4_applicable),
-    "F5": RuleDefinition("F5", FlexureF5Rule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f5_applicable),
-    "F6": RuleDefinition("F6", FlexureF6Rule, True, ("zy", "sy", "bf_2tf_ratio"), _is_f6_applicable),
-    "F7": RuleDefinition("F7", FlexureF7Rule, True, ("zx", "zy", "sx", "sy", "b", "h"), _is_f7_applicable),
-    "F8": RuleDefinition("F8", FlexureF8Rule, True, ("zx", "zy", "sx", "sy", "d_t_ratio"), _is_f8_applicable),
+    "F2-1": RuleDefinition("F2-1", FlexureF2YieldRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho"), _is_f2_applicable),
+    "F2-2": RuleDefinition("F2-2", FlexureF2LtbRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho"), _is_f2_applicable),
+    "F3-1": RuleDefinition("F3-1", FlexureF3YieldRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho", "bf_2tf_ratio", "h_tw_ratio"), _is_f3_applicable),
+    "F3-2": RuleDefinition("F3-2", FlexureF3LtbRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho", "bf_2tf_ratio", "h_tw_ratio"), _is_f3_applicable),
+    "F3-3": RuleDefinition("F3-3", FlexureF3FlbRule, True, ("zx", "sx", "iy", "cw", "ry", "j", "ho", "bf_2tf_ratio", "h_tw_ratio"), _is_f3_applicable),
+    "F4-1": RuleDefinition("F4-1", FlexureF4CompressionYieldRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f4_applicable),
+    "F4-2": RuleDefinition("F4-2", FlexureF4LtbRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f4_applicable),
+    "F4-3": RuleDefinition("F4-3", FlexureF4FlbRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f4_applicable),
+    "F4-4": RuleDefinition("F4-4", FlexureF4TensionYieldRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f4_applicable),
+    "F5-1": RuleDefinition("F5-1", FlexureF5CompressionYieldRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f5_applicable),
+    "F5-2": RuleDefinition("F5-2", FlexureF5LtbRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f5_applicable),
+    "F5-3": RuleDefinition("F5-3", FlexureF5FlbRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f5_applicable),
+    "F5-4": RuleDefinition("F5-4", FlexureF5TensionYieldRule, True, ("sx", "bf", "tf", "tw", "h", "bf_2tf_ratio", "h_tw_ratio"), _is_f5_applicable),
+    "F6-1": RuleDefinition("F6-1", FlexureF6YieldRule, True, ("zy", "sy", "bf_2tf_ratio"), _is_f6_applicable),
+    "F6-2": RuleDefinition("F6-2", FlexureF6FlbRule, True, ("zy", "sy", "bf_2tf_ratio"), _is_f6_applicable),
+    "F7-1-Mx": RuleDefinition(
+        "F7-1-Mx",
+        FlexureF7YieldMxRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_mx_applicable,
+    ),
+    "F7-1-My": RuleDefinition(
+        "F7-1-My",
+        FlexureF7YieldMyRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_my_applicable,
+    ),
+    "F7-2-Mx": RuleDefinition(
+        "F7-2-Mx",
+        FlexureF7FlangeMxRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_mx_applicable,
+    ),
+    "F7-2-My": RuleDefinition(
+        "F7-2-My",
+        FlexureF7FlangeMyRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_my_applicable,
+    ),
+    "F7-3-Mx": RuleDefinition(
+        "F7-3-Mx",
+        FlexureF7WebMxRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_mx_applicable,
+    ),
+    "F7-3-My": RuleDefinition(
+        "F7-3-My",
+        FlexureF7WebMyRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_my_applicable,
+    ),
+    "F7-4-Mx": RuleDefinition(
+        "F7-4-Mx",
+        FlexureF7LtbMxRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_mx_applicable,
+    ),
+    "F7-4-My": RuleDefinition(
+        "F7-4-My",
+        FlexureF7LtbMyRule,
+        True,
+        ("zx", "zy", "sx", "sy", "b", "h", "tdes", "b_tdes_ratio", "h_tdes_ratio"),
+        _is_f7_my_applicable,
+    ),
+    "F8-1-Mx": RuleDefinition("F8-1-Mx", FlexureF8YieldMxRule, True, ("zx", "zy", "sx", "sy", "d_t_ratio"), _is_f8_mx_applicable),
+    "F8-1-My": RuleDefinition("F8-1-My", FlexureF8YieldMyRule, True, ("zx", "zy", "sx", "sy", "d_t_ratio"), _is_f8_my_applicable),
+    "F8-2-Mx": RuleDefinition("F8-2-Mx", FlexureF8LocalBucklingMxRule, True, ("zx", "zy", "sx", "sy", "d_t_ratio"), _is_f8_mx_applicable),
+    "F8-2-My": RuleDefinition("F8-2-My", FlexureF8LocalBucklingMyRule, True, ("zx", "zy", "sx", "sy", "d_t_ratio"), _is_f8_my_applicable),
     "F9": RuleDefinition("F9", None, False, ("zx",), _has_any_flexure),
-    "F10": RuleDefinition("F10", FlexureF10Rule, True, ("b_t_ratio", "b", "t"), _is_f10_applicable),
-    "F11": RuleDefinition("F11", FlexureF11Rule, True, ("zx", "zy", "sx", "sy"), _is_f11_applicable),
-    "G2": RuleDefinition("G2", None, False, ("tw", "d"), _has_shear),
-    "G4": RuleDefinition("G4", None, False, ("tw", "d"), _has_shear),
-    "G5": RuleDefinition("G5", None, False, ("d",), _has_shear),
-    "H1": RuleDefinition("H1", None, False, ("area",), _has_interaction),
+    "F10-1-Mx": RuleDefinition("F10-1-Mx", FlexureF10YieldMxRule, True, ("b_t_ratio", "b", "t"), _is_f10_mx_applicable),
+    "F10-1-My": RuleDefinition("F10-1-My", FlexureF10YieldMyRule, True, ("b_t_ratio", "b", "t"), _is_f10_my_applicable),
+    "F10-2-Mx": RuleDefinition("F10-2-Mx", FlexureF10LtbMxRule, True, ("b_t_ratio", "b", "t"), _is_f10_mx_applicable),
+    "F10-2-My": RuleDefinition("F10-2-My", FlexureF10LtbMyRule, True, ("b_t_ratio", "b", "t"), _is_f10_my_applicable),
+    "F10-3-Mx": RuleDefinition("F10-3-Mx", FlexureF10LegBucklingMxRule, True, ("b_t_ratio", "b", "t"), _is_f10_mx_applicable),
+    "F10-3-My": RuleDefinition("F10-3-My", FlexureF10LegBucklingMyRule, True, ("b_t_ratio", "b", "t"), _is_f10_my_applicable),
+    "F11-1-Mx": RuleDefinition("F11-1-Mx", FlexureF11YieldMxRule, True, ("zx", "zy", "sx", "sy"), _is_f11_mx_applicable),
+    "F11-1-My": RuleDefinition("F11-1-My", FlexureF11YieldMyRule, True, ("zx", "zy", "sx", "sy"), _is_f11_my_applicable),
+    "F11-2-Mx": RuleDefinition("F11-2-Mx", FlexureF11LtbMxRule, True, ("zx", "zy", "sx", "sy"), _is_f11_mx_applicable),
+    "F11-2-My": RuleDefinition("F11-2-My", FlexureF11LtbMyRule, True, ("zx", "zy", "sx", "sy"), _is_f11_my_applicable),
+    "G2-Vx": RuleDefinition("G2-Vx", ShearG2VxRule, True, ("tw", "d"), _is_g2_vx_applicable),
+    "G3-Vx": RuleDefinition("G3-Vx", ShearG3VxRule, True, ("b", "t"), _is_g3_vx_applicable),
+    "G3-Vy": RuleDefinition("G3-Vy", ShearG3VyRule, True, ("b", "t"), _is_g3_vy_applicable),
+    "G4-Vx": RuleDefinition("G4-Vx", ShearG4VxRule, True, ("h", "tdes"), _is_g4_vx_applicable),
+    "G4-Vy": RuleDefinition("G4-Vy", ShearG4VyRule, True, ("b", "tdes"), _is_g4_vy_applicable),
+    "G5-Vx": RuleDefinition("G5-Vx", ShearG5VxRule, True, ("area", "od"), _is_g5_vx_applicable),
+    "G5-Vy": RuleDefinition("G5-Vy", ShearG5VyRule, True, ("area", "od"), _is_g5_vy_applicable),
+    "G6-Vy": RuleDefinition("G6-Vy", ShearG6VyRule, True, ("bf", "tf"), _is_g6_vy_applicable),
+    "H1": RuleDefinition("H1", CombinedH1HssRule, True, ("area",), _is_h1_hss_applicable),
+    "H3-1": RuleDefinition("H3-1", HssTorsionH3_1Rule, True, tuple(), _is_h3_1_hss_applicable),
+    "H3-2": RuleDefinition("H3-2", HssCombinedH3_2Rule, True, tuple(), _is_h3_2_hss_applicable),
     "I2": RuleDefinition("I2", None, False, ("area",), _has_interaction),
 }
 
 
 PROFILE_RULE_MAP = {
-    ProfileType.W_SHAPE: ["D2-1", "D2-2", "E3", "E4", "E7", "F2", "F3", "F4", "F5", "F6", "G2", "H1"],
-    ProfileType.CHANNEL: ["D2-1", "D2-2", "E3", "E4", "E7", "F2", "F6", "G2", "H1"],
-    ProfileType.DOUBLE_ANGLE: ["D2-1", "D2-2", "E3", "E4", "E7", "F9", "G2", "H1"],
-    ProfileType.RECTANGULAR_HSS: ["D2-1", "D2-2", "E3", "E4", "E7", "F7", "G4", "H1"],
-    ProfileType.CIRCULAR_HSS: ["D2-1", "D2-2", "E3", "E4", "E7", "F8", "G5", "H1"],
-    ProfileType.SINGLE_ANGLE: ["D2-1", "D2-2", "E3", "E5", "E7", "F10", "G2", "H1"],
-    ProfileType.SOLID_RECTANGULAR: ["D2-1", "D2-2", "E3", "F11"],
-    ProfileType.SOLID_CIRCULAR: ["D2-1", "D2-2", "E3", "F11"],
-    ProfileType.FILLED_RECTANGULAR: ["D2-1", "D2-2", "E3", "F11"],
-    ProfileType.FILLED_CIRCULAR: ["D2-1", "D2-2", "E3", "F11"],
+    ProfileType.W_SHAPE: [
+        "D2-1",
+        "D2-2",
+        "E3",
+        "E4",
+        "E7",
+        "F2-1",
+        "F2-2",
+        "F3-1",
+        "F3-2",
+        "F3-3",
+        "F4-1",
+        "F4-2",
+        "F4-3",
+        "F4-4",
+        "F5-1",
+        "F5-2",
+        "F5-3",
+        "F5-4",
+        "F6-1",
+        "F6-2",
+        "G2-Vx",
+        "G6-Vy",
+    ],
+    ProfileType.CHANNEL: ["D2-1", "D2-2", "E3", "E4", "E7", "F2-1", "F2-2", "F6-1", "F6-2", "G2-Vx", "G6-Vy"],
+    ProfileType.DOUBLE_ANGLE: ["D2-1", "D2-2", "E3", "E4", "E7", "F9", "G3-Vx", "G3-Vy"],
+    ProfileType.RECTANGULAR_HSS: [
+        "D2-1",
+        "D2-2",
+        "E3",
+        "E4",
+        "E7",
+        "F7-1-Mx",
+        "F7-1-My",
+        "F7-2-Mx",
+        "F7-2-My",
+        "F7-3-Mx",
+        "F7-3-My",
+        "F7-4-Mx",
+        "F7-4-My",
+        "G4-Vx",
+        "G4-Vy",
+        "H1",
+        "H3-1",
+        "H3-2",
+    ],
+    ProfileType.CIRCULAR_HSS: [
+        "D2-1",
+        "D2-2",
+        "E3",
+        "E4",
+        "E7",
+        "F8-1-Mx",
+        "F8-1-My",
+        "F8-2-Mx",
+        "F8-2-My",
+        "G5-Vx",
+        "G5-Vy",
+        "H1",
+        "H3-1",
+        "H3-2",
+    ],
+    ProfileType.SINGLE_ANGLE: [
+        "D2-1",
+        "D2-2",
+        "E3",
+        "E5",
+        "E7",
+        "F10-1-Mx",
+        "F10-1-My",
+        "F10-2-Mx",
+        "F10-2-My",
+        "F10-3-Mx",
+        "F10-3-My",
+        "G3-Vx",
+        "G3-Vy",
+    ],
+    ProfileType.SOLID_RECTANGULAR: ["D2-1", "D2-2", "E3", "F11-1-Mx", "F11-1-My", "F11-2-Mx", "F11-2-My"],
+    ProfileType.SOLID_CIRCULAR: ["D2-1", "D2-2", "E3", "F11-1-Mx", "F11-1-My", "F11-2-Mx", "F11-2-My"],
+    ProfileType.FILLED_RECTANGULAR: ["D2-1", "D2-2", "E3", "F11-1-Mx", "F11-1-My", "F11-2-Mx", "F11-2-My"],
+    ProfileType.FILLED_CIRCULAR: ["D2-1", "D2-2", "E3", "F11-1-Mx", "F11-1-My", "F11-2-Mx", "F11-2-My"],
 }
 
 
@@ -223,6 +497,14 @@ def _required_fields_for_e7(profile_type: str) -> Tuple[str, ...]:
     if profile_type in {"SINGLE_ANGLE", "DOUBLE_ANGLE"}:
         return ("area", "rx", "ry", "b_t_ratio")
     return ("area", "rx", "ry")
+
+
+def _required_fields_for_h3(profile_type: str) -> Tuple[str, ...]:
+    if profile_type == "CIRCULAR_HSS":
+        return ("area", "j", "od", "tdes")
+    if profile_type == "RECTANGULAR_HSS":
+        return ("h", "b", "tdes")
+    return tuple()
 
 
 def _section_slenderness_values(section: Section) -> Dict[str, Optional[float]]:
@@ -258,6 +540,8 @@ class ProfileRouter:
             return _required_fields_for_e4(profile_type)
         if rule_id == "E7":
             return _required_fields_for_e7(profile_type)
+        if rule_id in {"H3-1", "H3-2"}:
+            return _required_fields_for_h3(profile_type)
         return definition.required_section_fields
 
     @classmethod
@@ -302,7 +586,46 @@ class ProfileRouter:
     def _validate_flexure_selection(cls, case: SteelCase, section: Section, selected_rule_ids: List[str]) -> None:
         if not _has_any_flexure(case, section):
             return
-        flexure_rules = {"F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11"}
+        flexure_rules = {
+            "F2-1",
+            "F2-2",
+            "F3-1",
+            "F3-2",
+            "F3-3",
+            "F4-1",
+            "F4-2",
+            "F4-3",
+            "F4-4",
+            "F5-1",
+            "F5-2",
+            "F5-3",
+            "F5-4",
+            "F6-1",
+            "F6-2",
+            "F7-1-Mx",
+            "F7-1-My",
+            "F7-2-Mx",
+            "F7-2-My",
+            "F7-3-Mx",
+            "F7-3-My",
+            "F7-4-Mx",
+            "F7-4-My",
+            "F8-1-Mx",
+            "F8-1-My",
+            "F8-2-Mx",
+            "F8-2-My",
+            "F9",
+            "F10-1-Mx",
+            "F10-1-My",
+            "F10-2-Mx",
+            "F10-2-My",
+            "F10-3-Mx",
+            "F10-3-My",
+            "F11-1-Mx",
+            "F11-1-My",
+            "F11-2-Mx",
+            "F11-2-My",
+        }
         selected_f = [rule_id for rule_id in selected_rule_ids if rule_id in flexure_rules]
         if selected_f:
             return

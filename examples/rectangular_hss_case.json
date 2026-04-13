@@ -1,5 +1,5 @@
 {
-  "section_name": "PTE50X30X2mm",
+  "section_name": "PTE50X30X2.5mm",
   "design_method": "LRFD",
   "material": {
     "Fy": 345.0,
@@ -9,9 +9,10 @@
   "loads": {
     "Pu": 30.0,
     "Mux": 0.4,
-    "Muy": 0.0,
-    "Vux": 0.0,
-    "Vuy": 0.0
+    "Muy": 0.5,
+    "Tu": 0.8,
+    "Vux": 10.0,
+    "Vuy": 5.0
   },
   "lengths": {
     "Lx": 2000.0,

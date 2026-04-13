@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T202337327989Z",
+    "profile_type": "SOLID_RECTANGULAR",
+    "section_name": "SR200X100",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\solid_rectangular_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 308.77,
+      "governing_clauses": [
+        "F11-2"
+      ],
+      "governing_check_names": [
+        "Flexure F11-2 - Lateral-Torsional Buckling (Solid Bar/Round)"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 51.96152422706632,
+          "KL_over_r_y": 103.92304845413264,
+          "KL_over_r_governing": 103.92304845413264,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "SOLID_RECTANGULAR",
+        "overall": "unknown",
+        "is_slender": false,
+        "elements": {}
+      }
+    },
+    "clause_results": [
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "calculations": {
+          "clause": "E3",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 20000.0,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 3000.0,
+            "Ly_mm": 3000.0,
+            "rx_mm": 57.735026918962575,
+            "ry_mm": 28.867513459481287
+          },
+          "intermediate": {
+            "KL_over_r_x": 51.96152422706632,
+            "KL_over_r_y": 103.92304845413264,
+            "governing_axis": "y",
+            "Fex_mpa": 731.0818074881006,
+            "Fey_mpa": 182.77045187202515,
+            "Fe_mpa": 182.77045187202515,
+            "fy_over_fe": 1.8876136512567527,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 156.56684870546542,
+            "pn_n": 3131336.9741093083,
+            "pn_kn": 3131.3369741093084,
+            "be_mm": null,
+            "be_note": "Not required in current E3 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 2818.2032766983775
+        }
+      },
+      {
+        "clause": "F11-1",
+        "name": "Flexure F11-1 - Yielding (Solid Bar/Round)",
+        "calculations": {
+          "chapter_f_selection": "F11-1",
+          "inputs": {
+            "axis": "x",
+            "section_type": "SOLID_RECTANGULAR",
+            "Fy_mpa": 345.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 345000000.0,
+            "lateral_torsional_buckling_Mn_Nmm": 343077429.99999994
+          },
+          "intermediate": {
+            "axis": "x",
+            "ltb_note": "Inelastic LTB branch (F11-3).",
+            "slenderness_parameter": 60.0,
+            "Fcr_mpa": 514.616145,
+            "reported_limit_state": "yielding"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 345000000.0,
+          "capacity_kn_m": 310.5
+        }
+      },
+      {
+        "clause": "F11-2",
+        "name": "Flexure F11-2 - Lateral-Torsional Buckling (Solid Bar/Round)",
+        "calculations": {
+          "chapter_f_selection": "F11-2",
+          "inputs": {
+            "axis": "x",
+            "section_type": "SOLID_RECTANGULAR",
+            "Cb": 1.0,
+            "Lb_mm": 3000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 345000000.0,
+            "lateral_torsional_buckling_Mn_Nmm": 343077429.99999994
+          },
+          "intermediate": {
+            "axis": "x",
+            "ltb_note": "Inelastic LTB branch (F11-3).",
+            "slenderness_parameter": 60.0,
+            "Fcr_mpa": 514.616145,
+            "reported_limit_state": "lateral_torsional_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 343077429.99999994,
+          "capacity_kn_m": 308.7696869999999
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 51.96152422706632,
+      "KL_over_r_y": 103.92304845413264,
+      "KL_over_r_governing": 103.92304845413264,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "SR200X100",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 150.0,
+      "Mux": 6.0,
+      "Muy": 0.0,
+      "Vux": 0.0,
+      "Vuy": 0.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "An": 15000.0,
+      "U": 0.85
+    },
+    "custom_section": {
+      "type": "SOLID_RECTANGULAR",
+      "H": 200.0,
+      "B": 100.0
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 150.0,
+        "capacity": 2818.203,
+        "dcr": 0.053,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F11-1 - Yielding (Solid Bar/Round)",
+        "code": "AISC 360-22",
+        "clause": "F11-1",
+        "demand": 6.0,
+        "capacity": 310.5,
+        "dcr": 0.019,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F11-2 - Lateral-Torsional Buckling (Solid Bar/Round)",
+        "code": "AISC 360-22",
+        "clause": "F11-2",
+        "demand": 6.0,
+        "capacity": 308.77,
+        "dcr": 0.019,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 51.96152422706632,
+        "KL_over_r_y": 103.92304845413264,
+        "KL_over_r_governing": 103.92304845413264,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

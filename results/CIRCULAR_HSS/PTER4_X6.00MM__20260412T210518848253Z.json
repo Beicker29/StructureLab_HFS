@@ -1,0 +1,329 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T210518848253Z",
+    "profile_type": "CIRCULAR_HSS",
+    "section_name": "PTER4\"X6.00mm",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\examples\\circular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 14.318,
+      "governing_clauses": [
+        "F8-1",
+        "F8-2"
+      ],
+      "governing_check_names": [
+        "Flexure F8-1 - Yielding (Circular HSS Mx)",
+        "Flexure F8-2 - Local Buckling (Circular HSS Mx)"
+      ],
+      "overall_status": "PASS",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 90.93526482979823,
+          "KL_over_r_y": 90.93526482979823,
+          "KL_over_r_governing": 90.93526482979823,
+          "governing_axis": "x"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "CIRCULAR_HSS",
+        "overall": "non_slender",
+        "is_slender": false,
+        "elements": {
+          "wall": {
+            "ratio": 18.483870967741936,
+            "lambda_r": 91.28630705394191,
+            "classification": "non_slender"
+          }
+        }
+      }
+    },
+    "clause_results": [
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "calculations": {
+          "clause": "E3",
+          "inputs": {
+            "Fy_mpa": 241.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 1905.8710594044153,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 3500.0,
+            "Ly_mm": 3500.0,
+            "rx_mm": 38.48891853507968,
+            "ry_mm": 38.48891853507968
+          },
+          "intermediate": {
+            "KL_over_r_x": 90.93526482979823,
+            "KL_over_r_y": 90.93526482979823,
+            "governing_axis": "y",
+            "Fex_mpa": 238.7069529880802,
+            "Fey_mpa": 238.7069529880802,
+            "Fe_mpa": 238.7069529880802,
+            "fy_over_fe": 1.009606117388773,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 157.94169438809732,
+            "pn_n": 301016.50440757145,
+            "pn_kn": 301.01650440757146,
+            "be_mm": null,
+            "be_note": "Not required in current E3 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 270.91485396681435
+        }
+      },
+      {
+        "clause": "E4-1",
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "calculations": {
+          "clause": "E4",
+          "inputs": {
+            "Fy_mpa": 241.0,
+            "E_mpa": 200000.0,
+            "G_mpa": 77200.0,
+            "Ag_mm2": 1905.8710594044153,
+            "Kz": 1.0,
+            "Lz_mm": 3500.0,
+            "Ky": 1.0,
+            "Ly_mm": 3500.0,
+            "ry_mm": 38.48891853507968,
+            "J_mm4": 5646702.767815728,
+            "Cw_mm6": 11000000000.0,
+            "H": null,
+            "xa_mm": 0.0,
+            "ya_mm": 0.0
+          },
+          "intermediate": {
+            "KL_over_r_x": 90.93526482979823,
+            "KL_over_r_y": 90.93526482979823,
+            "KL_over_r_z": 64.30094241014488,
+            "ro_mm": 54.43155059338288,
+            "ro_source": "derived_from_ix_iy_ag",
+            "Fex_mpa": 238.7069529880802,
+            "Fey_mpa": 238.7069529880802,
+            "Fez_mpa": 77513.90006790141,
+            "Fe_mpa": 77513.90006790141,
+            "e4_mode": "torsional",
+            "warping_term_n": 1772500382.2364562,
+            "stvenant_term_n": 435925453675.3742,
+            "torsional_stiffness_n": 437697954057.61066,
+            "torsional_denominator_mm4": 5646702.767815728,
+            "flexural_torsional_terms": null,
+            "fy_over_fe": 0.00310911978095395,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 240.68658508845232,
+            "pn_n": 458717.59690695954,
+            "pn_kn": 458.71759690695956,
+            "be_mm": null,
+            "be_note": "be is not explicitly modeled in current E4 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 412.8458372162636
+        }
+      },
+      {
+        "clause": "F8-1",
+        "name": "Flexure F8-1 - Yielding (Circular HSS Mx)",
+        "calculations": {
+          "chapter_f_selection": "F8-1",
+          "inputs": {
+            "axis": "x",
+            "Fy_mpa": 241.0,
+            "E_mpa": 200000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 15909308.442215996,
+            "local_buckling_Mn_Nmm": 15909308.442215996
+          },
+          "intermediate": {
+            "axis": "x",
+            "D_over_t": 18.483870967741936,
+            "lambda_p": 58.09128630705395,
+            "lambda_r": 257.26141078838174,
+            "wall_class": "compact",
+            "Fcr_mpa": 241.0,
+            "reported_limit_state": "yielding"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 15909308.442215996,
+          "capacity_kn_m": 14.318377597994397
+        }
+      },
+      {
+        "clause": "F8-2",
+        "name": "Flexure F8-2 - Local Buckling (Circular HSS Mx)",
+        "calculations": {
+          "chapter_f_selection": "F8-2",
+          "inputs": {
+            "axis": "x",
+            "D_t_ratio": 18.483870967741936
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 15909308.442215996,
+            "local_buckling_Mn_Nmm": 15909308.442215996
+          },
+          "intermediate": {
+            "axis": "x",
+            "D_over_t": 18.483870967741936,
+            "lambda_p": 58.09128630705395,
+            "lambda_r": 257.26141078838174,
+            "wall_class": "compact",
+            "Fcr_mpa": 241.0,
+            "reported_limit_state": "local_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 15909308.442215996,
+          "capacity_kn_m": 14.318377597994397
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 90.93526482979823,
+      "KL_over_r_y": 90.93526482979823,
+      "KL_over_r_governing": 90.93526482979823,
+      "governing_axis": "x"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "PTER4\"X6.00mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 241.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 120.0,
+      "Mux": 6.0,
+      "Muy": 0.0,
+      "Vux": 0.0,
+      "Vuy": 0.0
+    },
+    "lengths": {
+      "Lx": 3500.0,
+      "Ly": 3500.0,
+      "Lz": 3500.0,
+      "Lb": 3500.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "An": 1300.0,
+      "U": 0.9
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 120.0,
+        "capacity": 270.915,
+        "dcr": 0.443,
+        "status": "PASS"
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 120.0,
+        "capacity": 412.846,
+        "dcr": 0.291,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F8-1 - Yielding (Circular HSS Mx)",
+        "code": "AISC 360-22",
+        "clause": "F8-1",
+        "demand": 6.0,
+        "capacity": 14.318,
+        "dcr": 0.419,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F8-2 - Local Buckling (Circular HSS Mx)",
+        "code": "AISC 360-22",
+        "clause": "F8-2",
+        "demand": 6.0,
+        "capacity": 14.318,
+        "dcr": 0.419,
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 90.93526482979823,
+        "KL_over_r_y": 90.93526482979823,
+        "KL_over_r_governing": 90.93526482979823,
+        "governing_axis": "x"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

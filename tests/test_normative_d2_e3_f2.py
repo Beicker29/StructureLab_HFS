@@ -92,7 +92,7 @@ class NormativeD2E3F2Tests(unittest.TestCase):
         )
         result = FlexureRule().check(case, self._section())
 
-        self.assertEqual("F2", result.clause)
+        self.assertEqual("F2-1", result.clause)
         self.assertEqual(120.0, result.demand)
         self.assertGreater(result.capacity, 0.0)
 

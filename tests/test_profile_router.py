@@ -1,6 +1,6 @@
 import unittest
 
-from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
+from src.steel_design.domain.errors import IncompleteSectionDataError
 from src.steel_design.domain.routing.profile_router import ProfileRouter
 from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
 from src.steel_design.sections.models import Section
@@ -38,15 +38,16 @@ def _build_w_section(*, zx):
 
 
 class ProfileRouterTests(unittest.TestCase):
-    def test_router_fails_hard_when_non_implemented_rule_is_required(self):
+    def test_router_fails_when_shear_rule_is_applicable_but_section_data_is_incomplete(self):
         case = _build_case(pu=0.0, mux=0.0, muy=0.0, vu=100.0)
         section = _build_w_section(zx=120000.0)
 
-        with self.assertRaises(RuleNotImplementedError) as raised:
+        with self.assertRaises(IncompleteSectionDataError) as raised:
             ProfileRouter.get_rules(case, section)
 
-        self.assertEqual("RULE_NOT_IMPLEMENTED", raised.exception.code)
-        self.assertEqual("G2", raised.exception.details["rule_id"])
+        self.assertEqual("INCOMPLETE_SECTION_DATA", raised.exception.code)
+        self.assertEqual("G2-Vx", raised.exception.details["rule_id"])
+        self.assertIn("tw", raised.exception.details["missing_fields"])
 
     def test_router_returns_only_implemented_rules_for_supported_case(self):
         case = _build_case(pu=0.0, mux=150.0, muy=0.0, vu=0.0)
@@ -54,8 +55,23 @@ class ProfileRouterTests(unittest.TestCase):
 
         rules = ProfileRouter.get_rules(case, section)
 
-        self.assertEqual(1, len(rules))
-        self.assertEqual("FlexureRule", rules[0].__class__.__name__)
+        rule_names = {rule.__class__.__name__ for rule in rules}
+        self.assertEqual(2, len(rules))
+        self.assertIn("FlexureF2YieldRule", rule_names)
+        self.assertIn("FlexureF2LtbRule", rule_names)
+
+    def test_router_reports_major_and_minor_flexure_rules_when_mux_and_muy_exist(self):
+        case = _build_case(pu=0.0, mux=150.0, muy=80.0, vu=0.0)
+        section = _build_w_section(zx=120000.0)
+
+        rules = ProfileRouter.get_rules(case, section)
+
+        rule_names = {rule.__class__.__name__ for rule in rules}
+        self.assertEqual(4, len(rules))
+        self.assertEqual(
+            {"FlexureF2YieldRule", "FlexureF2LtbRule", "FlexureF6YieldRule", "FlexureF6FlbRule"},
+            rule_names,
+        )
 
     def test_router_fails_when_required_section_data_is_missing(self):
         case = _build_case(pu=0.0, mux=150.0, muy=0.0, vu=0.0)

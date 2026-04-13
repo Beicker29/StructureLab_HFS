@@ -55,21 +55,31 @@ class ChapterFRoutingAndRulesTests(unittest.TestCase):
 
     def test_router_selects_f2_for_compact_w_major(self):
         rules = ProfileRouter.get_rules(_case(mux=120.0), self._w_section(flange_ratio=6.0, web_ratio=30.0))
-        self.assertEqual({"FlexureRule"}, {rule.__class__.__name__ for rule in rules})
+        rule_names = {rule.__class__.__name__ for rule in rules}
+        self.assertEqual({"FlexureF2YieldRule", "FlexureF2LtbRule"}, rule_names)
 
     def test_router_selects_f3_f4_f5_for_w_major_by_web_flange_class(self):
         rules_f3 = ProfileRouter.get_rules(_case(mux=120.0), self._w_section(flange_ratio=12.0, web_ratio=30.0))
-        self.assertEqual({"FlexureF3Rule"}, {rule.__class__.__name__ for rule in rules_f3})
+        self.assertEqual(
+            {"FlexureF3YieldRule", "FlexureF3LtbRule", "FlexureF3FlbRule"},
+            {rule.__class__.__name__ for rule in rules_f3},
+        )
 
         rules_f4 = ProfileRouter.get_rules(_case(mux=120.0), self._w_section(flange_ratio=8.0, web_ratio=100.0))
-        self.assertEqual({"FlexureF4Rule"}, {rule.__class__.__name__ for rule in rules_f4})
+        self.assertEqual(
+            {"FlexureF4CompressionYieldRule", "FlexureF4LtbRule", "FlexureF4FlbRule", "FlexureF4TensionYieldRule"},
+            {rule.__class__.__name__ for rule in rules_f4},
+        )
 
         rules_f5 = ProfileRouter.get_rules(_case(mux=120.0), self._w_section(flange_ratio=8.0, web_ratio=150.0))
-        self.assertEqual({"FlexureF5Rule"}, {rule.__class__.__name__ for rule in rules_f5})
+        self.assertEqual(
+            {"FlexureF5CompressionYieldRule", "FlexureF5LtbRule", "FlexureF5FlbRule", "FlexureF5TensionYieldRule"},
+            {rule.__class__.__name__ for rule in rules_f5},
+        )
 
     def test_router_selects_f6_for_w_minor_axis(self):
         rules = ProfileRouter.get_rules(_case(muy=80.0), self._w_section(flange_ratio=6.0, web_ratio=30.0))
-        self.assertEqual({"FlexureF6Rule"}, {rule.__class__.__name__ for rule in rules})
+        self.assertEqual({"FlexureF6YieldRule", "FlexureF6FlbRule"}, {rule.__class__.__name__ for rule in rules})
 
     def test_validate_case_rejects_asd_for_flexure_scope(self):
         with self.assertRaises(ValidationError):
@@ -98,7 +108,7 @@ class ChapterFRoutingAndRulesTests(unittest.TestCase):
             ),
         )
         result = FlexureF10Rule().check(case_ok, section)
-        self.assertEqual("F10", result.clause)
+        self.assertEqual("F10-3", result.clause)
         self.assertGreater(result.capacity, 0.0)
 
     def test_f11_runs_for_solid_rectangular(self):
@@ -118,7 +128,7 @@ class ChapterFRoutingAndRulesTests(unittest.TestCase):
             ry=28.8675135,
         )
         result = FlexureF11Rule().check(_case(mux=120.0), section)
-        self.assertEqual("F11", result.clause)
+        self.assertEqual("F11-2", result.clause)
         self.assertGreater(result.capacity, 0.0)
 
 

@@ -59,7 +59,7 @@ class CustomSolidSectionsTests(unittest.TestCase):
         engine = SteelDesignEngine(SectionRepository())
         case = SteelCase(
             section_name="SC160",
-            loads=Loads(Pu=250.0, Mux=20.0, Muy=0.0, Vu=0.0),
+            loads=Loads(Pu=250.0, Mux=20.0, Muy=10.0, Vu=0.0),
             connection=Connection(),
             custom_section={"type": "SOLID_CIRCULAR", "diameter": 160.0},
             **_base_case_kwargs(),
@@ -67,8 +67,15 @@ class CustomSolidSectionsTests(unittest.TestCase):
 
         result = engine.run(case)
         clauses = {check.clause for check in result.checks}
+        flexure_names = {check.name for check in result.checks if check.clause.startswith("F11-")}
         self.assertIn("E3-1", clauses)
-        self.assertIn("F11", clauses)
+        self.assertIn("F11-1", clauses)
+        self.assertIn("F11-2", clauses)
+        self.assertEqual(4, len([check for check in result.checks if check.clause.startswith("F11-")]))
+        self.assertIn("Flexure F11-1 - Yielding (Solid Bar/Round Mx)", flexure_names)
+        self.assertIn("Flexure F11-1 - Yielding (Solid Bar/Round My)", flexure_names)
+        self.assertIn("Flexure F11-2 - Lateral-Torsional Buckling (Solid Bar/Round Mx)", flexure_names)
+        self.assertIn("Flexure F11-2 - Lateral-Torsional Buckling (Solid Bar/Round My)", flexure_names)
 
     def test_tension_requires_an_and_u(self):
         engine = SteelDesignEngine(SectionRepository())

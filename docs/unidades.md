@@ -20,6 +20,7 @@ Este documento define las unidades que usa el motor y la convencion de signos.
 - `Pu < 0`: tension
 - `Pu = 0`: sin carga axial
 - `Mux`, `Muy`, `Vu`: se ingresan como magnitudes de diseno en `kN-m` y `kN`.
+- `Tu`: se ingresa como magnitud de torsion en `kN-m`.
 
 Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda.
 
@@ -28,6 +29,7 @@ Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda
 - `material.Fy`, `material.Fu`, `material.E`: `MPa`
 - `loads.Pu`: `kN` (positivo compresion, negativo tension)
 - `loads.Mux`, `loads.Muy`: `kN-m`
+- `loads.Tu`: `kN-m`
 - `loads.Vux`, `loads.Vuy`: `kN`
 - `loads.Vu`: `kN` (legacy, derivado automaticamente de `Vux` y `Vuy` cuando se proveen)
 - `lengths.Lx`, `Ly`, `Lz`, `Lb`: `mm`
@@ -71,6 +73,12 @@ Reglas de ingreso:
 - Chequeo de flexion `F2`:
   - `demand`: `kN-m`
   - `capacity`: `kN-m`
+- Chequeos de torsion `H3-1`:
+  - `demand`: `kN-m`
+  - `capacity`: `kN-m`
+- Chequeos de interaccion `H1`, `H3-2`:
+  - `demand`: adimensional
+  - `capacity`: adimensional (limite `1.0`)
 - `dcr`: adimensional
 - `status`: `PASS` o `FAIL`
 

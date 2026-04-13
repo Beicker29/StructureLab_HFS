@@ -8,11 +8,13 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 - Capitulo D (tension) implementado.
 - Capitulo E (compresion) implementado para E3, E4, E5 y E7.
 - Capitulo F implementado para F2, F3, F4, F5, F6, F7, F8, F10 y F11.
+- Capitulo G (cortante) implementado para G2, G3, G4, G5 y G6.
+- Capitulo H implementado para H1, H3-1 y H3-2 en perfiles HSS.
 - Traccion con D3 estricto (`Ae = U*An`) para todos los perfiles.
 - Secciones macizas custom por JSON (`SOLID_CIRCULAR`, `SOLID_RECTANGULAR`) con alcance axial (D2/E3).
 - Politica estricta: si una regla aplicable no puede evaluarse por datos faltantes, el caso falla con error estructurado.
 - Los checks axiales reportan clasificacion de elementos (`non_slender`/`slender`) en `checks[].details.element_classification`.
-- Flexion en alcance actual: solo `LRFD` y flexion simple (no biaxial).
+- Flexion en alcance actual: solo `LRFD`; cuando hay `Mux` y `Muy` se reportan checks por eje (sin interaccion biaxial H1).
 
 ## Estructura
 
@@ -88,8 +90,21 @@ El motor calcula `Ae = U*An` y valida que `Ae <= Ag`.
 Para evaluar flexion (`Mux` o `Muy`):
 
 - `design_method` debe ser `LRFD`.
-- no se admite flexion biaxial (`Mux` y `Muy` simultaneos).
+- se reportan checks por eje para `Mux` y `Muy`; la interaccion biaxial aun no esta implementada.
 - para angulo simple (`F10`) en `connection` se requiere:
   - `angle_flexure_axis`
   - `angle_ltb_restraint`
   - `angle_max_tension_location` cuando `angle_flexure_axis = geometric_axis`.
+
+## Nota de entrada para cortante (Capitulo G)
+
+- Si se entregan `Vux` y/o `Vuy`, el motor evalua cortante por eje.
+- Si solo se entrega `Vu` (legacy), se interpreta como demanda de cortante en eje mayor (`Vx`).
+- Para perfiles `RECTANGULAR_HSS`, el espesor de calculo es `tdes` (mm).
+
+## Nota de entrada para torsion y combinaciones (Capitulo H)
+
+- Se usa `loads.Tu` en `kN-m` como torsion requerida.
+- `H3-1` evalua torsion pura para `RECTANGULAR_HSS` y `CIRCULAR_HSS`.
+- `H3-2` evalua combinacion de torsion con axial/flexion/cortante.
+- Para perfiles no-HSS con `Tu != 0`, el motor retorna error estructurado (H3-3 fuera de alcance actual).

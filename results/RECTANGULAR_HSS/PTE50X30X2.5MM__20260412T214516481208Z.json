@@ -1,0 +1,1295 @@
+{
+  "meta": {
+    "generated_at_utc": "20260412T214516481208Z",
+    "profile_type": "RECTANGULAR_HSS",
+    "section_name": "PTE50X30X2.5mm",
+    "case_tag": null,
+    "input_file": "examples/rectangular_hss_case.json",
+    "sections_file": "data/sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "governing_capacity_kn_or_knm": 0.931,
+      "governing_clauses": [
+        "F7-4"
+      ],
+      "governing_check_names": [
+        "Flexure F7-4 - Lateral-Torsional Buckling (Rectangular HSS Mx)"
+      ],
+      "overall_status": "FAIL",
+      "admissibility": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 112.10922200248689,
+          "KL_over_r_y": 167.46298991917183,
+          "KL_over_r_governing": 167.46298991917183,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": false
+        }
+      }
+    },
+    "shared_context": {
+      "element_classification": {
+        "profile_type": "RECTANGULAR_HSS",
+        "overall": "non_slender",
+        "is_slender": false,
+        "elements": {
+          "wall_b": {
+            "ratio": 9.903225806451614,
+            "lambda_r": 33.70803886401537,
+            "classification": "non_slender"
+          },
+          "wall_h": {
+            "ratio": 18.50537634408602,
+            "lambda_r": 33.70803886401537,
+            "classification": "non_slender"
+          }
+        }
+      }
+    },
+    "clause_results": [
+      {
+        "clause": "E3-1",
+        "name": "Axial Compression (Flexural Buckling)",
+        "calculations": {
+          "clause": "E3",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Ag_mm2": 336.45681536418374,
+            "Kx": 1.0,
+            "Ky": 1.0,
+            "Lx_mm": 2000.0,
+            "Ly_mm": 2000.0,
+            "rx_mm": 17.839745600550458,
+            "ry_mm": 11.942937367625682
+          },
+          "intermediate": {
+            "KL_over_r_x": 112.10922200248689,
+            "KL_over_r_y": 167.46298991917183,
+            "governing_axis": "y",
+            "Fex_mpa": 157.05329904938736,
+            "Fey_mpa": 70.3869358013645,
+            "Fe_mpa": 70.3869358013645,
+            "fy_over_fe": 4.901477753962858,
+            "branch": "elastic_E3_3",
+            "fcr_mpa": 61.72934269779667,
+            "pn_n": 20769.258058624997,
+            "pn_kn": 20.769258058624995,
+            "be_mm": null,
+            "be_note": "Not required in current E3 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 18.692332252762498
+        },
+        "check_summary": {
+          "demand": 30.0,
+          "capacity": 18.692,
+          "dcr": 1.605,
+          "status": "FAIL"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 30.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi*Pn",
+              "value_used_for_dcr": 18.692332252762498,
+              "value_reported_in_check": 18.692,
+              "value_from_rule_memory": 18.692332252762498,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 30.000000 / 18.692332",
+              "value_raw": 1.6049361628250733,
+              "value_rounded_3dec": 1.605,
+              "value_reported_in_check": 1.605,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "FAIL",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "E4-1",
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "calculations": {
+          "clause": "E4",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "G_mpa": 77200.0,
+            "Ag_mm2": 336.45681536418374,
+            "Kz": 1.0,
+            "Lz_mm": 2000.0,
+            "Ky": 1.0,
+            "Ly_mm": 2000.0,
+            "ry_mm": 11.942937367625682,
+            "J_mm4": 110111.5100079399,
+            "Cw_mm6": null,
+            "H": null,
+            "xa_mm": 0.0,
+            "ya_mm": 0.0
+          },
+          "intermediate": {
+            "KL_over_r_x": 112.10922200248689,
+            "KL_over_r_y": 167.46298991917183,
+            "KL_over_r_z": 93.1603739110408,
+            "ro_mm": 21.468355224827757,
+            "ro_source": "derived_from_ix_iy_ag",
+            "Fex_mpa": 157.05329904938736,
+            "Fey_mpa": 70.3869358013645,
+            "Fez_mpa": 54817.99455106453,
+            "Fe_mpa": 54817.99455106453,
+            "e4_mode": "torsional",
+            "warping_term_n": null,
+            "stvenant_term_n": 8500608572.61296,
+            "torsional_stiffness_n": null,
+            "torsional_denominator_mm4": 155069.6745152616,
+            "flexural_torsional_terms": null,
+            "fy_over_fe": 0.006293553838030734,
+            "branch": "inelastic_E3_2",
+            "fcr_mpa": 344.09240754514286,
+            "pn_n": 115772.2356336336,
+            "pn_kn": 115.7722356336336,
+            "be_mm": null,
+            "be_note": "be is not explicitly modeled in current E4 implementation."
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi": 0.9,
+            "omega": null,
+            "capacity_expression": "phi*Pn"
+          },
+          "capacity_kn": 104.19501207027024
+        },
+        "check_summary": {
+          "demand": 30.0,
+          "capacity": 104.195,
+          "dcr": 0.288,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 30.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi*Pn",
+              "value_used_for_dcr": 104.19501207027024,
+              "value_reported_in_check": 104.195,
+              "value_from_rule_memory": 104.19501207027024,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 30.000000 / 104.195012",
+              "value_raw": 0.28792165194786556,
+              "value_rounded_3dec": 0.288,
+              "value_reported_in_check": 0.288,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-1",
+        "name": "Flexure F7-1 - Yielding (Rectangular HSS Mx)",
+        "calculations": {
+          "chapter_f_selection": "F7-1",
+          "inputs": {
+            "axis": "x",
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Mux_kn_m": 0.4,
+            "Muy_kn_m": 0.5
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1854105.190218095,
+            "flange_local_buckling_Mn_Nmm": 1854105.190218095,
+            "web_local_buckling_Mn_Nmm": 1854105.190218095,
+            "lateral_torsional_buckling_Mn_Nmm": 1034388.7063676291
+          },
+          "intermediate": {
+            "axis": "x",
+            "lambda_f": 9.903225806451614,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 18.50537634408602,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "Conservative LTB branch for rectangular HSS in current scope.",
+            "reported_limit_state": "yielding"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1854105.190218095,
+          "capacity_kn_m": 1.6686946711962853
+        },
+        "check_summary": {
+          "demand": 0.4,
+          "capacity": 1.669,
+          "dcr": 0.24,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.4,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.6686946711962853,
+              "value_reported_in_check": 1.669,
+              "value_from_rule_memory": 1.6686946711962853,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.400000 / 1.668695",
+              "value_raw": 0.23970832226199923,
+              "value_rounded_3dec": 0.24,
+              "value_reported_in_check": 0.24,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-1",
+        "name": "Flexure F7-1 - Yielding (Rectangular HSS My)",
+        "calculations": {
+          "chapter_f_selection": "F7-1",
+          "inputs": {
+            "axis": "y",
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Mux_kn_m": 0.4,
+            "Muy_kn_m": 0.5
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1297730.3647116602,
+            "flange_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "web_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "lateral_torsional_buckling_Mn_Nmm": 1297730.3647116602
+          },
+          "intermediate": {
+            "axis": "y",
+            "lambda_f": 18.50537634408602,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 9.903225806451614,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "LTB not applicable for minor axis or square section.",
+            "reported_limit_state": "yielding"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1297730.3647116602,
+          "capacity_kn_m": 1.1679573282404943
+        },
+        "check_summary": {
+          "demand": 0.5,
+          "capacity": 1.168,
+          "dcr": 0.428,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.5,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.1679573282404943,
+              "value_reported_in_check": 1.168,
+              "value_from_rule_memory": 1.1679573282404943,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.500000 / 1.167957",
+              "value_raw": 0.42809783192442535,
+              "value_rounded_3dec": 0.428,
+              "value_reported_in_check": 0.428,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-2",
+        "name": "Flexure F7-2 - Flange Local Buckling (Rectangular HSS Mx)",
+        "calculations": {
+          "chapter_f_selection": "F7-2",
+          "inputs": {
+            "axis": "x",
+            "b_tdes_ratio": 9.903225806451614,
+            "h_tdes_ratio": 18.50537634408602
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1854105.190218095,
+            "flange_local_buckling_Mn_Nmm": 1854105.190218095,
+            "web_local_buckling_Mn_Nmm": 1854105.190218095,
+            "lateral_torsional_buckling_Mn_Nmm": 1034388.7063676291
+          },
+          "intermediate": {
+            "axis": "x",
+            "lambda_f": 9.903225806451614,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 18.50537634408602,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "Conservative LTB branch for rectangular HSS in current scope.",
+            "reported_limit_state": "flange_local_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1854105.190218095,
+          "capacity_kn_m": 1.6686946711962853
+        },
+        "check_summary": {
+          "demand": 0.4,
+          "capacity": 1.669,
+          "dcr": 0.24,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.4,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.6686946711962853,
+              "value_reported_in_check": 1.669,
+              "value_from_rule_memory": 1.6686946711962853,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.400000 / 1.668695",
+              "value_raw": 0.23970832226199923,
+              "value_rounded_3dec": 0.24,
+              "value_reported_in_check": 0.24,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-2",
+        "name": "Flexure F7-2 - Flange Local Buckling (Rectangular HSS My)",
+        "calculations": {
+          "chapter_f_selection": "F7-2",
+          "inputs": {
+            "axis": "y",
+            "b_tdes_ratio": 9.903225806451614,
+            "h_tdes_ratio": 18.50537634408602
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1297730.3647116602,
+            "flange_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "web_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "lateral_torsional_buckling_Mn_Nmm": 1297730.3647116602
+          },
+          "intermediate": {
+            "axis": "y",
+            "lambda_f": 18.50537634408602,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 9.903225806451614,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "LTB not applicable for minor axis or square section.",
+            "reported_limit_state": "flange_local_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1297730.3647116602,
+          "capacity_kn_m": 1.1679573282404943
+        },
+        "check_summary": {
+          "demand": 0.5,
+          "capacity": 1.168,
+          "dcr": 0.428,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.5,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.1679573282404943,
+              "value_reported_in_check": 1.168,
+              "value_from_rule_memory": 1.1679573282404943,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.500000 / 1.167957",
+              "value_raw": 0.42809783192442535,
+              "value_rounded_3dec": 0.428,
+              "value_reported_in_check": 0.428,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-3",
+        "name": "Flexure F7-3 - Web Local Buckling (Rectangular HSS Mx)",
+        "calculations": {
+          "chapter_f_selection": "F7-3",
+          "inputs": {
+            "axis": "x",
+            "b_tdes_ratio": 9.903225806451614,
+            "h_tdes_ratio": 18.50537634408602
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1854105.190218095,
+            "flange_local_buckling_Mn_Nmm": 1854105.190218095,
+            "web_local_buckling_Mn_Nmm": 1854105.190218095,
+            "lateral_torsional_buckling_Mn_Nmm": 1034388.7063676291
+          },
+          "intermediate": {
+            "axis": "x",
+            "lambda_f": 9.903225806451614,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 18.50537634408602,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "Conservative LTB branch for rectangular HSS in current scope.",
+            "reported_limit_state": "web_local_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1854105.190218095,
+          "capacity_kn_m": 1.6686946711962853
+        },
+        "check_summary": {
+          "demand": 0.4,
+          "capacity": 1.669,
+          "dcr": 0.24,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.4,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.6686946711962853,
+              "value_reported_in_check": 1.669,
+              "value_from_rule_memory": 1.6686946711962853,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.400000 / 1.668695",
+              "value_raw": 0.23970832226199923,
+              "value_rounded_3dec": 0.24,
+              "value_reported_in_check": 0.24,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-3",
+        "name": "Flexure F7-3 - Web Local Buckling (Rectangular HSS My)",
+        "calculations": {
+          "chapter_f_selection": "F7-3",
+          "inputs": {
+            "axis": "y",
+            "b_tdes_ratio": 9.903225806451614,
+            "h_tdes_ratio": 18.50537634408602
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1297730.3647116602,
+            "flange_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "web_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "lateral_torsional_buckling_Mn_Nmm": 1297730.3647116602
+          },
+          "intermediate": {
+            "axis": "y",
+            "lambda_f": 18.50537634408602,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 9.903225806451614,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "LTB not applicable for minor axis or square section.",
+            "reported_limit_state": "web_local_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1297730.3647116602,
+          "capacity_kn_m": 1.1679573282404943
+        },
+        "check_summary": {
+          "demand": 0.5,
+          "capacity": 1.168,
+          "dcr": 0.428,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.5,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.1679573282404943,
+              "value_reported_in_check": 1.168,
+              "value_from_rule_memory": 1.1679573282404943,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.500000 / 1.167957",
+              "value_raw": 0.42809783192442535,
+              "value_rounded_3dec": 0.428,
+              "value_reported_in_check": 0.428,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-4",
+        "name": "Flexure F7-4 - Lateral-Torsional Buckling (Rectangular HSS Mx)",
+        "calculations": {
+          "chapter_f_selection": "F7-4",
+          "inputs": {
+            "axis": "x",
+            "Cb": 1.0,
+            "Lb_mm": 2000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1854105.190218095,
+            "flange_local_buckling_Mn_Nmm": 1854105.190218095,
+            "web_local_buckling_Mn_Nmm": 1854105.190218095,
+            "lateral_torsional_buckling_Mn_Nmm": 1034388.7063676291
+          },
+          "intermediate": {
+            "axis": "x",
+            "lambda_f": 9.903225806451614,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 18.50537634408602,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "Conservative LTB branch for rectangular HSS in current scope.",
+            "reported_limit_state": "lateral_torsional_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1034388.7063676291,
+          "capacity_kn_m": 0.9309498357308662
+        },
+        "check_summary": {
+          "demand": 0.4,
+          "capacity": 0.931,
+          "dcr": 0.43,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.4,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 0.9309498357308662,
+              "value_reported_in_check": 0.931,
+              "value_from_rule_memory": 0.9309498357308662,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.400000 / 0.930950",
+              "value_raw": 0.42966869389473566,
+              "value_rounded_3dec": 0.43,
+              "value_reported_in_check": 0.43,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "F7-4",
+        "name": "Flexure F7-4 - Lateral-Torsional Buckling (Rectangular HSS My)",
+        "calculations": {
+          "chapter_f_selection": "F7-4",
+          "inputs": {
+            "axis": "y",
+            "Cb": 1.0,
+            "Lb_mm": 2000.0
+          },
+          "limit_states": {
+            "yielding_Mn_Nmm": 1297730.3647116602,
+            "flange_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "web_local_buckling_Mn_Nmm": 1297730.3647116602,
+            "lateral_torsional_buckling_Mn_Nmm": 1297730.3647116602
+          },
+          "intermediate": {
+            "axis": "y",
+            "lambda_f": 18.50537634408602,
+            "lambda_pf": 26.966431091212304,
+            "lambda_rf": 33.70803886401537,
+            "flange_class": "compact",
+            "lambda_w": 9.903225806451614,
+            "lambda_pw": 58.26675289351229,
+            "lambda_rw": 137.2398725177769,
+            "web_class": "compact",
+            "ltb_note": "LTB not applicable for minor axis or square section.",
+            "reported_limit_state": "lateral_torsional_buckling"
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_b": 0.9,
+            "capacity_expression": "phi_b*Mn"
+          },
+          "Mn_Nmm": 1297730.3647116602,
+          "capacity_kn_m": 1.1679573282404943
+        },
+        "check_summary": {
+          "demand": 0.5,
+          "capacity": 1.168,
+          "dcr": 0.428,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN-m",
+            "capacity": "kN-m"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 0.5,
+              "unit": "kN-m"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_b*Mn",
+              "value_used_for_dcr": 1.1679573282404943,
+              "value_reported_in_check": 1.168,
+              "value_from_rule_memory": 1.1679573282404943,
+              "unit": "kN-m"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 0.500000 / 1.167957",
+              "value_raw": 0.42809783192442535,
+              "value_rounded_3dec": 0.428,
+              "value_reported_in_check": 0.428,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "G4-1",
+        "name": "Shear G4-1 - Wall Shear (Rectangular HSS Vy)",
+        "calculations": {
+          "clause": "G4",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "axis": "x",
+            "Vux_kn": 10.0,
+            "h_catalog_mm": 43.025,
+            "b_catalog_mm": 23.025000000000002,
+            "h_resisting_mm": 43.025,
+            "tdes_mm": 2.325,
+            "t_used_mm": 2.325,
+            "h_over_t": 18.50537634408602,
+            "Aw_mm2": 200.06625,
+            "kv": 5.0
+          },
+          "intermediate": {
+            "h_over_t_expression": "h_resisting/tdes",
+            "h_over_t_substitution": "43.025 / 2.325",
+            "Aw_expression": "Aw = 2*h_resisting*tdes",
+            "Aw_substitution": "2*43.025*2.325",
+            "Cv2": 1.0,
+            "Cv2_branch": "G2-9",
+            "Cv2_limit_g2_9": 59.222009226398214,
+            "Cv2_limit_g2_10": 73.75832058196868,
+            "Cv2_reference": "G2-9/G2-10/G2-11 with kv=5 and h/t = h_resisting/tdes",
+            "Vn_N": 41413.71375,
+            "Vn_kN": 41.41371375
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.9,
+            "omega_v": 1.67,
+            "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)"
+          },
+          "capacity_kn": 37.272342375
+        },
+        "check_summary": {
+          "demand": 10.0,
+          "capacity": 37.272,
+          "dcr": 0.268,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 10.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
+              "value_used_for_dcr": 37.272342375,
+              "value_reported_in_check": 37.272,
+              "value_from_rule_memory": 37.272342375,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 10.000000 / 37.272342",
+              "value_raw": 0.26829545348637346,
+              "value_rounded_3dec": 0.268,
+              "value_reported_in_check": 0.268,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "clause": "G4-1",
+        "name": "Shear G4-1 - Wall Shear (Rectangular HSS Vx)",
+        "calculations": {
+          "clause": "G4",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "axis": "y",
+            "Vuy_kn": 5.0,
+            "h_catalog_mm": 43.025,
+            "b_catalog_mm": 23.025000000000002,
+            "h_resisting_mm": 23.025000000000002,
+            "tdes_mm": 2.325,
+            "t_used_mm": 2.325,
+            "h_over_t": 9.903225806451614,
+            "Aw_mm2": 107.06625000000003,
+            "kv": 5.0
+          },
+          "intermediate": {
+            "h_over_t_expression": "h_resisting/tdes",
+            "h_over_t_substitution": "23.025000000000002 / 2.325",
+            "Aw_expression": "Aw = 2*h_resisting*tdes",
+            "Aw_substitution": "2*23.025000000000002*2.325",
+            "Cv2": 1.0,
+            "Cv2_branch": "G2-9",
+            "Cv2_limit_g2_9": 59.222009226398214,
+            "Cv2_limit_g2_10": 73.75832058196868,
+            "Cv2_reference": "G2-9/G2-10/G2-11 with kv=5 and h/t = h_resisting/tdes",
+            "Vn_N": 22162.713750000006,
+            "Vn_kN": 22.162713750000005
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 0.9,
+            "omega_v": 1.67,
+            "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)"
+          },
+          "capacity_kn": 19.946442375000007
+        },
+        "check_summary": {
+          "demand": 5.0,
+          "capacity": 19.946,
+          "dcr": 0.251,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "expression": "demand = required action from input loads",
+              "value": 5.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "expression": "capacity = phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
+              "value_used_for_dcr": 19.946442375000007,
+              "value_reported_in_check": 19.946,
+              "value_from_rule_memory": 19.946442375000007,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "expression": "DCR = demand / capacity",
+              "substitution": "DCR = 5.000000 / 19.946442",
+              "value_raw": 0.25067126788819144,
+              "value_rounded_3dec": 0.251,
+              "value_reported_in_check": 0.251,
+              "is_infinite": false
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "expression": "PASS if DCR <= 1.0 else FAIL",
+              "result": "PASS",
+              "threshold": 1.0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "D1": false,
+    "E2": false,
+    "short": "D.1:NO | E.2:NO",
+    "inputs": {
+      "KL_over_r_x": 112.10922200248689,
+      "KL_over_r_y": 167.46298991917183,
+      "KL_over_r_governing": 167.46298991917183,
+      "governing_axis": "y"
+    },
+    "limits": {
+      "D1_max": 300.0,
+      "E2_max": 200.0
+    },
+    "applicability": {
+      "D1": false,
+      "E2": false
+    }
+  },
+  "input": {
+    "section_name": "PTE50X30X2.5mm",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 400.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 30.0,
+      "Mux": 0.4,
+      "Muy": 0.5,
+      "Vux": 10.0,
+      "Vuy": 5.0
+    },
+    "lengths": {
+      "Lx": 2000.0,
+      "Ly": 2000.0,
+      "Lz": 2000.0,
+      "Lb": 2000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0,
+      "xa": 0.0,
+      "ya": 0.0
+    },
+    "connection": {
+      "An": 200.0,
+      "U": 0.9
+    }
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Axial Compression (Flexural Buckling)",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 30.0,
+        "capacity": 18.692,
+        "dcr": 1.605,
+        "status": "FAIL"
+      },
+      {
+        "name": "Axial Compression (Torsional/Flexural-Torsional)",
+        "code": "AISC 360-22",
+        "clause": "E4-1",
+        "demand": 30.0,
+        "capacity": 104.195,
+        "dcr": 0.288,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-1 - Yielding (Rectangular HSS Mx)",
+        "code": "AISC 360-22",
+        "clause": "F7-1",
+        "demand": 0.4,
+        "capacity": 1.669,
+        "dcr": 0.24,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-1 - Yielding (Rectangular HSS My)",
+        "code": "AISC 360-22",
+        "clause": "F7-1",
+        "demand": 0.5,
+        "capacity": 1.168,
+        "dcr": 0.428,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-2 - Flange Local Buckling (Rectangular HSS Mx)",
+        "code": "AISC 360-22",
+        "clause": "F7-2",
+        "demand": 0.4,
+        "capacity": 1.669,
+        "dcr": 0.24,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-2 - Flange Local Buckling (Rectangular HSS My)",
+        "code": "AISC 360-22",
+        "clause": "F7-2",
+        "demand": 0.5,
+        "capacity": 1.168,
+        "dcr": 0.428,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-3 - Web Local Buckling (Rectangular HSS Mx)",
+        "code": "AISC 360-22",
+        "clause": "F7-3",
+        "demand": 0.4,
+        "capacity": 1.669,
+        "dcr": 0.24,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-3 - Web Local Buckling (Rectangular HSS My)",
+        "code": "AISC 360-22",
+        "clause": "F7-3",
+        "demand": 0.5,
+        "capacity": 1.168,
+        "dcr": 0.428,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-4 - Lateral-Torsional Buckling (Rectangular HSS Mx)",
+        "code": "AISC 360-22",
+        "clause": "F7-4",
+        "demand": 0.4,
+        "capacity": 0.931,
+        "dcr": 0.43,
+        "status": "PASS"
+      },
+      {
+        "name": "Flexure F7-4 - Lateral-Torsional Buckling (Rectangular HSS My)",
+        "code": "AISC 360-22",
+        "clause": "F7-4",
+        "demand": 0.5,
+        "capacity": 1.168,
+        "dcr": 0.428,
+        "status": "PASS"
+      },
+      {
+        "name": "Shear G4-1 - Wall Shear (Rectangular HSS Vy)",
+        "code": "AISC 360-22",
+        "clause": "G4-1",
+        "demand": 10.0,
+        "capacity": 37.272,
+        "dcr": 0.268,
+        "status": "PASS"
+      },
+      {
+        "name": "Shear G4-1 - Wall Shear (Rectangular HSS Vx)",
+        "code": "AISC 360-22",
+        "clause": "G4-1",
+        "demand": 5.0,
+        "capacity": 19.946,
+        "dcr": 0.251,
+        "status": "PASS"
+      }
+    ],
+    "status": "FAIL",
+    "admissibility": {
+      "D1": false,
+      "E2": false,
+      "short": "D.1:NO | E.2:NO",
+      "inputs": {
+        "KL_over_r_x": 112.10922200248689,
+        "KL_over_r_y": 167.46298991917183,
+        "KL_over_r_governing": 167.46298991917183,
+        "governing_axis": "y"
+      },
+      "limits": {
+        "D1_max": 300.0,
+        "E2_max": 200.0
+      },
+      "applicability": {
+        "D1": false,
+        "E2": false
+      }
+    }
+  }
+}

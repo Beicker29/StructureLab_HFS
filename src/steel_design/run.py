@@ -39,7 +39,11 @@ def _sanitize_filename(text: str) -> str:
 
 def _build_global_summary(result) -> dict:
     checks = result.checks or []
-    positive_capacity_checks = [check for check in checks if (check.capacity or 0.0) > 0.0]
+    positive_capacity_checks = [
+        check
+        for check in checks
+        if (check.capacity or 0.0) > 0.0 and not str(check.clause).upper().startswith(("H1", "H3-2"))
+    ]
     if not positive_capacity_checks:
         return {
             "governing_capacity_kn_or_knm": None,
@@ -121,6 +125,7 @@ def _build_chapter_admissibility(case: SteelCase, section: Section | None) -> di
     pure_axial = (
         abs(case.loads.Mux) <= 1e-9
         and abs(case.loads.Muy) <= 1e-9
+        and abs(case.loads.Tu) <= 1e-9
         and abs(case.loads.Vu) <= 1e-9
         and abs(case.loads.Vux) <= 1e-9
         and abs(case.loads.Vuy) <= 1e-9
@@ -201,6 +206,85 @@ def _extract_shared_context(clause_results: list[dict]) -> dict:
     return shared_context
 
 
+def _infer_check_units(clause: str) -> dict:
+    clause_upper = (clause or "").upper()
+    if clause_upper.startswith("H1") or clause_upper.startswith("H3-2"):
+        return {"demand": "ratio", "capacity": "ratio"}
+    if clause_upper.startswith("H3-1"):
+        return {"demand": "kN-m", "capacity": "kN-m"}
+    if clause_upper.startswith("F"):
+        return {"demand": "kN-m", "capacity": "kN-m"}
+    return {"demand": "kN", "capacity": "kN"}
+
+
+def _extract_capacity_from_memory(memory: dict | None) -> float | None:
+    if not isinstance(memory, dict):
+        return None
+    for key in ("capacity_kn", "capacity_kn_m", "capacity_kn_or_knm", "capacity"):
+        value = memory.get(key)
+        if isinstance(value, (int, float)) and value > 0.0:
+            return float(value)
+    return None
+
+
+def _build_dcr_trace(check) -> dict:
+    details = check.details or {}
+    memory = details.get("memory") if isinstance(details, dict) else None
+    units = _infer_check_units(check.clause)
+    demand = float(check.demand or 0.0)
+    capacity_reported = float(check.capacity or 0.0)
+    capacity_from_memory = _extract_capacity_from_memory(memory)
+    capacity_for_dcr = capacity_from_memory if isinstance(capacity_from_memory, float) and capacity_from_memory > 0.0 else capacity_reported
+    dcr_raw = demand / capacity_for_dcr if capacity_for_dcr > 0.0 else math.inf
+    dcr_rounded = round(dcr_raw, 3) if math.isfinite(dcr_raw) else None
+    design_factor = memory.get("design_factor") if isinstance(memory, dict) and isinstance(memory.get("design_factor"), dict) else {}
+    capacity_expression = design_factor.get("capacity_expression", "rule_capacity")
+
+    if capacity_for_dcr > 0.0:
+        substitution = f"DCR = {demand:.6f} / {capacity_for_dcr:.6f}"
+    else:
+        substitution = "DCR = demand / 0.0 (undefined -> inf)"
+
+    return {
+        "units": units,
+        "steps": [
+            {
+                "id": 1,
+                "name": "Demand",
+                "expression": "demand = required action from input loads",
+                "value": demand,
+                "unit": units["demand"],
+            },
+            {
+                "id": 2,
+                "name": "Available Capacity",
+                "expression": f"capacity = {capacity_expression}",
+                "value_used_for_dcr": capacity_for_dcr,
+                "value_reported_in_check": capacity_reported,
+                "value_from_rule_memory": capacity_from_memory,
+                "unit": units["capacity"],
+            },
+            {
+                "id": 3,
+                "name": "Demand-Capacity Ratio",
+                "expression": "DCR = demand / capacity",
+                "substitution": substitution,
+                "value_raw": dcr_raw if math.isfinite(dcr_raw) else None,
+                "value_rounded_3dec": dcr_rounded,
+                "value_reported_in_check": check.dcr,
+                "is_infinite": not math.isfinite(dcr_raw),
+            },
+            {
+                "id": 4,
+                "name": "Status",
+                "expression": "PASS if DCR <= 1.0 else FAIL",
+                "result": check.status.value,
+                "threshold": 1.0,
+            },
+        ],
+    }
+
+
 def _write_detailed_results_file(
     *,
     result,
@@ -235,6 +319,13 @@ def _write_detailed_results_file(
             "clause": check.clause,
             "name": check.name,
             "calculations": details.get("memory"),
+            "check_summary": {
+                "demand": check.demand,
+                "capacity": check.capacity,
+                "dcr": check.dcr,
+                "status": check.status.value,
+            },
+            "check_trace": _build_dcr_trace(check),
         }
         context = {key: value for key, value in details.items() if key != "memory"}
         if context:

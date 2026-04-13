@@ -20,6 +20,7 @@ class Loads(BaseModel):
     Pu: float = Field(0.0, description="Required axial strength (kN). Positive is compression.")
     Mux: float = Field(0.0, description="Required flexural strength, major-axis (kN-m)")
     Muy: float = Field(0.0, description="Required flexural strength, minor-axis (kN-m)")
+    Tu: float = Field(0.0, description="Required torsional strength (kN-m)")
     Vux: float = Field(0.0, description="Required shear strength about x direction (kN)")
     Vuy: float = Field(0.0, description="Required shear strength about y direction (kN)")
     Vu: float = Field(0.0, description="Legacy resultant shear strength (kN)")
