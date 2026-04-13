@@ -1,0 +1,522 @@
+=== Table 6-2a—Cross-Section Strength for Rectangular Encased W-Shapes | page_index=822 | page_num=823 ===
+  6-105
+American Institute of Steel Construction
+Table 6-2a
+Cross-Section Strength 
+for Rectangular Encased 
+W-Shapes
+Subject to Flexure about the Major Axis
+Section Stress Distribution Pt. Defining Equation
+2
+2
+h
+yF0.85 cf  yrF A
+ PA = Fy As + FyrAsr + 0.85fcAc
+ MA = 0
+  As  = area of steel shape, in.2
+ Asr = area of all continuous reinforcing bars, in. 2  
+  Ac = h1h2 − As − Asr
+C
+ P   = 0.85fc Ac
+M  = MB
+D
+ PD  =  fAccʹ08 5
+2
+.
+ MD  = FyZs + FyrZr + 0.85fc 
+Zc/uni239B
+/uni239D
+/uni239C
+/uni239E
+/uni23A0
+/uni239F
+2
+  Zs = full x-axis plastic section modulus of steel shape, in. 3
+Asrs = area of continuous reinforcing bars at the centerline, in. 2
+ Zr = AA h
+sr srs−() 2
+2 2−/uni239B
+/uni239D
+/uni239C /uni239E
+/uni23A0
+/uni239Fc
+  Zc =
+ 4
+12
+2
+−−hh ZZsr  
+B
+ PB = 0
+MB = MD − FyZsn − 0.85fc
+Zcn
+
+
+
+
+
+2
+Zcn = h1h2  − Zsn
+For hn below the ﬂange h d tnf ≤−
+
+
+
+
+
+2
+ hn = fA AF Acc srsy rs rs′ +() −08 52
+20
+.
+.885 21′ −() + fh tF tcw yw
+     Zsn = twhn2
+For hn within the ﬂange d
+222−< ≤
+
+
+
+
+th d
+fn
+ hn =
+ 
+08 52 2′ +− +() −− () −fA Ad bA FA db Fcc sf srsy sf. yr srs
+cf yf
+A
+fh bF b20 85 21. ′ −() + 
+Zsn = Zs − bf nn
+d h d h22−
+
+
+
+
+ +
+ 
+
+
+
+
+For hn above the ﬂange >
+
+
+
+
+h d
+n 2
+ hn =
+ 
+′ ++fA AAcc s08 5 . srsy sy rs rs
+c
+FA FA
+fh
+() −−
+′()
+22
+20 85 1.
+Zsn = Z
+n
+s
+Fy = specified minimum yield stress of steel shape, ksi
+Fyr = specified minimum yield stress of reinforcing steel, ksi
+STEEL BEAM-COLUMN SELECTION TABLES
+Part 6.indd   105Part 6.indd   105 2022-07-28   7:30 PM2022-07-28   7:30 PM
+TECHSTREET
+@seismicisolation@seismicisolation
+
+=== Table 6-2b—Cross-Section Strength for Rectangular Encased W-Shapes | page_index=823 | page_num=824 ===
+6-106 DESIGN OF MEMBERS SUBJECT TO COMBINED FORCES
+American Institute of Steel Construction
+Table 6-2b
+Cross-Section Strength 
+for Rectangular Encased 
+W-Shapes
+Subject to Flexure about the Minor Axis
+Section Stress Distribution Pt. Defining Equation
+yF0.85 cf  yrF
+2
+fb
+2
+2
+h
+A
+ PA = FyAs + FyrAsr + 0.85fcAc
+ MA = 0
+ A s = area of steel shape, in.2
+ Asr = area of all continuous reinforcing bars, in. 2
+ A c  = h1h2 − As − Asr
+E
+ PE = FyAs + 0.85fc
+ 
+A h h b A
+c f
+sr− − ( ) +⎡
+⎣⎢
+⎤
+⎦⎥2 2
+1
+2
+ ME = MD − ZsEFy − 0.85fc 
+ZcE
+2
+⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+ZsE  = Zs = plastic section modulus of steel shape  
+          about the y-axis, in.3
+ZcE = h bf1
+2
+4  − ZsE
+ 
+C
+ PC = 0.85fcAc
+MC = MB
+D
+ PD = f Ac cʹ0 85
+2
+.
+MD = FyZs + FyrZr + 0.85fc 
+Zcn⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2
+ Zr = Asr h c−⎛
+⎝
+⎜
+2
+2 ⎞ ⎞
+⎠
+⎟
+Zcn =
+ 
+ h hn1
+2
+4 − Zs − Zr
+B
+ PB  = 0
+MB = MD − FyZsn − 0.85fc
+Zcn⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2
+Zcn = h1hn2 − Zsn
+For hn within the ﬂange  t h bw
+n
+f
+22<≤⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+ hn  = f A A tb F Ac c s ff y0 85 2 2ʹ +−( ) −. sf f
+yf c f
+tb
+Ft f h t
+−()
++ ʹ −()⎡⎣ ⎤⎦
+2
+2 4 0 85 2 1.
+     
+Zsn = Zs − 2tf 
+f
+n
+b h+⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2
+b hf
+n2 −⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+For hn above the ﬂange h b
+n
+f
+2>⎛
+⎝
+⎜ ⎞
+⎠
+⎟
+ hn = f0 85 ʹ. cc sy s
+c
+A A FA
+fh
++() −
+ʹ()
+2
+2 0 85 1.
+Zsn = Zs 
+Fy = specified minimum yield stress of steel shape, ksi
+Fyr = specified minimum yield stress of reinforcing steel, ksi
+Part 6.indd   106Part 6.indd   106 2022-07-28   7:06 PM2022-07-28   7:06 PM
+TECHSTREET
+@seismicisolation@seismicisolation
+
+=== Table 6-3—Cross-Section Strength for Composite Filled Rect. HSS | page_index=824 | page_num=825 ===
+  6-107
+American Institute of Steel Construction
+Table 6-3
+Cross-Section Strength 
+for Composite Filled 
+Rectangular HSS
+Subject to Flexure about Either Principal Axis
+Section Stress Distribution Pt. Defining Equation
+yF0.85 cf 
+2
+H
+A
+ PA = FyAs + 0.85fcAc
+MA = 0
+ As = area of steel shape, in.2
+ Ac = bihi − 0.858r i
+2
+ bi = B − 2t
+  hi = H − 2t
+  ri = t
+E
+ PE  = f Ac cʹ0 85
+2
+.  + 0.85fc
+ 
+bihE + 4FythE
+ ME = MD − FyZsE − 0.85fc
+ZcE⎛
+⎝
+⎜
+2
+⎞ ⎞
+⎠
+⎟
+ZcE = bihE
+2
+ 
+ZsE = 2thE
+2
+ 
+ hE  = 
+ 
++h Hn
+2 4
+C
+ PC = 0.85fcAc
+MC = MB
+D
+ PD = f Ac cʹ0 85
+2
+.
+MD = FyZs + f Zc cʹ0 85
+2
+.
+ Zs = full plastic section modulus of HSS, in. 3
+ Zc =
+ 
+ bhii
+2
+4  − 0.429r i
+2hi + 0.192ri
+3
+B
+ PB = 0
+ MB = MD − FyZsn − 0.85fc
+Zcn⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2
+Zsn = 2thn
+2
+Zcn = bihn
+2
+ hn  =
+ 
+0 8 5.ʹ
+ʹ +( )
+≤f A
+fb Ft
+hcc
+ci y
+i
+2 0 85 4 2.
+Table 6-3 Equations.indd   5 2022-05-27   9:14 PM
+Fy = specified minimum yield stress of steel shape, ksi
+Note: Equations in this table are applicable to single-axis bending of the shape about its x-x axis (when H ≥ B) or about its y-y 
+axis (when B > H ).
+STEEL BEAM-COLUMN SELECTION TABLES
+Part 6.indd   107Part 6.indd   107 2022-07-28   7:10 PM2022-07-28   7:10 PM
+TECHSTREET
+@seismicisolation@seismicisolation
+
+=== Table 6-4—Cross-Section Strength for Composite Filled Round HSS | page_index=825 | page_num=826 ===
+6-108 DESIGN OF MEMBERS SUBJECT TO COMBINED FORCES
+American Institute of Steel Construction
+Table 6-4
+Cross-Section Strength for 
+Composite Filled Round HSS
+Subject to Flexure about Any Axis
+Section Stress Distribution Pt. Defining Equation
+yF0.95 cf
+A
+ 
+ PA = FyAs + 0.95fcAc
+MA = 0
+ As = π dt t−( )2
+ Ac = h
+4
+2π
+E
+ PE  = PA − Fy d h −( )
+−⎛
+⎝⎜
+⎞
+⎠⎟
+2 2 2 2 2
+4 8
+θ θ θ sin
+ − 0.95fch2d h −( )
+−⎛
+⎝
+⎜
+⎞
+⎠
+⎟2 2 2 2 2
+4 8
+θ θ θ sin
+ ME  = FyZsE + 0.95fc 
+cEZ
+2
+⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+ZcE = h
+6 2
+3
+3 2⎛
+⎝
+⎜
+⎞
+⎠
+⎟sin θ
+ZsE = d h
+6 2
+3 3 2− ⎛
+⎝
+⎜
+⎞
+⎠
+⎟sin θ
+ hE = hn h
+2 4+
+ θ2 = π − 2 arscin Eh
+h
+2⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+C
+ PC = 0.95fcAc
+MC = MB
+D
+ PD  =
+ 
+f Ac c0.95
+2
+MD = FyZs + 0.95fc
+ 
+Zc⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2
+ Zs = plastic section modulus of steel shape, in. 3
+     =
+ 
+−d Zc
+3
+6 − Zc
+ Zc = h3
+6
+B
+ PB = 0
+MD = FyZsB + 0.95fc
+ZcB⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2
+ ZsB = d h− ⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+6 2
+3 3
+sin θ
+ ZcB = h
+6
+3
+s sin3
+2
+θ⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+  θ  = .
+.
+0 0260 2
+0 0848
+−K K
+K
+c s
+c
+     
+. .20 0260 20 857+ +( ) +K K Kc s c s
+c
+K
+K0 0848 .  (rad)
+ Kc = fc h 2
+ Ks  = Fy
+d t
+2   −⎛
+⎝
+⎜
+⎞
+⎠
+⎟t (thin HSS wall assumed)
+ hn  = h −⎛
+⎝
+⎜
+⎞
+⎠
+⎟
+2 2sin π θ
+Fy = specified minimum yield stress of steel shape, ksi
+Part 6.indd   108Part 6.indd   108 2022-07-08   2:24 PM2022-07-08   2:24 PM
+TECHSTREET
+@seismicisolation@seismicisolation
+

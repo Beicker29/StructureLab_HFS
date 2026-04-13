@@ -196,7 +196,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
             self.assertNotIn("D2-1", clauses)
             self.assertNotIn("D2-2", clauses)
 
-            detailed_files = list((results_dir / "W").glob("*.json"))
+            detailed_files = list(results_dir.glob("**/W/*.json"))
             self.assertGreater(len(detailed_files), 0)
             detailed_payload = json.loads(detailed_files[0].read_text(encoding="utf-8"))
             self.assertIn("memory", detailed_payload)
