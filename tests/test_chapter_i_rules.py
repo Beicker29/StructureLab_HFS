@@ -5,6 +5,7 @@ from src.steel_design.domain.routing.profile_router import ProfileRouter
 from src.steel_design.domain.rules.composite_rules import (
     CompositeI2EncasedCompressionRule,
     CompositeI2FilledCompressionRule,
+    CompositeI5CombinedRule,
     CompositeI3_1cRule,
     CompositeI4_1EncasedGoverningRule,
     CompositeI4_1FilledRule,
@@ -89,6 +90,26 @@ def _round_hss_section() -> Section:
     )
 
 
+def _rect_hss_noncompact_section() -> Section:
+    return Section(
+        name="PTE200X200X2",
+        type="RECTANGULAR_HSS",
+        A=1550.0,
+        Ix=8.20e6,
+        Iy=8.20e6,
+        Sx=82000.0,
+        Sy=82000.0,
+        Zx=94000.0,
+        Zy=94000.0,
+        rx=72.7,
+        ry=72.7,
+        h=200.0,
+        b=200.0,
+        tdes=2.0,
+        **{"h/tdes": 100.0, "b/tdes": 100.0},
+    )
+
+
 class ChapterIRulesTests(unittest.TestCase):
     def test_router_selects_chapter_i_for_encased_case(self):
         case = _base_case(
@@ -111,6 +132,21 @@ class ChapterIRulesTests(unittest.TestCase):
         self.assertIn("CompositeI2EncasedCompressionRule", names)
         self.assertIn("CompositeI3_3Rule", names)
         self.assertIn("CompositeI4_1EncasedGoverningRule", names)
+
+    def test_router_adds_i5_for_filled_axial_plus_flexure(self):
+        case = _base_case(
+            section_name="PTE100X60X4",
+            loads=Loads(Pu=250.0, Mux=30.0, Muy=0.0, Vu=0.0),
+            composite={
+                "role": "FILLED_MEMBER",
+                "nominal_strength_method": "ELASTIC",
+                "concrete": {"fc": 30.0, "wc": 2400.0},
+                "reinforcement": {"longitudinal_bars": []},
+            },
+        )
+        rules = ProfileRouter.get_rules(case, _rect_hss_section())
+        names = {rule.__class__.__name__ for rule in rules}
+        self.assertIn("CompositeI5CombinedRule", names)
 
     def test_router_fails_hard_for_strain_compat_method(self):
         case = _base_case(
@@ -217,6 +253,59 @@ class ChapterIRulesTests(unittest.TestCase):
         result = CompositeI4_1FilledRule().check(case, _round_hss_section())
         self.assertEqual("I4-1", result.clause)
         self.assertGreater(result.capacity, 0.0)
+
+    def test_i5_method_1_h1_1_returns_interaction_ratio(self):
+        case = _base_case(
+            section_name="PTE100X60X4",
+            loads=Loads(Pu=250.0, Mux=25.0, Muy=0.0, Vu=0.0),
+            composite={
+                "role": "FILLED_MEMBER",
+                "nominal_strength_method": "ELASTIC",
+                "concrete": {"fc": 30.0, "wc": 2400.0},
+                "reinforcement": {"longitudinal_bars": []},
+                "i5": {"method": "METHOD_1_H1_1"},
+            },
+        )
+        result = CompositeI5CombinedRule().check(case, _rect_hss_section())
+        self.assertEqual("I5", result.clause)
+        self.assertEqual("METHOD_1_H1_1", result.details["memory"]["inputs"]["method"])
+
+    def test_i5_method_2_runs_for_filled_with_tabulated_points(self):
+        case = _base_case(
+            section_name="PTE100X60X4",
+            loads=Loads(Pu=250.0, Mux=25.0, Muy=5.0, Vu=0.0),
+            composite={
+                "role": "FILLED_MEMBER",
+                "nominal_strength_method": "PLASTIC",
+                "concrete": {"fc": 30.0, "wc": 2400.0},
+                "reinforcement": {"longitudinal_bars": []},
+                "i5": {"method": "METHOD_2_PLASTIC_INTERACTION"},
+            },
+        )
+        result = CompositeI5CombinedRule().check(case, _rect_hss_section())
+        self.assertEqual("I5", result.clause)
+        self.assertEqual("METHOD_2_PLASTIC_INTERACTION", result.details["memory"]["inputs"]["method"])
+        method_data = result.details["memory"]["intermediate"]["method_data"]
+        self.assertEqual("6-3", method_data["table_reference"])
+        self.assertIn("interaction_points_by_axis", method_data)
+        self.assertIn("x", method_data["interaction_points_by_axis"])
+        self.assertIn("y", method_data["interaction_points_by_axis"])
+
+    def test_i5_method_4_direct_interaction_runs_for_noncompact_filled(self):
+        case = _base_case(
+            section_name="PTE200X200X2",
+            loads=Loads(Pu=250.0, Mux=20.0, Muy=10.0, Vu=0.0),
+            composite={
+                "role": "FILLED_MEMBER",
+                "nominal_strength_method": "ELASTIC",
+                "concrete": {"fc": 30.0, "wc": 2400.0},
+                "reinforcement": {"longitudinal_bars": []},
+                "i5": {"method": "METHOD_4_DIRECT_INTERACTION"},
+            },
+        )
+        result = CompositeI5CombinedRule().check(case, _rect_hss_noncompact_section())
+        self.assertEqual("I5", result.clause)
+        self.assertEqual("METHOD_4_DIRECT_INTERACTION", result.details["memory"]["inputs"]["method"])
 
 
 if __name__ == "__main__":

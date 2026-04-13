@@ -1,35 +1,39 @@
 {
-  "section_name": "PTER4\"X6.00mm",
-  "design_method": "LRFD",
-  "material": {
-    "Fy": 241.0,
-    "Fu": 400.0,
-    "E": 200000.0
-  },
-  "loads": {
-    "Pu": 120.0,
-    "Mux": 6.0,
-    "Muy": 0.0,
-    "Tu": 4.0,
-    "Vux": 0.0,
-    "Vuy": 0.0
-  },
-  "lengths": {
-    "Lx": 3500.0,
-    "Ly": 3500.0,
-    "Lz": 3500.0,
-    "Lb": 3500.0
-  },
-  "factors": {
-    "Kx": 1.0,
-    "Ky": 1.0,
-    "Kz": 1.0,
-    "Cb": 1.0,
-    "xa": 0.0,
-    "ya": 0.0
-  },
-  "connection": {
-    "An": 1300.0,
-    "U": 0.9
-  }
+    "section_name":  "PTER4\"X6.00mm",
+    "design_method":  "LRFD",
+    "material":  {
+                     "Fy":  241.0,
+                     "Fu":  400.0,
+                     "E":  200000.0
+                 },
+    "loads":  {
+                  "Pu":  120.0,
+                  "Mux":  6.0,
+                  "Muy":  0.0,
+                  "Tu":  4.0,
+                  "Vux":  0.0,
+                  "Vuy":  0.0
+              },
+    "lengths":  {
+                    "Lx":  3500.0,
+                    "Ly":  3500.0,
+                    "Lz":  3500.0,
+                    "Lb":  3500.0
+                },
+    "factors":  {
+                    "Kx":  1.0,
+                    "Ky":  1.0,
+                    "Kz":  1.0,
+                    "Cb":  1.0,
+                    "xa":  0.0,
+                    "ya":  0.0
+                },
+    "connection":  {
+                       "An":  1300.0,
+                       "U":  0.9
+                   },
+    "output":  {
+                   "write_results_json":  false
+               }
 }
+

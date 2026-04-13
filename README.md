@@ -53,7 +53,14 @@ python -m src.steel_design.run examples/composite_beam_case.json
 
 Salida por consola: resumen de checks (sin `details`).
 
-Salida detallada por ejecucion: se genera automaticamente un JSON en `results/<TIPO_PERFIL>/`.
+Por cada ejecucion, el CLI crea carpeta por ejemplo y corrida:
+- `results/<NOMBRE_DEL_JSON_DE_ENTRADA>/<TIMESTAMP>/`
+
+Control desde el input JSON (opcional):
+- `output.write_results_json` (`true` por defecto).
+- Si es `false`, no se guarda JSON detallado (solo salida en terminal + diagrama de interaccion cuando aplique).
+
+Salida detallada por ejecucion (cuando `output.write_results_json = true`): JSON en `results/<NOMBRE_DEL_JSON_DE_ENTRADA>/<TIMESTAMP>/<TIPO_PERFIL>/`.
 Incluye `input`, `output` completo y `memory` tipo memoria de calculo:
 - `memory.global_summary`: capacidad global gobernante (minima entre clausulas) y clausulas criticas.
 - `memory.clause_results`: desarrollo por clausula con variables intermedias, factores de diseno y capacidad.
@@ -128,6 +135,12 @@ Para evaluar flexion (`Mux` o `Muy`):
   - implementados: `PLASTIC`, `ELASTIC`
   - no implementados (fail-hard): `STRAIN_COMPAT`, `EFFECTIVE_STRAIN`
 - `composite.concrete.fc` y `composite.concrete.wc` son obligatorios (sin defaults ocultos).
+- Interaccion `I5` (axial + flexion) disponible en `ENCASED_MEMBER` y `FILLED_MEMBER` cuando `Pu != 0` y (`Mux` o `Muy`) != 0.
+- Selector de metodo para `I5`:
+  - `composite.i5.method = METHOD_1_H1_1`
+  - `composite.i5.method = METHOD_2_PLASTIC_INTERACTION` (usa tablas 6-2/6-3/6-4 del Steel Construction Manual 16th para puntos A/E/C/D/B)
+  - `composite.i5.method = METHOD_4_DIRECT_INTERACTION`
+- Si corre `I5` con `METHOD_2`, se exporta un diagrama de interaccion en `results/<INPUT>/<TIMESTAMP>/<PROFILE>/`.
 - Alcance actual fuera de implementacion:
   - `Composite Plate Shear Walls (CPSW)`
   - torsion en Chapter I
