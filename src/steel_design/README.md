@@ -45,6 +45,12 @@ Base del motor AISC 360-22.
   - `composite.concrete.fc` y `composite.concrete.wc` son obligatorios.
   - `composite.nominal_strength_method`: implementados `PLASTIC` y `ELASTIC`.
   - `STRAIN_COMPAT` y `EFFECTIVE_STRAIN` fallan en modo estricto (`RULE_NOT_IMPLEMENTED`).
+  - `I5` (axial + flexion) soporta metodos configurables en `composite.i5.method`:
+    - `METHOD_1_H1_1`
+    - `METHOD_2_PLASTIC_INTERACTION` (tablas 6-2/6-3/6-4 del Steel Construction Manual 16th)
+    - `METHOD_4_DIRECT_INTERACTION`
+  - con `METHOD_2`, el CLI guarda una imagen de diagrama de interaccion en `results/<INPUT>/<TIMESTAMP>/<PROFILE>/`.
+  - el guardado del JSON detallado se controla con `output.write_results_json` (default `true`).
   - alcance actual excluye `CPSW` (fail-hard).
 
 ## Politica de seguridad

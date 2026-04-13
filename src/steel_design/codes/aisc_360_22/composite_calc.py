@@ -183,3 +183,322 @@ def kc_i4_1(*, compact: bool, rectangular: bool, round_hss: bool, mu_k_nm: float
     k0 = 10.0 if rectangular else 9.0 if round_hss else 1.0
     kc = k0 + (1.0 - k0) * ((ratio - 0.5) / (0.7 - 0.5))
     return {"Kc": kc, "ratio_mu_over_vd": ratio, "branch": "I4-1_interpolated"}
+
+
+def i5_strength_ratio_csr(*, as_mm2: float, fy_mpa: float, asr_mm2: float, fysr_mpa: float, ac_mm2: float, fc_mpa: float) -> float:
+    """
+    AISC 360-22 Eq. I5-2:
+      csr = (As*Fy + Asr*Fysr) / (Ac*fc')
+    """
+    as_area = _positive(as_mm2)
+    fy = _positive(fy_mpa)
+    asr_area = _positive(asr_mm2)
+    fysr = _positive(fysr_mpa)
+    ac_area = _positive(ac_mm2)
+    fc = _positive(fc_mpa)
+    denominator = ac_area * fc
+    if min(denominator, as_area, fy) <= 0.0:
+        return 0.0
+    numerator = (as_area * fy) + (asr_area * fysr)
+    return numerator / denominator
+
+
+def i5_cp_cm_table(*, profile_type: str, csr: float) -> Dict[str, float | str]:
+    """
+    AISC 360-22 Table I5.1 coefficients for Eq. I5-1a/I5-1b.
+    """
+    c = _positive(csr)
+    if c <= 0.0:
+        return {"cp": 0.0, "cm": 0.0, "branch": "invalid_csr"}
+
+    ptype = (profile_type or "").upper()
+    if ptype == "RECTANGULAR_HSS":
+        cp = 0.17 / (c**0.4)
+        if c >= 0.5:
+            cm_raw = 1.06 / (c**0.11)
+            cm = max(cm_raw, 1.0)
+            branch = "rect_csr>=0.5"
+        else:
+            cm_raw = 0.90 / (c**0.36)
+            cm = min(cm_raw, 1.67)
+            branch = "rect_csr<0.5"
+        return {"cp": cp, "cm": cm, "cm_raw": cm_raw, "branch": branch}
+
+    if ptype == "CIRCULAR_HSS":
+        cp = 0.27 / (c**0.4)
+        if c >= 0.5:
+            cm_raw = 1.10 / (c**0.08)
+            cm = max(cm_raw, 1.0)
+            branch = "round_csr>=0.5"
+        else:
+            cm_raw = 0.95 / (c**0.32)
+            cm = min(cm_raw, 1.67)
+            branch = "round_csr<0.5"
+        return {"cp": cp, "cm": cm, "cm_raw": cm_raw, "branch": branch}
+
+    return {"cp": 0.0, "cm": 0.0, "branch": "unsupported_profile"}
+
+
+def i5_direct_interaction_ratio(*, pr_kN: float, pc_kN: float, mr_ratio: float, cp: float, cm: float) -> Dict[str, float | str]:
+    """
+    AISC 360-22 Eq. I5-1a / I5-1b.
+    `mr_ratio` is Mr/Mc (or equivalent biaxial aggregation).
+    """
+    pr = _positive(pr_kN)
+    pc = _positive(pc_kN)
+    cp_val = _positive(cp)
+    cm_val = _positive(cm)
+    m_ratio = max(0.0, float(mr_ratio))
+    if min(pc, cp_val, cm_val) <= 0.0:
+        return {"ratio": float("inf"), "branch": "invalid"}
+
+    p_ratio = pr / pc
+    if p_ratio >= cp_val:
+        ratio = p_ratio + ((1.0 - cp_val) / (cp_val * cm_val)) * m_ratio
+        return {"ratio": ratio, "branch": "I5-1a", "Pr_over_Pc": p_ratio}
+
+    ratio = (((1.0 - cm_val) / cp_val) * p_ratio) + m_ratio
+    return {"ratio": ratio, "branch": "I5-1b", "Pr_over_Pc": p_ratio}
+
+
+def i5_commentary_method2_ratio(
+    *,
+    pr_kN: float,
+    pa_kN: float,
+    pc_kN: float,
+    mrx_over_mcx: float,
+    mry_over_mcy: float,
+) -> Dict[str, float | str]:
+    """
+    Commentary Eq. C-I5-1a / C-I5-1b (simplified Method 2).
+    """
+    pr = _positive(pr_kN)
+    pa = _positive(pa_kN)
+    pc = _positive(pc_kN)
+    rx = max(0.0, float(mrx_over_mcx))
+    ry = max(0.0, float(mry_over_mcy))
+    m_sum = rx + ry
+    if min(pa, pc) <= 0.0:
+        return {"ratio": float("inf"), "branch": "invalid"}
+
+    if pr < pc:
+        ratio = (pr / pc) + m_sum
+        return {"ratio": ratio, "branch": "C-I5-1a"}
+
+    denominator = pa - pc
+    if denominator <= 0.0:
+        return {"ratio": float("inf"), "branch": "invalid_PA_PC"}
+    ratio = ((pr - pc) / denominator) + m_sum
+    return {"ratio": ratio, "branch": "C-I5-1b"}
+
+
+def _n_to_kn(value_n: float) -> float:
+    return float(value_n) / 1000.0
+
+
+def _nmm_to_kn_m(value_n_mm: float) -> float:
+    return float(value_n_mm) / 1_000_000.0
+
+
+def _pm_point(*, p_n: float, m_n_mm: float) -> Dict[str, float]:
+    return {"P_kN": _n_to_kn(p_n), "M_kN_m": _nmm_to_kn_m(m_n_mm)}
+
+
+def i5_method2_table63_points(
+    *,
+    fy_mpa: float,
+    fc_mpa: float,
+    as_mm2: float,
+    ac_mm2: float,
+    t_mm: float,
+    b_out_mm: float,
+    h_out_mm: float,
+    zs_x_mm3: float,
+    zs_y_mm3: float,
+) -> Dict[str, object]:
+    """
+    Steel Construction Manual 16th (2023), Table 6-3.
+    Cross-section strength points for composite filled rectangular HSS.
+    """
+    fy = _positive(fy_mpa)
+    fc = _positive(fc_mpa)
+    as_area = _positive(as_mm2)
+    ac_area = _positive(ac_mm2)
+    t = _positive(t_mm)
+    b_out = _positive(b_out_mm)
+    h_out = _positive(h_out_mm)
+    zsx = _positive(zs_x_mm3)
+    zsy = _positive(zs_y_mm3)
+    if min(fy, fc, as_area, ac_area, t, b_out, h_out, zsx, zsy) <= 0.0:
+        return {"valid": False, "reason": "invalid_inputs"}
+
+    b_i = b_out - (2.0 * t)
+    h_i = h_out - (2.0 * t)
+    r_i = t
+    if min(b_i, h_i) <= 0.0:
+        return {"valid": False, "reason": "invalid_inner_dimensions"}
+
+    p_a_n = (fy * as_area) + (0.85 * fc * ac_area)
+    p_c_n = 0.85 * fc * ac_area
+    p_d_n = p_c_n / 2.0
+
+    def _axis_points(*, width_i: float, depth_i: float, depth_out: float, z_s: float) -> Dict[str, object]:
+        z_c = (width_i * (depth_i**2) / 4.0) - (0.429 * (r_i**2) * depth_i) + (0.192 * (r_i**3))
+        m_d_n_mm = (fy * z_s) + (0.85 * fc * (z_c / 2.0))
+        denom = 2.0 * ((0.85 * fc * width_i) + (4.0 * fy * t))
+        h_n = (0.85 * fc * ac_area) / denom if denom > 0.0 else 0.0
+        h_n = max(0.0, min(h_n, depth_i / 2.0))
+
+        z_sn = 2.0 * t * (h_n**2)
+        z_cn = width_i * (h_n**2)
+        m_b_n_mm = m_d_n_mm - (fy * z_sn) - (0.85 * fc * (z_cn / 2.0))
+        m_b_n_mm = max(0.0, m_b_n_mm)
+
+        h_e = (h_n / 2.0) + (depth_out / 4.0)
+        z_se = 2.0 * t * (h_e**2)
+        z_ce = width_i * (h_e**2)
+        p_e_n = (0.85 * fc * ac_area / 2.0) + (0.85 * fc * width_i * h_e) + (4.0 * fy * t * h_e)
+        m_e_n_mm = m_d_n_mm - (fy * z_se) - (0.85 * fc * (z_ce / 2.0))
+        m_e_n_mm = max(0.0, m_e_n_mm)
+
+        return {
+            "points": {
+                "A": _pm_point(p_n=p_a_n, m_n_mm=0.0),
+                "E": _pm_point(p_n=p_e_n, m_n_mm=m_e_n_mm),
+                "C": _pm_point(p_n=p_c_n, m_n_mm=m_b_n_mm),
+                "D": _pm_point(p_n=p_d_n, m_n_mm=m_d_n_mm),
+                "B": _pm_point(p_n=0.0, m_n_mm=m_b_n_mm),
+            },
+            "intermediate": {
+                "b_i_mm": width_i,
+                "h_i_mm": depth_i,
+                "r_i_mm": r_i,
+                "h_n_mm": h_n,
+                "h_e_mm": h_e,
+                "Zc_mm3": z_c,
+                "Zsn_mm3": z_sn,
+                "Zcn_mm3": z_cn,
+                "ZsE_mm3": z_se,
+                "ZcE_mm3": z_ce,
+            },
+        }
+
+    axis_x = _axis_points(width_i=b_i, depth_i=h_i, depth_out=h_out, z_s=zsx)
+    axis_y = _axis_points(width_i=h_i, depth_i=b_i, depth_out=b_out, z_s=zsy)
+    return {
+        "valid": True,
+        "table": "6-3",
+        "PA_kN": _n_to_kn(p_a_n),
+        "PC_kN": _n_to_kn(p_c_n),
+        "axes": {"x": axis_x, "y": axis_y},
+        "inputs": {
+            "Fy_mpa": fy,
+            "fc_mpa": fc,
+            "As_mm2": as_area,
+            "Ac_mm2": ac_area,
+            "B_mm": b_out,
+            "H_mm": h_out,
+            "t_mm": t,
+        },
+    }
+
+
+def i5_method2_table64_points(
+    *,
+    fy_mpa: float,
+    fc_mpa: float,
+    d_out_mm: float,
+    t_mm: float,
+    zs_mm3: float,
+) -> Dict[str, object]:
+    """
+    Steel Construction Manual 16th (2023), Table 6-4.
+    Cross-section strength points for composite filled round HSS.
+    """
+    fy = _positive(fy_mpa)
+    fc = _positive(fc_mpa)
+    d = _positive(d_out_mm)
+    t = _positive(t_mm)
+    z_s = _positive(zs_mm3)
+    if min(fy, fc, d, t, z_s) <= 0.0:
+        return {"valid": False, "reason": "invalid_inputs"}
+
+    h = d - (2.0 * t)
+    if h <= 0.0:
+        return {"valid": False, "reason": "invalid_inner_diameter"}
+
+    as_area = math.pi * ((d * t) - (t**2))
+    ac_area = math.pi * (h**2) / 4.0
+    p_a_n = (fy * as_area) + (0.95 * fc * ac_area)
+    p_c_n = 0.95 * fc * ac_area
+    p_d_n = p_c_n / 2.0
+
+    z_c_d = h**3 / 6.0
+    m_d_n_mm = (fy * z_s) + (0.95 * fc * (z_c_d / 2.0))
+
+    k_c = fc * (h**2)
+    k_s = fy * ((d - t) / 2.0) * t
+    if k_c <= 0.0:
+        theta = math.pi / 2.0
+    else:
+        term1 = ((0.0260 * k_c) - (2.0 * k_s)) / (0.0848 * k_c)
+        radicand = (0.0260 * ((k_c + (2.0 * k_s)) ** 2) + (0.857 * k_c * k_s)) / (0.0848 * k_c)
+        theta = term1 + math.sqrt(max(0.0, radicand))
+    theta = max(1e-6, min(math.pi - 1e-6, theta))
+
+    sin_half_theta = math.sin(theta / 2.0)
+    h_n = (h / 2.0) * math.sin((math.pi - theta) / 2.0)
+    z_s_b = (d**3 / 6.0) - ((h**3 / 6.0) * (sin_half_theta**3))
+    z_c_b = (h**3 / 6.0) * (sin_half_theta**3)
+    m_b_n_mm = (fy * z_s_b) + (0.95 * fc * (z_c_b / 2.0))
+
+    h_e = (h_n / 2.0) + (h / 4.0)
+    arg = (2.0 * h_e / h) if h > 0.0 else 0.0
+    arg = max(-1.0, min(1.0, arg))
+    theta2 = math.pi - (2.0 * math.asin(arg))
+    shape_factor = (theta2 - math.sin(theta2)) / 8.0
+    p_e_n = p_a_n - (fy * ((d**2) - (h**2)) * shape_factor) - (0.95 * fc * (h**2) * shape_factor)
+    sin_half_theta2 = math.sin(theta2 / 2.0)
+    z_c_e = (h**3 / 6.0) * (sin_half_theta2**3)
+    z_s_e = (d**3 / 6.0) - ((h**3 / 6.0) * (sin_half_theta2**3))
+    m_e_n_mm = (fy * z_s_e) + (0.95 * fc * (z_c_e / 2.0))
+
+    points = {
+        "A": _pm_point(p_n=p_a_n, m_n_mm=0.0),
+        "E": _pm_point(p_n=p_e_n, m_n_mm=m_e_n_mm),
+        "C": _pm_point(p_n=p_c_n, m_n_mm=m_b_n_mm),
+        "D": _pm_point(p_n=p_d_n, m_n_mm=m_d_n_mm),
+        "B": _pm_point(p_n=0.0, m_n_mm=m_b_n_mm),
+    }
+    axis_data = {
+        "points": points,
+        "intermediate": {
+            "h_mm": h,
+            "h_n_mm": h_n,
+            "h_e_mm": h_e,
+            "theta_rad": theta,
+            "theta2_rad": theta2,
+            "Ks": k_s,
+            "Kc": k_c,
+            "Zc_D_mm3": z_c_d,
+            "Zs_B_mm3": z_s_b,
+            "Zc_B_mm3": z_c_b,
+            "Zs_E_mm3": z_s_e,
+            "Zc_E_mm3": z_c_e,
+        },
+    }
+    return {
+        "valid": True,
+        "table": "6-4",
+        "PA_kN": _n_to_kn(p_a_n),
+        "PC_kN": _n_to_kn(p_c_n),
+        "axes": {"x": axis_data, "y": axis_data},
+        "inputs": {
+            "Fy_mpa": fy,
+            "fc_mpa": fc,
+            "d_mm": d,
+            "t_mm": t,
+            "As_mm2": as_area,
+            "Ac_mm2": ac_area,
+        },
+    }
