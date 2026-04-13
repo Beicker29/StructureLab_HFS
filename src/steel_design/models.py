@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -85,6 +85,151 @@ class CustomSection(BaseModel):
         return self
 
 
+class CompositeRole(str, Enum):
+    ENCASED_MEMBER = "ENCASED_MEMBER"
+    FILLED_MEMBER = "FILLED_MEMBER"
+    COMPOSITE_BEAM = "COMPOSITE_BEAM"
+
+
+class CompositeNominalStrengthMethod(str, Enum):
+    PLASTIC = "PLASTIC"
+    STRAIN_COMPAT = "STRAIN_COMPAT"
+    ELASTIC = "ELASTIC"
+    EFFECTIVE_STRAIN = "EFFECTIVE_STRAIN"
+
+
+class CompositeConcrete(BaseModel):
+    fc: float = Field(..., description="Specified compressive strength of concrete (MPa)")
+    wc: float = Field(..., description="Concrete unit weight (kg/m3)")
+
+    @model_validator(mode="after")
+    def validate_concrete_values(self):
+        if self.fc <= 0.0:
+            raise ValueError("composite.concrete.fc must be > 0.")
+        if self.wc <= 0.0:
+            raise ValueError("composite.concrete.wc must be > 0.")
+        return self
+
+
+class CompositeLongitudinalBar(BaseModel):
+    count: int = Field(..., description="Number of bars at this coordinate")
+    db: float = Field(..., description="Bar diameter (mm)")
+    fy: float = Field(..., description="Bar yield stress (MPa)")
+    x: float = Field(..., description="Bar x coordinate from composite centroid (mm)")
+    y: float = Field(..., description="Bar y coordinate from composite centroid (mm)")
+
+    @model_validator(mode="after")
+    def validate_longitudinal_bar(self):
+        if self.count <= 0:
+            raise ValueError("composite.reinforcement.longitudinal_bars.count must be >= 1.")
+        if self.db <= 0.0:
+            raise ValueError("composite.reinforcement.longitudinal_bars.db must be > 0.")
+        if self.fy <= 0.0:
+            raise ValueError("composite.reinforcement.longitudinal_bars.fy must be > 0.")
+        return self
+
+
+class CompositeTransverseReinforcement(BaseModel):
+    db: float = Field(..., description="Transverse bar diameter (mm)")
+    spacing: float = Field(..., description="Spacing (mm)")
+    fy: float = Field(..., description="Yield stress (MPa)")
+    type: str = Field(..., description="Transverse reinforcement type (ties/hoops/spirals/stirrups)")
+
+    @model_validator(mode="after")
+    def validate_transverse(self):
+        if self.db <= 0.0:
+            raise ValueError("composite.reinforcement.transverse.db must be > 0.")
+        if self.spacing <= 0.0:
+            raise ValueError("composite.reinforcement.transverse.spacing must be > 0.")
+        if self.fy <= 0.0:
+            raise ValueError("composite.reinforcement.transverse.fy must be > 0.")
+        if not self.type or not self.type.strip():
+            raise ValueError("composite.reinforcement.transverse.type is required.")
+        return self
+
+
+class CompositeReinforcement(BaseModel):
+    longitudinal_bars: List[CompositeLongitudinalBar] = Field(
+        default_factory=list,
+        description="Longitudinal reinforcement layout.",
+    )
+    transverse: Optional[CompositeTransverseReinforcement] = Field(
+        None,
+        description="Minimum transverse reinforcement definition.",
+    )
+
+
+class CompositeGeometry(BaseModel):
+    B: Optional[float] = Field(None, description="Overall composite width for encased members (mm)")
+    H: Optional[float] = Field(None, description="Overall composite depth for encased members (mm)")
+    cover: Optional[float] = Field(None, description="Concrete cover to reinforcement (mm)")
+    slab_effective_width: Optional[float] = Field(None, description="Effective slab width for composite beam (mm)")
+    slab_thickness: Optional[float] = Field(None, description="Slab thickness for composite beam (mm)")
+    deck_present: Optional[bool] = Field(None, description="Whether formed steel deck is present.")
+
+
+class CompositeAnchorType(str, Enum):
+    STUD = "STUD"
+    CHANNEL = "CHANNEL"
+
+
+class CompositeAnchorSegment(str, Enum):
+    POSITIVE = "positive"
+    NEGATIVE = "negative"
+
+
+class CompositeAnchorGroup(BaseModel):
+    type: CompositeAnchorType
+    count: int = Field(..., description="Number of anchors in this group")
+    segment: CompositeAnchorSegment = Field(
+        CompositeAnchorSegment.POSITIVE,
+        description="Span segment associated with this anchor group.",
+    )
+    d: Optional[float] = Field(None, description="Stud shank diameter (mm)")
+    Fu: Optional[float] = Field(None, description="Stud ultimate tensile strength (MPa)")
+    Rg: Optional[float] = Field(1.0, description="Deck geometry reduction factor for stud anchors")
+    Rp: Optional[float] = Field(0.75, description="Deck position reduction factor for stud anchors")
+    la: Optional[float] = Field(None, description="Channel anchor length (mm)")
+    tf: Optional[float] = Field(None, description="Channel flange thickness (mm)")
+    tw: Optional[float] = Field(None, description="Channel web thickness (mm)")
+
+    @model_validator(mode="after")
+    def validate_anchor_group(self):
+        if self.count <= 0:
+            raise ValueError("composite.anchors.groups.count must be >= 1.")
+        if self.type == CompositeAnchorType.STUD:
+            if self.d is None or self.d <= 0.0:
+                raise ValueError("composite.anchors.groups.d must be > 0 for STUD anchors.")
+            if self.Fu is not None and self.Fu <= 0.0:
+                raise ValueError("composite.anchors.groups.Fu must be > 0 when provided.")
+            if self.Rg is not None and self.Rg <= 0.0:
+                raise ValueError("composite.anchors.groups.Rg must be > 0 when provided.")
+            if self.Rp is not None and self.Rp <= 0.0:
+                raise ValueError("composite.anchors.groups.Rp must be > 0 when provided.")
+            return self
+
+        if self.la is None or self.la <= 0.0:
+            raise ValueError("composite.anchors.groups.la must be > 0 for CHANNEL anchors.")
+        if self.tf is None or self.tf <= 0.0:
+            raise ValueError("composite.anchors.groups.tf must be > 0 for CHANNEL anchors.")
+        if self.tw is None or self.tw <= 0.0:
+            raise ValueError("composite.anchors.groups.tw must be > 0 for CHANNEL anchors.")
+        return self
+
+
+class CompositeAnchors(BaseModel):
+    groups: List[CompositeAnchorGroup] = Field(default_factory=list)
+
+
+class CompositeConfig(BaseModel):
+    role: CompositeRole
+    nominal_strength_method: CompositeNominalStrengthMethod
+    concrete: CompositeConcrete
+    reinforcement: CompositeReinforcement = Field(default_factory=CompositeReinforcement)
+    geometry: CompositeGeometry = Field(default_factory=CompositeGeometry)
+    anchors: CompositeAnchors = Field(default_factory=CompositeAnchors)
+
+
 class Connection(BaseModel):
     An: Optional[float] = Field(None, description="Net area for tension rupture (mm^2)")
     U: Optional[float] = Field(None, description="Shear lag factor for tension rupture (0 < U <= 1)")
@@ -123,6 +268,10 @@ class SteelCase(BaseModel):
     custom_section: Optional[CustomSection] = Field(
         None,
         description="Optional custom solid section defined directly in input.",
+    )
+    composite: Optional[CompositeConfig] = Field(
+        None,
+        description="Optional Chapter I composite member configuration.",
     )
     design_method: DesignMethod = DesignMethod.LRFD
 

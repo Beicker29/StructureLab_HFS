@@ -33,6 +33,10 @@ class ExampleSmokeTests(unittest.TestCase):
             "examples/circular_hss_case.json",
             "examples/solid_circular_case.json",
             "examples/solid_rectangular_case.json",
+            "examples/composite_encased_case.json",
+            "examples/composite_filled_rectangular_hss_case.json",
+            "examples/composite_filled_circular_hss_case.json",
+            "examples/composite_beam_case.json",
         ]
         for example in positive_examples:
             with self.subTest(example=example):

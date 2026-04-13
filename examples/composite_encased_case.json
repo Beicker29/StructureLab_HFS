@@ -1,0 +1,61 @@
+{
+  "section_name": "W14X90",
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 345.0,
+    "Fu": 450.0,
+    "E": 200000.0
+  },
+  "loads": {
+    "Pu": 950.0,
+    "Mux": 0.0,
+    "Muy": 0.0,
+    "Vux": 180.0,
+    "Vuy": 0.0
+  },
+  "lengths": {
+    "Lx": 3000.0,
+    "Ly": 3000.0,
+    "Lz": 3000.0,
+    "Lb": 3000.0
+  },
+  "factors": {
+    "Kx": 1.0,
+    "Ky": 1.0,
+    "Kz": 1.0,
+    "Cb": 1.0,
+    "xa": 0.0,
+    "ya": 0.0
+  },
+  "connection": {},
+  "composite": {
+    "role": "ENCASED_MEMBER",
+    "nominal_strength_method": "PLASTIC",
+    "concrete": {
+      "fc": 35.0,
+      "wc": 2400.0
+    },
+    "geometry": {
+      "B": 550.0,
+      "H": 550.0,
+      "cover": 40.0
+    },
+    "reinforcement": {
+      "longitudinal_bars": [
+        {
+          "count": 8,
+          "db": 25.0,
+          "fy": 420.0,
+          "x": 200.0,
+          "y": 200.0
+        }
+      ],
+      "transverse": {
+        "db": 10.0,
+        "spacing": 180.0,
+        "fy": 420.0,
+        "type": "ties"
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 - Capitulo F implementado para F2, F3, F4, F5, F6, F7, F8, F10 y F11.
 - Capitulo G (cortante) implementado para G2, G3, G4, G5 y G6.
 - Capitulo H implementado para H1, H3-1 y H3-2 en perfiles HSS.
+- Capitulo I implementado (alcance actual) para I1, I2, I3-1, I3-3, I3-4 e I4 en miembros compuestos `ENCASED_MEMBER`, `FILLED_MEMBER` y `COMPOSITE_BEAM` (sin CPSW).
 - Traccion con D3 estricto (`Ae = U*An`) para todos los perfiles.
 - Secciones macizas custom por JSON (`SOLID_CIRCULAR`, `SOLID_RECTANGULAR`) con alcance axial (D2/E3).
 - Politica estricta: si una regla aplicable no puede evaluarse por datos faltantes, el caso falla con error estructurado.
@@ -44,6 +45,10 @@ pip install -r requirements.txt
 python -m src.steel_design.run examples/w_shape_case.json
 python -m src.steel_design.run examples/rectangular_hss_case.json
 python -m src.steel_design.run examples/circular_hss_case.json
+python -m src.steel_design.run examples/composite_encased_case.json
+python -m src.steel_design.run examples/composite_filled_rectangular_hss_case.json
+python -m src.steel_design.run examples/composite_filled_circular_hss_case.json
+python -m src.steel_design.run examples/composite_beam_case.json
 ```
 
 Salida por consola: resumen de checks (sin `details`).
@@ -64,6 +69,10 @@ Casos actualmente ejecutables (exit code 0):
 - `examples/circular_hss_case.json`
 - `examples/solid_circular_case.json`
 - `examples/solid_rectangular_case.json`
+- `examples/composite_encased_case.json`
+- `examples/composite_filled_rectangular_hss_case.json`
+- `examples/composite_filled_circular_hss_case.json`
+- `examples/composite_beam_case.json`
 
 Casos de error esperado (exit code != 0):
 
@@ -108,3 +117,17 @@ Para evaluar flexion (`Mux` o `Muy`):
 - `H3-1` evalua torsion pura para `RECTANGULAR_HSS` y `CIRCULAR_HSS`.
 - `H3-2` evalua combinacion de torsion con axial/flexion/cortante.
 - Para perfiles no-HSS con `Tu != 0`, el motor retorna error estructurado (H3-3 fuera de alcance actual).
+
+## Nota de entrada para miembros compuestos (Capitulo I)
+
+- Activacion explicita por `composite.role`:
+  - `ENCASED_MEMBER`
+  - `FILLED_MEMBER`
+  - `COMPOSITE_BEAM`
+- Metodo nominal por caso (`composite.nominal_strength_method`):
+  - implementados: `PLASTIC`, `ELASTIC`
+  - no implementados (fail-hard): `STRAIN_COMPAT`, `EFFECTIVE_STRAIN`
+- `composite.concrete.fc` y `composite.concrete.wc` son obligatorios (sin defaults ocultos).
+- Alcance actual fuera de implementacion:
+  - `Composite Plate Shear Walls (CPSW)`
+  - torsion en Chapter I
