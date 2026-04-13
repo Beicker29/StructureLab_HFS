@@ -23,10 +23,16 @@ def _minor_demand(case: SteelCase) -> float:
     return abs(case.loads.Muy)
 
 
-def _any_flexure_demand(case: SteelCase) -> tuple[str, float]:
-    if _major_demand(case) > 0.0:
-        return "x", _major_demand(case)
-    return "y", _minor_demand(case)
+def _axis_demand(case: SteelCase, axis: str) -> float:
+    return _major_demand(case) if axis == "x" else _minor_demand(case)
+
+
+def _axis_m_label(axis: str) -> str:
+    return "Mx" if axis == "x" else "My"
+
+
+def _flexure_name(clause: str, limit_state: str, context: str) -> str:
+    return f"Flexure {clause} - {limit_state} ({context})"
 
 
 def _build_flexure_result(*, case: SteelCase, name: str, clause: str, demand: float, evaluation: dict, inputs: dict) -> CheckResult:
@@ -54,195 +60,508 @@ def _build_flexure_result(*, case: SteelCase, name: str, clause: str, demand: fl
     )
 
 
-class FlexureRule:
-    """F2: Doubly symmetric compact I-shaped members and channels (major axis)."""
+def _build_flexure_result_from_mn(
+    *,
+    case: SteelCase,
+    name: str,
+    clause: str,
+    demand: float,
+    mn_nmm: float,
+    base_evaluation: dict,
+    inputs: dict,
+    limit_state_label: str,
+) -> CheckResult:
+    evaluation = {
+        "Mn_Nmm": mn_nmm,
+        "limit_states": base_evaluation["limit_states"],
+        "intermediate": {**base_evaluation["intermediate"], "reported_limit_state": limit_state_label},
+    }
+    return _build_flexure_result(case=case, name=name, clause=clause, demand=demand, evaluation=evaluation, inputs=inputs)
+
+
+def _common_major_inputs(case: SteelCase, section: Section, demand: float) -> dict:
+    return {
+        "Fy_mpa": case.material.Fy,
+        "E_mpa": case.material.E,
+        "Cb": case.factors.Cb,
+        "Lb_mm": case.lengths.Lb,
+        "Mux_kn_m": demand,
+        "Zx_mm3": section.zx,
+        "Sx_mm3": section.sx,
+    }
+
+
+class FlexureF2YieldRule:
+    """F2-1: yielding for compact I-shapes/channels in major-axis flexure."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         demand = _major_demand(case)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Major F2", "F2")
+            return _nominal_pass(_flexure_name("F2-1", "Yielding", "Major Axis"), "F2-1")
         evaluation = flexure_calc.evaluate_f2(case, section)
-        return _build_flexure_result(
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure Major F2",
-            clause="F2",
+            name=_flexure_name("F2-1", "Yielding", "Major Axis"),
+            clause="F2-1",
             demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Cb": case.factors.Cb,
-                "Lb_mm": case.lengths.Lb,
-                "Mux_kn_m": demand,
-                "Zx_mm3": section.zx,
-                "Sx_mm3": section.sx,
-            },
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="yielding",
         )
 
 
-class FlexureF3Rule:
-    """F3: Doubly symmetric I-shapes, compact web with noncompact/slender flange."""
+class FlexureF2LtbRule:
+    """F2-2: lateral-torsional buckling for compact I-shapes/channels in major-axis flexure."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         demand = _major_demand(case)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Major F3", "F3")
+            return _nominal_pass(_flexure_name("F2-2", "Lateral-Torsional Buckling", "Major Axis"), "F2-2")
+        evaluation = flexure_calc.evaluate_f2(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F2-2", "Lateral-Torsional Buckling", "Major Axis"),
+            clause="F2-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["ltb_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="lateral_torsional_buckling",
+        )
+
+
+class FlexureF3YieldRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F3-1", "Yielding", "Major Axis"), "F3-1")
         evaluation = flexure_calc.evaluate_f3(case, section)
-        return _build_flexure_result(
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure Major F3",
-            clause="F3",
+            name=_flexure_name("F3-1", "Yielding", "Major Axis"),
+            clause="F3-1",
             demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Cb": case.factors.Cb,
-                "Lb_mm": case.lengths.Lb,
-                "Mux_kn_m": demand,
-                "bf_2tf_ratio": section.bf_2tf_ratio,
-                "h_tw_ratio": section.h_tw_ratio,
-            },
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="yielding",
         )
 
 
-class FlexureF4Rule:
-    """F4 implemented conservatively via F5 branch (User Note in F4)."""
-
+class FlexureF3LtbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         demand = _major_demand(case)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Major F4", "F4")
+            return _nominal_pass(_flexure_name("F3-2", "Lateral-Torsional Buckling", "Major Axis"), "F3-2")
+        evaluation = flexure_calc.evaluate_f3(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F3-2", "Lateral-Torsional Buckling", "Major Axis"),
+            clause="F3-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["ltb_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="lateral_torsional_buckling",
+        )
+
+
+class FlexureF3FlbRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F3-3", "Flange Local Buckling", "Major Axis"), "F3-3")
+        evaluation = flexure_calc.evaluate_f3(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F3-3", "Flange Local Buckling", "Major Axis"),
+            clause="F3-3",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["flange_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={
+                **_common_major_inputs(case, section, demand),
+                "bf_2tf_ratio": section.bf_2tf_ratio,
+                "h_tw_ratio": section.h_tw_ratio,
+            },
+            limit_state_label="flange_local_buckling",
+        )
+
+
+class FlexureF4CompressionYieldRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F4-1", "Compression Flange Yielding", "Major Axis"), "F4-1")
         evaluation = flexure_calc.evaluate_f4_conservative(case, section)
-        return _build_flexure_result(
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure Major F4",
-            clause="F4",
+            name=_flexure_name("F4-1", "Compression Flange Yielding", "Major Axis"),
+            clause="F4-1",
             demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Cb": case.factors.Cb,
-                "Lb_mm": case.lengths.Lb,
-                "Mux_kn_m": demand,
-                "bf_2tf_ratio": section.bf_2tf_ratio,
-                "h_tw_ratio": section.h_tw_ratio,
-            },
+            mn_nmm=evaluation["limit_states"]["compression_flange_yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="compression_flange_yielding",
         )
 
 
-class FlexureF5Rule:
-    """F5: I-shaped members with slender webs."""
-
+class FlexureF4LtbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         demand = _major_demand(case)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Major F5", "F5")
-        evaluation = flexure_calc.evaluate_f5(case, section)
-        return _build_flexure_result(
+            return _nominal_pass(_flexure_name("F4-2", "Lateral-Torsional Buckling", "Major Axis"), "F4-2")
+        evaluation = flexure_calc.evaluate_f4_conservative(case, section)
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure Major F5",
-            clause="F5",
+            name=_flexure_name("F4-2", "Lateral-Torsional Buckling", "Major Axis"),
+            clause="F4-2",
             demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Cb": case.factors.Cb,
-                "Lb_mm": case.lengths.Lb,
-                "Mux_kn_m": demand,
-                "bf_2tf_ratio": section.bf_2tf_ratio,
-                "h_tw_ratio": section.h_tw_ratio,
-            },
+            mn_nmm=evaluation["limit_states"]["lateral_torsional_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="lateral_torsional_buckling",
         )
 
 
-class FlexureF6Rule:
-    """F6: I-shaped members and channels bent about minor axis."""
+class FlexureF4FlbRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F4-3", "Compression Flange Local Buckling", "Major Axis"), "F4-3")
+        evaluation = flexure_calc.evaluate_f4_conservative(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F4-3", "Compression Flange Local Buckling", "Major Axis"),
+            clause="F4-3",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["compression_flange_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={**_common_major_inputs(case, section, demand), "bf_2tf_ratio": section.bf_2tf_ratio},
+            limit_state_label="compression_flange_local_buckling",
+        )
 
+
+class FlexureF4TensionYieldRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F4-4", "Tension Flange Yielding", "Major Axis"), "F4-4")
+        evaluation = flexure_calc.evaluate_f4_conservative(case, section)
+        # Conservative placeholder in current doubly-symmetric implementation.
+        mn_tfy = evaluation["limit_states"]["compression_flange_yielding_Mn_Nmm"]
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F4-4", "Tension Flange Yielding", "Major Axis"),
+            clause="F4-4",
+            demand=demand,
+            mn_nmm=mn_tfy,
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="tension_flange_yielding_conservative",
+        )
+
+
+class FlexureF5CompressionYieldRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F5-1", "Compression Flange Yielding", "Major Axis"), "F5-1")
+        evaluation = flexure_calc.evaluate_f5(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F5-1", "Compression Flange Yielding", "Major Axis"),
+            clause="F5-1",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["compression_flange_yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="compression_flange_yielding",
+        )
+
+
+class FlexureF5LtbRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F5-2", "Lateral-Torsional Buckling", "Major Axis"), "F5-2")
+        evaluation = flexure_calc.evaluate_f5(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F5-2", "Lateral-Torsional Buckling", "Major Axis"),
+            clause="F5-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["lateral_torsional_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="lateral_torsional_buckling",
+        )
+
+
+class FlexureF5FlbRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F5-3", "Compression Flange Local Buckling", "Major Axis"), "F5-3")
+        evaluation = flexure_calc.evaluate_f5(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F5-3", "Compression Flange Local Buckling", "Major Axis"),
+            clause="F5-3",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["compression_flange_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={**_common_major_inputs(case, section, demand), "bf_2tf_ratio": section.bf_2tf_ratio},
+            limit_state_label="compression_flange_local_buckling",
+        )
+
+
+class FlexureF5TensionYieldRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _major_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F5-4", "Tension Flange Yielding", "Major Axis"), "F5-4")
+        evaluation = flexure_calc.evaluate_f5(case, section)
+        mn_tfy = evaluation["limit_states"]["compression_flange_yielding_Mn_Nmm"]
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F5-4", "Tension Flange Yielding", "Major Axis"),
+            clause="F5-4",
+            demand=demand,
+            mn_nmm=mn_tfy,
+            base_evaluation=evaluation,
+            inputs=_common_major_inputs(case, section, demand),
+            limit_state_label="tension_flange_yielding_conservative",
+        )
+
+
+class FlexureF6YieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         demand = _minor_demand(case)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Minor F6", "F6")
+            return _nominal_pass(_flexure_name("F6-1", "Yielding", "Minor Axis"), "F6-1")
         evaluation = flexure_calc.evaluate_f6(case, section)
-        return _build_flexure_result(
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure Minor F6",
-            clause="F6",
+            name=_flexure_name("F6-1", "Yielding", "Minor Axis"),
+            clause="F6-1",
             demand=demand,
-            evaluation=evaluation,
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
             inputs={
                 "Fy_mpa": case.material.Fy,
                 "E_mpa": case.material.E,
                 "Muy_kn_m": demand,
                 "Zy_mm3": section.zy,
                 "Sy_mm3": section.sy,
+            },
+            limit_state_label="yielding",
+        )
+
+
+class FlexureF6FlbRule:
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand = _minor_demand(case)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F6-2", "Flange Local Buckling", "Minor Axis"), "F6-2")
+        evaluation = flexure_calc.evaluate_f6(case, section)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F6-2", "Flange Local Buckling", "Minor Axis"),
+            clause="F6-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["flange_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={
+                "Fy_mpa": case.material.Fy,
+                "E_mpa": case.material.E,
+                "Muy_kn_m": demand,
                 "bf_2tf_ratio": section.bf_2tf_ratio,
             },
+            limit_state_label="flange_local_buckling",
         )
 
 
-class FlexureF7Rule:
-    """F7: Square/rectangular HSS and box sections."""
+class FlexureF7YieldRule:
+    axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        axis, demand = _any_flexure_demand(case)
+        axis = self.axis
+        demand = _axis_demand(case, axis)
         if demand <= 0.0:
-            return _nominal_pass("Flexure HSS Rectangular F7", "F7")
+            return _nominal_pass(_flexure_name("F7-1", "Yielding", f"Rectangular HSS {_axis_m_label(axis)}"), "F7-1")
         evaluation = flexure_calc.evaluate_f7(case, section, axis=axis)
-        return _build_flexure_result(
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure HSS Rectangular F7",
-            clause="F7",
+            name=_flexure_name("F7-1", "Yielding", f"Rectangular HSS {_axis_m_label(axis)}"),
+            clause="F7-1",
             demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "axis": axis,
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Cb": case.factors.Cb,
-                "Lb_mm": case.lengths.Lb,
-                "Mux_kn_m": _major_demand(case),
-                "Muy_kn_m": _minor_demand(case),
-                "b_tdes_ratio": section.b_tdes_ratio,
-                "h_tdes_ratio": section.h_tdes_ratio,
-            },
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "Fy_mpa": case.material.Fy, "E_mpa": case.material.E, "Mux_kn_m": _major_demand(case), "Muy_kn_m": _minor_demand(case)},
+            limit_state_label="yielding",
         )
 
 
-class FlexureF8Rule:
-    """F8: Round HSS."""
+class FlexureF7YieldMxRule(FlexureF7YieldRule):
+    axis = "x"
+
+
+class FlexureF7YieldMyRule(FlexureF7YieldRule):
+    axis = "y"
+
+
+class FlexureF7FlangeRule:
+    axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        axis, demand = _any_flexure_demand(case)
+        axis = self.axis
+        demand = _axis_demand(case, axis)
         if demand <= 0.0:
-            return _nominal_pass("Flexure HSS Circular F8", "F8")
+            return _nominal_pass(_flexure_name("F7-2", "Flange Local Buckling", f"Rectangular HSS {_axis_m_label(axis)}"), "F7-2")
+        evaluation = flexure_calc.evaluate_f7(case, section, axis=axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F7-2", "Flange Local Buckling", f"Rectangular HSS {_axis_m_label(axis)}"),
+            clause="F7-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["flange_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "b_tdes_ratio": section.b_tdes_ratio, "h_tdes_ratio": section.h_tdes_ratio},
+            limit_state_label="flange_local_buckling",
+        )
+
+
+class FlexureF7FlangeMxRule(FlexureF7FlangeRule):
+    axis = "x"
+
+
+class FlexureF7FlangeMyRule(FlexureF7FlangeRule):
+    axis = "y"
+
+
+class FlexureF7WebRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        axis = self.axis
+        demand = _axis_demand(case, axis)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F7-3", "Web Local Buckling", f"Rectangular HSS {_axis_m_label(axis)}"), "F7-3")
+        evaluation = flexure_calc.evaluate_f7(case, section, axis=axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F7-3", "Web Local Buckling", f"Rectangular HSS {_axis_m_label(axis)}"),
+            clause="F7-3",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["web_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "b_tdes_ratio": section.b_tdes_ratio, "h_tdes_ratio": section.h_tdes_ratio},
+            limit_state_label="web_local_buckling",
+        )
+
+
+class FlexureF7WebMxRule(FlexureF7WebRule):
+    axis = "x"
+
+
+class FlexureF7WebMyRule(FlexureF7WebRule):
+    axis = "y"
+
+
+class FlexureF7LtbRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        axis = self.axis
+        demand = _axis_demand(case, axis)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F7-4", "Lateral-Torsional Buckling", f"Rectangular HSS {_axis_m_label(axis)}"), "F7-4")
+        evaluation = flexure_calc.evaluate_f7(case, section, axis=axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F7-4", "Lateral-Torsional Buckling", f"Rectangular HSS {_axis_m_label(axis)}"),
+            clause="F7-4",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["lateral_torsional_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "Cb": case.factors.Cb, "Lb_mm": case.lengths.Lb},
+            limit_state_label="lateral_torsional_buckling",
+        )
+
+
+class FlexureF7LtbMxRule(FlexureF7LtbRule):
+    axis = "x"
+
+
+class FlexureF7LtbMyRule(FlexureF7LtbRule):
+    axis = "y"
+
+
+class FlexureF8YieldRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        axis = self.axis
+        demand = _axis_demand(case, axis)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F8-1", "Yielding", f"Circular HSS {_axis_m_label(axis)}"), "F8-1")
         evaluation = flexure_calc.evaluate_f8(case, section, axis=axis)
-        return _build_flexure_result(
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure HSS Circular F8",
-            clause="F8",
+            name=_flexure_name("F8-1", "Yielding", f"Circular HSS {_axis_m_label(axis)}"),
+            clause="F8-1",
             demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "axis": axis,
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Mux_kn_m": _major_demand(case),
-                "Muy_kn_m": _minor_demand(case),
-                "D_t_ratio": section.d_t_ratio,
-            },
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "Fy_mpa": case.material.Fy, "E_mpa": case.material.E},
+            limit_state_label="yielding",
         )
 
 
-class FlexureF10Rule:
-    """F10: Single angles."""
+class FlexureF8YieldMxRule(FlexureF8YieldRule):
+    axis = "x"
+
+
+class FlexureF8YieldMyRule(FlexureF8YieldRule):
+    axis = "y"
+
+
+class FlexureF8LocalBucklingRule:
+    axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        _, demand = _any_flexure_demand(case)
+        axis = self.axis
+        demand = _axis_demand(case, axis)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Single Angle F10", "F10")
+            return _nominal_pass(_flexure_name("F8-2", "Local Buckling", f"Circular HSS {_axis_m_label(axis)}"), "F8-2")
+        evaluation = flexure_calc.evaluate_f8(case, section, axis=axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F8-2", "Local Buckling", f"Circular HSS {_axis_m_label(axis)}"),
+            clause="F8-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "D_t_ratio": section.d_t_ratio},
+            limit_state_label="local_buckling",
+        )
+
+
+class FlexureF8LocalBucklingMxRule(FlexureF8LocalBucklingRule):
+    axis = "x"
+
+
+class FlexureF8LocalBucklingMyRule(FlexureF8LocalBucklingRule):
+    axis = "y"
+
+
+class FlexureF10YieldRule:
+    axis = "x"
+
+    @staticmethod
+    def _resolve_connection(case: SteelCase):
         axis = case.connection.angle_flexure_axis.value if case.connection.angle_flexure_axis else None
         restraint = case.connection.angle_ltb_restraint
         if axis is None:
@@ -260,55 +579,197 @@ class FlexureF10Rule:
                 "connection.angle_max_tension_location is required for geometric-axis bending of single angles (F10).",
                 details={"required_field": "connection.angle_max_tension_location"},
             )
-        evaluation = flexure_calc.evaluate_f10(case, section, axis=axis)
-        return _build_flexure_result(
-            case=case,
-            name="Flexure Single Angle F10",
-            clause="F10",
-            demand=demand,
-            evaluation=evaluation,
-            inputs={
-                "axis": axis,
-                "restraint": restraint.value,
-                "max_tension_location": (
-                    case.connection.angle_max_tension_location.value
-                    if case.connection.angle_max_tension_location
-                    else None
-                ),
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
-                "Cb": case.factors.Cb,
-                "Lb_mm": case.lengths.Lb,
-                "lambda_leg_b_t": section.b_t_ratio,
-            },
-        )
-
-
-class FlexureF11Rule:
-    """F11: Rectangular bars and rounds (custom solid sections)."""
+        return axis, restraint
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        axis, demand = _any_flexure_demand(case)
+        demand_axis = self.axis
+        demand = _axis_demand(case, demand_axis)
         if demand <= 0.0:
-            return _nominal_pass("Flexure Solid Bar/Round F11", "F11")
-        evaluation = flexure_calc.evaluate_f11(case, section, axis=axis)
-        return _build_flexure_result(
+            return _nominal_pass(_flexure_name("F10-1", "Yielding", f"Single Angle {_axis_m_label(demand_axis)}"), "F10-1")
+        angle_axis, restraint = self._resolve_connection(case)
+        evaluation = flexure_calc.evaluate_f10(case, section, axis=angle_axis)
+        return _build_flexure_result_from_mn(
             case=case,
-            name="Flexure Solid Bar/Round F11",
-            clause="F11",
+            name=_flexure_name("F10-1", "Yielding", f"Single Angle {_axis_m_label(demand_axis)}"),
+            clause="F10-1",
             demand=demand,
-            evaluation=evaluation,
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"demand_axis": demand_axis, "angle_axis": angle_axis, "restraint": restraint.value},
+            limit_state_label="yielding",
+        )
+
+
+class FlexureF10YieldMxRule(FlexureF10YieldRule):
+    axis = "x"
+
+
+class FlexureF10YieldMyRule(FlexureF10YieldRule):
+    axis = "y"
+
+
+class FlexureF10LtbRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand_axis = self.axis
+        demand = _axis_demand(case, demand_axis)
+        if demand <= 0.0:
+            return _nominal_pass(
+                _flexure_name("F10-2", "Lateral-Torsional Buckling", f"Single Angle {_axis_m_label(demand_axis)}"),
+                "F10-2",
+            )
+        angle_axis, restraint = FlexureF10YieldRule._resolve_connection(case)
+        evaluation = flexure_calc.evaluate_f10(case, section, axis=angle_axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F10-2", "Lateral-Torsional Buckling", f"Single Angle {_axis_m_label(demand_axis)}"),
+            clause="F10-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["lateral_torsional_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
             inputs={
-                "axis": axis,
-                "Fy_mpa": case.material.Fy,
-                "E_mpa": case.material.E,
+                "demand_axis": demand_axis,
+                "angle_axis": angle_axis,
+                "restraint": restraint.value,
                 "Cb": case.factors.Cb,
                 "Lb_mm": case.lengths.Lb,
-                "Mux_kn_m": _major_demand(case),
-                "Muy_kn_m": _minor_demand(case),
-                "section_type": section.type,
-                "h_mm": section.h,
-                "b_mm": section.b,
-                "d_mm": section.od,
             },
+            limit_state_label="lateral_torsional_buckling",
         )
+
+
+class FlexureF10LtbMxRule(FlexureF10LtbRule):
+    axis = "x"
+
+
+class FlexureF10LtbMyRule(FlexureF10LtbRule):
+    axis = "y"
+
+
+class FlexureF10LegBucklingRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        demand_axis = self.axis
+        demand = _axis_demand(case, demand_axis)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F10-3", "Leg Local Buckling", f"Single Angle {_axis_m_label(demand_axis)}"), "F10-3")
+        angle_axis, _ = FlexureF10YieldRule._resolve_connection(case)
+        evaluation = flexure_calc.evaluate_f10(case, section, axis=angle_axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F10-3", "Leg Local Buckling", f"Single Angle {_axis_m_label(demand_axis)}"),
+            clause="F10-3",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["leg_local_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"demand_axis": demand_axis, "angle_axis": angle_axis, "lambda_leg_b_t": section.b_t_ratio},
+            limit_state_label="leg_local_buckling",
+        )
+
+
+class FlexureF10LegBucklingMxRule(FlexureF10LegBucklingRule):
+    axis = "x"
+
+
+class FlexureF10LegBucklingMyRule(FlexureF10LegBucklingRule):
+    axis = "y"
+
+
+class FlexureF11YieldRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        axis = self.axis
+        demand = _axis_demand(case, axis)
+        if demand <= 0.0:
+            return _nominal_pass(_flexure_name("F11-1", "Yielding", f"Solid Bar/Round {_axis_m_label(axis)}"), "F11-1")
+        evaluation = flexure_calc.evaluate_f11(case, section, axis=axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F11-1", "Yielding", f"Solid Bar/Round {_axis_m_label(axis)}"),
+            clause="F11-1",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["yielding_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "section_type": section.type, "Fy_mpa": case.material.Fy},
+            limit_state_label="yielding",
+        )
+
+
+class FlexureF11YieldMxRule(FlexureF11YieldRule):
+    axis = "x"
+
+
+class FlexureF11YieldMyRule(FlexureF11YieldRule):
+    axis = "y"
+
+
+class FlexureF11LtbRule:
+    axis = "x"
+
+    def check(self, case: SteelCase, section: Section) -> CheckResult:
+        axis = self.axis
+        demand = _axis_demand(case, axis)
+        if demand <= 0.0:
+            return _nominal_pass(
+                _flexure_name("F11-2", "Lateral-Torsional Buckling", f"Solid Bar/Round {_axis_m_label(axis)}"),
+                "F11-2",
+            )
+        evaluation = flexure_calc.evaluate_f11(case, section, axis=axis)
+        return _build_flexure_result_from_mn(
+            case=case,
+            name=_flexure_name("F11-2", "Lateral-Torsional Buckling", f"Solid Bar/Round {_axis_m_label(axis)}"),
+            clause="F11-2",
+            demand=demand,
+            mn_nmm=evaluation["limit_states"]["lateral_torsional_buckling_Mn_Nmm"],
+            base_evaluation=evaluation,
+            inputs={"axis": axis, "section_type": section.type, "Cb": case.factors.Cb, "Lb_mm": case.lengths.Lb},
+            limit_state_label="lateral_torsional_buckling",
+        )
+
+
+class FlexureF11LtbMxRule(FlexureF11LtbRule):
+    axis = "x"
+
+
+class FlexureF11LtbMyRule(FlexureF11LtbRule):
+    axis = "y"
+
+
+# Backward compatibility aliases used by some tests/imports.
+class FlexureRule(FlexureF2YieldRule):
+    pass
+
+
+class FlexureF3Rule(FlexureF3FlbRule):
+    pass
+
+
+class FlexureF4Rule(FlexureF4FlbRule):
+    pass
+
+
+class FlexureF5Rule(FlexureF5FlbRule):
+    pass
+
+
+class FlexureF6Rule(FlexureF6FlbRule):
+    pass
+
+
+class FlexureF7Rule(FlexureF7FlangeMxRule):
+    pass
+
+
+class FlexureF8Rule(FlexureF8LocalBucklingMxRule):
+    pass
+
+
+class FlexureF10Rule(FlexureF10LegBucklingMxRule):
+    pass
+
+
+class FlexureF11Rule(FlexureF11LtbMxRule):
+    pass

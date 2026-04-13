@@ -95,7 +95,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
             self.assertIn('"code": "INCOMPLETE_SECTION_DATA"', completed.stderr)
             self.assertIn('"stage": "run_engine"', completed.stderr)
 
-    def test_cli_fails_hard_for_non_implemented_rule(self):
+    def test_cli_returns_json_for_supported_shear_case(self):
         with _temporary_test_dir() as tmp:
             sections_path = tmp / "sections.xlsx"
             case_path = tmp / "case.json"
@@ -104,26 +104,25 @@ class EngineCliIntegrationTests(unittest.TestCase):
                 headers=[
                     "shape",
                     "A",
-                    "Zx",
-                    "Sx",
-                    "Iy",
-                    "ry",
-                    "J",
-                    "Cw",
-                    "ho",
                     "rx",
+                    "ry",
+                    "d",
+                    "tw",
+                    "bf",
+                    "tf",
                     "bf/2tf",
                     "h/tw",
                 ],
-                rows=[["W14X90", 17000.0, 1500.0, 1300.0, 500.0, 55.0, 3.0, 4.0, 300.0, 90.0, 6.0, 20.0]],
+                rows=[["W14X90", 17000.0, 90.0, 55.0, 360.0, 8.0, 200.0, 12.0, 6.0, 20.0]],
             )
             _write_case(case_path, pu=0.0, mux=0.0, muy=0.0, vu=50.0)
 
             completed = self._run_cli(case_path, sections_path)
 
-            self.assertNotEqual(0, completed.returncode)
-            self.assertIn('"code": "RULE_NOT_IMPLEMENTED"', completed.stderr)
-            self.assertIn('"rule_id": "G2"', completed.stderr)
+            self.assertEqual(0, completed.returncode)
+            payload = json.loads(completed.stdout)
+            self.assertIn("checks", payload)
+            self.assertTrue(any(check["clause"] == "G2-1" for check in payload["checks"]))
 
     def test_cli_returns_json_for_fully_supported_case(self):
         with _temporary_test_dir() as tmp:
@@ -153,7 +152,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
 
             self.assertEqual(0, completed.returncode)
             self.assertIn('"status":"PASS"', completed.stdout.replace(" ", ""))
-            self.assertIn("Flexure Major F2", completed.stdout)
+            self.assertIn("F2-1", completed.stdout)
 
     def test_cli_prints_compact_output_and_writes_detailed_results_file(self):
         with _temporary_test_dir() as tmp:

@@ -40,11 +40,6 @@ def validate_case(case: SteelCase):
             )
     has_major_flexure = abs(case.loads.Mux) > 0.0
     has_minor_flexure = abs(case.loads.Muy) > 0.0
-    if has_major_flexure and has_minor_flexure:
-        raise ValidationError(
-            "Biaxial flexure is not supported in the current Chapter F scope. Provide either Mux or Muy.",
-            details={"Mux": case.loads.Mux, "Muy": case.loads.Muy},
-        )
     if (has_major_flexure or has_minor_flexure) and case.design_method.value != "LRFD":
         raise ValidationError(
             "Chapter F flexural checks are implemented only for LRFD in the current scope.",

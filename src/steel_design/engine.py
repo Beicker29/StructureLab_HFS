@@ -5,7 +5,7 @@ from .results_model import EngineResult
 from .sections.models import Section
 from .sections.repository import SectionRepository
 from .domain.validation import validate_case
-from .domain.errors import SectionNotFoundError, ValidationError
+from .domain.errors import RuleNotImplementedError, SectionNotFoundError, ValidationError
 from .domain.routing.profile_router import ProfileRouter
 
 
@@ -124,6 +124,12 @@ class SteelDesignEngine:
             raise ValidationError(
                 "angle_compression_mode is required for single-angle compression (E5).",
                 details={"section": section.name, "required_field": "connection.angle_compression_mode"},
+            )
+
+        if abs(case.loads.Tu) > 0.0 and section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"}:
+            raise RuleNotImplementedError(
+                "Torsion is implemented only for round and rectangular HSS in current scope (H3.1/H3.2).",
+                details={"section": section.name, "profile_type": section.type, "requested_clause": "H3.3"},
             )
             
         # 3. Get rules dynamically

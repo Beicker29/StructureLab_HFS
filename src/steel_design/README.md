@@ -27,11 +27,19 @@ Base del motor AISC 360-22.
   - `Ae = U*An` (sin fallback a `Ae`).
 - Para flexion (Capitulo F):
   - solo se admite `LRFD`.
-  - solo se admite flexion simple (`Mux` o `Muy`, no ambos).
+  - se reportan checks por eje cuando existen `Mux` y `Muy` (sin interaccion biaxial H1).
   - para angulo simple en flexion (`F10`) se requiere:
     - `connection.angle_flexure_axis`
     - `connection.angle_ltb_restraint`
     - `connection.angle_max_tension_location` cuando `angle_flexure_axis = geometric_axis`.
+- Para cortante (Capitulo G):
+  - `Vux` y `Vuy` activan checks por eje.
+  - `Vu` legacy se interpreta como demanda en eje mayor.
+  - en `RECTANGULAR_HSS`, el espesor de diseno es `tdes` (mm).
+- Para torsion/combinaciones (Capitulo H):
+  - `Tu` activa `H3` solo en `RECTANGULAR_HSS` y `CIRCULAR_HSS`.
+  - `H1` se evalua para combinacion axial + flexion en HSS.
+  - `H3-3` (no-HSS con torsion) permanece fuera de alcance y falla de forma explicita.
 
 ## Politica de seguridad
 

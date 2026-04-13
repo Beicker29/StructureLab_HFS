@@ -323,20 +323,20 @@ def evaluate_f7(case, section, axis: str) -> Dict[str, object]:
     E = case.material.E
     Cb = case.factors.Cb
     Lb = case.lengths.Lb
-    t = _positive(section.tdes) or _positive(section.t)
+    t = _positive(section.tdes)
     h = _positive(section.h)
     b = _positive(section.b)
     if axis == "x":
         z = _positive(section.zx)
         s = _positive(section.sx)
-        lambda_f = _positive(section.b_tdes_ratio) or (_positive(section.b_t_ratio))
-        lambda_w = _positive(section.h_tdes_ratio) or (_positive(section.h_tw_ratio))
+        lambda_f = _positive(section.b_tdes_ratio)
+        lambda_w = _positive(section.h_tdes_ratio)
         ry = _positive(section.ry)
     else:
         z = _positive(section.zy)
         s = _positive(section.sy)
-        lambda_f = (_positive(section.h_tdes_ratio) or _positive(section.h_tw_ratio))
-        lambda_w = (_positive(section.b_tdes_ratio) or _positive(section.b_t_ratio))
+        lambda_f = _positive(section.h_tdes_ratio)
+        lambda_w = _positive(section.b_tdes_ratio)
         ry = _positive(section.rx)
     mp = Fy * z
     sqrt_ratio = _sqrt_ratio(E, Fy)
