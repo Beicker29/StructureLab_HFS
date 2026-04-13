@@ -98,6 +98,12 @@ class CompositeNominalStrengthMethod(str, Enum):
     EFFECTIVE_STRAIN = "EFFECTIVE_STRAIN"
 
 
+class CompositeI5Method(str, Enum):
+    METHOD_1_H1_1 = "METHOD_1_H1_1"
+    METHOD_2_PLASTIC_INTERACTION = "METHOD_2_PLASTIC_INTERACTION"
+    METHOD_4_DIRECT_INTERACTION = "METHOD_4_DIRECT_INTERACTION"
+
+
 class CompositeConcrete(BaseModel):
     fc: float = Field(..., description="Specified compressive strength of concrete (MPa)")
     wc: float = Field(..., description="Concrete unit weight (kg/m3)")
@@ -221,6 +227,29 @@ class CompositeAnchors(BaseModel):
     groups: List[CompositeAnchorGroup] = Field(default_factory=list)
 
 
+class CompositeI5Config(BaseModel):
+    method: CompositeI5Method = Field(
+        CompositeI5Method.METHOD_1_H1_1,
+        description="Commentary I5 method selector.",
+    )
+    method2_pc_ratio: Optional[float] = Field(
+        None,
+        description="Optional P_C/P_A ratio for Method 2 when not inferred (0 < ratio < 1).",
+    )
+    method2_mc_ratio: Optional[float] = Field(
+        None,
+        description="Optional M_C/M_B ratio for Method 2 when not inferred (0 < ratio).",
+    )
+
+    @model_validator(mode="after")
+    def validate_i5_config(self):
+        if self.method2_pc_ratio is not None and not (0.0 < self.method2_pc_ratio < 1.0):
+            raise ValueError("composite.i5.method2_pc_ratio must satisfy 0 < value < 1.")
+        if self.method2_mc_ratio is not None and self.method2_mc_ratio <= 0.0:
+            raise ValueError("composite.i5.method2_mc_ratio must be > 0 when provided.")
+        return self
+
+
 class CompositeConfig(BaseModel):
     role: CompositeRole
     nominal_strength_method: CompositeNominalStrengthMethod
@@ -228,6 +257,7 @@ class CompositeConfig(BaseModel):
     reinforcement: CompositeReinforcement = Field(default_factory=CompositeReinforcement)
     geometry: CompositeGeometry = Field(default_factory=CompositeGeometry)
     anchors: CompositeAnchors = Field(default_factory=CompositeAnchors)
+    i5: CompositeI5Config = Field(default_factory=CompositeI5Config)
 
 
 class Connection(BaseModel):

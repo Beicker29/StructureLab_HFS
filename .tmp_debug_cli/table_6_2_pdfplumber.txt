@@ -1,0 +1,175 @@
+=== page 823 ===
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                        6-105        
+                                                                     
+                                                                     
+                            Table 6-2a                               
+                     Cross-Section Strength                          
+                    for Rectangular Encased                          
+                           W-Shapes                                  
+                                                                     
+                 Subject to Flexure about the Major Axis             
+             Section Stress Distribution Pt. Defining Equation       
+                                P A = F y A s + F yr A sr + 0.85f c A c
+                                M A = 0                              
+                    0.85fc  Fy Fyr A A s = area of steel shape, in.2
+                                A sr = area of all continuous reinforcing bars, in.2
+                                A c = h 1 h 2 − A s − A sr           
+                                P = 0.85f c A c                      
+                               C                                     
+                                M = M B                              
+                                P D =                                
+                                   0.85fcʹAc                         
+                                    2                                
+                                M D = F y Z s + F yr Z r + 0.85f c   
+                                           ⎛                         
+                                           ⎝ ⎜                       
+                                            Z                        
+                                            2                        
+                                            c⎞                       
+                                             ⎠ ⎟                     
+                                Z s = full x-axis plastic section modulus of steel shape, in.3
+                               D A srs = area of continuous reinforcing bars at the centerline, in.2
+                                Z r = (Asr−Asrs )⎛ ⎝ h 22 2−         
+           h2                                                        
+           2                                                         
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                        American Institute of Steel Construction     
+                                        ⎜                            
+          STEEL BEAM-COLUMN SELECTION TABLES                         
+                                           ⎞ c ⎠⎟                    
+                                Z c =                                
+                                   h1                                
+                                    4                                
+                                    h2 2                             
+                                     −Zs−Zr                          
+                                P B = 0                              
+                                M B = M D − F y Z sn − 0.85f c       
+                                                                    
+                                                                   
+                                           Z                         
+                                            2                        
+                                            cn                      
+                                                                   
+                                Z cn = h 1 h n 2 − Z sn              
+                                           d                       
+                                For h                                
+                                  n                                  
+                                   below the flange hn≤            
+                                            2                        
+                                             −tf                   
+                                  h n = 0 2 .8  0 5 . f 88 c′ 5 ( f A c′ c (h + 1 A − s t r w s ) ) − + 2 2 F F yr yt A w sr  s
+                                  Z sn = t w h n 2                   
+                                          d    d                   
+                               B For h n within the flange 22 −tf<hn≤ 2
+                                  h n = 0.8 5fc′(Ac+As 2 −  0 d . b 8 f 5f + c′( A h s 1 rs − )− bf 2 ) F + y 2 (A Fy s b − f dbf )−2FyrAsrs
+                                       d d                       
+                                  Z sn = Z s − b f 2 −hn2 +hn
+                                           d                       
+                                For h n above the flange hn> 2   
+                                  h n = 0.85fc′(Ac+As 2 + ( A 0. s 8 rs 5 ) fc − ′h1 2 ) FyAs−2FyrAsrs
+                                  Z sn = Z s                         
+           Fy = specified minimum yield stress of steel shape, ksi   
+           Fyr = specified minimum yield stress of reinforcing steel, ksi
+                             @@sseeisismmicicisisoolalatitoionn      
+                                                       TECHSTREET    
+      PPaarrtt 66..iinndddd 110055                      22002222--0077--2288 77::3300 PPMM
+
+=== page 824 ===
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+          6-106              DESIGN OF MEMBERS SUBJECT TO COMBINED FORCES
+                                                                     
+                                                                     
+                                   Table 6-2b                        
+                            Cross-Section Strength                   
+                            for Rectangular Encased                  
+                                  W-Shapes                           
+                                                                     
+                         Subject to Flexure about the Minor Axis     
+              Section  Stress Distribution Pt. Defining Equation     
+                       0.85fc  Fy Fyr P A = F y A s + F yr A sr + 0.85f c A c
+                                   M A = 0                           
+                                 A A s = area of steel shape, in.2   
+                                   A sr = area of all continuous reinforcing bars, in.2
+                                   A c = h 1 h 2 − A s − A sr        
+                                   P E = F y A s + 0.85f c ⎡ ⎣ ⎢ Ac− h 2 1(h2−bf )+ A 2 sr⎤ ⎦ ⎥
+                                                                     
+                                   M E = M D − Z sE F y − 0.85f c    
+                                              ⎛                      
+                                              ⎝⎜                     
+                                              Z                      
+                                               2                     
+                                               cE⎞                   
+                                                ⎠⎟                   
+                                 E                                   
+                                   Z sE = Z s = plastic section modulus of steel shape
+                                        about the y-axis, in.3       
+            bf                        h1bf 2                         
+            2                      Z cE = 4 − Z sE                   
+                                   P C = 0.85f c A c                 
+                                 C                                   
+                                   M C = M B                         
+                                   P D =                             
+                                      0.85                           
+                                       2                             
+                                       fcʹAc                         
+                                   M D = F y Z s + F yr Z r + 0.85f c
+                                              ⎛                      
+                                              ⎝⎜                     
+                                               Z                     
+                                               2                     
+                                               cn⎞                   
+                                                ⎠⎟                   
+                                 D Z r = A sr ⎛ ⎝ ⎜ h 2 2 −c ⎞⎞ ⎠ ⎟  
+                                   Z cn =                            
+                                      h1                             
+                                      4                              
+                                       hn 2                          
+                                        − Z s − Z r                  
+                                   P B = 0                           
+            h2                     M B = M D − F y Z sn − 0.85f c    
+                                             ⎛                       
+                                             ⎝⎜                      
+                                              Z                      
+                                               2                     
+                                               cn⎞                   
+                                                ⎠⎟                   
+            2                      Z cn = h 1 h n 2 − Z sn           
+                                   For h n within the flange ⎛ ⎝ ⎜ t 2 w<hn≤ b 2 f ⎟ ⎞ ⎠
+                                 B   h n = 0.85fcʹ( 2 Ac ⎡⎣ 4 + Fy A tf s− + 2 0 t . f 8 b 5 f fc ) ʹ − (h 2 1 F − y 2 ( t A f s )⎤⎦ −2tfbf )
+                                     Z sn = Z s − 2t f ⎜ ⎛ ⎝ b 2 f +hn ⎞ ⎠ ⎟ ⎝ ⎜ ⎛b 2 f −hn ⎞ ⎠ ⎟
+                                   For h n above the flange          
+                                             ⎛                       
+                                             ⎝ ⎜hn>                  
+                                               b                     
+                                               2                     
+                                                f⎞                   
+                                                ⎠ ⎟                  
+                                     h n = 0.85fcʹ( 2 A ( c 0. + 85 A f s cʹh )− 1 ) 2FyAs
+                                     Z sn= Z s                       
+           Fy = specified minimum yield stress of steel shape, ksi   
+           Fyr = specified minimum yield stress of reinforcing steel, ksi
+                             @@sseeisismmicicisisoolalatitoionn      
+                        American Institute of Steel Construction     
+       TECHSTREET                                                    
+      PPaarrtt 66..iinndddd 110066                      22002222--0077--2288 77::0066 PPMM
+

@@ -1,35 +1,39 @@
 {
-  "section_name": "L12X12X1-3/8",
-  "design_method": "LRFD",
-  "material": {
-    "Fy": 250.0,
-    "Fu": 400.0,
-    "E": 200000.0
-  },
-  "loads": {
-    "Pu": 120.0,
-    "Mux": 8.0,
-    "Muy": 0.0,
-    "Vux": 0.0,
-    "Vuy": 0.0
-  },
-  "lengths": {
-    "Lx": 3200.0,
-    "Ly": 3200.0,
-    "Lz": 3200.0,
-    "Lb": 3200.0
-  },
-  "factors": {
-    "Kx": 1.0,
-    "Ky": 1.0,
-    "Kz": 1.0,
-    "Cb": 1.0
-  },
-  "connection": {
-    "angle_compression_mode": "one_leg",
-    "An": 1200.0,
-    "U": 0.9,
-    "angle_flexure_axis": "major_principal",
-    "angle_ltb_restraint": "discrete_unbraced"
-  }
+    "section_name":  "L12X12X1-3/8",
+    "design_method":  "LRFD",
+    "material":  {
+                     "Fy":  250.0,
+                     "Fu":  400.0,
+                     "E":  200000.0
+                 },
+    "loads":  {
+                  "Pu":  120.0,
+                  "Mux":  8.0,
+                  "Muy":  0.0,
+                  "Vux":  0.0,
+                  "Vuy":  0.0
+              },
+    "lengths":  {
+                    "Lx":  3200.0,
+                    "Ly":  3200.0,
+                    "Lz":  3200.0,
+                    "Lb":  3200.0
+                },
+    "factors":  {
+                    "Kx":  1.0,
+                    "Ky":  1.0,
+                    "Kz":  1.0,
+                    "Cb":  1.0
+                },
+    "connection":  {
+                       "angle_compression_mode":  "one_leg",
+                       "An":  1200.0,
+                       "U":  0.9,
+                       "angle_flexure_axis":  "major_principal",
+                       "angle_ltb_restraint":  "discrete_unbraced"
+                   },
+    "output":  {
+                   "write_results_json":  false
+               }
 }
+

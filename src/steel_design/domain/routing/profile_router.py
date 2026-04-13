@@ -14,6 +14,7 @@ from ..rules.composite_rules import (
     CompositeI2EncasedTensionRule,
     CompositeI2FilledCompressionRule,
     CompositeI2FilledTensionRule,
+    CompositeI5CombinedRule,
     CompositeI3_1aRule,
     CompositeI3_1bRule,
     CompositeI3_1cRule,
@@ -718,6 +719,8 @@ class ProfileRouter:
                 rules.append(CompositeI2EncasedCompressionRule())
             elif case.loads.Pu < 0.0:
                 rules.append(CompositeI2EncasedTensionRule())
+            if abs(case.loads.Pu) > 0.0 and _has_any_flexure(case, section):
+                rules.append(CompositeI5CombinedRule())
             rules.append(CompositeI3_3Rule())
             if _has_shear(case, section):
                 rules.extend(
@@ -735,6 +738,8 @@ class ProfileRouter:
                 rules.append(CompositeI2FilledCompressionRule())
             elif case.loads.Pu < 0.0:
                 rules.append(CompositeI2FilledTensionRule())
+            if abs(case.loads.Pu) > 0.0 and _has_any_flexure(case, section):
+                rules.append(CompositeI5CombinedRule())
             rules.append(CompositeI3_4Rule())
             if _has_shear(case, section):
                 rules.append(CompositeI4_1FilledRule())
