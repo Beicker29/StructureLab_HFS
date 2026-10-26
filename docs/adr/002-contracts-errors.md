@@ -1,6 +1,6 @@
 # ADR-002 — Contratos comunes, completitud y errores
 
-Fecha: 2026-10-26. Tarea: HFS-001. Estado: decisión propuesta para revisión; no cambia el JSON, los enums, errores ni códigos de salida actuales.
+Fecha: 2026-10-26. Tarea: HFS-001. Estado: arquitectura aprobada por el usuario al autorizar HFS-002, con precisiones documentales incorporadas. No cambia el JSON, los enums, errores ni códigos de salida actuales.
 
 ## Problema
 
@@ -22,7 +22,8 @@ Distribuir responsabilidades sin repetir políticas:
 |---|---|
 | Tipo, campos permitidos, finitud y dominio local | Modelos compartidos; reglas reutilizables pequeñas si hay consumidores reales |
 | Relaciones entre entradas y compatibilidad del caso | `domain/validation.py` |
-| Condición normativa/aplicabilidad y campos requeridos por regla | Registro/selección de `domain/routing`, con fuente explícita |
+| Requisitos normativos esperados | Matriz normativa derivada de fuentes y revisada independientemente del router; no depende de reglas disponibles |
+| Soporte/aplicabilidad ejecutable y campos requeridos por regla | Registro/selección de `domain/routing`, contrastado con requisitos independientes |
 | Existencia, identidad, procedencia y normalización del perfil | `sections` |
 | Cálculo bruto, eje, unidad y traza | Evaluación/regla propietaria; presentación no los reconstruye |
 | Agregación y cobertura | Ejecución común del motor |
@@ -42,6 +43,8 @@ Decisiones para contratos futuros, a implementar solo en tareas autorizadas:
 **F-32:** mantener por compatibilidad el exit actual (0 si ejecutó, 1 ante excepción) mientras se revise su contrato. Consumidores actuales deben comprobar también el estado JSON. No adoptar automáticamente «FAIL implica exit no cero»: esa elección afecta scripts y requiere transición documentada. La futura API también separará éxito de transporte y resultado de diseño.
 
 ## Justificación
+
+Precisión aprobada en HFS-002: **PASS expresa cumplimiento del alcance verificable declarado**, con hipótesis y exclusiones identificadas; nunca certificación global automática AISC 360-22. El alcance no puede definirse a posteriori como las reglas que sí se ejecutaron. La ausencia de validación independiente exigida para ese alcance impide anunciarla como obtenida. Véase la [propuesta de cobertura](../normative/hfs002-coverage-proposal.md), sin modificación del contrato actual.
 
 Un modelo compartido reduce discrepancias de validación sin duplicar jerarquías. Separar completitud, resistencia y transporte evita usar la ausencia de error como prueba de seguridad. Unidad/eje y DCR bruto eliminan inferencias del reporte; las referencias de fuente se vinculan mediante el [ADR-003](003-traceability-testing.md).
 

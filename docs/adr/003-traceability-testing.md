@@ -1,6 +1,6 @@
 # ADR-003 — Trazabilidad normativa y pruebas independientes
 
-Fecha: 2026-10-26. Tarea: HFS-001. Estado: decisión propuesta para revisión técnica; no se implementa la matriz de HFS-002 ni se certifican reglas AISC.
+Fecha: 2026-10-26. Tarea: HFS-001. Estado: arquitectura aprobada por el usuario al autorizar HFS-002. La matriz documental HFS-002 se entrega aparte para revisión; no se certifican reglas AISC.
 
 ## Problema
 
@@ -20,7 +20,7 @@ Las etiquetas de cláusula y las pruebas de positividad/routing no acreditan exa
 - El registro existente `RuleDefinition` es el punto de partida de metadatos/aplicabilidad ejecutables. Ampliarlo en su tarea en lugar de crear un segundo registro para UI o reportes. Conservar condiciones complejas como funciones legibles, sin DSL ni descubrimiento dinámico.
 - Por regla/método: ID estable, referencia precisa, condición y límites de aplicabilidad, entradas/unidades/ejes, función implementadora, factores, variables intermedias, resultado bruto, hipótesis, referencias de pruebas y estado de validación. Compartir el dato, no copiar textos normativos íntegros en cada reporte.
 - La traza debe nacer en la evaluación que tomó la decisión. El reporte la formatea; no vuelve a calcular la capacidad, adivinar unidades por prefijo ni decidir otra rama. Mantener referencias a estados límite incluso si varias reglas reutilizan una función aritmética.
-- La matriz de cobertura tendrá una autoridad normativa independiente de la lista de checks ejecutados: comparar lo requerido con lo evaluado. Derivar ambos conjuntos del mismo routing defectuoso sería circular. Su elaboración por familia/demanda/condición es HFS-002 y está fuera de esta tarea.
+- La [matriz HFS-002](../normative/hfs002-applicability.md) tiene autoridad documental independiente del router: requisitos derivados de Specification identificada y revisión ingenieril, no de `RULE_DEFINITIONS`, `PROFILE_RULE_MAP`, predicados ni salidas. El registro ejecutable describe implementaciones y se contrasta después. Los esperados de selección tampoco se generan con el router. No es otro motor de capacidades: son requisitos y evidencia independientes.
 - Specification, Commentary, User Note, manual/ejemplo auxiliar e inferencia se etiquetan separadamente. Una cita a «AISC» o a «conservador» no basta. Incertidumbre de interpretación y reglas no implementadas quedan visibles.
 
 ## Estrategia de pruebas
@@ -43,7 +43,7 @@ Se aprovecha el registro y las trazas existentes y se elimina la reconstrucción
 
 ## Consecuencias
 
-La matriz actual `docs/aisc_360_22_traceability.md` se conserva como inventario manual inicial; después podrá generarse desde metadatos revisados, sin mantener dos autoridades editables. Se adopta la [política de evidencia](../audit/evidence-policy.md) para distinguir fixtures mantenidas, capturas de aceptación e información regenerable.
+La matriz actual `docs/aisc_360_22_traceability.md` se conserva como inventario manual inicial de implementación; después podrá generarse desde metadatos revisados, sin mantener dos autoridades editables. Esa generación no aplica a la matriz normativa independiente: sus requisitos no provienen del router. Se adopta la [política de evidencia](../audit/evidence-policy.md) para distinguir fixtures mantenidas, capturas de aceptación e información regenerable. PASS se limita al alcance verificable declarado, nunca a certificación AISC global.
 
 ## Riesgos y verificación futura
 

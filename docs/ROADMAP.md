@@ -5,9 +5,9 @@
 **Documento:** 26 de octubre de 2026.  
 **Objetivo:** motor AISC 360-22 de diseño/verificación de miembros de acero, trazable, sencillo, testeable, con CLI y app web. AISC 341-22 se reserva como alcance normativo separado y optativo.
 
-**Actualización HFS-001 (2026-10-26):** HFS-000 aceptada como línea base de comportamiento, no validación AISC. Las decisiones documentales de HFS-001 quedan para revisión en [ADR-001](adr/001-engine-architecture.md), [ADR-002](adr/002-contracts-errors.md) y [ADR-003](adr/003-traceability-testing.md). El estado vivo F-01–F-32 está en [seguimiento maestro](audit/tracking.md); el diagnóstico HFS-000 permanece inmutable. HFS-002 y tareas posteriores no se han iniciado.
+**Estado actualizado HFS-002 (2026-10-26):** HFS-000 aceptada como línea base de comportamiento, no validación AISC. HFS-001 aprobada arquitectónicamente con ajustes incorporados en [ADR-001](adr/001-engine-architecture.md), [ADR-002](adr/002-contracts-errors.md) y [ADR-003](adr/003-traceability-testing.md). HFS-002 documental se presenta para revisión en su [informe](audit/hfs002/report.md). El estado vivo F-01–F-38 está en [seguimiento maestro](audit/tracking.md); el diagnóstico HFS-000 permanece inmutable. HFS-010/016 y tareas posteriores no se implementan aquí.
 
-> Esta es una auditoría estática de arquitectura y porciones representativas del código obtenidas del repositorio. NO se han ejecutado aquí las pruebas ni se han recalculado todos los ejemplos contra el texto normativo. Distinguir defectos confirmados de riesgos pendientes de validación numérica. El listado puede ampliarse durante los hitos de auditoría.
+> El diagnóstico inicial del roadmap fue estático. Las pruebas efectivamente ejecutadas se documentan por hito (HFS-000/001/002), sin implicar que todos los ejemplos se hayan recalculado independientemente contra la norma. Distinguir defectos confirmados de riesgos pendientes de validación numérica.
 
 ## 1. Principios no negociables
 
@@ -32,14 +32,14 @@
 | F-03 | P0 | C | `domain/routing/profile_router.py::_w_or_channel_major_flexure_selection` | Faltan razones de esbeltez y el código devuelve F2. Nunca asumir sección compacta por ausencia de datos; bloquear. |
 | F-04 | P0 | C | `models.py`, `SteelCase`, `Loads`, Pydantic BaseModel por defecto | Campos desconocidos pueden ignorarse; cargas faltantes son 0. Rechazar campos extra, determinar campos requeridos y semántica de 0. |
 | F-05 | P0 | C | `run.py::_build_global_summary` | Elige la menor capacidad mezclando kN y kN·m. Sustituir por DCR gobernante y agrupar capacidades por dimensión y eje. |
-| F-06 | P0 | C/R | `combined_hss_rules.py::_available_shear_strength` | Usa `max(Vcx,Vcy)` con una demanda `max(Vux,Vuy)` para interacción H3. La validez física/normativa requiere revisión; no combinar arbitrariamente capacidades direccionales. |
+| F-06 | P0 | C/R | `combined_hss_rules.py::_available_shear_strength` | HFS-002 confirma discrepancia con H3.2: se exige máximo de cocientes por eje, no cociente de máximos. Contraejemplo 0,5 vs 0,25; validación física de ejes/capacidades pendiente. |
 | F-07 | P0 | C | `run.py::_build_chapter_admissibility` | D1 (300) y E2 (200) se presentan como admisibilidad; separar recomendaciones de incumplimientos. Revisar semántica de aplicabilidad de D1/E2. |
 | F-08 | P0 | C/R | `models.py::Loads.normalize_shear` | Sobrescribe `Vu` si hay Vux/Vuy y fabrica resultante vectorial; resolver contradicciones y definir transformación a ejes locales con física explícita. |
 | F-09 | P0 | C | `domain/rules/*::_build_result`, `round(dcr,3)` | Umbral se evalúa sin redondeo pero DCR se publica redondeado; conservar precisión cruda y diferenciación display vs decisión, especialmente 0.9999/1.0001. |
 | F-10 | P0 | C/R | `domain/routing/profile_router.py::_is_missing_numeric`, `sections/loader.py::_coerce_float` | Ausencia de validación explícita de finitud en varios lugares; probar y prohibir NaN, infinito, números negativos y dimensiones imposibles. |
 | F-11 | P1 | C/R | `domain/rules/shear_rules.py::_axis_v_label` | Comentario indica inversión legacy de etiquetas respecto de routing; documentar y comprobar matemáticamente ejes, componentes y capacidades. No corregir solo nombres. |
 | F-12 | P1 | C/R | `sections/loader.py`, selección `field_values['id']` para D/t | Revisar que D/t corresponda al diámetro exterior físico, no ID, según familia/convención de catálogo. |
-| F-13 | P0 propuesto | C | `sections/repository.py::load`, `docs/audit/catalog-duplicates.json` | Duplicados reales HEA 100 con geometrías distintas; última fila sobrescribe. Priorizar identificación/rechazo antes de G1, sin esperar toda la fase 4. Ubicación de corrección acotada pendiente de revisión; justificación en seguimiento maestro. |
+| F-13 | P0 | C | `sections/repository.py::load`, `docs/audit/catalog-duplicates.json` | Duplicados reales HEA 100 con geometrías distintas; última fila sobrescribe. HFS-016 antes de G1 para mitigación acotada, HFS-040 para catálogo integral. Sin implementación en HFS-002. |
 | F-14 | P1 | C | `sections/loader.py` | Conversión de unidades por encabezados y fallback `1.0`; definir metadatos por fuente y rechazo si la unidad de entrada es ambigua. |
 | F-15 | P1 | C | `run.py::_build_case_section` y `engine.py::_build_custom_section` | Geometría de sección custom duplicada; extracción única a dominio geométrico. |
 | F-16 | P1 | C | `run.py`, 747 líneas | CLI mezcla ejecución, generación de memorias, trazas, gráficos y serialización; servicios y exportadores separados. |
@@ -62,9 +62,13 @@
 
 **Nota de rigor:** un defecto de diseño de software no demuestra por sí solo un resultado estructural incorrecto para un caso dado. Y un resultado correcto en una prueba no certifica todas las combinaciones del capítulo correspondiente.
 
+Nuevos IDs HFS-002: **F-33 P0 propuesto** biaxialidad sin axial; **F-34 P0 propuesto** flexión pura compuesta sin check resistente; **F-35 P0 propuesto** método E7 distinto de área efectiva; **F-36 P0 propuesto** condiciones/ramas E5 y E4 ángulo incompletas; **F-37 P1** IDs/citas de interacción; **F-38 P1** complementos y precondiciones sin cobertura. Evidencia, certeza y cierre en [seguimiento maestro](audit/tracking.md) y [contraste normativo](normative/hfs002-implementation.md). No duplicar aquí el diagnóstico completo.
+
 ## 3. Arquitectura objetivo mínima
 
-**Revisión crítica HFS-001:** el árbol siguiente conserva la propuesta original como contexto, no prescribe crear todas esas capas. ADR-001 propone conservar `sections`, funciones en `codes` y reglas/routing en `domain`; extraer solo responsabilidades justificadas, sin `services` web obligatorio ni segundo motor. DRY y contratos compartidos son las fronteras requeridas; la aprobación técnica de esta revisión sigue pendiente. No hay migración de carpetas en HFS-001.
+**Actualización HFS-002:** HFS-001 recibió aprobación arquitectónica del usuario. Se precisó PASS como cumplimiento del alcance verificable declarado, nunca certificación global automática AISC 360-22. La [matriz normativa](normative/hfs002-applicability.md) es independiente del router; el [contraste](normative/hfs002-implementation.md) y la [propuesta HFS-010](normative/hfs002-coverage-proposal.md) se entregan para revisión, sin implementar cobertura ni corregir cálculos. F-33–F-38 están en el seguimiento maestro; F-06 tiene discrepancia algebraica confirmada con H3.2. Erratas oficiales pendientes de cotejo, según [fuentes](normative/hfs002-sources.md).
+
+**Revisión crítica HFS-001 aprobada:** el árbol siguiente conserva la propuesta original como contexto, no prescribe crear todas esas capas. ADR-001 conserva `sections`, funciones en `codes` y reglas/routing en `domain`; extraer solo responsabilidades justificadas, sin `services` web obligatorio ni segundo motor. DRY y contratos compartidos son las fronteras requeridas. No hay migración de carpetas en HFS-001/002.
 
 ```text
 src/
@@ -103,7 +107,7 @@ examples/           # Casos versionados
 
 **Estados:** Check: `PASS | FAIL | NOT_APPLICABLE | NOT_EVALUATED`. Caso: `PASS | FAIL | INCOMPLETE`. Advertencias separadas de cumplimiento. Un cálculo fallido técnicamente también puede devolver un error estructurado, no un falso FAIL de resistencia.
 
-`ApplicabilityPlan` debe demostrar explícitamente: cuáles verificaciones son obligatorias para familia/geometría/solicitaciones, por qué se activan/no activan, y si todas las obligatorias están implementadas y se ejecutaron.
+`ApplicabilityPlan` debe demostrar explícitamente: cuáles verificaciones son obligatorias para familia/geometría/solicitaciones, por qué se activan/no activan, y si todas las obligatorias están implementadas y se ejecutaron. Los requisitos proceden de una matriz normativa independiente del router. PASS solo acredita el alcance verificable declarado; no certificación automática global de AISC 360-22. Datos/interpretaciones desconocidos no son NOT_APPLICABLE.
 
 **Precisión:** `float` puede mantenerse para cálculo ingenieril si se prueba la estabilidad numérica y se rechazan valores no finitos. No imponer Decimal universalmente: la física del problema no exige la misma aritmética exacta del detallado geométrico de RCWallDetailer.
 
@@ -122,7 +126,8 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-013 | 1 | Revisar convenciones `Pu,Mux,Muy,Vux,Vuy,Vu,Tu`, ejes y capacidades de cortante H3 | 011 | Ensayos direccionales no confunden ejes; si norma/caso no cubierto -> INCOMPLETE. |
 | HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | DCR gobernante con dimensión válida, `cases=[]` rechazado. |
 | HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Decisiones no cambian por redondeo; avisos no se confunden con incumplimientos. |
-| HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-015 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |
+| HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. No implementada en HFS-002; alcance integral sigue HFS-040. |
+| HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-016 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |
 | HFS-021 | 2 | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Web y CLI futuros utilizan la misma ejecución; no hay lógica duplicada. |
 | HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021 | JSON round-trip, migración explícita y esquemas generados reproducibles. |
 | HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |
@@ -153,7 +158,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 ### Puertas de avance
 
 - **G0 — línea base:** se conocen salidas actuales y suite que corre; cambios futuros comparables.
-- **G1 — seguridad:** no existen falsos PASS por omisión, inputs ambiguos, estados o agregación incorrecta. Hasta entonces, no publicar web como verificador apto para diseño profesional.
+- **G1 — seguridad:** no existen falsos PASS por omisión, inputs ambiguos, estados o agregación incorrecta; HFS-016 debe mitigar F-13 antes de franquearla. PASS solo acredita el alcance verificable declarado y no certificación global AISC. Hasta entonces, no publicar web como verificador apto para diseño profesional.
 - **G2 — integridad:** núcleo instalable, contratos versionados y traza de ejecución única.
 - **G3 — validación normativa:** cada familia publicitada dispone de matriz de aplicabilidad y oráculos independientes, con huecos bloqueados.
 - **G4 — web:** el servicio web produce exactamente el mismo resultado canónico y mantiene indicadores de cobertura/limitaciones.
@@ -216,4 +221,4 @@ Criterio de aceptación: baseline reproducible, evidencias de pruebas reales, ma
 
 Una reescritura de módulo solo se permite si se demuestra al menos una de estas condiciones: (a) defectos sistémicos no corregibles localmente, (b) múltiples duplicaciones semánticas difíciles de mantener, (c) trazabilidad no representable sin rediseño, o (d) incompatibilidad persistente con validación reproducible. Antes de reescribir: ensayo de caracterización, oráculo de referencia, mapa de migración y rollback.
 
-**Prioridad inmediata:** ejecutar `HFS-000` y, con resultados, `HFS-001` y `HFS-002`; luego corregir los P0 mediante PRs pequeños `HFS-010` a `HFS-015`. La app web se inicia únicamente después de la puerta G1.
+**Prioridad inmediata:** revisar la entrega HFS-002; después de autorización, corregir los P0 mediante tareas pequeñas HFS-010 a HFS-016. Los nuevos dominios incompletos deben bloquearse por cobertura antes de su reparación normativa profunda. La app web se inicia únicamente después de la puerta G1.
