@@ -23,6 +23,8 @@
 - Mantener `float` salvo necesidad numérica demostrada; decisiones con valores brutos, redondeo solo para presentación. Declarar tolerancias absolutas/relativas por magnitud y justificar límites. No introducir tolerancias que cambien PASS/FAIL sin revisión.
 - No comparar capacidades de dimensiones distintas. Preservar eje, signo, método LRFD/ASD, origen del dato y unidad. No asumir compacto, cero, finitud o geometría válida por ausencia de datos.
 - El objetivo es que ausencia de verificaciones o cobertura incompleta nunca se presente como PASS. Los defectos actuales deben seguir visibles; no alterar el motor fuera de una tarea autorizada para corregirlos.
+- PASS expresa cumplimiento únicamente del alcance verificable declarado, con hipótesis y exclusiones explícitas; nunca certificación global automática AISC 360-22. No definir ese alcance retrospectivamente como los checks que el router ejecutó.
+- La [matriz normativa independiente](docs/normative/hfs002-applicability.md) define requisitos desde las fuentes; el [contraste](docs/normative/hfs002-implementation.md) registra soporte del código. No derivar la matriz ni los esperados independientes desde `ProfileRouter`, sus predicados o sus resultados. Incertidumbre de aplicabilidad no equivale a NOT_APPLICABLE.
 
 ## Verificación y cambios
 

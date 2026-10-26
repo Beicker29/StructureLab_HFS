@@ -1,6 +1,6 @@
 # ADR-001 — Un motor, fronteras simples y DRY
 
-Fecha: 2026-10-26. Tarea: HFS-001. Estado: decisión propuesta para revisión técnica; implementación posterior, sin cambios de runtime en esta tarea.
+Fecha: 2026-10-26. Tarea: HFS-001. Estado: arquitectura aprobada por el usuario al autorizar HFS-002; implementación posterior. Los ajustes acordados son documentales, sin cambios de runtime.
 
 ## Problema
 
@@ -43,6 +43,8 @@ Conservar estas fronteras permite mejorar cobertura sin reescribir los seis mód
 DRY tiene una excepción deliberada: un cálculo independiente de referencia no debe reutilizar las funciones productivas. Tampoco se unifican E3/I2, factores de capítulos distintos o F4/F5 por parecido: la equivalencia normativa no está demostrada.
 
 ## Consecuencias
+
+El registro ejecutable del router describe soporte del motor, no autoridad normativa. La [matriz HFS-002](../normative/hfs002-applicability.md) se deriva y revisa independientemente; su contraste con reglas permite detectar omisiones. Esto no crea un segundo motor ni duplica capacidades. PASS queda limitado al alcance verificable declarado, nunca a certificación AISC global.
 
 El árbol del roadmap pasa a ser ilustrativo, no una lista de carpetas obligatorias. No habrá nuevas carpetas de producción vacías, repositorios abstractos, DI, caches globales o servicios HTTP todavía. Se podrá extraer `reporting` cuando tenga funciones reales; FastAPI queda como candidato del hito web, sin dependencia instalada ahora.
 
