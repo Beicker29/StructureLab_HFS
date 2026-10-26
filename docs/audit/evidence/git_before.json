@@ -1,0 +1,58 @@
+{
+  "head": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "80a9d3609d452ab3413ad632629b1fadcab8415c\n",
+    "stderr": ""
+  },
+  "branch": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "status": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "status",
+      "--short",
+      "--untracked-files=all"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "?? docs/ROADMAP.md\n?? docs/audit/evidence/tracked_inventory.json\n?? scripts/audit_baseline.py\n?? tests/test_hfs000_characterization.py\n",
+    "stderr": "warning: could not open directory '.tmp_test/tmp0_8yr_64/': Permission denied\nwarning: could not open directory '.tmp_test/tmp2a4bzka6/': Permission denied\nwarning: could not open directory '.tmp_test/tmp5wxraw4a/': Permission denied\nwarning: could not open directory '.tmp_test/tmp7twtefjq/': Permission denied\nwarning: could not open directory '.tmp_test/tmp7z8f7yop/': Permission denied\nwarning: could not open directory '.tmp_test/tmpb5sea0ud/': Permission denied\nwarning: could not open directory '.tmp_test/tmpdavf6e0t/': Permission denied\nwarning: could not open directory '.tmp_test/tmpg2nfbxa4/': Permission denied\nwarning: could not open directory '.tmp_test/tmpqahi728y/': Permission denied\nwarning: could not open directory '.tmp_test/tmpqaod4h_n/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_4rn4de_o/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_6jywjxew/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_ainfdvxk/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_ijzsgdqb/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_k1ipcu4t/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_qqmb2y75/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_16efx1m7/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_3bjrukkv/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_4gy7xx53/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_5g740m8n/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_biqp3kr_/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_bxbq1fqe/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_dkwosl6m/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_dxbzjt36/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_glg8iwj6/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_gnhhrd45/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_hsnte0lm/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_vrs7uucx/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_z9pii8k8/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader__s7gevx_/': Permission denied\n"
+  },
+  "diff": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "diff",
+      "--stat",
+      "HEAD"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "version": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "--version"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "git version 2.53.0.windows.4\n",
+    "stderr": ""
+  }
+}

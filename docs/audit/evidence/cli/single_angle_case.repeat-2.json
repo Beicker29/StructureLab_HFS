@@ -1,0 +1,14 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "src.steel_design.run",
+    "examples/single_angle_case.json",
+    "--results-dir",
+    "audit-results/repeat-2"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000-work",
+  "returncode": 0,
+  "stdout": "{\n  \"status\": \"PASS\",\n  \"admissibility\": {\n    \"short\": \"D.1:NO | E.2:NO\",\n    \"D1\": {\n      \"applicable\": false,\n      \"admissible\": false\n    },\n    \"E2\": {\n      \"applicable\": false,\n      \"admissible\": false\n    }\n  },\n  \"checks\": [\n    {\n      \"name\": \"Axial Compression (Flexural Buckling)\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"E3-1\",\n      \"demand\": 120.0,\n      \"capacity\": 4244.497,\n      \"dcr\": 0.028,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Axial Compression (Single Angle)\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"E5-1a\",\n      \"demand\": 120.0,\n      \"capacity\": 2719.691,\n      \"dcr\": 0.044,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Flexure F10-1 - Yielding (Single Angle Mx)\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"F10-1\",\n      \"demand\": 8.0,\n      \"capacity\": 184.275,\n      \"dcr\": 0.043,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Flexure F10-2 - Lateral-Torsional Buckling (Single Angle Mx)\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"F10-2\",\n      \"demand\": 8.0,\n      \"capacity\": 92.138,\n      \"dcr\": 0.087,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Flexure F10-3 - Leg Local Buckling (Single Angle Mx)\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"F10-3\",\n      \"demand\": 8.0,\n      \"capacity\": 184.275,\n      \"dcr\": 0.043,\n      \"status\": \"PASS\"\n    }\n  ],\n  \"artifacts\": {\n    \"results_run_dir\": \"audit-results\\\\repeat-2\\\\SINGLE_ANGLE_CASE\\\\20261026T202308717593Z\",\n    \"interaction_diagram_i5_method2_image\": null,\n    \"detailed_results_json\": null,\n    \"write_results_json\": false\n  }\n}\n",
+  "stderr": ""
+}

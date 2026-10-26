@@ -1,0 +1,14 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "src.steel_design.run",
+    "examples/double_angle_case.json",
+    "--results-dir",
+    "audit-results/repeat-1"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000-work-clean",
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "{\n  \"error\": {\n    \"type\": \"IncompleteSectionDataError\",\n    \"message\": \"Section data is incomplete for an applicable rule.\",\n    \"stage\": \"run_engine\",\n    \"code\": \"INCOMPLETE_SECTION_DATA\",\n    \"details\": {\n      \"section\": \"2L12X12X1-3/8\",\n      \"profile_type\": \"DOUBLE_ANGLE\",\n      \"rule_id\": \"E4\",\n      \"missing_fields\": [\n        \"j\",\n        \"cw\"\n      ]\n    }\n  }\n}\n"
+}

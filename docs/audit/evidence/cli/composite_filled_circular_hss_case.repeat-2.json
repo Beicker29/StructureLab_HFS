@@ -1,0 +1,14 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "src.steel_design.run",
+    "examples/composite_filled_circular_hss_case.json",
+    "--results-dir",
+    "audit-results/repeat-2"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000-work",
+  "returncode": 0,
+  "stdout": "{\n  \"status\": \"FAIL\",\n  \"admissibility\": {\n    \"short\": \"D.1:NO | E.2:NO\",\n    \"D1\": {\n      \"applicable\": false,\n      \"admissible\": false\n    },\n    \"E2\": {\n      \"applicable\": false,\n      \"admissible\": false\n    }\n  },\n  \"checks\": [\n    {\n      \"name\": \"Composite General Provisions I1\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"I1\",\n      \"demand\": 1.0,\n      \"capacity\": 1.0,\n      \"dcr\": 1.0,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Composite Axial Compression (Filled) I2\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"I2-2\",\n      \"demand\": 220.0,\n      \"capacity\": 312.443,\n      \"dcr\": 0.704,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Combined Flexure and Axial Force I5 (METHOD_2_PLASTIC_INTERACTION)\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"I5\",\n      \"demand\": 2.49,\n      \"capacity\": 1.0,\n      \"dcr\": 2.49,\n      \"status\": \"FAIL\"\n    },\n    {\n      \"name\": \"Minimum Reinforcement Ratio I3-4\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"I3-4\",\n      \"demand\": 0.0,\n      \"capacity\": 1.0,\n      \"dcr\": 0.0,\n      \"status\": \"PASS\"\n    },\n    {\n      \"name\": \"Filled Shear I4-1\",\n      \"code\": \"AISC 360-22\",\n      \"clause\": \"I4-1\",\n      \"demand\": 60.0,\n      \"capacity\": 383.485,\n      \"dcr\": 0.156,\n      \"status\": \"PASS\"\n    }\n  ],\n  \"artifacts\": {\n    \"results_run_dir\": \"audit-results\\\\repeat-2\\\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\\\20261026T202258720575Z\",\n    \"interaction_diagram_i5_method2_image\": \"audit-results\\\\repeat-2\\\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\\\20261026T202258720575Z\\\\CIRCULAR_HSS\\\\PTER4_X6.00MM__20261026T202300440891Z__I5_METHOD2.svg\",\n    \"detailed_results_json\": null,\n    \"write_results_json\": false\n  }\n}\n",
+  "stderr": ""
+}
