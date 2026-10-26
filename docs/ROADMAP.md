@@ -5,6 +5,8 @@
 **Documento:** 26 de octubre de 2026.  
 **Objetivo:** motor AISC 360-22 de diseño/verificación de miembros de acero, trazable, sencillo, testeable, con CLI y app web. AISC 341-22 se reserva como alcance normativo separado y optativo.
 
+**Actualización HFS-001 (2026-10-26):** HFS-000 aceptada como línea base de comportamiento, no validación AISC. Las decisiones documentales de HFS-001 quedan para revisión en [ADR-001](adr/001-engine-architecture.md), [ADR-002](adr/002-contracts-errors.md) y [ADR-003](adr/003-traceability-testing.md). El estado vivo F-01–F-32 está en [seguimiento maestro](audit/tracking.md); el diagnóstico HFS-000 permanece inmutable. HFS-002 y tareas posteriores no se han iniciado.
+
 > Esta es una auditoría estática de arquitectura y porciones representativas del código obtenidas del repositorio. NO se han ejecutado aquí las pruebas ni se han recalculado todos los ejemplos contra el texto normativo. Distinguir defectos confirmados de riesgos pendientes de validación numérica. El listado puede ampliarse durante los hitos de auditoría.
 
 ## 1. Principios no negociables
@@ -17,6 +19,7 @@
 6. **Fronteras simples:** sin microservicios, base de datos requerida, contenedores obligatorios, framework frontend pesado o diseño de plugins genéricos en el MVP.
 7. **Sin inventar implementaciones normativas:** reglas no implementadas o validación incierta se declaran explícitamente.
 8. **Revisión humana:** los cambios en selección de estados límite, ecuaciones, propiedades de catálogos, estabilidad e interacción requieren evaluación ingenieril antes de declararse validados.
+9. **DRY permanente:** una fuente de verdad por concepto técnico, con simplicidad y responsabilidad única. No fusionar ecuaciones de dominios diferentes ni reducir líneas mediante abstracciones sin beneficio. CLI/API/web comparten motor y contratos. Diagnóstico y propietarios en [inventario DRY](architecture/dry-inventory.md); consolidaciones pendientes, sin refactorizar en HFS-001.
 
 ## 2. Hallazgos del análisis estático
 
@@ -36,7 +39,7 @@
 | F-10 | P0 | C/R | `domain/routing/profile_router.py::_is_missing_numeric`, `sections/loader.py::_coerce_float` | Ausencia de validación explícita de finitud en varios lugares; probar y prohibir NaN, infinito, números negativos y dimensiones imposibles. |
 | F-11 | P1 | C/R | `domain/rules/shear_rules.py::_axis_v_label` | Comentario indica inversión legacy de etiquetas respecto de routing; documentar y comprobar matemáticamente ejes, componentes y capacidades. No corregir solo nombres. |
 | F-12 | P1 | C/R | `sections/loader.py`, selección `field_values['id']` para D/t | Revisar que D/t corresponda al diámetro exterior físico, no ID, según familia/convención de catálogo. |
-| F-13 | P1 | C | `sections/repository.py::load` | Nombres duplicados sobrescriben silenciosamente secciones; fallo explícito de duplicado o namespace/catalog-id. |
+| F-13 | P0 propuesto | C | `sections/repository.py::load`, `docs/audit/catalog-duplicates.json` | Duplicados reales HEA 100 con geometrías distintas; última fila sobrescribe. Priorizar identificación/rechazo antes de G1, sin esperar toda la fase 4. Ubicación de corrección acotada pendiente de revisión; justificación en seguimiento maestro. |
 | F-14 | P1 | C | `sections/loader.py` | Conversión de unidades por encabezados y fallback `1.0`; definir metadatos por fuente y rechazo si la unidad de entrada es ambigua. |
 | F-15 | P1 | C | `run.py::_build_case_section` y `engine.py::_build_custom_section` | Geometría de sección custom duplicada; extracción única a dominio geométrico. |
 | F-16 | P1 | C | `run.py`, 747 líneas | CLI mezcla ejecución, generación de memorias, trazas, gráficos y serialización; servicios y exportadores separados. |
@@ -54,10 +57,14 @@
 | F-28 | P2 | R | Repositorio general | Verificar licencias y permisos de redistribución para normas PDF y tablas/datos; registrar dependencia documental y erratas aplicables. |
 | F-29 | P1 | C | `run.py` modo lote: `aggregate_pass=True` y `cases=[]` | Lote vacío puede declararse PASS; exigir ≥1 caso válido y agregación completa, resultados por caso. |
 | F-30 | P1 | R | `src/steel_design/codes/aisc_360_22` | Auditoría profunda de E4/E5/E7, F2–F11, G2–G6, H, I; revisar todos los factores, dominios, límites y errores numéricos. No asumir fidelidad por etiqueta de ecuación. |
+| F-31 | P0 | C/R | `domain/routing/profile_router.py::_validate_flexure_selection`; caracterización HFS-000 | Un check F del eje menor evita bloqueo aunque la demanda mayor no se evalúe. Omisión confirmada en sonda sintética; contraste con canal real pendiente. Seguimiento HFS-002/010/032. |
+| F-32 | P1 | C | `run.py::main`, ejemplos HFS-000 | FAIL estructural puede devolver exit 0. Es contrato observable, no regresión. Documentar separación ejecución/cumplimiento y revisar consumidores antes de cambiar exit; HFS-021/022. |
 
 **Nota de rigor:** un defecto de diseño de software no demuestra por sí solo un resultado estructural incorrecto para un caso dado. Y un resultado correcto en una prueba no certifica todas las combinaciones del capítulo correspondiente.
 
 ## 3. Arquitectura objetivo mínima
+
+**Revisión crítica HFS-001:** el árbol siguiente conserva la propuesta original como contexto, no prescribe crear todas esas capas. ADR-001 propone conservar `sections`, funciones en `codes` y reglas/routing en `domain`; extraer solo responsabilidades justificadas, sin `services` web obligatorio ni segundo motor. DRY y contratos compartidos son las fronteras requeridas; la aprobación técnica de esta revisión sigue pendiente. No hay migración de carpetas en HFS-001.
 
 ```text
 src/
@@ -88,7 +95,7 @@ schemas/            # Versiones JSON Schema
 examples/           # Casos versionados
 ```
 
-**No mover todos los archivos a la vez.** Esta es la estructura de destino; se materializa incrementalmente, con compatibilidad controlada de API.
+**No mover todos los archivos a la vez.** Esta es una estructura ilustrativa de la propuesta original, revisada por ADR-001; las extracciones se justifican por problemas concretos y compatibilidad controlada, no por completar ese árbol.
 
 ### Flujo de cálculo
 

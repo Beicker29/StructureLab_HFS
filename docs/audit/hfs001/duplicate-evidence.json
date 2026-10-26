@@ -1,0 +1,103 @@
+{
+  "base_commit": "dae8d76507810362c4e31484a00b8d664525f2e6",
+  "definition": "Identical file bytes (SHA-256); no semantic deduplication and no deletion.",
+  "groups": [
+    {
+      "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+      "bytes_each": 4696,
+      "paths": [
+        "docs/audit/evidence-clean/artifacts/repeat-1/COMPOSITE_ENCASED_CASE/20261026T202446525771Z/W/W14X90__20261026T202446525771Z__I5_METHOD2.svg",
+        "docs/audit/evidence-clean/artifacts/repeat-2/COMPOSITE_ENCASED_CASE/20261026T202509127853Z/W/W14X90__20261026T202509128819Z__I5_METHOD2.svg",
+        "docs/audit/evidence/artifacts/repeat-1/COMPOSITE_ENCASED_CASE/20261026T202234148176Z/W/W14X90__20261026T202234148176Z__I5_METHOD2.svg",
+        "docs/audit/evidence/artifacts/repeat-2/COMPOSITE_ENCASED_CASE/20261026T202257062293Z/W/W14X90__20261026T202257063294Z__I5_METHOD2.svg",
+        "results/COMPOSITE_ENCASED_CASE/20260413T170017263405Z/interaction_diagrams/W/W14X90__20260413T170017264405Z__I5_METHOD2.svg",
+        "results/COMPOSITE_ENCASED_CASE/20260413T170156712189Z/interaction_diagrams/W/W14X90__20260413T170156713145Z__I5_METHOD2.svg",
+        "results/COMPOSITE_ENCASED_CASE/20260413T170755477072Z/W/W14X90__20260413T170755478083Z__I5_METHOD2.svg"
+      ]
+    },
+    {
+      "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+      "bytes_each": 4754,
+      "paths": [
+        "docs/audit/evidence-clean/artifacts/repeat-1/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20261026T202448108377Z/CIRCULAR_HSS/PTER4_X6.00MM__20261026T202449769956Z__I5_METHOD2.svg",
+        "docs/audit/evidence-clean/artifacts/repeat-2/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20261026T202510718079Z/CIRCULAR_HSS/PTER4_X6.00MM__20261026T202512359282Z__I5_METHOD2.svg",
+        "docs/audit/evidence/artifacts/repeat-1/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20261026T202235873913Z/CIRCULAR_HSS/PTER4_X6.00MM__20261026T202237581952Z__I5_METHOD2.svg",
+        "docs/audit/evidence/artifacts/repeat-2/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20261026T202258720575Z/CIRCULAR_HSS/PTER4_X6.00MM__20261026T202300440891Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20260413T170022490053Z/interaction_diagrams/CIRCULAR_HSS/PTER4_X6.00MM__20260413T170024312208Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20260413T170202061243Z/interaction_diagrams/CIRCULAR_HSS/PTER4_X6.00MM__20260413T170203769226Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_CIRCULAR_HSS_CASE/20260413T170800912186Z/CIRCULAR_HSS/PTER4_X6.00MM__20260413T170802697850Z__I5_METHOD2.svg"
+      ]
+    },
+    {
+      "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+      "bytes_each": 4750,
+      "paths": [
+        "docs/audit/evidence-clean/artifacts/repeat-1/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20261026T202451358559Z/RECTANGULAR_HSS/PTE50X30X2.5MM__20261026T202453085995Z__I5_METHOD2.svg",
+        "docs/audit/evidence-clean/artifacts/repeat-2/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20261026T202513983606Z/RECTANGULAR_HSS/PTE50X30X2.5MM__20261026T202515636257Z__I5_METHOD2.svg",
+        "docs/audit/evidence/artifacts/repeat-1/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20261026T202239268249Z/RECTANGULAR_HSS/PTE50X30X2.5MM__20261026T202240919694Z__I5_METHOD2.svg",
+        "docs/audit/evidence/artifacts/repeat-2/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20261026T202302082110Z/RECTANGULAR_HSS/PTE50X30X2.5MM__20261026T202303716589Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20260413T170018988612Z/interaction_diagrams/RECTANGULAR_HSS/PTE50X30X2.5MM__20260413T170020753022Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20260413T170034666906Z/interaction_diagrams/RECTANGULAR_HSS/PTE50X30X2.5MM__20260413T170036450402Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20260413T170158509310Z/interaction_diagrams/RECTANGULAR_HSS/PTE50X30X2.5MM__20260413T170200267101Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20260413T170730460739Z/RECTANGULAR_HSS/PTE50X30X2.5MM__20260413T170732380245Z__I5_METHOD2.svg",
+        "results/COMPOSITE_FILLED_RECTANGULAR_HSS_CASE/20260413T170757278273Z/RECTANGULAR_HSS/PTE50X30X2.5MM__20260413T170759093730Z__I5_METHOD2.svg"
+      ]
+    },
+    {
+      "sha256": "4f67016c9e64911f54511ef4cd0fd6d30c2528581836e96de2a8f27dd094434a",
+      "bytes_each": 754,
+      "paths": [
+        "docs/audit/evidence-clean/catalog.json",
+        "docs/audit/evidence/catalog.json"
+      ]
+    },
+    {
+      "sha256": "cc0aea9f27a9be4cb2d41397ed27b03c25b0cfd911cc2997254c9718f3cf835e",
+      "bytes_each": 5600,
+      "paths": [
+        "docs/audit/evidence-clean/copied_inputs.json",
+        "docs/audit/evidence/copied_inputs.json"
+      ]
+    },
+    {
+      "sha256": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62",
+      "bytes_each": 155016,
+      "paths": [
+        "docs/audit/evidence-clean/engine-results.json",
+        "docs/audit/evidence/engine-results.json"
+      ]
+    },
+    {
+      "sha256": "a853af272f314569fd1a448064b8f46ac84782fa8c6b73370337580573428b87",
+      "bytes_each": 267,
+      "paths": [
+        "docs/audit/evidence-clean/environment-freeze.txt",
+        "docs/audit/evidence/environment-freeze.txt"
+      ]
+    },
+    {
+      "sha256": "5849a471c0e18aa18c12367c3448d5c4ff8e76da8b2958bcb3907df86fe6a60e",
+      "bytes_each": 989,
+      "paths": [
+        "docs/audit/evidence-clean/environment.json",
+        "docs/audit/evidence/environment.json"
+      ]
+    },
+    {
+      "sha256": "513f525ba0a5b44f0bd8e14921db47aa1ba4ae82a97a81d0cc6d6182a61d4f29",
+      "bytes_each": 25752,
+      "paths": [
+        "docs/audit/evidence-clean/examples.json",
+        "docs/audit/evidence/examples.json"
+      ]
+    },
+    {
+      "sha256": "66e890b380d525634d57c70c1a4d9d4dc2eebe41836292272f4316759e502ddb",
+      "bytes_each": 13202,
+      "paths": [
+        "docs/audit/evidence-clean/tracked_inventory.json",
+        "docs/audit/evidence/tracked_inventory.json"
+      ]
+    }
+  ]
+}
