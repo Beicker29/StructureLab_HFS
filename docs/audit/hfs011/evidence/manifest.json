@@ -1,0 +1,110 @@
+{
+  "after/catalog.json": {
+    "source": ".venv/hfs011-final/catalog.json",
+    "sha256": "4f67016c9e64911f54511ef4cd0fd6d30c2528581836e96de2a8f27dd094434a"
+  },
+  "after/comparison.json": {
+    "source": ".venv/hfs011-final/comparison.json",
+    "sha256": "fc0ec5115ca5a30056b80932819ae3800dd24a72cbafb1f975954bae4654b91c"
+  },
+  "after/copied_inputs.json": {
+    "source": ".venv/hfs011-final/copied_inputs.json",
+    "sha256": "9b75b0274163a9dafa277c6f071ce8723e04715dfbf3f1fdaae8545d06f955a3"
+  },
+  "after/engine-results.json": {
+    "source": ".venv/hfs011-final/engine-results.json",
+    "sha256": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62"
+  },
+  "after/environment.json": {
+    "source": ".venv/hfs011-final/environment.json",
+    "sha256": "ac7908caf0cfb7f2a9a384702076352b833b45501aaeb1a8e28bce71d7c3f6ac"
+  },
+  "after/pytest-characterization.json": {
+    "source": ".venv/hfs011-final/pytest-characterization.json",
+    "sha256": "8f94342c8ff26d24191432472d39b639065a95aae7593728075a93bd7838753d"
+  },
+  "after/pytest-characterization.xml": {
+    "source": ".venv/hfs011-final/pytest-characterization.xml",
+    "sha256": "acb677839ed6ca12b52e85b1e40e540e7867911fd7f2d2e92ea50a1717115590"
+  },
+  "after/pytest-contracts.json": {
+    "source": ".venv/hfs011-final/pytest-contracts.json",
+    "sha256": "797db9561e67c4735793f2664752f1d20057bde7fc5991135fb76ce079c66b46"
+  },
+  "after/pytest-contracts.xml": {
+    "source": ".venv/hfs011-final/pytest-contracts.xml",
+    "sha256": "2e2909a573392ab30adf52f16d4a31c7d058139dc6c5a368145a7f0cf5a35f49"
+  },
+  "after/pytest-original.json": {
+    "source": ".venv/hfs011-final/pytest-original.json",
+    "sha256": "985fdb75e458ba6a1deafcf2a91b0241097e66b6a4f2097a668d4c8dcdf60d84"
+  },
+  "after/pytest-original.xml": {
+    "source": ".venv/hfs011-final/pytest-original.xml",
+    "sha256": "eae13f8c0b1216fa10e2a73bb1bfe745b1d216a4da9df646102636394ef9f029"
+  },
+  "after/SHA256SUMS.json": {
+    "source": ".venv/hfs011-final/SHA256SUMS.json",
+    "sha256": "6f9b7ded87da55642b6716a5af094d60ea9c6dde787e5e05c0aca7f981c34c0f"
+  },
+  "after/verification.json": {
+    "source": ".venv/hfs011-final/verification.json",
+    "sha256": "8179609951dafec1f8d60d6d0dbb3c6976a79c6c81651d14216f9053c3b800fa"
+  },
+  "before/engine-results.json": {
+    "source": ".venv/hfs011-before-clean/engine-results.json",
+    "sha256": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62"
+  },
+  "before/pytest-existing.json": {
+    "source": ".venv/hfs011-before-clean/pytest-existing.json",
+    "sha256": "cbb4dd8fd9b2995d2eff9c229b4ed7f5da4b78ece9d8719f0a0739408dcd7ab0"
+  },
+  "before/pytest-existing.xml": {
+    "source": ".venv/hfs011-before-clean/pytest-existing.xml",
+    "sha256": "0b13d5bdcb61cff26220b94b42bab5949f6964d4f6234ba85ad3662fb0e7a741"
+  },
+  "before/pytest-characterization.json": {
+    "source": ".venv/hfs011-before-clean/pytest-characterization.json",
+    "sha256": "c1c1e21ca1c58dc856fa1999a07ba40f57d310a950072a6d395ae93f22736d9f"
+  },
+  "before/pytest-characterization.xml": {
+    "source": ".venv/hfs011-before-clean/pytest-characterization.xml",
+    "sha256": "c59c582da981dd007efafa5842909d5029e4e558b9a6189e11aa5b74209fe472"
+  },
+  "before/environment.json": {
+    "source": ".venv/hfs011-before-clean/environment.json",
+    "sha256": "30d7de8d19bdfa2b6564c8cfe7add3035b144ee49118d795cf4183297648df71"
+  },
+  "before/environment-freeze.txt": {
+    "source": ".venv/hfs011-before-clean/environment-freeze.txt",
+    "sha256": "a853af272f314569fd1a448064b8f46ac84782fa8c6b73370337580573428b87"
+  },
+  "before/copied_inputs.json": {
+    "source": ".venv/hfs011-before-clean/copied_inputs.json",
+    "sha256": "2574815fb356d618fc1df2cb0ef87f8386fe399582bd9e5ca81c4f801ad21aa7"
+  },
+  "before/verification.json": {
+    "source": ".venv/hfs011-before-clean/verification.json",
+    "sha256": "07247accccd9dc4ec88f3202e7096c65fb35fc9e59bb98091c324b3c700d5f19"
+  },
+  "attempts/installation-race.json": {
+    "source": ".venv/hfs011-before/pytest-existing.json",
+    "sha256": "9dda472a4804777019f64064282ace64ee3edec7fe41523a1bd7152deb0ad9ec"
+  },
+  "attempts/early-original.json": {
+    "source": ".venv/hfs011-after-initial/pytest-existing.json",
+    "sha256": "eb4fdc9fa5f493f9c533b4df51f07e477a5de7d1b6ad94d4f7812dd26b0ad076"
+  },
+  "attempts/early-xpass.json": {
+    "source": ".venv/hfs011-after-initial/pytest-characterization.json",
+    "sha256": "32446c6fe6891c0c031a3db8a1e4cffdf40325f922f9c09856e322003ecf28d8"
+  },
+  "attempts/initial-contracts.xml": {
+    "source": ".venv/hfs011-targeted.xml",
+    "sha256": "6faade6bcd0e5062e49b62573ba6bcb2f3efda4a602d5df08424c79118a1bcad"
+  },
+  "attempts/intermediate-verification.json": {
+    "source": ".venv/hfs011-review/verification.json",
+    "sha256": "9efbd4b743a3e40ea56936c4578a282af548820d23c3dad2a650d1ba34b17e40"
+  }
+}

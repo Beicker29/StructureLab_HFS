@@ -1,0 +1,14 @@
+{
+  "catalog.json": "4f67016c9e64911f54511ef4cd0fd6d30c2528581836e96de2a8f27dd094434a",
+  "comparison.json": "fc0ec5115ca5a30056b80932819ae3800dd24a72cbafb1f975954bae4654b91c",
+  "copied_inputs.json": "9b75b0274163a9dafa277c6f071ce8723e04715dfbf3f1fdaae8545d06f955a3",
+  "engine-results.json": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62",
+  "environment.json": "ac7908caf0cfb7f2a9a384702076352b833b45501aaeb1a8e28bce71d7c3f6ac",
+  "pytest-characterization.json": "8f94342c8ff26d24191432472d39b639065a95aae7593728075a93bd7838753d",
+  "pytest-characterization.xml": "acb677839ed6ca12b52e85b1e40e540e7867911fd7f2d2e92ea50a1717115590",
+  "pytest-contracts.json": "797db9561e67c4735793f2664752f1d20057bde7fc5991135fb76ce079c66b46",
+  "pytest-contracts.xml": "2e2909a573392ab30adf52f16d4a31c7d058139dc6c5a368145a7f0cf5a35f49",
+  "pytest-original.json": "985fdb75e458ba6a1deafcf2a91b0241097e66b6a4f2097a668d4c8dcdf60d84",
+  "pytest-original.xml": "eae13f8c0b1216fa10e2a73bb1bfe745b1d216a4da9df646102636394ef9f029",
+  "verification.json": "8179609951dafec1f8d60d6d0dbb3c6976a79c6c81651d14216f9053c3b800fa"
+}

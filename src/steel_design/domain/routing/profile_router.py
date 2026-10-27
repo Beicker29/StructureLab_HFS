@@ -549,7 +549,7 @@ class ProfileRouter:
         if value is None:
             return True
         if isinstance(value, (int, float)):
-            return value <= 0.0
+            return not math.isfinite(value) or value <= 0.0
         return True
 
     @classmethod

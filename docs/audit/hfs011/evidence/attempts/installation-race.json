@@ -1,0 +1,18 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-rA",
+    "--tb=short",
+    "--ignore=tests/test_hfs000_characterization.py",
+    "--junitxml=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011-before\\pytest-existing.xml",
+    "-o",
+    "junit_logging=all"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011-before-work",
+  "returncode": 2,
+  "stdout": "\n=================================== ERRORS ====================================\n_______________ ERROR collecting tests/test_chapter_e_rules.py ________________\nImportError while importing test module 'C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011-before-work\\tests\\test_chapter_e_rules.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\importlib\\__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\test_chapter_e_rules.py:4: in <module>\n    from src.steel_design.domain.rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule\nsrc\\steel_design\\domain\\rules\\axial_rules.py:4: in <module>\n    from ...models import CheckResult, CheckStatus, SteelCase\nsrc\\steel_design\\models.py:4: in <module>\n    from pydantic import BaseModel, Field, model_validator\nE   ModuleNotFoundError: No module named 'pydantic'\n============================== warnings summary ===============================\nsrc\\steel_design\\sections\\models.py:4\n  C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011-before-work\\src\\steel_design\\sections\\models.py:4: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    class Section(BaseModel):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nERROR tests/test_chapter_e_rules.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 2.22s\n",
+  "stderr": ""
+}

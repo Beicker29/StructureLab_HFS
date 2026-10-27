@@ -247,7 +247,9 @@ class ChapterERulesTests(unittest.TestCase):
             ]
         )
         engine = SteelDesignEngine(repo)
-        case = _compression_case("W24X131", pu=500.0, xa=-1.0, ya=0.0)
+        case = _compression_case("W24X131", pu=500.0, xa=0.0, ya=0.0)
+        # HFS-011 rejects xa<0 at construction; exercise the engine boundary too.
+        case.factors = case.factors.model_copy(update={"xa": -1.0})
 
         with self.assertRaises(ValidationError):
             engine.run(case)

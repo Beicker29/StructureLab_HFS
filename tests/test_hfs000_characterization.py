@@ -48,7 +48,7 @@ def run_case(repository, loads):
     return result
 
 
-@known_defect("F-02: empty loads give PASS with zero checks")
+# HFS-011: corrected input rejection, demonstrated before removing strict xfail.
 def test_empty_loads_must_not_pass(repository):
     try:
         result = run_case(repository, {})
@@ -57,7 +57,7 @@ def test_empty_loads_must_not_pass(repository):
     assert result.status.value != "PASS"
 
 
-@known_defect("F-04: misspelled Mxu silently ignored")
+# HFS-011: corrected input rejection, demonstrated before removing strict xfail.
 def test_load_typo_must_be_rejected(repository):
     try:
         result = run_case(repository, {"Mxu": 1000000})
@@ -66,7 +66,7 @@ def test_load_typo_must_be_rejected(repository):
     assert result.status.value != "PASS"
 
 
-@known_defect("F-10: string NaN axial demand bypasses checks")
+# HFS-011: corrected input rejection, demonstrated before removing strict xfail.
 def test_nan_load_must_be_rejected(repository):
     try:
         result = run_case(repository, {"Pu": "NaN"})
@@ -110,7 +110,7 @@ def test_channel_both_axes_must_block_if_major_axis_is_unsupported(repository):
     assert any("major" in check.name.lower() for check in result.checks)
 
 
-@known_defect("F-08: conflicting Vu is overwritten by directional resultant")
+# HFS-011: corrected input rejection, demonstrated before removing strict xfail.
 def test_conflicting_shear_must_be_rejected():
     try:
         loads = Loads(Vu=99, Vux=3, Vuy=4)
@@ -164,3 +164,9 @@ def test_empty_bundle_must_not_pass(tmp_path):
         assert json.loads(completed.stderr)["error"]
         return
     assert json.loads(completed.stdout)["status"] != "PASS"
+
+
+@known_defect("F-02: explicit zero demand still gives PASS with zero checks; HFS-010 pending")
+def test_explicit_zero_loads_must_not_pass_without_checks(repository):
+    result = run_case(repository, {"Pu": 0})
+    assert result.status.value != "PASS"

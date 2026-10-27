@@ -45,6 +45,8 @@ Registrar comando completo, cwd, SHA, Python/dependencias, códigos de salida y 
 
 ## Evidencia, revisión y cierre
 
+Para HFS-011 y siguientes, separar también `tests/test_hfs011_input_contracts.py` de la suite original. El capturador [audit_hfs011.py](scripts/audit_hfs011.py) ejecuta las tres suites por separado en una copia nueva y compara los ejemplos con la captura previa; comandos y migración en el [informe HFS-011](docs/audit/hfs011/report.md). No presentar los casos parametrizados nuevos como métodos de la suite histórica ni los xfail como aprobados.
+
 - Cambio normativo o de propiedades: fuente precisa, cálculo esperado independiente, tolerancia, fronteras y revisión ingenieril antes de declararlo validado.
 - Corrección de defecto: reproducción previa, contraste posterior y actualización del F-ID; no borrar un xfail sin reemplazar su objetivo de seguridad.
 - Refactorización sin cambio de comportamiento: comparación por caso/estado límite y preservación de trazas. No conservar un defecto por obediencia a un snapshot; separar su reparación.

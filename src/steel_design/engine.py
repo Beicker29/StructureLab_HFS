@@ -4,7 +4,7 @@ from .models import CheckStatus, CustomSectionType, SteelCase
 from .results_model import EngineResult
 from .sections.models import Section
 from .sections.repository import SectionRepository
-from .domain.validation import validate_case
+from .domain.validation import validate_case, validate_section, validate_case_section
 from .domain.errors import RuleNotImplementedError, SectionNotFoundError, ValidationError
 from .domain.routing.profile_router import ProfileRouter
 
@@ -78,15 +78,22 @@ class SteelDesignEngine:
         4. Aggregate
         """
         # 1. Validation
-        validate_case(case)
+        case = validate_case(case)
         
         # 2. Fetch section
         if case.custom_section is not None:
-            section = _build_custom_section(case)
+            try:
+                section = _build_custom_section(case)
+            except (OverflowError, ZeroDivisionError) as exc:
+                raise ValidationError("Custom dimensions exceed the supported floating-point range.",
+                                      details={"field": "custom_section"}) from exc
         else:
             section = self.repository.get(case.section_name)
             if not section:
                 raise SectionNotFoundError(f"Section {case.section_name} not found in database.")
+
+        section = validate_section(section)
+        validate_case_section(case, section)
 
         if case.loads.Pu < 0.0 and case.composite is None:
             an = case.connection.An or 0.0

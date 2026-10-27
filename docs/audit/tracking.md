@@ -1,21 +1,21 @@
-# Seguimiento maestro de hallazgos — HFS-002
+# Seguimiento maestro de hallazgos — HFS-011
 
-Fecha: 2026-10-26. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
+Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
 
-Estado de todos los IDs: **abierto**. «Observado» acredita código/ejecución; «riesgo» conserva incertidumbre normativa/física. Las tareas son destinos de seguimiento, no correcciones ejecutadas. La [matriz HFS-002](../normative/hfs002-applicability.md) y su [contraste/riesgos](../normative/hfs002-implementation.md) documentan la revisión nueva, sin modificar findings HFS-000.
+Estado: hallazgos abiertos, con F-04 implementado para revisión contractual y avances parciales HFS-011 detallados al final. «Observado» acredita código/ejecución; «riesgo» conserva incertidumbre normativa/física. Las tareas indican seguimiento; las correcciones ejecutadas se identifican expresamente. La [matriz HFS-002](../normative/hfs002-applicability.md) y su [contraste/riesgos](../normative/hfs002-implementation.md) conservan el diagnóstico, sin reescribir findings HFS-000.
 
 | ID | Prioridad | Certeza / asunto | Tarea de seguimiento | Condición mínima de cierre, además de evidencia y revisión |
 |---|---|---|---|---|
 | F-01 | P0 | W sin interacción reproducido; H1.1/2 local incluye familias elegibles no HSS, H2 alternativa según condiciones | HFS-010/034 | Cobertura por combinación y dominio; no copiar HSS indiscriminadamente |
 | F-02 | P0 | Observado: PASS sin checks | HFS-010 | Caso vacío/incompleto nunca PASS |
 | F-03 | P0 | F2 sin razones reproducido; F2/B4.1 exigen alas/alma compactas, no default | HFS-012 | Derivación con geometría fiable o bloqueo; fronteras y canal con ancho correcto |
-| F-04 | P0 | Observado: campos/cargas omitidos | HFS-011 | Typos y faltantes tratados según contrato explícito |
+| F-04 | P0 | Corregido en contrato HFS-011 para revisión: extras/vacío rechazados, carga parcial documentada | HFS-011 | Evidencia por campo; revisión técnica del contrato/defaults pendiente |
 | F-05 | P0 | Observado: resumen mezcla dimensiones | HFS-014 | Gobernante por DCR con eje/unidad y sin mínimo incompatible |
 | F-06 | P0 | H3.2/H3-6 exige máximo de cocientes; max demanda/max capacidad no equivale, contraejemplo independiente 0,5 vs 0,25 | HFS-013/033/034 | Resolver ejes y capacidades con HSS real asimétrico; discrepancia algebraica confirmada, impacto físico por caso pendiente |
 | F-07 | P0 | D1/E2: límites 300/200 son User Notes; E5≤200 sí condiciona alternativa | HFS-015 | Recomendaciones separadas del cumplimiento y contexto de cláusula |
-| F-08 | P0 | Observado: Vu contradictorio reemplazado | HFS-011/013 | Política única de cargas/ejes sin pérdida silenciosa |
+| F-08 | P0 | Parcial HFS-011: no sobrescribe/fabrica Vu; representaciones activas contradictorias rechazadas | HFS-011/013 | Física de ejes y capacidades pendiente HFS-013; no cierre global |
 | F-09 | P0 | Observado: DCR redondeado incompatible visualmente con FAIL | HFS-015 | Valores brutos y presentación diferenciados; fronteras |
-| F-10 | P0 | NaN axial confirmado; otros dominios pendientes | HFS-011/040 | Finitud/dominios comprobados por frontera de entrada |
+| F-10 | P0 | Parcial HFS-011: finitud en modelos/parser, dominios y sección seleccionada; NaN axial corregido | HFS-011/040 | Calidad/coherencia completa del catálogo y extremos numéricos pendientes; no cierre global |
 | F-11 | P1 | Etiquetas invertidas observadas; física pendiente | HFS-013/033 | Correspondencia matemática eje/demanda/capacidad |
 | F-12 | P1 | Selección ID observada; significado físico pendiente | HFS-033/040 | D/t contrastado con fuente y geometría real |
 | F-13 | **P0** | Duplicados reales de geometría diferente, sobrescritura confirmada; mitigación acordada antes de G1 | HFS-016 acotada; alcance completo HFS-040 | Identidad ambigua no puede seleccionar geometría silenciosamente; catálogo contrastado; no corregido ahora |
@@ -27,7 +27,7 @@ Estado de todos los IDs: **abierto**. «Observado» acredita código/ejecución;
 | F-19 | P1 | UN F4 PDF124 describe alternativa conservadora F5; fidelidad de código y dominio siguen pendientes | HFS-032 | Fuente, dominio y conservadurismo contrastados, traza de alternativa explícita |
 | F-20 | P1 | Capacidades H/I requieren auditoría | HFS-034/035 | Oráculos por trayectoria/método y origen de capacidades |
 | F-21 | P1 | Resultado sin unidad/completitud/bruto dedicados | HFS-022/024 | Contrato común y traza sin inferencias de interfaz |
-| F-22 | P1 | Defaults observados; hipótesis de estabilidad pendientes | HFS-022/037 | Procedencia de K/Cb/demandas y alcance explícitos |
+| F-22 | P1 | Defaults auditados/documentados HFS-011; sin acreditación de análisis ni procedencia | HFS-011/022/037 | Procedencia de K/Cb/demandas y alcance explícitos; permanece abierto |
 | F-23 | P1 | Pruebas existentes insuficientes para validación exhaustiva | HFS-031–038/041/042 | Referencias independientes por dominio publicitado |
 | F-24 | P1 | Sin empaquetado/CI, requisitos abiertos | HFS-020 | Instalación y tests fuera del checkout reproducibles |
 | F-25 | P1 | Históricos/temporales versionados | Política HFS-001; limpieza posterior separada | Trazabilidad recuperable y justificación antes de retirar |
@@ -59,4 +59,12 @@ HFS-002 precisó F-06 y F-07 con S22 local; sus correcciones y efectos por caso 
 
 ## Cambios de estado
 
-Para cerrar un ID registrar tarea/commit, reproducción previa, resultado posterior, prueba independiente cuando corresponda y alcance de revisión. Si solo una parte se resuelve, mantener abierto con alcance residual. Los 11 `known defect` y toda la evidencia HFS-000 permanecen intactos. HFS-001 aprobada arquitectónicamente; HFS-002 documental presentada para revisión. Ningún defecto cerrado; HFS-010/016 no ejecutadas.
+Para cerrar un ID registrar tarea/commit, reproducción previa, resultado posterior, prueba independiente cuando corresponda y alcance de revisión. Si solo una parte se resuelve, mantener abierto con alcance residual. Toda la evidencia congelada HFS-000 permanece intacta. HFS-001 aprobada arquitectónicamente; HFS-002 aceptada por el usuario como matriz documental y diagnóstico. HFS-011 presenta cambios contractuales para revisión; HFS-010/016 no ejecutadas.
+
+### HFS-011 — correcciones demostradas y alcance residual (2026-10-27)
+
+[Informe](hfs011/report.md), [contrato y migración](../contracts/hfs011-inputs.md). Base `5fe2c67a0d14f2541be032278d272cd85c080ecf`, cambios sin commit. Previo: 11 xfail estrictos. Primer contraste posterior: cuatro XPASS estrictos (F-04 typo, F-10 NaN, F-08 contradicción Vu y F-02 objeto loads vacío). Se confirmaron los motivos de rechazo con pruebas específicas de campo antes de retirar esas cuatro marcas; capturas y expectativas numéricas no se alteraron.
+
+Las cuatro pruebas ahora pasan como regresión de seguridad. F-02 **no está cerrado**: se agrega reproducción explícita `loads={"Pu":0}` que sigue PASS sin checks, con xfail estricto del mismo defecto. Caracterización final: 4 aprobadas + 8 xfail (7 anteriores + esa reproducción residual). F-01/03/05/09/13/29/31 permanecen visibles. F-04 queda implementado para revisión del contrato parcial (omisión declarada=0, no desconocido). F-08/10/22 conservan los pendientes de sus filas. Ningún cierre ingenieril global aprobado.
+
+Las dos pruebas originales de rechazo del motor para U>1 y xa<0 construyen ahora un objeto válido y lo alteran mediante model_copy: construir directamente esos valores ya falla en Pydantic. Mantienen la expectativa de rechazo en el motor; pruebas nuevas verifican también el rechazo temprano. No hay ecuaciones/capacidades/interacción modificadas ni validación ingenieril declarada.
