@@ -13,7 +13,7 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 - Capitulo I implementado (alcance actual) para I1, I2, I3-1, I3-3, I3-4 e I4 en miembros compuestos `ENCASED_MEMBER`, `FILLED_MEMBER` y `COMPOSITE_BEAM` (sin CPSW).
 - Traccion con D3 estricto (`Ae = U*An`) para todos los perfiles.
 - Secciones macizas custom por JSON (`SOLID_CIRCULAR`, `SOLID_RECTANGULAR`) con alcance axial (D2/E3).
-- Politica estricta: si una regla aplicable no puede evaluarse por datos faltantes, el caso falla con error estructurado.
+- Datos faltantes o cobertura no acreditada impiden PASS: se informa INCOMPLETE o un error estructurado según la etapa.
 - Los checks axiales reportan clasificacion de elementos (`non_slender`/`slender`) en `checks[].details.element_classification`.
 - Flexion en alcance actual: solo `LRFD`; cuando hay `Mux` y `Muy` se reportan checks por eje (sin interaccion biaxial H1).
 
@@ -50,8 +50,8 @@ no es válido; las componentes omitidas en una carga parcial declaran cero.
 Revisar [contrato, defaults y migración JSON](docs/contracts/hfs011-inputs.md)
 y [pruebas y riesgos residuales](docs/audit/hfs011/report.md).
 HFS-002 fue aceptada como matriz documental y diagnóstico; no como validación
-normativa exhaustiva. HFS-010 sigue pendiente: entradas válidas no garantizan
-cobertura completa y un PASS actual no certifica cumplimiento global AISC.
+normativa exhaustiva. Entradas válidas no garantizan cobertura completa;
+consultar el contrato HFS-010 siguiente. PASS no certifica cumplimiento global AISC.
 
 ## Integridad del catálogo (HFS-016)
 
@@ -61,8 +61,26 @@ Una identidad repetida, incluso con propiedades iguales, produce
 `HEA 100` y `PTEXXMM` quedan bloqueados; los demás perfiles siguen disponibles,
 sujetos a la validación física de HFS-011. El Excel se conserva sin correcciones.
 Consultar [contrato y migración del repositorio](docs/contracts/hfs016-catalog.md)
-y [informe, pruebas y límites](docs/audit/hfs016/report.md). HFS-016 está entregada
-para revisión; no acredita el catálogo completo ni habilita HFS-010.
+y [informe, pruebas y límites](docs/audit/hfs016/report.md). HFS-016 fue concluida
+dentro de su alcance; no acredita la calidad integral del catálogo.
+
+## Cobertura y resultados (HFS-010)
+
+El motor construye obligaciones desde la matriz HFS-002 antes de consultar el
+router. El estado global ahora admite **INCOMPLETE**: cero checks, omisiones,
+condiciones desconocidas o rutas no acreditadas no producen PASS. Los checks
+resistentes y sus números se conservan; `known_failures` identifica los FAIL
+conocidos aun cuando la cobertura sea incompleta.
+
+En esta entrega solo puede acreditarse cobertura completa para tracción axial
+de macizos custom ordinarios, con `tension_scope` explícito y ambos estados D2
+evaluados. Los demás dominios permanecen incompletos o mantienen errores de no
+soporte. No añadir declaraciones para obtener PASS sin evidencia de ingeniería.
+CLI conserva exit 0 cuando devuelve un resultado: es obligatorio leer `status`.
+
+Ver [contrato y migración](docs/contracts/hfs010-coverage.md) e
+[informe, estados de los 12 ejemplos y riesgos](docs/audit/hfs010/report.md).
+HFS-010 se entrega para revisión; no implementa HFS-012/013/014 ni acredita G1.
 
 ## Uso CLI
 
