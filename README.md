@@ -4,6 +4,7 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 
 ## Estado actual
 
+- Resumen CLI/memoria: gobernantes observados por DCR publicado, conservando empates y fallos. Lotes vacíos rechazados antes de ejecutar/publicar. [Contrato y migración HFS-014](docs/contracts/hfs014-summary-bundles.md).
 - Arquitectura por capas (`codes`, `domain`, `sections`, `engine`).
 - Capitulo D (tension) implementado.
 - Capitulo E (compresion) implementado para E3, E4, E5 y E7.

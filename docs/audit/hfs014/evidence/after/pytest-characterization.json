@@ -1,0 +1,19 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs000_characterization.py",
+    "--basetemp=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs014-after-work\\temp-characterization",
+    "--junitxml=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs014-after\\pytest-characterization.xml"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs014-after-work",
+  "returncode": 0,
+  "stdout": ".........x..                                                             [100%]\n=========================== short test summary info ===========================\nXFAIL tests/test_hfs000_characterization.py::test_failed_check_must_retain_dcr_above_one - known defect: F-09: FAIL is published with dcr=1.0 after rounding\n11 passed, 1 xfailed in 4.24s\n",
+  "stderr": ""
+}

@@ -1,0 +1,17 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_hfs014_summary_bundle.py",
+    "-q",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=.venv/hfs014-targeted-temp"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "exit": 0,
+  "stdout": "........................................................................ [100%]\n72 passed in 24.61s\n",
+  "stderr": ""
+}

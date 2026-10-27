@@ -4,6 +4,7 @@ from typing import List, Literal
 from pydantic import BaseModel, Field, computed_field, model_validator
 
 from .models import CheckResult, CheckStatus
+from .domain.errors import ValidationError
 
 
 class AnalysisStatus(str, Enum):
@@ -99,7 +100,12 @@ class EngineResult(BaseModel):
 
 
 def aggregate_case_statuses(statuses: List[AnalysisStatus]) -> AnalysisStatus:
-    """Propagate case incompleteness; empty-bundle legacy policy remains HFS-014."""
+    """Aggregate actual cases; an empty bundle has no compliance result."""
+    if not statuses:
+        raise ValidationError(
+            "A case bundle must contain at least one case.", code="EMPTY_CASE_BUNDLE",
+            details={"field": "cases", "minimum_items": 1, "received_items": 0},
+        )
     if AnalysisStatus.INCOMPLETE in statuses:
         return AnalysisStatus.INCOMPLETE
     return AnalysisStatus.FAIL if AnalysisStatus.FAIL in statuses else AnalysisStatus.PASS

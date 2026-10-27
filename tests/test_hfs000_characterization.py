@@ -134,13 +134,15 @@ def test_duplicate_sections_must_be_rejected():
     assert [record.area for record in repo.get_all()] == [100, 200]
 
 
-@known_defect("F-05: summary compares force and moment magnitudes")
+# HFS-014: F-05 corrected; keep the dimensional counterexample as a regression.
 def test_mixed_dimension_summary_must_not_report_scalar_minimum():
     checks = [CheckResult(name="axial", clause="E3-1", demand=90, capacity=100, dcr=.9, status="PASS"),
               CheckResult(name="flexure", clause="F2-1", demand=1, capacity=50, dcr=.02, status="PASS")]
     summary = _build_global_summary(EngineResult(checks=checks, status="PASS"))
     print(summary)
-    assert summary.get("governing_capacity_kn_or_knm") is None
+    assert "governing_capacity_kn_or_knm" not in summary
+    assert summary["max_dcr_published"] == .9
+    assert [c["check_index"] for c in summary["observed_governing_checks"]] == [0]
 
 
 @known_defect("F-09: FAIL is published with dcr=1.0 after rounding")
@@ -154,7 +156,7 @@ def test_failed_check_must_retain_dcr_above_one():
     assert check.status.value == "FAIL" and check.dcr > 1
 
 
-@known_defect("F-29: empty CLI bundle returns PASS")
+# HFS-014: F-29 is an input error, never a compliance result.
 def test_empty_bundle_must_not_pass(tmp_path):
     path = tmp_path / "empty.json"
     path.write_text('{"cases": []}', encoding="utf-8")
@@ -163,10 +165,9 @@ def test_empty_bundle_must_not_pass(tmp_path):
                                "--results-dir", str(tmp_path / "results")],
                               cwd=ROOT, capture_output=True, text=True, check=False)
     print(completed.stdout, completed.stderr)
-    if completed.returncode != 0:
-        assert json.loads(completed.stderr)["error"]
-        return
-    assert json.loads(completed.stdout)["status"] != "PASS"
+    assert completed.returncode == 1 and not completed.stdout
+    assert json.loads(completed.stderr)["error"]["code"] == "EMPTY_CASE_BUNDLE"
+    assert not (tmp_path / "results").exists()
 
 
 # HFS-010: explicit zero demand has no accredited resistance scope.

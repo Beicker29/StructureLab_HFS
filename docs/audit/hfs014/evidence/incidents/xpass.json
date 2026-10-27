@@ -1,0 +1,18 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_hfs000_characterization.py",
+    "-k",
+    "mixed_dimension_summary or empty_bundle",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=.venv/hfs014-xpass-temp"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "exit": 1,
+  "stdout": "FF                                                                       [100%]\n================================== FAILURES ===================================\n_________ test_mixed_dimension_summary_must_not_report_scalar_minimum _________\n[XPASS(strict)] known defect: F-05: summary compares force and moment magnitudes\n---------------------------- Captured stdout call -----------------------------\n{'version': 'HFS-014-v1', 'overall_status': 'INCOMPLETE', 'scope': 'executed_checks_only', 'description': 'Observed governing checks among executed checks; not a definitive governing limit state for the structure.', 'ranking_basis': 'published_dcr; exact ties retained; raw DCR not reconstructed', 'eligibility_basis': 'provisional_numeric_checks_without_coverage', 'max_dcr_published': 0.9, 'observed_governing_checks': [{'check_index': 0, 'clause': 'E3-1', 'name': 'axial', 'dcr_published': 0.9, 'status': 'PASS'}], 'failed_checks': [], 'excluded_checks': []}\n_______________________ test_empty_bundle_must_not_pass _______________________\n[XPASS(strict)] known defect: F-29: empty CLI bundle returns PASS\n---------------------------- Captured stdout call -----------------------------\n {\n  \"error\": {\n    \"type\": \"ValidationError\",\n    \"message\": \"A case bundle must contain at least one case.\",\n    \"stage\": \"run_engine\",\n    \"code\": \"EMPTY_CASE_BUNDLE\",\n    \"details\": {\n      \"field\": \"cases\",\n      \"minimum_items\": 1,\n      \"received_items\": 0\n    }\n  }\n}\n\n=========================== short test summary info ===========================\nFAILED tests/test_hfs000_characterization.py::test_mixed_dimension_summary_must_not_report_scalar_minimum\nFAILED tests/test_hfs000_characterization.py::test_empty_bundle_must_not_pass\n2 failed, 10 deselected in 2.51s\n",
+  "stderr": ""
+}

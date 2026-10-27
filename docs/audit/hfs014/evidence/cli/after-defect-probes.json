@@ -1,0 +1,75 @@
+{
+  "F05": {
+    "checks": [
+      {
+        "name": "axial",
+        "code": "AISC 360-22",
+        "clause": "E3-1",
+        "demand": 90.0,
+        "capacity": 100.0,
+        "dcr": 0.9,
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "flexure",
+        "code": "AISC 360-22",
+        "clause": "F2-1",
+        "demand": 1.0,
+        "capacity": 50.0,
+        "dcr": 0.02,
+        "status": "PASS",
+        "details": null
+      }
+    ],
+    "summary": {
+      "version": "HFS-014-v1",
+      "overall_status": "INCOMPLETE",
+      "scope": "executed_checks_only",
+      "description": "Observed governing checks among executed checks; not a definitive governing limit state for the structure.",
+      "ranking_basis": "published_dcr; exact ties retained; raw DCR not reconstructed",
+      "eligibility_basis": "provisional_numeric_checks_without_coverage",
+      "max_dcr_published": 0.9,
+      "observed_governing_checks": [
+        {
+          "check_index": 0,
+          "clause": "E3-1",
+          "name": "axial",
+          "dcr_published": 0.9,
+          "status": "PASS"
+        }
+      ],
+      "failed_checks": [],
+      "excluded_checks": []
+    }
+  },
+  "F29_direct": {
+    "error": {
+      "type": "ValidationError",
+      "code": "EMPTY_CASE_BUNDLE",
+      "message": "A case bundle must contain at least one case.",
+      "details": {
+        "field": "cases",
+        "minimum_items": 1,
+        "received_items": 0
+      }
+    }
+  },
+  "F29_cli": {
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+      "-m",
+      "src.steel_design.run",
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\14ca\\empty.json",
+      "--sections",
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs014-after-work\\data\\sections.xlsx",
+      "--results-dir",
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\14ca\\empty-results"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs014-after-work",
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "{\n  \"error\": {\n    \"type\": \"ValidationError\",\n    \"message\": \"A case bundle must contain at least one case.\",\n    \"stage\": \"run_engine\",\n    \"code\": \"EMPTY_CASE_BUNDLE\",\n    \"details\": {\n      \"field\": \"cases\",\n      \"minimum_items\": 1,\n      \"received_items\": 0\n    }\n  }\n}\n"
+  },
+  "F29_created_output_directory": false
+}
