@@ -173,26 +173,88 @@ def _classify_element(value: float, compact_limit: float, noncompact_limit: floa
     return "slender"
 
 
+def _flexure_ratio(section: Section, field: str, width: str, thickness: str,
+                   divisor: float, limits: Tuple[float, float]) -> float:
+    """Resolve a B4.1 ratio; absence is not compactness or permission to repair data.
+
+    Dimensions must have their B4.1 meaning (in particular h excludes fillets).
+    Supplied ratios remain authoritative when rounded geometry agrees in class.
+    A contradictory classification blocks selection without a numerical tolerance.
+    """
+    value = getattr(section, field)
+    dimensions = {name: getattr(section, name) for name in (width, thickness)}
+    invalid = [name for name, number in {field: value, **dimensions}.items()
+               if number is not None and (isinstance(number, bool)
+                   or not isinstance(number, (int, float))
+                   or not math.isfinite(number) or number <= 0)]
+    derived = None
+    if not invalid and all(number is not None for number in dimensions.values()):
+        derived = dimensions[width] / dimensions[thickness] / divisor
+        if not math.isfinite(derived) or derived <= 0:
+            invalid.append(f"{width}/{thickness}")
+    reason = None
+    state = "INVALID" if invalid else "MISSING"
+    if invalid:
+        reason = "Nonpositive, nonfinite or invalid slenderness data cannot establish compactness."
+    elif value is None and derived is None:
+        reason = "Slenderness is absent and cannot be derived from explicit B4.1 dimensions."
+    elif value is not None and derived is not None and (
+            _classify_element(value, *limits) != _classify_element(derived, *limits)):
+        state = "INCONSISTENT"
+        reason = "Supplied ratio and explicit dimensions imply different B4.1b classes."
+    if reason:
+        raise IncompleteSectionDataError(reason, details={
+            "section": section.name, "profile_type": section.type,
+            "rule_id": "ChapterFSelection", "component": "Mux", "state": state,
+            "ratio": field, "supplied": value, "derived": derived,
+            "dimensions": dimensions, "divisor": divisor,
+            "missing_fields": [field] if value is None else [], "invalid_fields": invalid,
+            "reference": "ANSI/AISC 360-22 B4.1, Table B4.1b cases 10/15; F2-F5",
+        })
+    return value if value is not None else derived
+
+
 def _w_or_channel_major_flexure_selection(case: SteelCase, section: Section) -> Optional[str]:
     if not _has_major_flexure(case, section):
         return None
 
     fy = case.material.Fy
     e = case.material.E
-    sqrt_ratio = math.sqrt(e / fy) if min(e, fy) > 0.0 else 0.0
-    flange_ratio = _safe_ratio(section.bf_2tf_ratio)
-    web_ratio = _safe_ratio(section.h_tw_ratio)
-    if min(flange_ratio, web_ratio) <= 0.0:
-        return "F2"
-
-    flange_class = _classify_element(flange_ratio, 0.38 * sqrt_ratio, 1.0 * sqrt_ratio)
-    web_class = _classify_element(web_ratio, 3.76 * sqrt_ratio, 5.70 * sqrt_ratio)
     profile = section.type.upper()
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+               and math.isfinite(v) and v > 0 for v in (e, fy)):
+        raise IncompleteSectionDataError("Finite positive E and Fy are required for B4.1b.",
+                                        details={"rule_id": "ChapterFSelection", "component": "Mux",
+                                                 "state": "INVALID", "invalid_fields": ["E", "Fy"]})
+    modulus_ratio = e / fy
+    if not math.isfinite(modulus_ratio) or modulus_ratio <= 0:
+        raise IncompleteSectionDataError("E/Fy is outside the finite positive floating-point range.",
+                                        details={"rule_id": "ChapterFSelection", "component": "Mux",
+                                                 "state": "INVALID", "invalid_fields": ["E/Fy"]})
+    sqrt_ratio = math.sqrt(modulus_ratio)
+    flange_limits = (0.38 * sqrt_ratio, 1.0 * sqrt_ratio)
+    web_limits = (3.76 * sqrt_ratio, 5.70 * sqrt_ratio)
+    # B4.1a(a)/(b): half-width for I shapes, FULL flange width for channels.
+    flange_ratio = _flexure_ratio(section, "b_t_ratio" if profile == "CHANNEL" else "bf_2tf_ratio",
+                                  "bf", "tf", 1.0 if profile == "CHANNEL" else 2.0, flange_limits)
+    web_ratio = _flexure_ratio(section, "h_tw_ratio", "h", "tw", 1.0, web_limits)
+    if ((section.bf is not None and section.tw is not None and section.bf <= section.tw)
+            or (all(v is not None for v in (section.h, section.d, section.tf))
+                and section.h > section.d - 2 * section.tf)):
+        raise IncompleteSectionDataError("Flange/web geometry is physically inconsistent.", details={
+            "section": section.name, "rule_id": "ChapterFSelection", "component": "Mux",
+            "state": "INCONSISTENT", "required": "bf > tw and h <= d - 2tf; h excludes fillets"})
+    flange_class = _classify_element(flange_ratio, *flange_limits)
+    web_class = _classify_element(web_ratio, *web_limits)
 
     if profile == "CHANNEL":
         if flange_class == "compact" and web_class == "compact":
             return "F2"
-        return None
+        raise RuleNotImplementedError("Channel major-axis flexure outside compact F2 scope.", details={
+            "section": section.name, "profile_type": profile, "rule_id": "ChapterFSelection",
+            "component": "Mux", "state": "UNSUPPORTED", "flange_class": flange_class,
+            "web_class": web_class, "flange_ratio": flange_ratio, "web_ratio": web_ratio,
+            "reference": "ANSI/AISC 360-22 B4.1b cases 10/15; F2; F3-F5 apply to I shapes"})
 
     if web_class == "compact" and flange_class == "compact":
         return "F2"
@@ -762,7 +824,12 @@ class ProfileRouter:
         return rules
 
     @classmethod
-    def get_rules(cls, case: SteelCase, section: Section) -> List:
+    def get_rules(cls, case: SteelCase, section: Section, selection_errors: Optional[List[dict]] = None) -> List:
+        """Collect W/channel flexure selection errors only when the caller requests it.
+
+        Engine coverage retains these errors while independent checks can run.
+        The default two-argument interface remains strict; no shared router state.
+        """
         if case.composite is not None:
             return cls._get_composite_rules(case, section)
 
@@ -775,6 +842,16 @@ class ProfileRouter:
 
         active_rules = []
         active_rule_ids: List[str] = []
+        major_branch = None
+        flexure_blocked = False
+        if profile_type in {"W", "CHANNEL"} and _has_major_flexure(case, section):
+            try:
+                major_branch = _w_or_channel_major_flexure_selection(case, section)
+            except (IncompleteSectionDataError, RuleNotImplementedError) as exc:
+                if selection_errors is None:
+                    raise
+                selection_errors.append({"implementation": "ProfileRouter", "error": exc.to_dict()})
+                flexure_blocked = True
         e7_applicable = cls._is_e7_applicable(case, section)
         for rule_id in PROFILE_RULE_MAP[profile_type]:
             definition = RULE_DEFINITIONS.get(rule_id)
@@ -784,16 +861,28 @@ class ProfileRouter:
             if rule_id == "E7" and not e7_applicable:
                 continue
 
-            if not definition.applicability(case, section):
+            if profile_type in {"W", "CHANNEL"} and rule_id.split("-")[0] in {"F2", "F3", "F4", "F5"}:
+                if rule_id.split("-")[0] != major_branch:
+                    continue
+            elif not definition.applicability(case, section):
                 continue
 
             if not definition.implemented or definition.rule_class is None:
                 cls._raise_not_implemented(rule_id, section)
 
             required_fields = cls._required_fields(section, rule_id, definition)
-            cls._validate_section_fields(section, rule_id, required_fields)
+            try:
+                cls._validate_section_fields(section, rule_id, required_fields)
+            except IncompleteSectionDataError as exc:
+                if selection_errors is None or profile_type not in {"W", "CHANNEL"} or not rule_id.startswith("F"):
+                    raise
+                exc.details["component"] = "Muy" if rule_id.startswith("F6") else "Mux"
+                selection_errors.append({"implementation": "ProfileRouter", "error": exc.to_dict()})
+                flexure_blocked = True
+                continue
             active_rules.append(definition.rule_class())
             active_rule_ids.append(rule_id)
 
-        cls._validate_flexure_selection(case, section, active_rule_ids)
+        if not flexure_blocked:
+            cls._validate_flexure_selection(case, section, active_rule_ids)
         return active_rules

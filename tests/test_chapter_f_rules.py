@@ -41,10 +41,11 @@ class ChapterFRoutingAndRulesTests(unittest.TestCase):
             Sy=500.0e3,
             Zx=2200.0e3,
             Zy=700.0e3,
-            bf=250.0,
+            # HFS-012: keep the declared class, with consistent synthetic geometry.
+            bf=2.0 * 16.0 * flange_ratio,
             tf=16.0,
             tw=10.0,
-            h=500.0,
+            h=10.0 * web_ratio,
             rx=90.0,
             ry=55.0,
             J=4000.0e3,

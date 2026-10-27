@@ -52,6 +52,12 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+HFS-012 añade `tests/test_hfs012_flexure_selection.py` como sexta suite separada:
+pasar también `--extra-suite tests/test_hfs012_flexure_selection.py` al capturador.
+No usar `--coverage-transition` para esta corrección: los ejemplos existentes
+deben conservarse íntegros; las diferencias dirigidas de selección se contrastan
+con sondas antes/después. [Reproducción y evidencia](docs/audit/hfs012/report.md).
+
 HFS-010 añade una quinta suite: `tests/test_hfs010_coverage.py`, separada también
 de la original. Pasar `--extra-suite` para HFS-016 y HFS-010 al capturador, además
 de `--coverage-transition`: esta opción exige igualdad exacta de checks/trazas y

@@ -1,5 +1,10 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Entrega HFS-012 (2026-10-27):** corrección acotada de selección F2 presentada
+para revisión en [informe](audit/hfs012/report.md). Base `main` con HFS-010/011/016;
+cambios locales sin commit ni push por instrucción del usuario. Se conserva la
+prioridad de F-31 y no se avanza a otro hito. Las notas siguientes son históricas.
+
 **Actualización HFS-010 (2026-10-27):** HFS-000/001/002/011/016 concluidas dentro de
 sus alcances. Control mínimo de cobertura implementado en la rama
 `hfs-010-coverage-gate`: [informe](audit/hfs010/report.md) y
@@ -131,7 +136,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-002 | 0 | Matriz *familia × demandas × condiciones × estados límite* | 000 | Identifica todos los huecos y casos no implementados; revisión ingenieril requerida. |
 | HFS-010 | 1 | Cierre de cobertura y estados de resultado `INCOMPLETE` | 002 | Implementada: obligaciones independientes, INCOMPLETE y FAIL conocidos preservados. [Pruebas y límites](audit/hfs010/report.md). Cero checks, obligaciones ausentes y métodos no soportados no acreditan PASS. |
 | HFS-011 | 1 | Endurecer Pydantic: campos extra, faltantes, finitud, dominios | 000 | Implementada para revisión antes de HFS-010 por autorización expresa; [evidencia y rupturas](audit/hfs011/report.md). Typos, NaN, inf, dominios y cortantes contradictorios rechazados; sin validación AISC exhaustiva. |
-| HFS-012 | 1 | Corregir fallback indebido de F2 por esbeltez ausente | 010,011 | Falta de `bf/2tf` o `h/tw` no puede clasificar sección compacta automáticamente. |
+| HFS-012 | 1 | Corregir fallback indebido de F2 por esbeltez ausente | 010,011 | Implementada para revisión: ausencia no implica compacidad; derivación explícita B4.1 o bloqueo, ancho completo del canal, pendientes HFS-010 y regresiones. [Informe](audit/hfs012/report.md). |
 | HFS-013 | 1 | Revisar convenciones `Pu,Mux,Muy,Vux,Vuy,Vu,Tu`, ejes y capacidades de cortante H3 | 011 | Ensayos direccionales no confunden ejes; si norma/caso no cubierto -> INCOMPLETE. |
 | HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | DCR gobernante con dimensión válida, `cases=[]` rechazado. |
 | HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Decisiones no cambian por redondeo; avisos no se confunden con incumplimientos. |
@@ -230,4 +235,8 @@ Criterio de aceptación: baseline reproducible, evidencias de pruebas reales, ma
 
 Una reescritura de módulo solo se permite si se demuestra al menos una de estas condiciones: (a) defectos sistémicos no corregibles localmente, (b) múltiples duplicaciones semánticas difíciles de mantener, (c) trazabilidad no representable sin rediseño, o (d) incompatibilidad persistente con validación reproducible. Antes de reescribir: ensayo de caracterización, oráculo de referencia, mapa de migración y rollback.
 
-**Prioridad inmediata:** publicar/fusionar HFS-010 según la instrucción actual del usuario y someterla a revisión técnica posterior. No iniciar otras tareas sin autorización. HFS-011/016 concluidas dentro de sus alcances. Los nuevos dominios incompletos deben bloquearse por cobertura antes de su reparación normativa profunda. La app web se inicia únicamente después de la puerta G1.
+**Prioridad inmediata:** revisar técnicamente la entrega HFS-012. La base `main`
+ya incorpora HFS-010/011/016 según la instrucción del usuario; HFS-012 queda
+local, sin commit ni push automáticos. No iniciar otras tareas sin autorización.
+Los nuevos dominios incompletos deben bloquearse por cobertura antes de su
+reparación normativa profunda. La app web se inicia únicamente después de G1.

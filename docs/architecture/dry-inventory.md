@@ -98,3 +98,19 @@ No usar este inventario como autorización de refactorización. Primero resolver
 Antes de consolidar: enumerar consumidores, fijar dominio/unidades/factores, seleccionar propietario, comparar cada salida y traza, aportar oráculo independiente si afecta cálculo, conservar ID de ecuación/estado límite, explicar divergencias esperadas y retirar la copia solo tras verificar consumidores. Mantener funciones de cláusulas distintas si la equivalencia sigue sin demostrar.
 
 Este inventario cubre las duplicaciones representativas inspeccionadas; no es una prueba exhaustiva de todas las ecuaciones ni el plan de cobertura de HFS-002. La fuente única reduce divergencias, pero no garantiza que la fuente sea correcta: por eso permanecen las validaciones independientes.
+
+## Aplicación acotada HFS-012
+
+DRY-09/18: el selector existente sigue siendo el propietario de la selección
+F2–F5. `_flexure_ratio` resuelve datos dentro de ese mismo módulo y reutiliza
+`_classify_element`; no hay segundo clasificador ni motor. La selección mayor
+se resuelve una vez por llamada del router. El loader no cambia: su derivación
+de columnas es importación; el selector contrasta el significado B4.1 y no
+rellena Section ni el catálogo. La consolidación general de geometrías y de
+clasificación entre router/evaluadores permanece pendiente, sin mezclar E/F/I.
+
+`coverage_evidence.record_selection_errors` solo vincula diagnósticos a
+obligaciones ya construidas por el plan independiente; no calcula límites ni
+genera requisitos desde el router. CLI consume el resultado común. El beneficio
+concreto es conservar checks independientes sin perder la causa de una demanda
+no evaluada. Pruebas numéricas y límites en [informe HFS-012](../audit/hfs012/report.md).

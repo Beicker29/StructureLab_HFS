@@ -78,7 +78,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
             check=False,
         )
 
-    def test_cli_fails_hard_for_incomplete_catalog_data(self):
+    def test_cli_reports_incomplete_for_unknown_flexure_selection(self):
         with _temporary_test_dir() as tmp:
             sections_path = tmp / "sections.xlsx"
             case_path = tmp / "case.json"
@@ -89,11 +89,19 @@ class EngineCliIntegrationTests(unittest.TestCase):
             )
             _write_case(case_path, pu=0.0, mux=200.0, muy=0.0, vu=0.0)
 
-            completed = self._run_cli(case_path, sections_path)
+            completed = self._run_cli(case_path, sections_path, tmp / "results")
 
-            self.assertNotEqual(0, completed.returncode)
-            self.assertIn('"code": "INCOMPLETE_SECTION_DATA"', completed.stderr)
-            self.assertIn('"stage": "run_engine"', completed.stderr)
+            # HFS-012: no guessed F2, and the shared coverage result explains why.
+            self.assertEqual(0, completed.returncode, completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("INCOMPLETE", payload["status"])
+            self.assertEqual([], payload["checks"])
+            self.assertFalse(payload["coverage"]["complete"])
+            error = payload["coverage"]["evaluation_errors"][0]["error"]
+            self.assertEqual("INCOMPLETE_SECTION_DATA", error["code"])
+            self.assertEqual("Mux", error["details"]["component"])
+            detail = json.loads(Path(payload["artifacts"]["detailed_results_json"]).read_text(encoding="utf-8"))
+            self.assertEqual(payload["coverage"], detail["output"]["coverage"])
 
     def test_cli_returns_json_for_supported_shear_case(self):
         with _temporary_test_dir() as tmp:
