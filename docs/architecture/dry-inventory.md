@@ -14,6 +14,16 @@ Fecha: 2026-10-26. Base inspeccionada: `dae8d76507810362c4e31484a00b8d664525f2e6
 
 ## Propietarios por responsabilidad
 
+Actualización HFS-016 (2026-10-27, para revisión): `sections/identity.py::section_identity`
+es la única política de nombres para importación y consulta. `SectionRepository`
+conserva registros por identidad y decide unicidad; `SectionSource` define la
+procedencia, que aporta el loader. Motor y CLI consumen `get`, sin otra selección.
+Se sustituyen las dos conversiones de nombre independientes del loader/repositorio
+por esa función; las conversiones de familia y nombres de reportes no son identidad.
+No se añaden servicios ni dependencias. Mapa de consumidores, compatibilidad y
+pruebas antes/después: [contrato](../contracts/hfs016-catalog.md) e
+[informe](../audit/hfs016/report.md). Las demás consolidaciones siguen pendientes.
+
 Esta tabla es el mapa canónico de propiedad arquitectónica; los ADR explican sus razones. «Objetivo» designa responsabilidad, no una nueva carpeta/clase obligatoria.
 
 | Concepto | Fuente actual que se conserva | Fuente canónica objetivo y consumidores |

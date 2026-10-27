@@ -1,4 +1,7 @@
 import re
+import hashlib
+from io import BytesIO
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import openpyxl
@@ -6,7 +9,8 @@ from pydantic import TypeAdapter, ValidationError as PydanticValidationError
 from ..input_contracts import FiniteNumber
 
 from ..domain.errors import CatalogSchemaError
-from .models import Section
+from .models import Section, SectionSource
+from .identity import section_identity
 
 _CATALOG_NUMBER = TypeAdapter(FiniteNumber)
 
@@ -264,7 +268,10 @@ def load_sections_from_excel(filepath: str) -> List[Section]:
     Loads sections from all profile sheets in sections.xlsx.
     Strict mode: schema and parsing issues raise CatalogSchemaError.
     """
-    workbook = openpyxl.load_workbook(filepath, data_only=True)
+    # Hash precisely the bytes parsed, not a second read of a changing file.
+    source_bytes = Path(filepath).read_bytes()
+    source_hash = hashlib.sha256(source_bytes).hexdigest()
+    workbook = openpyxl.load_workbook(BytesIO(source_bytes), data_only=True)
     profile_sheets = [sheet for sheet in workbook.sheetnames if sheet.strip().upper() != "README"]
     if not profile_sheets:
         raise CatalogSchemaError(
@@ -291,11 +298,12 @@ def load_sections_from_excel(filepath: str) -> List[Section]:
 
         for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
             shape_index = required_columns["shape"]
-            raw_shape = _clean_value(row[shape_index]) if shape_index is not None else None
+            original_shape = row[shape_index] if shape_index is not None else None
+            raw_shape = _clean_value(original_shape)
             if raw_shape is None:
                 continue
 
-            section_name = str(raw_shape).upper()
+            section_name = section_identity(str(original_shape))
             # WT profiles are intentionally excluded from this repository scope.
             if section_name.startswith("WT"):
                 continue
@@ -337,6 +345,8 @@ def load_sections_from_excel(filepath: str) -> List[Section]:
             try:
                 section = Section(
                     name=section_name,
+                    source=SectionSource(file=str(Path(filepath).resolve()), sha256=source_hash,
+                                         sheet=sheet_name, row=row_number, original_name=str(original_shape)),
                     type=section_type,
                     A=field_values["area"],
                     d=field_values["d"],
