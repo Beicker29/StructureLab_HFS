@@ -1,4 +1,4 @@
-# Seguimiento maestro de hallazgos — HFS-011
+# Seguimiento maestro de hallazgos — HFS-016
 
 Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
 
@@ -18,7 +18,7 @@ Estado: hallazgos abiertos, con F-04 implementado para revisión contractual y a
 | F-10 | P0 | Parcial HFS-011: finitud en modelos/parser, dominios y sección seleccionada; NaN axial corregido | HFS-011/040 | Calidad/coherencia completa del catálogo y extremos numéricos pendientes; no cierre global |
 | F-11 | P1 | Etiquetas invertidas observadas; física pendiente | HFS-013/033 | Correspondencia matemática eje/demanda/capacidad |
 | F-12 | P1 | Selección ID observada; significado físico pendiente | HFS-033/040 | D/t contrastado con fuente y geometría real |
-| F-13 | **P0** | Duplicados reales de geometría diferente, sobrescritura confirmada; mitigación acordada antes de G1 | HFS-016 acotada; alcance completo HFS-040 | Identidad ambigua no puede seleccionar geometría silenciosamente; catálogo contrastado; no corregido ahora |
+| F-13 | **P0** | Sobrescritura corregida y cierre funcional demostrado en HFS-016; pendiente revisión del PR | HFS-016 entregada; calidad integral HFS-040 | get rechaza identidades repetidas con todos los candidatos/procedencia; no se decide qué geometría es correcta. [Evidencia](hfs016/report.md) |
 | F-14 | P1 | Fallback de escala observado; impacto por fuente pendiente | HFS-040 | Unidades de importación inequívocas y pruebas dimensionales |
 | F-15 | P1 | Geometría custom duplicada | HFS-021; DRY-05 | Un constructor consumido por cálculo y reporte, equivalencia probada |
 | F-16 | P1 | CLI con responsabilidades mezcladas | HFS-021/024 | Ejecución/reportes separados con propósito, sin otro motor |
@@ -51,7 +51,7 @@ Las reproducciones, archivos/símbolos y salidas de F-01 a F-32 están en [findi
 
 **F-13: recomendar P0.** HFS-000 observó HEA 100 duplicado con A=2124/2534 mm² y d=96/114 mm; se retiene la última entrada según el orden, sin aviso. Esto compromete qué geometría se calcula aun con fórmulas correctas. [catalog-duplicates.json](catalog-duplicates.json) preserva ambas. No se sabe cuál nombre/fila es correcto; renombrar automáticamente sería otra hipótesis. PTEXXMM de área cero añade riesgo de calidad, pero no prueba una capacidad incorrecta en cada caso.
 
-Acuerdo documental HFS-002: se registra **HFS-016**, fase 1, dependencias 000/001, antes de G1, como mitigación estrecha de identificación/rechazo de F-13. HFS-040 conserva importación canónica completa. No se implementa HFS-016 ahora. Rechazar duplicados globalmente podría impedir cargar ejemplos: exige diseño y prueba de transición, no un arreglo incidental. Prioridad P0 ratificada para este seguimiento por la ubicación acordada antes de G1; la solución técnica sigue pendiente.
+Acuerdo documental HFS-002: se registra **HFS-016**, fase 1, dependencias 000/001, antes de G1, como mitigación estrecha de identificación/rechazo de F-13. HFS-040 conserva importación canónica completa. Actualización HFS-016: implementada para revisión con rechazo por identidad al consultar, conservando el resto del catálogo. Se demuestra el cierre funcional de la sobrescritura (F-13); no se acredita cuál geometría es correcta ni la calidad integral HFS-040. Prioridad P0 histórica conservada. Ver [informe](hfs016/report.md).
 
 **F-31 permanece P0:** omite una componente y puede declarar PASS; la sonda es sintética, por lo que confirmar su impacto en perfiles reales sigue pendiente. **F-32 permanece P1:** exit 0 no significa por sí mismo defecto de cálculo; preservarlo y exigir lectura del JSON es compatible con el contrato actual. Cualquier nueva semántica se revisará con sus consumidores.
 
@@ -68,3 +68,18 @@ Para cerrar un ID registrar tarea/commit, reproducción previa, resultado poster
 Las cuatro pruebas ahora pasan como regresión de seguridad. F-02 **no está cerrado**: se agrega reproducción explícita `loads={"Pu":0}` que sigue PASS sin checks, con xfail estricto del mismo defecto. Caracterización final: 4 aprobadas + 8 xfail (7 anteriores + esa reproducción residual). F-01/03/05/09/13/29/31 permanecen visibles. F-04 queda implementado para revisión del contrato parcial (omisión declarada=0, no desconocido). F-08/10/22 conservan los pendientes de sus filas. Ningún cierre ingenieril global aprobado.
 
 Las dos pruebas originales de rechazo del motor para U>1 y xa<0 construyen ahora un objeto válido y lo alteran mediante model_copy: construir directamente esos valores ya falla en Pydantic. Mantienen la expectativa de rechazo en el motor; pruebas nuevas verifican también el rechazo temprano. No hay ecuaciones/capacidades/interacción modificadas ni validación ingenieril declarada.
+
+
+### HFS-016 — integridad mínima, entregada para revisión
+
+HFS-011 aprobada por el usuario antes de esta tarea; sus informes permanecen históricos.
+F-13 reproducido antes: HEA 100 cambia de A=2534/d=114 a A=2124/d=96 al invertir
+la carga; después ambas consultas rechazan con `AMBIGUOUS_SECTION`. Se retienen
+1228 registros y 1223 identidades; 1221 son únicas recuperables. HEA 100 y PTEXXMM
+quedan bloqueadas con hoja/fila/hash y todas sus propiedades. No se corrigen filas.
+El test F-13 pasa sin xfail tras adaptar su expectativa al rechazo en get;
+caracterización final: 5 aprobadas y 7 xfail estrictos. Las otras expectativas
+congeladas y evidencias HFS-000/011 no se modifican. Los 12 ejemplos conservan
+resultados exactos. [Pruebas, compatibilidad y riesgos](hfs016/report.md).
+El cierre técnico de F-13 requiere revisión humana del PR; F-10/14/27 y HFS-040
+siguen abiertos en su alcance residual. No se inicia HFS-010 ni otra tarea.

@@ -38,6 +38,12 @@ class CatalogSchemaError(SteelDesignError):
     default_code = "CATALOG_SCHEMA_ERROR"
 
 
+class AmbiguousSectionError(SteelDesignError):
+    """More than one catalog record has the requested identity."""
+
+    default_code = "AMBIGUOUS_SECTION"
+
+
 class RuleNotImplementedError(SteelDesignError):
     """Raised when a required AISC rule is not implemented in the engine."""
 

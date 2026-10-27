@@ -12,7 +12,7 @@ import sys
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from src.steel_design.domain.errors import SteelDesignError
+from src.steel_design.domain.errors import AmbiguousSectionError, SteelDesignError
 from src.steel_design.engine import SteelDesignEngine
 from src.steel_design.models import CheckResult, Loads, SteelCase
 from src.steel_design.results_model import EngineResult
@@ -120,15 +120,14 @@ def test_conflicting_shear_must_be_rejected():
     assert False, "Contradictory shear inputs were accepted"
 
 
-@known_defect("F-13: duplicate section silently replaces prior properties")
+# HFS-016: F-13 rejection is at selection, preserving every loaded record.
 def test_duplicate_sections_must_be_rejected():
     repo = SectionRepository()
-    try:
-        repo.load([Section(name="duplicate", A=100), Section(name="DUPLICATE", A=200)])
-    except SteelDesignError:
-        return
-    print({"count": len(repo.get_all()), "retained_area": repo.get("duplicate").area})
-    assert len(repo.get_all()) == 2, "Duplicate silently collapsed without error"
+    repo.load([Section(name="duplicate", A=100), Section(name="DUPLICATE", A=200)])
+    with pytest.raises(AmbiguousSectionError) as caught:
+        repo.get("duplicate")
+    assert caught.value.code == "AMBIGUOUS_SECTION"
+    assert [record.area for record in repo.get_all()] == [100, 200]
 
 
 @known_defect("F-05: summary compares force and moment magnitudes")

@@ -53,6 +53,17 @@ HFS-002 fue aceptada como matriz documental y diagnóstico; no como validación
 normativa exhaustiva. HFS-010 sigue pendiente: entradas válidas no garantizan
 cobertura completa y un PASS actual no certifica cumplimiento global AISC.
 
+## Integridad del catálogo (HFS-016)
+
+Los nombres se consultan con una política única de mayúsculas y espacios ASCII.
+Una identidad repetida, incluso con propiedades iguales, produce
+`AMBIGUOUS_SECTION` al seleccionarla (CLI: exit 1), sin elegir una fila.
+`HEA 100` y `PTEXXMM` quedan bloqueados; los demás perfiles siguen disponibles,
+sujetos a la validación física de HFS-011. El Excel se conserva sin correcciones.
+Consultar [contrato y migración del repositorio](docs/contracts/hfs016-catalog.md)
+y [informe, pruebas y límites](docs/audit/hfs016/report.md). HFS-016 está entregada
+para revisión; no acredita el catálogo completo ni habilita HFS-010.
+
 ## Uso CLI
 
 ```bash
