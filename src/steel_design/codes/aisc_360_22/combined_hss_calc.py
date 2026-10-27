@@ -1,3 +1,4 @@
+from ...design_methods import require_design_method
 import math
 from typing import Dict, Optional
 
@@ -160,10 +161,10 @@ def calculate_available_torsional_strength(*, tn_nmm: float, design_method: str,
     """
     Converts Tn from N*mm to available torsional strength in kN-m.
     """
+    method = require_design_method(design_method)
     tn = _positive(tn_nmm)
     if tn <= 0.0:
         return 0.0
-    method = (design_method or "").upper()
     if method == "LRFD":
         return _positive(phi_t) * tn / 1_000_000.0
     omega = _positive(omega_t)

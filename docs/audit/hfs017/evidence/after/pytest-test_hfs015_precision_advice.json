@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs015_precision_advice.py",
+    "--basetemp=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\17aw\\temp-test_hfs015_precision_advice",
+    "--junitxml=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\17a\\pytest-test_hfs015_precision_advice.xml"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\17aw",
+  "returncode": 0,
+  "stdout": "........................................................................ [ 85%]\n............                                                             [100%]\n84 passed in 2.81s\n",
+  "stderr": ""
+}

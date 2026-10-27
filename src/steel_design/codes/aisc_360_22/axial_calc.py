@@ -1,3 +1,4 @@
+from ...design_methods import require_design_method
 import math
 from typing import Dict, Optional
 
@@ -93,18 +94,26 @@ def calculate_Pn(Fcr: float, Ag: float) -> float:
     return Fcr * Ag
 
 
+def compression_design_factor(method: str) -> dict:
+    method = require_design_method(method).value
+    if method == "LRFD":
+        return {"design_method": method, "phi": 0.90, "omega": None, "capacity_expression": "phi*Pn"}
+    return {"design_method": method, "phi": None, "omega": 1.67, "capacity_expression": "Pn/omega"}
+
+
 def calculate_available_compressive_strength(Pn: float, method: str) -> float:
     """
     Converts Pn (N) to available compressive strength (kN).
     LRFD: phi_c = 0.90
     ASD: omega_c = 1.67
     """
+    factor = compression_design_factor(method)
     if Pn <= 0.0:
         return 0.0
     Pn_kn = Pn / 1000.0
-    if method.upper() == "LRFD":
-        return 0.90 * Pn_kn
-    return Pn_kn / 1.67
+    if factor["design_method"] == "LRFD":
+        return factor["phi"] * Pn_kn
+    return Pn_kn / factor["omega"]
 
 
 def calculate_ro_for_double_symmetric(Ag: float, Ix: float, Iy: float) -> float:

@@ -1,3 +1,5 @@
+from ..design_methods import require_case_method
+from ...codes.aisc_360_22.tension_calc import tension_design_factor
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
 from ..evaluators.tension_evaluator import TensionEvaluator
@@ -21,6 +23,7 @@ class TensionRule:
         self.evaluator = TensionEvaluator()
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         if case.loads.Pu >= 0.0:
             return _nominal_pass("Tension Yielding (D2-1)", "D2-1")
 
@@ -37,6 +40,7 @@ class TensionRule:
             details={
                 "memory": {
                     "clause": "D2-1",
+                    "design_factor": tension_design_factor(case.design_method, "yielding"),
                     "inputs": {
                         "Fy_mpa": case.material.Fy,
                         "Ag_mm2": evaluation["Ag_mm2"],
@@ -59,6 +63,7 @@ class TensionRuptureRule:
         self.evaluator = TensionEvaluator()
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         if case.loads.Pu >= 0.0:
             return _nominal_pass("Tension Rupture (D2-2/D3)", "D2-2")
 
@@ -75,6 +80,7 @@ class TensionRuptureRule:
             details={
                 "memory": {
                     "clause": "D2-2",
+                    "design_factor": tension_design_factor(case.design_method, "rupture"),
                     "inputs": {
                         "Fu_mpa": case.material.Fu,
                         "An_mm2": evaluation["An_mm2"],

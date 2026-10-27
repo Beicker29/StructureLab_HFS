@@ -1,3 +1,4 @@
+from ...design_methods import require_design_method
 import math
 from typing import Dict
 
@@ -71,10 +72,10 @@ def calculate_available_shear_strength(
     """
     Converts nominal shear strength Vn (N) to available strength (kN).
     """
+    method = require_design_method(design_method)
     vn = _safe_positive(vn_n)
     if vn <= 0.0:
         return 0.0
-    method = (design_method or "").upper()
     if method == "LRFD":
         return _safe_positive(phi_v) * vn / 1000.0
     return vn / (_safe_positive(omega_v) * 1000.0) if _safe_positive(omega_v) > 0.0 else 0.0

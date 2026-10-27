@@ -1,5 +1,6 @@
 import math
 
+from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import shear_calc
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
@@ -99,6 +100,7 @@ class ShearG2VxRule:
     """G2: I-shaped members and channels (major-axis web shear)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         demand = _shear_demand(case, "x")
         if demand <= 0.0:
             return _nominal_pass(_shear_name("G2-1", "Web Shear", "Major Axis Vy"), "G2-1")
@@ -162,6 +164,7 @@ class ShearG3Rule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         if _shear_demand(case, self.axis) <= 0:
             return _nominal_pass("G3 no demand", "G3-1")
         raise RuleNotImplementedError(
@@ -199,6 +202,7 @@ class ShearG4Rule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         return _hss_shear_check(case, section, self.axis, "RECTANGULAR_HSS")
 
 
@@ -214,6 +218,7 @@ class ShearG5Rule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         return _hss_shear_check(case, section, self.axis, "CIRCULAR_HSS")
 
 
@@ -229,6 +234,7 @@ class ShearG6VyRule:
     """G6: W minor bending-plane shear (Vuy is a local-x force)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         demand = _shear_demand(case, "y")
         if demand <= 0.0:
             return _nominal_pass(_shear_name("G6-1", "Minor-Axis Shear", "Minor Axis Vx"), "G6-1")

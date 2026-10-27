@@ -1,3 +1,4 @@
+from ..design_methods import require_case_method
 from ...models import SteelCase
 from ...sections.models import Section
 from ...codes.aisc_360_22 import tension_calc
@@ -5,9 +6,10 @@ from ...codes.aisc_360_22 import tension_calc
 class TensionEvaluator:
     def evaluate(self, case: SteelCase, section: Section) -> dict:
         """
-        Evaluates the available tensile strength (kips) and returns a dict with details
+        Evaluates the available tensile strength (kN) and returns a dict with details
         for both limit states: yielding and rupture.
         """
+        require_case_method(case)
         Ag = section.area
         an = case.connection.An or 0.0
         u_factor = case.connection.U or 0.0
@@ -36,6 +38,7 @@ class TensionEvaluator:
             governing_limit_state = "rupture"
             
         return {
+            "design_method": case.design_method.value,
             "capacity": governing_capacity,
             "clause": governing_clause,
             "governing_limit_state": governing_limit_state,

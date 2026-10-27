@@ -1,5 +1,6 @@
 import math
 
+from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import axial_calc
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
@@ -24,11 +25,8 @@ def _result(name: str, clause: str, demand: float, capacity: float, details: dic
     )
 
 
-def _design_factor(method: str) -> dict:
-    method_upper = method.upper()
-    if method_upper == "LRFD":
-        return {"design_method": method_upper, "phi": 0.90, "omega": None, "capacity_expression": "phi*Pn"}
-    return {"design_method": method_upper, "phi": None, "omega": 1.67, "capacity_expression": "Pn/omega"}
+# Compatibility alias; E1 owns both conversion and factor trace.
+_design_factor = axial_calc.compression_design_factor
 
 
 def _safe_klr(K: float, L: float, r: float | None) -> float | None:
@@ -200,6 +198,7 @@ class AxialE3Rule:
     """Flexural buckling of members without slender elements (E3)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         demand = _compression_demand(case)
         if demand <= 0.0:
             return _pass_result("Axial Compression E3", "E3")
@@ -253,6 +252,7 @@ class AxialE4Rule:
     """Torsional and flexural-torsional buckling (E4)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         demand = _compression_demand(case)
         if demand <= 0.0:
             return _pass_result("Axial Compression E4", "E4")
@@ -314,6 +314,7 @@ class AxialE5Rule:
     """Single-angle compression members (E5)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         demand = _compression_demand(case)
         if demand <= 0.0:
             return _pass_result("Axial Compression E5", "E5")
@@ -367,6 +368,7 @@ class AxialE7Rule:
     """Members with slender elements (E7)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         demand = _compression_demand(case)
         if demand <= 0.0:
             return _pass_result("Axial Compression E7", "E7")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from ..design_methods import require_case_method
 from typing import Dict, Tuple
 
 from ...codes.aisc_360_22 import axial_calc, composite_calc, shear_calc
@@ -29,6 +30,7 @@ def _build_result(*, name: str, clause: str, demand: float, capacity: float, det
 
 
 def _ensure_supported_method(case: SteelCase, section: Section) -> str:
+    require_case_method(case, chapter="I")
     method = case.composite.nominal_strength_method.value
     if method in {"STRAIN_COMPAT", "EFFECTIVE_STRAIN"}:
         raise RuleNotImplementedError(
@@ -240,6 +242,7 @@ def _effective_inertia_and_pe(
 
 
 def _bare_steel_compression_capacity_k_n(case: SteelCase, section: Section) -> float:
+    require_case_method(case, chapter="I")
     fe_x = axial_calc.calculate_Fe_flexural(case.material.E, case.factors.Kx, case.lengths.Lx, _positive(section.rx))
     fe_y = axial_calc.calculate_Fe_flexural(case.material.E, case.factors.Ky, case.lengths.Ly, _positive(section.ry))
     fe_e3_candidates = [value for value in (fe_x, fe_y) if value > 0.0]
@@ -383,6 +386,7 @@ def _composite_beam_horizontal_shear(case: SteelCase, section: Section) -> Dict[
 
 
 def _steel_shear_capacity_k_n(case: SteelCase, section: Section) -> Dict[str, float]:
+    require_case_method(case, chapter="I")
     fy = case.material.Fy
     e = case.material.E
     profile = section.type.upper()
@@ -724,6 +728,7 @@ def _filled_first_yield_response(
 
 
 def _filled_flexural_capacity_i3_axis(case: SteelCase, section: Section, *, axis: str) -> Dict[str, float | str | dict]:
+    require_case_method(case, chapter="I")
     profile = section.type.upper()
     if profile not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"}:
         raise RuleNotImplementedError(
@@ -803,6 +808,7 @@ def _filled_flexural_capacity_i3_axis(case: SteelCase, section: Section, *, axis
 
 
 def _encased_steel_only_flexural_capacity_axis(case: SteelCase, section: Section, *, axis: str) -> Dict[str, float | str]:
+    require_case_method(case, chapter="I")
     z = _positive(section.zx) if axis == "x" else _positive(section.zy)
     if z <= 0.0:
         s = _positive(section.sx) if axis == "x" else _positive(section.sy)
@@ -818,6 +824,7 @@ def _encased_steel_only_flexural_capacity_axis(case: SteelCase, section: Section
 
 
 def _composite_flexural_capacities_i5(case: SteelCase, section: Section) -> Dict[str, Dict[str, float | str | dict]]:
+    require_case_method(case, chapter="I")
     role = _composite_role(case)
     if role == "FILLED_MEMBER":
         return {
@@ -836,6 +843,7 @@ def _composite_flexural_capacities_i5(case: SteelCase, section: Section) -> Dict
 
 
 def _composite_axial_capacity_i5(case: SteelCase, section: Section) -> Dict[str, float | str]:
+    require_case_method(case, chapter="I")
     role = _composite_role(case)
     pu = case.loads.Pu
     if pu > 0.0:
@@ -858,6 +866,7 @@ def _composite_axial_capacity_i5(case: SteelCase, section: Section) -> Dict[str,
 
 
 def _i5_moment_ratio_sum(case: SteelCase, flex_caps: Dict[str, Dict[str, float | str | dict]]) -> Dict[str, float]:
+    require_case_method(case, chapter="I")
     mcx = float(flex_caps["x"]["Mc_kN_m"])
     mcy = float(flex_caps["y"]["Mc_kN_m"])
     r_x = _safe_ratio(demand=case.loads.Mux, capacity=mcx, ratio_name="Mrx/Mcx")
@@ -866,6 +875,7 @@ def _i5_moment_ratio_sum(case: SteelCase, flex_caps: Dict[str, Dict[str, float |
 
 
 def _i5_method_1_h1_interaction(case: SteelCase, axial_cap_kN: float, m_ratio_sum: float) -> Dict[str, float | str]:
+    require_case_method(case, chapter="I")
     if case.loads.Pu == 0.0:
         return {"ratio": m_ratio_sum, "branch": "H1-no-axial", "Pu_over_P": 0.0}
     p_ratio = _safe_ratio(demand=case.loads.Pu, capacity=axial_cap_kN, ratio_name="Pr/Pc_or_Pt")
@@ -932,6 +942,7 @@ def _i5_method2_encased_table_points(
     parts: Dict[str, float],
     flex_caps: Dict[str, Dict[str, float | str | dict]],
 ) -> Dict[str, object]:
+    require_case_method(case, chapter="I")
     b = _positive(parts.get("B_mm"))
     h = _positive(parts.get("H_mm"))
     if min(b, h) <= 0.0:
@@ -1015,6 +1026,7 @@ def _i5_method_2_interaction(
     m_ratios: Dict[str, float],
     flex_caps: Dict[str, Dict[str, float | str | dict]],
 ) -> Dict[str, object]:
+    require_case_method(case, chapter="I")
     if case.loads.Pu <= 0.0:
         raise ValidationError(
             "Method 2 is scoped to combined axial compression and flexure.",
@@ -1073,6 +1085,7 @@ def _i5_method_2_interaction(
 
 
 def _i5_method_4_interaction(case: SteelCase, section: Section, axial_cap_kN: float, m_ratio_sum: float) -> Dict[str, object]:
+    require_case_method(case, chapter="I")
     if case.loads.Pu <= 0.0:
         raise ValidationError(
             "Method 4 (Eq. I5-1) is scoped to combined axial compression and flexure.",
@@ -1124,6 +1137,7 @@ def _i5_method_4_interaction(case: SteelCase, section: Section, axial_cap_kN: fl
 
 class CompositeI1Rule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         role = _composite_role(case)
         method = _ensure_supported_method(case, section)
         components = _composite_section_components(case, section)
@@ -1169,6 +1183,7 @@ class CompositeI1Rule:
 
 class CompositeI2EncasedCompressionRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         demand = max(case.loads.Pu, 0.0)
         if demand <= 0.0:
             return _nominal_pass("Composite Axial Compression (Encased) I2", "I2-1b")
@@ -1242,6 +1257,7 @@ class CompositeI2EncasedCompressionRule:
 
 class CompositeI2EncasedTensionRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         demand = abs(case.loads.Pu) if case.loads.Pu < 0.0 else 0.0
         if demand <= 0.0:
             return _nominal_pass("Composite Axial Tension (Encased) I2", "I2-8")
@@ -1275,6 +1291,7 @@ class CompositeI2EncasedTensionRule:
 
 class CompositeI2FilledCompressionRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         demand = max(case.loads.Pu, 0.0)
         if demand <= 0.0:
             return _nominal_pass("Composite Axial Compression (Filled) I2", "I2-2")
@@ -1389,6 +1406,7 @@ class CompositeI2FilledCompressionRule:
 
 class CompositeI2FilledTensionRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         demand = abs(case.loads.Pu) if case.loads.Pu < 0.0 else 0.0
         if demand <= 0.0:
             return _nominal_pass("Composite Axial Tension (Filled) I2", "I2-14")
@@ -1422,6 +1440,7 @@ class CompositeI2FilledTensionRule:
 
 class CompositeI5CombinedRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         role = _composite_role(case)
         if role not in {"ENCASED_MEMBER", "FILLED_MEMBER"}:
             return _nominal_pass("Combined Flexure and Axial Force I5", "I5")
@@ -1504,6 +1523,7 @@ class CompositeI5CombinedRule:
 
 class CompositeI3_1aRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
             return _nominal_pass("Load Transfer Concrete Crushing I3-1a", "I3-1a")
         _ensure_supported_method(case, section)
@@ -1530,6 +1550,7 @@ class CompositeI3_1aRule:
 
 class CompositeI3_1bRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
             return _nominal_pass("Load Transfer Steel Yielding I3-1b", "I3-1b")
         _ensure_supported_method(case, section)
@@ -1553,6 +1574,7 @@ class CompositeI3_1bRule:
 
 class CompositeI3_1cRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
             return _nominal_pass("Load Transfer Steel Anchors I3-1c", "I3-1c")
         _ensure_supported_method(case, section)
@@ -1583,6 +1605,7 @@ class CompositeI3_1cRule:
 
 class CompositeI3_3Rule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
             return _nominal_pass("Minimum Reinforcement Ratio I3-3", "I3-3")
         parts = _composite_section_components(case, section)
@@ -1608,6 +1631,7 @@ class CompositeI3_3Rule:
 
 class CompositeI3_4Rule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "FILLED_MEMBER":
             return _nominal_pass("Minimum Reinforcement Ratio I3-4", "I3-4")
         parts = _composite_section_components(case, section)
@@ -1653,6 +1677,7 @@ class CompositeI3_4Rule:
 
 class CompositeI4_1aEncasedRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
             return _nominal_pass("Encased Shear Steel Only I4-1a", "I4-1a")
         demand = _required_shear(case)
@@ -1679,6 +1704,7 @@ class CompositeI4_1aEncasedRule:
 
 class CompositeI4_1bEncasedRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
             return _nominal_pass("Encased Shear RC Only I4-1b", "I4-1b")
         demand = _required_shear(case)
@@ -1716,6 +1742,7 @@ class CompositeI4_1bEncasedRule:
 
 class CompositeI4_1cEncasedRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
             return _nominal_pass("Encased Shear Steel+Transverse I4-1c", "I4-1c")
         demand = _required_shear(case)
@@ -1752,6 +1779,7 @@ class CompositeI4_1cEncasedRule:
 
 class CompositeI4_1EncasedGoverningRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
             return _nominal_pass("Encased Shear Governing I4-1", "I4-1")
         demand = _required_shear(case)
@@ -1783,6 +1811,7 @@ class CompositeI4_1EncasedGoverningRule:
 
 class CompositeI4_1FilledRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "FILLED_MEMBER":
             return _nominal_pass("Filled Shear I4-1", "I4-1")
         demand = _required_shear(case)
@@ -1860,6 +1889,7 @@ class CompositeI4_1FilledRule:
 
 class CompositeI4_3BeamDeckSteelOnlyRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
             return _nominal_pass("Composite Beam Shear Steel Only I4-3", "I4-3")
         if not bool(case.composite.geometry.deck_present):

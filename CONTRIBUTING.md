@@ -52,6 +52,14 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+HFS-017 añade la undécima suite `tests/test_hfs017_design_method.py` (468 casos).
+Pasarla como octava `--extra-suite` a `audit_hfs011.py`, además de las siete
+anteriores. [Comandos y evidencia](docs/audit/hfs017/report.md). La captura
+general conserva literalmente los 12 ejemplos; `compare_hfs017.py` verifica
+también 24 recorridos CLI/memoria. La nueva suite contra la base reproduce
+433 fallos esperados (exit 1); en la entrega pasa completa (exit 0). No cambiar
+expectativas congeladas ni acreditar dominios ASD F/I por esos resultados.
+
 HFS-015 añade la décima suite `tests/test_hfs015_precision_advice.py` (84 casos).
 Ejecutar `audit_hfs011.py` con las siete `--extra-suite` del
 [informe](docs/audit/hfs015/report.md), separando original/caracterización/HFS-011.

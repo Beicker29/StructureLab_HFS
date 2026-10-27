@@ -5,6 +5,7 @@ length from column unbraced lengths. Only demanded directions need evaluation.
 """
 import math
 
+from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import shear_calc
 from ..actions import shear_trace
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
@@ -29,6 +30,7 @@ def round_hss_dimensions(section):
 
 
 def evaluate_hss_shear(case, section, axis):
+    require_case_method(case)
     trace = shear_trace(case, axis)
     fy, e = case.material.Fy, case.material.E
     profile = section.type.upper()

@@ -7,9 +7,7 @@ from pydantic import BaseModel, Field, StrictBool, computed_field, field_seriali
 from .input_contracts import (InputModel, FiniteNumber, PositiveNumber,
                               NonNegativeNumber, UnitFactor, PositiveCount, NonBlankString)
 
-class DesignMethod(str, Enum):
-    LRFD = "LRFD"
-    ASD = "ASD"
+from .design_methods import DesignMethod
 
 class CheckStatus(str, Enum):
     PASS = "PASS"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from ..design_methods import require_case_method
 from typing import Dict, Optional
 
 from ...codes.aisc_360_22 import axial_calc, combined_hss_calc, flexure_calc
@@ -55,6 +56,7 @@ def _slenderness_values(section: Section) -> dict:
 
 
 def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]:
+    require_case_method(case)
     profile = section.type.upper()
     fy = case.material.Fy
     e = case.material.E
@@ -131,6 +133,7 @@ def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]
 
 
 def _available_axial_strength(case: SteelCase, section: Section) -> Dict[str, object]:
+    require_case_method(case)
     pu = case.loads.Pu
     if pu == 0.0:
         return {"available_kN": math.inf, "mode": "none", "components": {}}
@@ -210,6 +213,7 @@ def _available_axial_strength(case: SteelCase, section: Section) -> Dict[str, ob
 
 
 def _available_flexural_strength(case: SteelCase, section: Section, axis: str) -> Dict[str, object]:
+    require_case_method(case)
     demand = abs(case.loads.Mux if axis == "x" else case.loads.Muy)
     if demand <= 0.0:
         return {"available_kN_m": math.inf, "evaluation": None}
@@ -228,6 +232,7 @@ def _available_flexural_strength(case: SteelCase, section: Section, axis: str) -
 
 def _available_shear_strength(case: SteelCase, section: Section) -> Dict[str, object]:
     # H3-6 specifies the larger RATIO, retaining each demand with its own capacity.
+    require_case_method(case)
     evaluations, capacities, demands, ratios = {}, {}, {}, {}
     for axis in ("x", "y"):
         demands[axis] = shear_demand(case, axis)
@@ -248,6 +253,7 @@ def _available_shear_strength(case: SteelCase, section: Section) -> Dict[str, ob
 
 
 def _compute_h1_interaction(case: SteelCase, section: Section) -> Dict[str, object]:
+    require_case_method(case)
     if case.loads.Pu == 0.0 or (abs(case.loads.Mux) <= 0.0 and abs(case.loads.Muy) <= 0.0):
         raise ValidationError("H1 requires combined axial force and flexure.", details={"Pu": case.loads.Pu, "Mux": case.loads.Mux, "Muy": case.loads.Muy})
 
@@ -299,6 +305,7 @@ class CombinedH1HssRule:
     """H1 interaction for HSS members with combined axial force and flexure."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         if case.loads.Pu == 0.0 or (abs(case.loads.Mux) <= 0.0 and abs(case.loads.Muy) <= 0.0):
             return _nominal_pass("Combined Forces H1", "H1")
 
@@ -338,6 +345,7 @@ class HssTorsionH3_1Rule:
     """H3-1: round and rectangular HSS subjected to torsion."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         tr = abs(case.loads.Tu)
         if tr <= 0.0:
             return _nominal_pass("HSS Torsion H3-1", "H3-1")
@@ -379,6 +387,7 @@ class HssCombinedH3_2Rule:
     """H3-2: HSS subjected to combined torsion, shear, flexure, and axial force."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case)
         tr = abs(case.loads.Tu)
         has_other_forces = (
             abs(case.loads.Pu) > 0.0
