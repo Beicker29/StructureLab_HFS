@@ -193,13 +193,14 @@ class EngineCliIntegrationTests(unittest.TestCase):
             self.assertNotIn("details", completed.stdout)
             self.assertIn("admissibility", stdout_payload)
             self.assertIn("short", stdout_payload["admissibility"])
-            self.assertEqual("D.1:NO | E.2:SI", stdout_payload["admissibility"]["short"])
+            # HFS-015 migration: User Notes are advice, never admissibility.
+            self.assertEqual("D1: NOT_APPLICABLE | E2: WITHIN_RECOMMENDATION (recommendations only)", stdout_payload["admissibility"]["short"])
             self.assertIn("D1", stdout_payload["admissibility"])
             self.assertIn("E2", stdout_payload["admissibility"])
             self.assertFalse(stdout_payload["admissibility"]["D1"]["applicable"])
-            self.assertFalse(stdout_payload["admissibility"]["D1"]["admissible"])
+            self.assertFalse(stdout_payload["admissibility"]["D1"]["resistance"])
             self.assertTrue(stdout_payload["admissibility"]["E2"]["applicable"])
-            self.assertTrue(stdout_payload["admissibility"]["E2"]["admissible"])
+            self.assertEqual("WITHIN_RECOMMENDATION", stdout_payload["admissibility"]["E2"]["assessment"])
             clauses = {check["clause"] for check in stdout_payload["checks"]}
             self.assertNotIn("D2-1", clauses)
             self.assertNotIn("D2-2", clauses)
@@ -214,7 +215,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
             self.assertIn("input", detailed_payload)
             self.assertIn("output", detailed_payload)
             self.assertIn("admissibility", detailed_payload)
-            self.assertEqual("D.1:NO | E.2:SI", detailed_payload["admissibility"]["short"])
+            self.assertEqual("D1: NOT_APPLICABLE | E2: WITHIN_RECOMMENDATION (recommendations only)", detailed_payload["admissibility"]["short"])
             self.assertIn("inputs", detailed_payload["admissibility"])
             self.assertIn("limits", detailed_payload["admissibility"])
             self.assertIn("admissibility", detailed_payload["memory"]["global_summary"])
@@ -223,7 +224,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
             self.assertIn("element_classification", detailed_payload["memory"]["shared_context"])
             self.assertTrue(all("context" not in clause for clause in detailed_payload["memory"]["clause_results"]))
 
-    def test_cli_reports_e2_not_admissible_when_klr_exceeds_200(self):
+    def test_cli_reports_e2_recommendation_when_klr_exceeds_200(self):
         with _temporary_test_dir() as tmp:
             sections_path = tmp / "sections.xlsx"
             case_path = tmp / "case.json"
@@ -238,9 +239,10 @@ class EngineCliIntegrationTests(unittest.TestCase):
 
             self.assertEqual(0, completed.returncode)
             stdout_payload = json.loads(completed.stdout)
-            self.assertFalse(stdout_payload["admissibility"]["E2"]["admissible"])
+            self.assertEqual("EXCEEDS_RECOMMENDATION", stdout_payload["admissibility"]["E2"]["assessment"])
+            self.assertFalse(stdout_payload["admissibility"]["E2"]["resistance"])
             self.assertTrue(stdout_payload["admissibility"]["E2"]["applicable"])
-            self.assertEqual("D.1:NO | E.2:NO", stdout_payload["admissibility"]["short"])
+            self.assertEqual("D1: NOT_APPLICABLE | E2: EXCEEDS_RECOMMENDATION (recommendations only)", stdout_payload["admissibility"]["short"])
 
 
 if __name__ == "__main__":

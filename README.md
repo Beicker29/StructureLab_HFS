@@ -4,6 +4,8 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 
 ## Estado actual
 
+- HFS-015: números originales y presentación separada; avisos D1/E2 sin carácter de incumplimiento resistente. El resumen ordena DCR sin redondear. [Contrato y migración](docs/contracts/hfs015-precision-advice.md).
+
 - Resumen CLI/memoria: gobernantes observados por DCR publicado, conservando empates y fallos. Lotes vacíos rechazados antes de ejecutar/publicar. [Contrato y migración HFS-014](docs/contracts/hfs014-summary-bundles.md).
 - Arquitectura por capas (`codes`, `domain`, `sections`, `engine`).
 - Capitulo D (tension) implementado.

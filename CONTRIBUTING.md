@@ -52,6 +52,18 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+HFS-015 añade la décima suite `tests/test_hfs015_precision_advice.py` (84 casos).
+Ejecutar `audit_hfs011.py` con las siete `--extra-suite` del
+[informe](docs/audit/hfs015/report.md), separando original/caracterización/HFS-011.
+La igualdad literal histórica falla intencionalmente por precisión y contrato:
+el exit 1 del capturador no debe ocultarse ni confundirse con tests fallidos.
+`scripts/compare_hfs015.py` exige invariantes del motor y contrasta los 24
+consumidores CLI/memoria. Los comandos y resultados reales están en el informe.
+F-09 es regresión ordinaria: caracterización con 12 aprobadas y ningún xfail.
+Las dos expectativas originales de admisibilidad migran con evidencia S22;
+sus expectativas previas permanecen en Git y la captura base. Las notas de
+HFS-014 y anteriores que siguen son históricas.
+
 HFS-014 añade la novena suite `tests/test_hfs014_summary_bundle.py`.
 `scripts/audit_hfs014.py --baseline <JSON engine previo> --out <nueva> --work <nueva>`
 separa las nueve suites y exige igualdad de resultados del motor. La captura

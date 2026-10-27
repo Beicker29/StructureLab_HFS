@@ -9,7 +9,8 @@ from pathlib import Path
 
 from pydantic import AliasChoices, Field, StrictBool, ValidationError as PydanticValidationError
 
-from .models import CustomSectionType, SteelCase
+from .models import CustomSectionType, SteelCase, finite_json_payload
+from .domain.recommendations import slenderness_recommendations
 from .results_model import AnalysisStatus, aggregate_case_statuses
 from .input_contracts import InputModel
 from .engine import SteelDesignEngine
@@ -94,11 +95,11 @@ def _build_global_summary(result) -> dict:
             candidates.append(entry)
     maximum = max((c["dcr_published"] for c in candidates), default=None)
     return {
-        "version": "HFS-014-v1",
+        "version": "HFS-015-v2",
         "overall_status": result.status.value,
         "scope": "executed_checks_only",
         "description": "Observed governing checks among executed checks; not a definitive governing limit state for the structure.",
-        "ranking_basis": "published_dcr; exact ties retained; raw DCR not reconstructed",
+        "ranking_basis": "original_unrounded_dcr; exact raw ties retained; published numbers are raw",
         "eligibility_basis": "executed_resistance_obligations" if resistance_indices is not None
                              else "provisional_numeric_checks_without_coverage",
         "max_dcr_published": maximum,
@@ -163,66 +164,14 @@ def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | N
     )
 
 
-def _safe_klr(k: float, length: float, radius: float | None) -> float | None:
-    if radius is None or radius <= 0.0 or k <= 0.0 or length <= 0.0:
-        return None
-    return (k * length) / radius
-
-
 def _build_chapter_admissibility(case: SteelCase, section: Section | None) -> dict:
-    pure_axial = (
-        abs(case.loads.Mux) <= 1e-9
-        and abs(case.loads.Muy) <= 1e-9
-        and abs(case.loads.Tu) <= 1e-9
-        and abs(case.loads.Vu) <= 1e-9
-        and abs(case.loads.Vux) <= 1e-9
-        and abs(case.loads.Vuy) <= 1e-9
-    )
-    klr_x = _safe_klr(case.factors.Kx, case.lengths.Lx, section.rx if section else None)
-    klr_y = _safe_klr(case.factors.Ky, case.lengths.Ly, section.ry if section else None)
-    valid_klr = [value for value in (klr_x, klr_y) if value is not None]
-    max_klr = max(valid_klr) if valid_klr else None
-    governing_axis = None
-    if max_klr is not None:
-        governing_axis = "x" if klr_x is not None and abs(klr_x - max_klr) <= 1e-9 else "y"
-
-    d1_applicable = pure_axial and case.loads.Pu < 0.0
-    e2_applicable = pure_axial and case.loads.Pu > 0.0
-    d1 = bool(d1_applicable and max_klr is not None and max_klr <= 300.0)
-    e2 = bool(e2_applicable and max_klr is not None and max_klr <= 200.0)
-    return {
-        "D1": d1,
-        "E2": e2,
-        "short": f"D.1:{'SI' if d1 else 'NO'} | E.2:{'SI' if e2 else 'NO'}",
-        "inputs": {
-            "KL_over_r_x": klr_x,
-            "KL_over_r_y": klr_y,
-            "KL_over_r_governing": max_klr,
-            "governing_axis": governing_axis,
-        },
-        "limits": {
-            "D1_max": 300.0,
-            "E2_max": 200.0,
-        },
-        "applicability": {
-            "D1": d1_applicable,
-            "E2": e2_applicable,
-        },
-    }
+    # Legacy transport key/name retained; content is advisory, never admissibility.
+    return slenderness_recommendations(case, section)
 
 
 def _build_compact_admissibility(admissibility: dict) -> dict:
-    return {
-        "short": admissibility["short"],
-        "D1": {
-            "applicable": admissibility["applicability"]["D1"],
-            "admissible": admissibility["D1"],
-        },
-        "E2": {
-            "applicable": admissibility["applicability"]["E2"],
-            "admissible": admissibility["E2"],
-        },
-    }
+    # One advisory source for compact and detailed consumers; no lost diagnostics.
+    return admissibility
 
 
 def _extract_shared_context(clause_results: list[dict]) -> dict:
@@ -276,61 +225,23 @@ def _extract_capacity_from_memory(memory: dict | None) -> float | None:
 
 
 def _build_dcr_trace(check) -> dict:
-    details = check.details or {}
-    memory = details.get("memory") if isinstance(details, dict) else None
-    units = _infer_check_units(check.clause)
-    demand = float(check.demand or 0.0)
-    capacity_reported = float(check.capacity or 0.0)
-    capacity_from_memory = _extract_capacity_from_memory(memory)
-    capacity_for_dcr = capacity_from_memory if isinstance(capacity_from_memory, float) and capacity_from_memory > 0.0 else capacity_reported
-    dcr_raw = demand / capacity_for_dcr if capacity_for_dcr > 0.0 else math.inf
-    dcr_rounded = round(dcr_raw, 3) if math.isfinite(dcr_raw) else None
-    design_factor = memory.get("design_factor") if isinstance(memory, dict) and isinstance(memory.get("design_factor"), dict) else {}
-    capacity_expression = design_factor.get("capacity_expression", "rule_capacity")
-
-    if capacity_for_dcr > 0.0:
-        substitution = f"DCR = {demand:.6f} / {capacity_for_dcr:.6f}"
-    else:
-        substitution = "DCR = demand / 0.0 (undefined -> inf)"
-
-    return {
-        "units": units,
+    """Project actual result values, including interactions; no reconstruction."""
+    units = {"demand": check.unit, "capacity": check.unit}
+    return finite_json_payload({
+        "version": "HFS-015-raw-v1", "units": units,
+        "source": "CheckResult original values; not reconstructed from memory/display",
+        "unit_diagnostic": None if check.unit else "Unit not supplied by producer (legacy/inactive check)",
+        "numeric_issue": check.numeric_issue,
         "steps": [
-            {
-                "id": 1,
-                "name": "Demand",
-                "expression": "demand = required action from input loads",
-                "value": demand,
-                "unit": units["demand"],
-            },
-            {
-                "id": 2,
-                "name": "Available Capacity",
-                "expression": f"capacity = {capacity_expression}",
-                "value_used_for_dcr": capacity_for_dcr,
-                "value_reported_in_check": capacity_reported,
-                "value_from_rule_memory": capacity_from_memory,
-                "unit": units["capacity"],
-            },
-            {
-                "id": 3,
-                "name": "Demand-Capacity Ratio",
-                "expression": "DCR = demand / capacity",
-                "substitution": substitution,
-                "value_raw": dcr_raw if math.isfinite(dcr_raw) else None,
-                "value_rounded_3dec": dcr_rounded,
-                "value_reported_in_check": check.dcr,
-                "is_infinite": not math.isfinite(dcr_raw),
-            },
-            {
-                "id": 4,
-                "name": "Status",
-                "expression": "PASS if DCR <= 1.0 else FAIL",
-                "result": check.status.value,
-                "threshold": 1.0,
-            },
+            {"id": 1, "name": "Demand", "value": check.demand, "unit": check.unit},
+            {"id": 2, "name": "Available Capacity", "value_used_for_dcr": check.capacity,
+             "value_reported_in_check": check.capacity, "unit": check.unit},
+            {"id": 3, "name": "Demand-Capacity Ratio", "value_raw": check.dcr,
+             "value_reported_in_check": check.dcr, "display": check.display["dcr_label"]},
+            {"id": 4, "name": "Status", "result": check.status.value, "threshold": 1.0,
+             "expression": "Producer decision using original DCR, no tolerance or display rounding"},
         ],
-    }
+    })
 
 
 def _extract_i5_method2_points(result) -> tuple[dict, dict] | None:
@@ -602,7 +513,7 @@ def _write_detailed_results_file(
     }
     if interaction_diagram_path:
         payload["meta"]["interaction_diagram_i5_method2_image"] = interaction_diagram_path
-    output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    output_path.write_text(json.dumps(finite_json_payload(payload), indent=2, allow_nan=False), encoding="utf-8")
     return output_path
 
 
@@ -777,7 +688,7 @@ def main():
                         "results_run_dir": execution_results_dir,
                         "cases": summaries,
                     },
-                    indent=2,
+                    indent=2, allow_nan=False,
                 )
             )
         else:
@@ -793,7 +704,7 @@ def main():
                 results_dir=execution_results_dir,
                 write_results_json=output_options["write_results_json"],
             )
-            print(json.dumps(summary, indent=2))
+            print(json.dumps(finite_json_payload(summary), indent=2, allow_nan=False))
 
     except Exception as e:
         _print_structured_error(e, stage="run_engine")

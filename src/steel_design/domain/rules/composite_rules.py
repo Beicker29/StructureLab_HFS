@@ -17,15 +17,13 @@ def _nominal_pass(name: str, clause: str) -> CheckResult:
     return CheckResult(name=name, clause=clause, demand=0.0, capacity=0.0, dcr=0.0, status=CheckStatus.PASS)
 
 
-def _build_result(*, name: str, clause: str, demand: float, capacity: float, details: dict) -> CheckResult:
-    dcr = demand / capacity if capacity > 0.0 else float("inf")
-    return CheckResult(
+def _build_result(*, name: str, clause: str, demand: float, capacity: float, details: dict, unit: str) -> CheckResult:
+    return CheckResult.from_values(
+        unit=unit,
         name=name,
         clause=clause,
-        demand=round(demand, 3),
-        capacity=round(capacity, 3),
-        dcr=round(dcr, 3),
-        status=CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL,
+        demand=demand,
+        capacity=capacity,
         details=details,
     )
 
@@ -1140,6 +1138,7 @@ class CompositeI1Rule:
                 fy_mpa=case.material.Fy,
             )
         return _build_result(
+            unit="ratio",
             name="Composite General Provisions I1",
             clause="I1",
             demand=1.0,
@@ -1199,6 +1198,7 @@ class CompositeI2EncasedCompressionRule:
         steel_floor = _bare_steel_compression_capacity_k_n(case, section)
         available = max(phi_capacity, steel_floor)
         return _build_result(
+            unit="kN",
             name="Composite Axial Compression (Encased) I2",
             clause="I2-1b",
             demand=demand,
@@ -1250,6 +1250,7 @@ class CompositeI2EncasedTensionRule:
         pn = (case.material.Fy * parts["As_mm2"]) + (parts["Fysr_mpa"] * parts["Asr_mm2"])
         capacity = 0.90 * pn / 1000.0
         return _build_result(
+            unit="kN",
             name="Composite Axial Tension (Encased) I2",
             clause="I2-8",
             demand=demand,
@@ -1355,6 +1356,7 @@ class CompositeI2FilledCompressionRule:
         if fn_clause is not None:
             details_intermediate["Fn_source_clause"] = fn_clause
         return _build_result(
+            unit="kN",
             name="Composite Axial Compression (Filled) I2",
             clause="I2-2",
             demand=demand,
@@ -1395,6 +1397,7 @@ class CompositeI2FilledTensionRule:
         pn = (case.material.Fy * parts["As_mm2"]) + (parts["Fysr_mpa"] * parts["Asr_mm2"])
         capacity = 0.90 * pn / 1000.0
         return _build_result(
+            unit="kN",
             name="Composite Axial Tension (Filled) I2",
             clause="I2-14",
             demand=demand,
@@ -1455,6 +1458,7 @@ class CompositeI5CombinedRule:
 
         ratio = float(method_data["ratio"])
         return _build_result(
+            unit="ratio",
             name=f"Combined Flexure and Axial Force I5 ({method.value})",
             clause="I5",
             demand=ratio,
@@ -1505,6 +1509,7 @@ class CompositeI3_1aRule:
         _ensure_supported_method(case, section)
         shear = _composite_beam_horizontal_shear(case, section)
         return _build_result(
+            unit="kN",
             name="Load Transfer Concrete Crushing I3-1a",
             clause="I3-1a",
             demand=shear["V_required_kN"],
@@ -1530,6 +1535,7 @@ class CompositeI3_1bRule:
         _ensure_supported_method(case, section)
         shear = _composite_beam_horizontal_shear(case, section)
         return _build_result(
+            unit="kN",
             name="Load Transfer Steel Yielding I3-1b",
             clause="I3-1b",
             demand=shear["V_required_kN"],
@@ -1552,6 +1558,7 @@ class CompositeI3_1cRule:
         _ensure_supported_method(case, section)
         shear = _composite_beam_horizontal_shear(case, section)
         return _build_result(
+            unit="kN",
             name="Load Transfer Steel Anchors I3-1c",
             clause="I3-1c",
             demand=shear["V_required_kN"],
@@ -1583,6 +1590,7 @@ class CompositeI3_3Rule:
         demand = 0.004
         capacity = rho
         return _build_result(
+            unit="ratio",
             name="Minimum Reinforcement Ratio I3-3",
             clause="I3-3",
             demand=demand,
@@ -1606,6 +1614,7 @@ class CompositeI3_4Rule:
         rho = (parts["Asr_mm2"] / parts["Ag_mm2"]) if parts["Ag_mm2"] > 0.0 else 0.0
         if parts["Asr_mm2"] <= 0.0:
             return _build_result(
+                unit="ratio",
                 name="Minimum Reinforcement Ratio I3-4",
                 clause="I3-4",
                 demand=0.0,
@@ -1626,6 +1635,7 @@ class CompositeI3_4Rule:
         demand = 0.004
         capacity = rho
         return _build_result(
+            unit="ratio",
             name="Minimum Reinforcement Ratio I3-4",
             clause="I3-4",
             demand=demand,
@@ -1650,6 +1660,7 @@ class CompositeI4_1aEncasedRule:
             return _nominal_pass("Encased Shear Steel Only I4-1a", "I4-1a")
         steel = _steel_shear_capacity_k_n(case, section)
         return _build_result(
+            unit="kN",
             name="Encased Shear Steel Only I4-1a",
             clause="I4-1a",
             demand=demand,
@@ -1686,6 +1697,7 @@ class CompositeI4_1bEncasedRule:
         v_n = vc_n + vs_n
         capacity = 0.75 * v_n / 1000.0
         return _build_result(
+            unit="kN",
             name="Encased Shear RC Only I4-1b",
             clause="I4-1b",
             demand=demand,
@@ -1721,6 +1733,7 @@ class CompositeI4_1cEncasedRule:
         vn = vn_steel + vs_n
         capacity = 0.75 * vn / 1000.0
         return _build_result(
+            unit="kN",
             name="Encased Shear Steel+Transverse I4-1c",
             clause="I4-1c",
             demand=demand,
@@ -1751,6 +1764,7 @@ class CompositeI4_1EncasedGoverningRule:
         governing = max(capacities, key=capacities.get)
         capacity = capacities[governing]
         return _build_result(
+            unit="kN",
             name="Encased Shear Governing I4-1",
             clause="I4-1",
             demand=demand,
@@ -1814,6 +1828,7 @@ class CompositeI4_1FilledRule:
         v_n = (0.6 * case.material.Fy * av) + (kc["Kc"] * case.composite.concrete.fc * parts["Ac_mm2"])
         capacity = 0.90 * v_n / 1000.0
         return _build_result(
+            unit="kN",
             name="Filled Shear I4-1",
             clause="I4-1",
             demand=demand,
@@ -1854,6 +1869,7 @@ class CompositeI4_3BeamDeckSteelOnlyRule:
             return _nominal_pass("Composite Beam Shear Steel Only I4-3", "I4-3")
         steel = _steel_shear_capacity_k_n(case, section)
         return _build_result(
+            unit="kN",
             name="Composite Beam Shear Steel Only I4-3",
             clause="I4-3",
             demand=demand,

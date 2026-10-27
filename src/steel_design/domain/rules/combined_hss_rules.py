@@ -20,15 +20,13 @@ def _nominal_pass(name: str, clause: str) -> CheckResult:
     return CheckResult(name=name, clause=clause, demand=0.0, capacity=0.0, dcr=0.0, status=CheckStatus.PASS)
 
 
-def _build_result(*, name: str, clause: str, demand: float, capacity: float, details: dict) -> CheckResult:
-    dcr = demand / capacity if capacity > 0.0 else float("inf")
-    return CheckResult(
+def _build_result(*, name: str, clause: str, demand: float, capacity: float, details: dict, unit: str) -> CheckResult:
+    return CheckResult.from_values(
+        unit=unit,
         name=name,
         clause=clause,
-        demand=round(demand, 3),
-        capacity=round(capacity, 3),
-        dcr=round(dcr, 3),
-        status=CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL,
+        demand=demand,
+        capacity=capacity,
         details=details,
     )
 
@@ -306,6 +304,7 @@ class CombinedH1HssRule:
 
         interaction = _compute_h1_interaction(case, section)
         return _build_result(
+            unit="ratio",
             name=f"Combined Forces ({interaction['clause']})",
             clause=interaction["clause"],
             demand=float(interaction["interaction_ratio"]),
@@ -346,6 +345,7 @@ class HssTorsionH3_1Rule:
         torsion = _torsion_capacity_h3(case, section)
         tc = float(torsion["Tc_kN_m"])
         return _build_result(
+            unit="kN-m",
             name="HSS Torsion (H3-1)",
             clause="H3-1",
             demand=tr,
@@ -421,6 +421,7 @@ class HssCombinedH3_2Rule:
         )
 
         return _build_result(
+            unit="ratio",
             name="HSS Combined Torsion/Shear/Flexure/Axial (H3-2)",
             clause="H3-2",
             demand=interaction,
