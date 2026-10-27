@@ -114,22 +114,6 @@ class SteelDesignEngine:
                     },
                 )
 
-        if section.type.upper() in {"SOLID_CIRCULAR", "SOLID_RECTANGULAR"} and (
-            abs(case.loads.Vu) > 0.0 or abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0
-        ):
-            raise ValidationError(
-                "Solid custom sections currently do not support shear checks (Vu).",
-                details={
-                    "section": section.name,
-                    "profile_type": section.type,
-                    "Mux": case.loads.Mux,
-                    "Muy": case.loads.Muy,
-                    "Vu": case.loads.Vu,
-                    "Vux": case.loads.Vux,
-                    "Vuy": case.loads.Vuy,
-                },
-            )
-
         if (
             section.type.upper() == "SINGLE_ANGLE"
             and case.loads.Pu > 0
@@ -141,14 +125,20 @@ class SteelDesignEngine:
                 details={"section": section.name, "required_field": "connection.angle_compression_mode"},
             )
 
-        if abs(case.loads.Tu) > 0.0 and section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"} and case.composite is None:
-            raise RuleNotImplementedError(
-                "Torsion is implemented only for round and rectangular HSS in current scope (H3.1/H3.2).",
-                details={"section": section.name, "profile_type": section.type, "requested_clause": "H3.3"},
-            )
-            
         # Expected obligations are constructed BEFORE and independently of routing.
         coverage = build_coverage_plan(case, section)
+        # HFS-013: absent G/H resistance is a pending component, not permission
+        # to discard independent checks or to report complete coverage.
+        if case.composite is None:
+            unsupported = []
+            if case.loads.Tu and section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"}:
+                unsupported.append(("Tu", "H3.3 torsional stress analysis is not implemented for this family."))
+            if section.type.upper() in {"SOLID_CIRCULAR", "SOLID_RECTANGULAR"}:
+                unsupported.extend((component, "Solid-member shear resistance is not implemented; G5 is for hollow tubes.")
+                    for component in ("Vu", "Vux", "Vuy") if getattr(case.loads, component))
+            for component, reason in unsupported:
+                error = RuleNotImplementedError(reason, details={"section": section.name, "component": component})
+                coverage.evaluation_errors.append({"implementation": "SteelDesignEngine", "error": error.to_dict()})
         # 3. Get rules dynamically
         selection_errors = []
         rules = self.router.get_rules(case, section, selection_errors)

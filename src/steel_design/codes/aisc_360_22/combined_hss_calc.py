@@ -11,19 +11,15 @@ def calculate_round_hss_torsional_constant(*, D_mm: float, t_mm: float, c_catalo
     H3 User Note / commentary-aligned torsional constant C for round HSS.
     Preference order:
     1) catalog C
-    2) C = 2J/D
-    3) conservative user note approximation C = pi*(D-t)^2*t/2
+    2) conservative user note approximation C = pi*(D-t)^2*t/2
+    j_mm4 is retained for call compatibility, but not used as a normative C.
     """
     c_catalog = _positive(c_catalog_mm3)
     D = _positive(D_mm)
     t = _positive(t_mm)
-    j = _positive(j_mm4)
 
     if c_catalog > 0.0:
         return {"C_mm3": c_catalog, "source": "catalog_C"}
-
-    if min(j, D) > 0.0:
-        return {"C_mm3": (2.0 * j) / D, "source": "derived_2J_over_D"}
 
     if min(D, t) <= 0.0:
         return {"C_mm3": 0.0, "source": "invalid"}
@@ -52,7 +48,7 @@ def calculate_rectangular_hss_torsional_constant(*, B_mm: float, H_mm: float, t_
     return {"C_mm3": max(c_user, 0.0), "source": "user_note_conservative"}
 
 
-def calculate_round_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, L_mm: float, D_mm: float, t_mm: float) -> Dict[str, float | str]:
+def calculate_round_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, L_mm: float | None, D_mm: float, t_mm: float) -> Dict[str, float | str | None]:
     """
     H3-2a/H3-2b for round HSS torsion:
     Fcr = max(Fcr_2a, Fcr_2b), but <= 0.6Fy
@@ -62,7 +58,16 @@ def calculate_round_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, L_mm: float, D_mm
     L = _positive(L_mm)
     D = _positive(D_mm)
     t = _positive(t_mm)
-    if min(E, Fy, L, D, t) <= 0.0:
+    if min(E, Fy, D, t) <= 0.0:
+        return {"Fcr_mpa": 0.0, "Fcr_H3_2a_mpa": 0.0, "Fcr_H3_2b_mpa": 0.0, "branch": "invalid"}
+
+    if L_mm is None:
+        lower_bound = .60 * E / ((D / t) ** 1.5)
+        known = lower_bound >= .6 * Fy
+        return {"Fcr_mpa": .6 * Fy if known else None, "Fcr_H3_2a_mpa": None,
+                "Fcr_H3_2b_mpa": lower_bound,
+                "branch": "yielding_proved_without_L" if known else "requires_member_length"}
+    if L <= 0:
         return {"Fcr_mpa": 0.0, "Fcr_H3_2a_mpa": 0.0, "Fcr_H3_2b_mpa": 0.0, "branch": "invalid"}
 
     l_over_d = L / D
@@ -85,7 +90,7 @@ def calculate_round_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, L_mm: float, D_mm
     }
 
 
-def calculate_rectangular_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, h_mm: float, t_mm: float) -> Dict[str, float | str]:
+def calculate_rectangular_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, h_mm: float, t_mm: float) -> Dict[str, float | str | None]:
     """
     H3-3/H3-4/H3-5 for rectangular HSS torsion.
     """
@@ -126,7 +131,10 @@ def calculate_rectangular_hss_fcr_h3(*, E_mpa: float, Fy_mpa: float, h_mm: float
             "branch": "H3-4",
         }
 
-    fcr = 4.58 * E / (h_over_t**2)
+    if h_over_t > 260:
+        return {"Fcr_mpa": None, "h_over_t": h_over_t, "limit_H3_3": limit_h3_3,
+                "limit_H3_4": limit_h3_4, "branch": "outside_H3_5_h_over_t_260"}
+    fcr = 0.458 * math.pi**2 * E / (h_over_t**2)
     return {
         "Fcr_mpa": fcr,
         "h_over_t": h_over_t,
@@ -165,8 +173,8 @@ def calculate_available_torsional_strength(*, tn_nmm: float, design_method: str,
 def calculate_h3_6_interaction(*, normal_ratio: float, shear_torsion_ratio: float) -> float:
     """
     H3-6 interaction in implemented scope:
-    (normal_ratio)^2 + (shear_torsion_ratio)^2
+    normal_ratio + (shear_torsion_ratio)^2, S22 printed 16.1-86.
     """
     normal = max(0.0, float(normal_ratio))
     shear_torsion = max(0.0, float(shear_torsion_ratio))
-    return (normal**2) + (shear_torsion**2)
+    return normal + (shear_torsion**2)

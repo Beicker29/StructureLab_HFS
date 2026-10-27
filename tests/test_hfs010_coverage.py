@@ -239,7 +239,10 @@ def test_f36_e5_conditions_and_branches_stay_pending(repository):
 def test_f06_directional_hss_combination_stays_pending(repository):
     result = SteelDesignEngine(repository).run(example("rectangular_hss"))
     assert result.status.value == "INCOMPLETE"
-    assert obligations(result)["N30.interaction"].executed_checks
+    # HFS-013: this catalog HSS lacks C; no reconstruction of exterior B/H.
+    assert not obligations(result)["N30.interaction"].executed_checks
+    assert any(e["error"]["details"].get("missing_fields") == ["c"]
+               for e in result.coverage.evaluation_errors)
     assert "F-06" in obligations(result)["N30.interaction"].reason
     assert {"G.shear.Vux", "G.shear.Vuy"} <= obligations(result).keys()
 

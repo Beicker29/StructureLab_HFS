@@ -163,7 +163,7 @@ def build_coverage_plan(case: SteelCase, section: Section) -> CoverageReport:
                    "RECTANGULAR_HSS": "N25", "CIRCULAR_HSS": "N26"}.get(family, "N35")
             add(f"G.shear.{component}", ids, "shear_yielding_buckling", component,
                 f"Nonzero {component}; physical direction must be established without transforming axes",
-                "F-08/F-11: directional mapping and full shear domain validation remain unresolved.",
+                "HFS-013 establishes bending-plane shear suffixes; full domain, load location and section validity remain unaccredited (F-08/F-11).",
                 ["Physical direction, resisting elements, Lv if applicable and one validated shear route"],
                 alternatives=("G2.1 base route", "G2.2/3 tension-field route with all prerequisites")
                 if family in {"W", "CHANNEL"} else ())
@@ -186,7 +186,7 @@ def build_coverage_plan(case: SteelCase, section: Section) -> CoverageReport:
             if hss and any((loads.Pu, loads.Mux, loads.Muy, loads.Vu, loads.Vux, loads.Vuy)):
                 add("N30.interaction", "N30", "torsion_interaction", "Pu+Mux+Muy+V+Tu",
                     "Torsion with other demands; H3 threshold determines a permitted alternative",
-                    "F-06: directional demand/capacity selection is unvalidated; no isolated maximum correction is made.",
+                    "F-06/HFS-013: paired directional ratios and H3-6 corrected; dependent D/E/F strengths and the full interaction domain remain unaccredited.",
                     ["Validated Tr/Tc branch, directional capacities and maximum of directional ratios"],
                     alternatives=("H1 if Tr/Tc <= 0.20 with conditions", "H3-6 if Tr/Tc > 0.20"))
 

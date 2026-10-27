@@ -1,6 +1,7 @@
 import unittest
 
 from src.steel_design.domain.routing.profile_router import ProfileRouter
+from src.steel_design.domain.errors import RuleNotImplementedError
 from src.steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG3VxRule, ShearG5VxRule, ShearG6VyRule
 from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
 from src.steel_design.sections.models import Section
@@ -35,7 +36,7 @@ class ChapterGRulesTests(unittest.TestCase):
         self.assertGreater(result.capacity, 0.0)
         self.assertAlmostEqual(1.0, result.details["memory"]["design_factor"]["phi_v"])
 
-    def test_g3_single_angle_major_shear_returns_capacity(self):
+    def test_g3_single_angle_shear_requires_resisting_leg_direction(self):
         section = Section(
             name="L4X4X3/8",
             type="SINGLE_ANGLE",
@@ -44,9 +45,9 @@ class ChapterGRulesTests(unittest.TestCase):
             t=9.5,
             **{"b/t": 10.5},
         )
-        result = ShearG3VxRule().check(_case(vux=60.0), section)
-        self.assertEqual("G3-1", result.clause)
-        self.assertGreater(result.capacity, 0.0)
+        # HFS-013: one b/t does not establish the actual leg/load direction.
+        with self.assertRaises(RuleNotImplementedError):
+            ShearG3VxRule().check(_case(vux=60.0), section)
 
     def test_g4_rectangular_hss_routes_both_axes_with_directional_shear(self):
         case = _case(vux=40.0, vuy=20.0)
@@ -79,7 +80,7 @@ class ChapterGRulesTests(unittest.TestCase):
         self.assertGreater(result.capacity, 0.0)
         self.assertIn("Fcr_branch", result.details["memory"]["intermediate"])
 
-    def test_g6_channel_minor_shear_returns_capacity(self):
+    def test_g6_channel_minor_shear_requires_flange_force_distribution(self):
         section = Section(
             name="C15X50",
             type="CHANNEL",
@@ -88,9 +89,9 @@ class ChapterGRulesTests(unittest.TestCase):
             tf=12.0,
             **{"b/t": 7.5},
         )
-        result = ShearG6VyRule().check(_case(vuy=40.0), section)
-        self.assertEqual("G6-1", result.clause)
-        self.assertGreater(result.capacity, 0.0)
+        # HFS-013: G6-1 is per element; no declared load distribution for channel.
+        with self.assertRaises(RuleNotImplementedError):
+            ShearG6VyRule().check(_case(vuy=40.0), section)
 
     def test_legacy_vu_routes_major_shear_only(self):
         case = _case(vu=80.0)

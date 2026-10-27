@@ -5,7 +5,7 @@ from typing import Dict
 NORMATIVE_E_MPA = 200000.0
 
 
-def _safe_positive(value: float) -> float:
+def _safe_positive(value: float | None) -> float:
     return float(value) if isinstance(value, (int, float)) and value > 0.0 else 0.0
 
 
@@ -84,10 +84,10 @@ def calculate_round_hss_fcr(
     *,
     e_mpa: float,
     fy_mpa: float,
-    lv_mm: float,
+    lv_mm: float | None,
     diameter_mm: float,
     thickness_mm: float,
-) -> Dict[str, float | str]:
+) -> Dict[str, float | str | None]:
     """
     Shear critical stress Fcr for round HSS per Eq. G5-2a/G5-2b.
     """
@@ -96,7 +96,19 @@ def calculate_round_hss_fcr(
     lv = _safe_positive(lv_mm)
     diameter = _safe_positive(diameter_mm)
     thickness = _safe_positive(thickness_mm)
-    if min(e, fy, lv, diameter, thickness) <= 0.0:
+    if min(e, fy, diameter, thickness) <= 0.0:
+        return {"Fcr_mpa": 0.0, "fcr_g5_2a_mpa": 0.0, "fcr_g5_2b_mpa": 0.0, "branch": "invalid"}
+
+    if lv_mm is None:
+        # max(a,b), capped by 0.6Fy: if b reaches the cap, the answer is
+        # independent of a and hence of unknown Lv. Otherwise do not invent Lv.
+        lower_bound = .78 * e / ((diameter / thickness) ** 1.5)
+        known = lower_bound >= .6 * fy
+        return {"Fcr_mpa": .6 * fy if known else None, "fcr_g5_2a_mpa": None,
+                "fcr_g5_2b_mpa": lower_bound,
+                "branch": "yielding_proved_without_Lv" if known else "requires_Lv"}
+
+    if lv <= 0:
         return {"Fcr_mpa": 0.0, "fcr_g5_2a_mpa": 0.0, "fcr_g5_2b_mpa": 0.0, "branch": "invalid"}
 
     lv_over_d = lv / diameter

@@ -30,9 +30,9 @@ class Loads(InputModel):
     Mux: FiniteNumber = Field(0.0, description="Required flexural strength, major-axis (kN-m)")
     Muy: FiniteNumber = Field(0.0, description="Required flexural strength, minor-axis (kN-m)")
     Tu: FiniteNumber = Field(0.0, description="Required torsional strength (kN-m)")
-    Vux: FiniteNumber = Field(0.0, description="Required shear strength about x direction (kN)")
-    Vuy: FiniteNumber = Field(0.0, description="Required shear strength about y direction (kN)")
-    Vu: FiniteNumber = Field(0.0, description="Legacy scalar shear demand (kN); current x route, not a vector resultant")
+    Vux: FiniteNumber = Field(0.0, description="Shear associated with major-axis Mux, force along local y (kN); suffix names bending plane")
+    Vuy: FiniteNumber = Field(0.0, description="Shear associated with minor-axis Muy, force along local x (kN); suffix names bending plane")
+    Vu: FiniteNumber = Field(0.0, description="Legacy scalar alias of Vux (local-y force, kN), never a vector resultant")
 
     @model_validator(mode="after")
     def validate_load_representation(self):
