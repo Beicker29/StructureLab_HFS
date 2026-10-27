@@ -1,0 +1,18 @@
+{
+  "base_sha": "a6f7ede7172dc9ef2beb9829157f0af6d14b3d82",
+  "evidence_files_verified": 38,
+  "evidence_hash_mismatches": [],
+  "input_files_verified": 56,
+  "input_hash_mismatches": [],
+  "broken_local_links": [],
+  "diff_check_exit": 0,
+  "diff_check_stderr": "warning: in the working copy of 'scripts/audit_hfs011.py', LF will be replaced by CRLF the next time Git touches it\n",
+  "protected_paths_changed": [],
+  "protected_check_exit": 0,
+  "legacy_example_values_compared": 1679,
+  "maximum_absolute_difference": 0.0,
+  "example_transitions_expected": true,
+  "critical_probes": 14,
+  "critical_probe_checks_identical": true,
+  "matrix_sha256": "0d88a56ad831b7eae32ea185b589d439d8427ed91b83f251e32ca06d647061a9"
+}

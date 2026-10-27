@@ -1,0 +1,57 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011\\Scripts\\python.exe",
+  "overrides": {
+    "PYTHONNOUSERSITE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONUTF8": "1"
+  },
+  "branch": {
+    "command": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "hfs-010-coverage-gate\n",
+    "stderr": ""
+  },
+  "head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "a6f7ede7172dc9ef2beb9829157f0af6d14b3d82\n",
+    "stderr": ""
+  },
+  "status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "freeze": {
+    "command": [
+      "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "freeze",
+      "--all"
+    ],
+    "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "annotated-types==0.8.0\ncolorama==0.4.6\net_xmlfile==2.0.0\niniconfig==2.3.1\nopenpyxl==3.1.5\npackaging==26.3\npip==25.0.1\npluggy==1.7.0\npydantic==2.14.1\npydantic_core==2.50.1\nPygments==2.21.0\npytest==9.1.1\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\n",
+    "stderr": ""
+  },
+  "baseline": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\docs\\audit\\hfs016\\evidence\\after\\engine-results.json",
+  "baseline_sha256": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62"
+}

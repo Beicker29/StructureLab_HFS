@@ -52,6 +52,13 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+HFS-010 añade una quinta suite: `tests/test_hfs010_coverage.py`, separada también
+de la original. Pasar `--extra-suite` para HFS-016 y HFS-010 al capturador, además
+de `--coverage-transition`: esta opción exige igualdad exacta de checks/trazas y
+errores previos, pero comprueba los cambios intencionales de estado global por
+separado. No usar igualdad literal de resultados completos para ocultar o impedir
+esa transición. [Comandos y resultados](docs/audit/hfs010/report.md).
+
 Para HFS-011 y siguientes, separar también `tests/test_hfs011_input_contracts.py` de la suite original. El capturador [audit_hfs011.py](scripts/audit_hfs011.py) ejecuta las tres suites por separado en una copia nueva y compara los ejemplos con la captura previa; comandos y migración en el [informe HFS-011](docs/audit/hfs011/report.md). No presentar los casos parametrizados nuevos como métodos de la suite histórica ni los xfail como aprobados.
 
 - Cambio normativo o de propiedades: fuente precisa, cálculo esperado independiente, tolerancia, fronteras y revisión ingenieril antes de declararlo validado.

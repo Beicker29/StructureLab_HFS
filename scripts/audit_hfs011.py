@@ -68,15 +68,22 @@ def capture(args):
                          "before_sha256": canonical_hash(before.get(name)),
                          "after_sha256": canonical_hash(value)} for name, value in results.items()}
     write_json(out / "comparison.json", comparison)
+    regression_ok = before == results
+    if getattr(args, "coverage_transition", False):
+        from compare_hfs010 import compare_coverage_transition
+        transition = compare_coverage_transition(before, results)
+        write_json(out / "coverage-transition.json", transition)
+        regression_ok = all(entry["compatible"] for entry in transition.values())
     unchanged = all(sha(ROOT / name) == digest for name, digest in inputs.items())
     summary = {"suites": suites, "source_inputs_unchanged_during_capture": unchanged,
                "examples_identical": before == results, "case_files": len(results),
-               "engine_results_sha256": canonical_hash(results)}
+               "engine_results_sha256": canonical_hash(results),
+               "regression_accepted": regression_ok}
     write_json(out / "verification.json", summary)
     write_json(out / "SHA256SUMS.json", {p.relative_to(out).as_posix(): sha(p)
                                          for p in sorted(out.rglob("*")) if p.is_file()})
     print(json.dumps(summary, indent=2), flush=True)
-    return 0 if unchanged and before == results and all(s["exit"] == 0 for s in suites.values()) else 1
+    return 0 if unchanged and regression_ok and all(s["exit"] == 0 for s in suites.values()) else 1
 
 
 if __name__ == "__main__":
@@ -86,4 +93,6 @@ if __name__ == "__main__":
     parser.add_argument("--work", required=True)
     parser.add_argument("--extra-suite", action="append", default=[],
                         help="Additional test file to capture separately from the original suite.")
+    parser.add_argument("--coverage-transition", action="store_true",
+                        help="HFS-010: compare legacy checks/traces exactly and audit intended global-state changes separately.")
     raise SystemExit(capture(parser.parse_args()))

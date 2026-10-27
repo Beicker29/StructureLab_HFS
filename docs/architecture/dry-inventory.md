@@ -14,6 +14,20 @@ Fecha: 2026-10-26. Base inspeccionada: `dae8d76507810362c4e31484a00b8d664525f2e6
 
 ## Propietarios por responsabilidad
 
+Actualización HFS-010 (2026-10-27, para revisión): la matriz HFS-002 permanece como
+única fuente documental de requisitos. `domain/coverage.py` es su proyección
+conservadora ejecutable, sin imports del router ni capacidades; no se mantiene
+otra tabla normativa editable. `domain/coverage_evidence.py` vincula clases
+concretas ejecutadas con obligaciones parciales, sin construir el esperado.
+`results_model.py` es el propietario de cobertura, estado global y propagación
+de INCOMPLETE; CLI serializa esos resultados. `models.TensionScope` centraliza
+las declaraciones externas del único dominio completo de v1. Las guardas físicas
+siguen en HFS-011; no se duplica An<=Ag. [Contrato](../contracts/hfs010-coverage.md)
+e [informe](../audit/hfs010/report.md) detallan consumidores, pruebas y cambios.
+DRY-14 queda resuelto solo para cobertura de caso y propagación del nuevo estado;
+lote vacío F-29, resumen F-05, ecuaciones y consolidaciones de capacidades siguen
+en sus tareas. No se trasladan reglas ni se añade motor/DSL/servicio.
+
 Actualización HFS-016 (2026-10-27, para revisión): `sections/identity.py::section_identity`
 es la única política de nombres para importación y consulta. `SectionRepository`
 conserva registros por identidad y decide unicidad; `SectionSource` define la

@@ -75,16 +75,17 @@ def test_nan_load_must_be_rejected(repository):
     assert result.status.value != "PASS"
 
 
-@known_defect("F-01: W compression plus biaxial bending has no H interaction")
+# HFS-010: omission blocked by independent coverage; H formulas remain pending.
 def test_w_combination_requires_interaction_or_block(repository):
     try:
         result = run_case(repository, {"Pu": 1, "Mux": 1, "Muy": 1})
     except SteelDesignError:
         return
-    assert any(check.clause.startswith("H") for check in result.checks)
+    assert result.status.value == "INCOMPLETE"
+    assert any(o.id == "N29.interaction" and o.status.value == "PENDING" for o in result.coverage.obligations)
 
 
-@known_defect("F-03: missing slenderness ratios select F2")
+# HFS-010: global PASS blocked; correction of the F2 selector remains HFS-012.
 def test_missing_slenderness_must_block(repository):
     section = repository.get("W12X26").model_copy(update={"bf_2tf_ratio": None, "h_tw_ratio": None})
     repo = SectionRepository()
@@ -96,7 +97,7 @@ def test_missing_slenderness_must_block(repository):
     assert result.status.value != "PASS"
 
 
-@known_defect("F-31: channel minor-axis rules hide unsupported major-axis demand")
+# HFS-010: missing major component is explicit; no new major-axis implementation.
 def test_channel_both_axes_must_block_if_major_axis_is_unsupported(repository):
     # Synthetic routing probe, not a physically validated catalog section.
     section = repository.get("W12X26").model_copy(update={
@@ -107,7 +108,8 @@ def test_channel_both_axes_must_block_if_major_axis_is_unsupported(repository):
         result = run_case(repo, {"Mux": 1, "Muy": 1})
     except SteelDesignError:
         return
-    assert any("major" in check.name.lower() for check in result.checks)
+    assert result.status.value == "INCOMPLETE"
+    assert any(o.id == "F.yielding.Mux" and not o.executed_checks for o in result.coverage.obligations)
 
 
 # HFS-011: corrected input rejection, demonstrated before removing strict xfail.
@@ -165,7 +167,7 @@ def test_empty_bundle_must_not_pass(tmp_path):
     assert json.loads(completed.stdout)["status"] != "PASS"
 
 
-@known_defect("F-02: explicit zero demand still gives PASS with zero checks; HFS-010 pending")
+# HFS-010: explicit zero demand has no accredited resistance scope.
 def test_explicit_zero_loads_must_not_pass_without_checks(repository):
     result = run_case(repository, {"Pu": 0})
     assert result.status.value != "PASS"

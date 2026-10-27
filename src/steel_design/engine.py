@@ -1,12 +1,15 @@
 import math
 
-from .models import CheckStatus, CustomSectionType, SteelCase
+from .models import CustomSectionType, SteelCase
 from .results_model import EngineResult
 from .sections.models import Section
 from .sections.repository import SectionRepository
 from .domain.validation import validate_case, validate_section, validate_case_section
 from .domain.errors import RuleNotImplementedError, SectionNotFoundError, ValidationError
 from .domain.routing.profile_router import ProfileRouter
+from .domain.coverage import build_coverage_plan
+from .domain.coverage_evidence import record_evaluation
+from .domain.errors import IncompleteSectionDataError
 
 
 def _build_custom_section(case: SteelCase) -> Section:
@@ -144,20 +147,20 @@ class SteelDesignEngine:
                 details={"section": section.name, "profile_type": section.type, "requested_clause": "H3.3"},
             )
             
+        # Expected obligations are constructed BEFORE and independently of routing.
+        coverage = build_coverage_plan(case, section)
         # 3. Get rules dynamically
         rules = self.router.get_rules(case, section)
         
         # 4. Run checks
         checks = []
         for rule in rules:
-            result = rule.check(case, section)
+            try:
+                result = rule.check(case, section)
+            except (RuleNotImplementedError, IncompleteSectionDataError) as exc:
+                coverage.evaluation_errors.append({"implementation": type(rule).__name__, "error": exc.to_dict()})
+                continue
             checks.append(result)
-            
-        # 5. Aggregate overall status
-        overall_status = CheckStatus.PASS
-        for c in checks:
-            if c.status == CheckStatus.FAIL:
-                overall_status = CheckStatus.FAIL
-                break
-                
-        return EngineResult(checks=checks, status=overall_status)
+            record_evaluation(coverage, rule, result, len(checks) - 1, case, section)
+
+        return EngineResult(checks=checks, coverage=coverage)
