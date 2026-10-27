@@ -44,10 +44,13 @@ def capture(args):
         "baseline": str(baseline), "baseline_sha256": sha(baseline),
     })
     suites = {}
+    extra_suites = getattr(args, "extra_suite", [])
     for label, selection in [
-        ("original", ["--ignore=tests/test_hfs000_characterization.py", "--ignore=tests/test_hfs011_input_contracts.py"]),
+        ("original", ["--ignore=tests/test_hfs000_characterization.py", "--ignore=tests/test_hfs011_input_contracts.py",
+                      *[f"--ignore={path}" for path in extra_suites]]),
         ("characterization", ["tests/test_hfs000_characterization.py"]),
         ("contracts", ["tests/test_hfs011_input_contracts.py"]),
+        *[(Path(path).stem, [path]) for path in extra_suites],
     ]:
         xml = out / f"pytest-{label}.xml"
         command = [sys.executable, "-m", "pytest", "-q", "-ra", "--tb=short", "-p", "no:cacheprovider",
@@ -81,4 +84,6 @@ if __name__ == "__main__":
     parser.add_argument("--baseline", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--work", required=True)
+    parser.add_argument("--extra-suite", action="append", default=[],
+                        help="Additional test file to capture separately from the original suite.")
     raise SystemExit(capture(parser.parse_args()))

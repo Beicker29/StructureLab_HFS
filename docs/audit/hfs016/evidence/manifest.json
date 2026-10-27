@@ -1,0 +1,160 @@
+{
+  "policy": "New copies only; original captures preserved; no frozen evidence overwritten.",
+  "files": [
+    {
+      "file": "before/catalog.json",
+      "origin": ".venv/hfs016-before/catalog.json",
+      "sha256": "4f67016c9e64911f54511ef4cd0fd6d30c2528581836e96de2a8f27dd094434a"
+    },
+    {
+      "file": "before/comparison.json",
+      "origin": ".venv/hfs016-before/comparison.json",
+      "sha256": "fc0ec5115ca5a30056b80932819ae3800dd24a72cbafb1f975954bae4654b91c"
+    },
+    {
+      "file": "before/copied_inputs.json",
+      "origin": ".venv/hfs016-before/copied_inputs.json",
+      "sha256": "9b75b0274163a9dafa277c6f071ce8723e04715dfbf3f1fdaae8545d06f955a3"
+    },
+    {
+      "file": "before/engine-results.json",
+      "origin": ".venv/hfs016-before/engine-results.json",
+      "sha256": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62"
+    },
+    {
+      "file": "before/environment.json",
+      "origin": ".venv/hfs016-before/environment.json",
+      "sha256": "338e309afabd1be7a475df19a9658ef1cd88dfc8851d3609b437f15bdbf6c3f6"
+    },
+    {
+      "file": "before/pytest-characterization.json",
+      "origin": ".venv/hfs016-before/pytest-characterization.json",
+      "sha256": "aa98bf539dc662fefcc64c276e8273752bfedc8ef0332a8079f6abc41405e16e"
+    },
+    {
+      "file": "before/pytest-characterization.xml",
+      "origin": ".venv/hfs016-before/pytest-characterization.xml",
+      "sha256": "68e1314aba9be46cb23886fd3c7cd17e3e717274f912b3b76bf7f64a6e391884"
+    },
+    {
+      "file": "before/pytest-contracts.json",
+      "origin": ".venv/hfs016-before/pytest-contracts.json",
+      "sha256": "d0435b5850ebe893063c85cdf785aa2589a3d690ea79b878ea4276a85b880cba"
+    },
+    {
+      "file": "before/pytest-contracts.xml",
+      "origin": ".venv/hfs016-before/pytest-contracts.xml",
+      "sha256": "233442659c9dda9b322a092892475cd153bd8c44be47a84164a33272c3c9dbe5"
+    },
+    {
+      "file": "before/pytest-original.json",
+      "origin": ".venv/hfs016-before/pytest-original.json",
+      "sha256": "bd23c6360093a32ca9101d1b7f590b27bd88862a16ea2427d1c9469b86750d1a"
+    },
+    {
+      "file": "before/pytest-original.xml",
+      "origin": ".venv/hfs016-before/pytest-original.xml",
+      "sha256": "ea9177dc52193d2020931f21a1d66cdc0ef6a190aeef0be2f80293f7c807c27a"
+    },
+    {
+      "file": "before/SHA256SUMS.json",
+      "origin": ".venv/hfs016-before/SHA256SUMS.json",
+      "sha256": "718ab90ceae8dbf25dfadd925e5d8b37c6e2c27b2da6dcd4c0a6800a9a49060f"
+    },
+    {
+      "file": "before/verification.json",
+      "origin": ".venv/hfs016-before/verification.json",
+      "sha256": "6e213cf2b4c2aba8a3afeb2af04dd4294ab422248b7ca56bf61818a844133fb3"
+    },
+    {
+      "file": "after/catalog.json",
+      "origin": ".venv/hfs016-final/catalog.json",
+      "sha256": "5763a182bfaf3f8e43ac646e2fc09ccebd8c009e4f036953083f474320049274"
+    },
+    {
+      "file": "after/comparison.json",
+      "origin": ".venv/hfs016-final/comparison.json",
+      "sha256": "fc0ec5115ca5a30056b80932819ae3800dd24a72cbafb1f975954bae4654b91c"
+    },
+    {
+      "file": "after/copied_inputs.json",
+      "origin": ".venv/hfs016-final/copied_inputs.json",
+      "sha256": "892d0f43611564f89c54e88d599d3b2debea50a3a0bdcb36e2fd28de78cab7b5"
+    },
+    {
+      "file": "after/engine-results.json",
+      "origin": ".venv/hfs016-final/engine-results.json",
+      "sha256": "e3cd46b98f61c5b24901c10fc385fc046ab15abcb87de32c067b36b0637b8d62"
+    },
+    {
+      "file": "after/environment.json",
+      "origin": ".venv/hfs016-final/environment.json",
+      "sha256": "8aa696fbec61ada62909b0eee62a5072987cd326e4a5e783ba75c56897598658"
+    },
+    {
+      "file": "after/pytest-characterization.json",
+      "origin": ".venv/hfs016-final/pytest-characterization.json",
+      "sha256": "aafc1772923be04bb62e6f52b293b18872f7bd4263c3f73fc5b8fe8bb240cfca"
+    },
+    {
+      "file": "after/pytest-characterization.xml",
+      "origin": ".venv/hfs016-final/pytest-characterization.xml",
+      "sha256": "52d71fce416eca8dae306d42a01a677b23ee259ec3c1bfca55c40dded9d41109"
+    },
+    {
+      "file": "after/pytest-contracts.json",
+      "origin": ".venv/hfs016-final/pytest-contracts.json",
+      "sha256": "e65e27c30b713eed780b2bbfaa7fc364b3d4c90369008b0ee2251b84a52896b4"
+    },
+    {
+      "file": "after/pytest-contracts.xml",
+      "origin": ".venv/hfs016-final/pytest-contracts.xml",
+      "sha256": "1aaf08d2b318ebd1075b96e748349cdfd5baa9e016668a33ace16048bccb0905"
+    },
+    {
+      "file": "after/pytest-original.json",
+      "origin": ".venv/hfs016-final/pytest-original.json",
+      "sha256": "3d984ebd6d0b61fefae64027d0256b750ff2e272121bf365179746e020c6bc75"
+    },
+    {
+      "file": "after/pytest-original.xml",
+      "origin": ".venv/hfs016-final/pytest-original.xml",
+      "sha256": "47308ab0dc60b62321469e74cdb5155560022ce0aef7e06fc14aa4d8ec717274"
+    },
+    {
+      "file": "after/pytest-test_hfs016_catalog_integrity.json",
+      "origin": ".venv/hfs016-final/pytest-test_hfs016_catalog_integrity.json",
+      "sha256": "1f4274f2f49f352d4647d5d756e416010b015c9fe001a2124df4481eb7b237e8"
+    },
+    {
+      "file": "after/pytest-test_hfs016_catalog_integrity.xml",
+      "origin": ".venv/hfs016-final/pytest-test_hfs016_catalog_integrity.xml",
+      "sha256": "0a8306a11b1f0f508a1cff07fd9317a4882c065eeb7fa2802b5df1c7d0e6b334"
+    },
+    {
+      "file": "after/SHA256SUMS.json",
+      "origin": ".venv/hfs016-final/SHA256SUMS.json",
+      "sha256": "ec0fbc99c77338ca26f96aa0dc7bf23b0bec622144a2cfe18cf9a8ab48dbb267"
+    },
+    {
+      "file": "after/verification.json",
+      "origin": ".venv/hfs016-final/verification.json",
+      "sha256": "e97f4f13373bbfdbabc5156f491a92d68c25b63f52f3b59b8c4cc142fad3ddf6"
+    },
+    {
+      "file": "probes-before.json",
+      "origin": ".venv/hfs016-probes-before.json",
+      "sha256": "9ea259a64fac4ce5194edeac64a2fd2afd9e2fa5a720b4f0a58e2197987649ae"
+    },
+    {
+      "file": "probes-after.json",
+      "origin": ".venv/hfs016-probes-after.json",
+      "sha256": "d925ff706cb208901bda49c945e768cb35b6d98e7628e9a9b1c324387bd1725e"
+    },
+    {
+      "file": "initial-characterization.json",
+      "origin": ".venv/hfs016-initial/pytest-characterization.json",
+      "sha256": "591179262066a42b66a47a1272575d4000d5de1f3948d3b4760b3ef1aa13968f"
+    }
+  ]
+}
