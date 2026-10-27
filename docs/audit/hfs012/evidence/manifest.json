@@ -1,0 +1,205 @@
+{
+  "promoted": [
+    {
+      "source": ".venv/hfs012-before-clean/comparison.json",
+      "target": "docs/audit/hfs012/evidence/before/comparison.json",
+      "sha256": "d5f7f92e118d1ee13a0256974dfae908856ce25726de04aff0485973f32bce4e",
+      "bytes": 2917
+    },
+    {
+      "source": ".venv/hfs012-before-clean/copied_inputs.json",
+      "target": "docs/audit/hfs012/evidence/before/copied_inputs.json",
+      "sha256": "9ec88a71f073d9483cf622e20c7c30e2800a67adfd85ddb3cddbfd312690ddfd",
+      "bytes": 6288
+    },
+    {
+      "source": ".venv/hfs012-before-clean/environment.json",
+      "target": "docs/audit/hfs012/evidence/before/environment.json",
+      "sha256": "0c4b1bc1885d284eb476c4d0d03ee634ab7324631f369f3d93a3926cdc3fbd6e",
+      "bytes": 2216
+    },
+    {
+      "source": ".venv/hfs012-before-clean/pytest-characterization.json",
+      "target": "docs/audit/hfs012/evidence/before/pytest-characterization.json",
+      "sha256": "ca0fe9d143f45388122c8498aafc878d35bc4e38b8c4fc7a354c70f553da4b0f",
+      "bytes": 1356
+    },
+    {
+      "source": ".venv/hfs012-before-clean/pytest-contracts.json",
+      "target": "docs/audit/hfs012/evidence/before/pytest-contracts.json",
+      "sha256": "967f353ebfba63c35032b028f73c680aadf98501204c2350a7791e909fd117bd",
+      "bytes": 1520
+    },
+    {
+      "source": ".venv/hfs012-before-clean/pytest-original.json",
+      "target": "docs/audit/hfs012/evidence/before/pytest-original.json",
+      "sha256": "1798cb55d92271a07e28bf68f9d7a1a641776317527e55ac54c85a64dca1daf3",
+      "bytes": 1044
+    },
+    {
+      "source": ".venv/hfs012-before-clean/pytest-test_hfs010_coverage.json",
+      "target": "docs/audit/hfs012/evidence/before/pytest-test_hfs010_coverage.json",
+      "sha256": "1b5177971c11b662b442715c6a4eaa46901cfc7025b7435c90ecf9dc4630edef",
+      "bytes": 804
+    },
+    {
+      "source": ".venv/hfs012-before-clean/pytest-test_hfs016_catalog_integrity.json",
+      "target": "docs/audit/hfs012/evidence/before/pytest-test_hfs016_catalog_integrity.json",
+      "sha256": "2556ae19a5838aa66e0542853b1562cee0d3ea68220961c9922ebf9fb286e417",
+      "bytes": 832
+    },
+    {
+      "source": ".venv/hfs012-before-clean/verification.json",
+      "target": "docs/audit/hfs012/evidence/before/verification.json",
+      "sha256": "f2ce153e9ea7bb7b7d1ad3cde17316179567511752115a345f417ceffa8e1679",
+      "bytes": 2072
+    },
+    {
+      "source": ".venv/hfs012-release/comparison.json",
+      "target": "docs/audit/hfs012/evidence/after/comparison.json",
+      "sha256": "d5f7f92e118d1ee13a0256974dfae908856ce25726de04aff0485973f32bce4e",
+      "bytes": 2917
+    },
+    {
+      "source": ".venv/hfs012-release/copied_inputs.json",
+      "target": "docs/audit/hfs012/evidence/after/copied_inputs.json",
+      "sha256": "99404debc5efd8fc5a89603f0ac1d67302c7bf5545229ae55557609ebff3ee0f",
+      "bytes": 6401
+    },
+    {
+      "source": ".venv/hfs012-release/environment.json",
+      "target": "docs/audit/hfs012/evidence/after/environment.json",
+      "sha256": "878b146257977cf11f9b71b9d6d8d2cebf7007a86db9a60780b2d57852847294",
+      "bytes": 2242
+    },
+    {
+      "source": ".venv/hfs012-release/pytest-characterization.json",
+      "target": "docs/audit/hfs012/evidence/after/pytest-characterization.json",
+      "sha256": "296365bbb4bcac5c44818ebf997bb5c6e31386bf97ee99108cce1b1b5f9ca4a7",
+      "bytes": 1341
+    },
+    {
+      "source": ".venv/hfs012-release/pytest-contracts.json",
+      "target": "docs/audit/hfs012/evidence/after/pytest-contracts.json",
+      "sha256": "322f8a315a1168480f164473d23386bbe39b06d2fdcf1245f6a2b02aff514d3f",
+      "bytes": 1505
+    },
+    {
+      "source": ".venv/hfs012-release/pytest-original.json",
+      "target": "docs/audit/hfs012/evidence/after/pytest-original.json",
+      "sha256": "153036dcfe691017e091da87ef46a26a68064b10e828dcbffb0f686e1e54891c",
+      "bytes": 1085
+    },
+    {
+      "source": ".venv/hfs012-release/pytest-test_hfs010_coverage.json",
+      "target": "docs/audit/hfs012/evidence/after/pytest-test_hfs010_coverage.json",
+      "sha256": "693a1edcf766329ec21e144669b3df74ba428ccba54ec792dcdd02cc4d0458ad",
+      "bytes": 789
+    },
+    {
+      "source": ".venv/hfs012-release/pytest-test_hfs012_flexure_selection.json",
+      "target": "docs/audit/hfs012/evidence/after/pytest-test_hfs012_flexure_selection.json",
+      "sha256": "b2d1518abc69e489848d3e915646161942bc183bc062a000bc689279c18bfb0b",
+      "bytes": 816
+    },
+    {
+      "source": ".venv/hfs012-release/pytest-test_hfs016_catalog_integrity.json",
+      "target": "docs/audit/hfs012/evidence/after/pytest-test_hfs016_catalog_integrity.json",
+      "sha256": "c38c5ccfeb08a04904542332ccbe65b09ffd146cc82727fd0da81971d2a7934f",
+      "bytes": 817
+    },
+    {
+      "source": ".venv/hfs012-release/verification.json",
+      "target": "docs/audit/hfs012/evidence/after/verification.json",
+      "sha256": "e5cf66ce0aa48e4cce5b6042c743aaa71f70042f4e75f266f76a2b2640b585fc",
+      "bytes": 2447
+    },
+    {
+      "source": ".venv/hfs012-before/environment.json",
+      "target": "docs/audit/hfs012/evidence/incidents/initial-environment.json",
+      "sha256": "e4f945ad6be272e14659a6af99686169bb6611cf97cdf33eab214aa6088cf38a",
+      "bytes": 4479
+    },
+    {
+      "source": ".venv/hfs012-before/verification.json",
+      "target": "docs/audit/hfs012/evidence/incidents/sandbox-verification.json",
+      "sha256": "cd16a37b47269e92a06dc028f0efda8f94b0cc33e1f5f8f0e4040c240927827a",
+      "bytes": 2070
+    },
+    {
+      "source": ".venv/hfs012-initial-targeted.json",
+      "target": "docs/audit/hfs012/evidence/incidents/initial-targeted.json",
+      "sha256": "9e872dbf6eea6a701fcc4b0e0bb2cbdfe3cc0f7085a6a0d86c9b5b407296258b",
+      "bytes": 13912
+    },
+    {
+      "source": ".venv/hfs012-after-initial/pytest-original.json",
+      "target": "docs/audit/hfs012/evidence/incidents/initial-cli-transition.json",
+      "sha256": "a9b9ff427624c4d4090562d48ea80944c441b764b9c8b590fdbf64772b0d064c",
+      "bytes": 1649
+    },
+    {
+      "source": ".venv/hfs012-probes-before.json",
+      "target": "docs/audit/hfs012/evidence/probes-before.json",
+      "sha256": "502bdd2a48b4b4e9c77bf9c5acb0431743dcd559c75d75d92c25516b9fbcc356",
+      "bytes": 214707
+    },
+    {
+      "source": ".venv/hfs012-probes-after.json",
+      "target": "docs/audit/hfs012/evidence/probes-after.json",
+      "sha256": "353d7b214333c070870e5f32e2fa0a82a41ab53a15211eb6cd17740cef2b416b",
+      "bytes": 208512
+    },
+    {
+      "source": ".venv/hfs012-before/pytest-characterization.json",
+      "target": "docs/audit/hfs012/evidence/incidents/sandbox-characterization.json",
+      "sha256": "be4105531c92ee50361ef9dfedee5cac2938cae09a878a0bc7252bd97dd953e6",
+      "bytes": 5913
+    },
+    {
+      "source": ".venv/hfs012-before/pytest-contracts.json",
+      "target": "docs/audit/hfs012/evidence/incidents/sandbox-contracts.json",
+      "sha256": "84b90d1ec64af5e0b100a215dbaa4f19777554946289944cf4a3f9e8cbb12361",
+      "bytes": 6620
+    },
+    {
+      "source": ".venv/hfs012-before/pytest-test_hfs016_catalog_integrity.json",
+      "target": "docs/audit/hfs012/evidence/incidents/sandbox-test_hfs016_catalog_integrity.json",
+      "sha256": "7484705799fc5bf8d0a1c8e217436555472ddef95375f4a30bcc0a1dc6245089",
+      "bytes": 5953
+    },
+    {
+      "source": ".venv/hfs012-before/pytest-test_hfs010_coverage.json",
+      "target": "docs/audit/hfs012/evidence/incidents/sandbox-test_hfs010_coverage.json",
+      "sha256": "7b9d1fb75c89c68d81f8c680768ebd18f46e508cf1642c603de0d2ff525ff3ac",
+      "bytes": 5917
+    }
+  ],
+  "examples": {
+    "canonical": "docs/audit/hfs010/evidence/after/engine-results.json",
+    "sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2",
+    "captures": {
+      ".venv/hfs012-before": {
+        "identical": true,
+        "sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2"
+      },
+      ".venv/hfs012-before-clean": {
+        "identical": true,
+        "sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2"
+      },
+      ".venv/hfs012-release": {
+        "identical": true,
+        "sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2"
+      }
+    },
+    "policy": "Equal results remain recoverable in tracked HFS-010; new duplicate output copies stay in .venv."
+  },
+  "commands": {
+    "before": "python .venv/hfs012-before-work/scripts/audit_hfs011.py --baseline docs/audit/hfs010/evidence/after/engine-results.json --out .venv/hfs012-before-clean --work .venv/hfs012-before-clean-work --extra-suite tests/test_hfs016_catalog_integrity.py --extra-suite tests/test_hfs010_coverage.py",
+    "after": "python scripts/audit_hfs011.py --baseline .venv/hfs012-before/engine-results.json --out .venv/hfs012-release --work .venv/hfs012-release-work --extra-suite tests/test_hfs016_catalog_integrity.py --extra-suite tests/test_hfs010_coverage.py --extra-suite tests/test_hfs012_flexure_selection.py",
+    "probes_before": "python docs/audit/hfs012/probes.py --root .venv/hfs012-before-work --out .venv/hfs012-probes-before.json",
+    "probes_after": "python docs/audit/hfs012/probes.py --root . --out .venv/hfs012-probes-after.json"
+  },
+  "interpreter": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS"
+}

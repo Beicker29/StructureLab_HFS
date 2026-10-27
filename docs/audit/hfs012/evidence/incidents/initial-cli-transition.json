@@ -1,0 +1,23 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--ignore=tests/test_hfs000_characterization.py",
+    "--ignore=tests/test_hfs011_input_contracts.py",
+    "--ignore=tests/test_hfs016_catalog_integrity.py",
+    "--ignore=tests/test_hfs010_coverage.py",
+    "--ignore=tests/test_hfs012_flexure_selection.py",
+    "--basetemp=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs012-after-initial-work\\temp-original",
+    "--junitxml=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs012-after-initial\\pytest-original.xml"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs012-after-initial-work",
+  "returncode": 1,
+  "stdout": ".........................................F.................. [ 88%]\n........                                                                 [100%]\n================================== FAILURES ===================================\n__ EngineCliIntegrationTests.test_cli_fails_hard_for_incomplete_catalog_data __\ntests\\test_engine_cli_integration.py:94: in test_cli_fails_hard_for_incomplete_catalog_data\n    self.assertNotEqual(0, completed.returncode)\nE   AssertionError: 0 == 0\n=========================== short test summary info ===========================\nFAILED tests/test_engine_cli_integration.py::EngineCliIntegrationTests::test_cli_fails_hard_for_incomplete_catalog_data\n1 failed, 67 passed, 12 subtests passed in 38.53s\n",
+  "stderr": ""
+}

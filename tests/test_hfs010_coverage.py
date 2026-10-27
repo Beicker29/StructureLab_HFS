@@ -188,13 +188,15 @@ def test_f01_f33_interaction_required_independently_of_router(repository, loads)
 
 
 def test_f03_unknown_compactness_is_never_covered(repository):
-    section = repository.get("W12X26").model_copy(update=dict(bf_2tf_ratio=None, h_tw_ratio=None))
+    # HFS-012: remove the dimensions as well, so compactness is truly unknown.
+    section = repository.get("W12X26").model_copy(update=dict(bf_2tf_ratio=None, h_tw_ratio=None, bf=None, h=None))
     repo = SectionRepository()
     repo.load([section])
     result = SteelDesignEngine(repo).run(SteelCase(**payload(dict(Mux=1))))
     assert result.status.value == "INCOMPLETE"
     assert obligations(result)["N11.conditions.Mux"].applicability == "UNKNOWN"
-    assert obligations(result)["F.yielding.Mux"].executed_checks  # old F2 computation retained, never accredited
+    assert not obligations(result)["F.yielding.Mux"].executed_checks
+    assert result.coverage.evaluation_errors  # HFS-012 suppresses unaccredited F2
 
 
 def test_f31_minor_axis_does_not_cover_major(repository):

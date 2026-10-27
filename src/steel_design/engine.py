@@ -8,7 +8,7 @@ from .domain.validation import validate_case, validate_section, validate_case_se
 from .domain.errors import RuleNotImplementedError, SectionNotFoundError, ValidationError
 from .domain.routing.profile_router import ProfileRouter
 from .domain.coverage import build_coverage_plan
-from .domain.coverage_evidence import record_evaluation
+from .domain.coverage_evidence import record_evaluation, record_selection_errors
 from .domain.errors import IncompleteSectionDataError
 
 
@@ -150,7 +150,9 @@ class SteelDesignEngine:
         # Expected obligations are constructed BEFORE and independently of routing.
         coverage = build_coverage_plan(case, section)
         # 3. Get rules dynamically
-        rules = self.router.get_rules(case, section)
+        selection_errors = []
+        rules = self.router.get_rules(case, section, selection_errors)
+        record_selection_errors(coverage, selection_errors)
         
         # 4. Run checks
         checks = []

@@ -1,6 +1,11 @@
-# Seguimiento maestro de hallazgos — HFS-010
+# Seguimiento maestro de hallazgos — HFS-012
 
 Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
+
+Entrega actual: [HFS-012](hfs012/report.md) sobre `main` con HFS-010/011/016
+incorporadas. Corrección F-03 lista para revisión; F-31 sigue abierto. Cambios
+locales sin publicación automática. El párrafo siguiente conserva el contexto
+de aceptación y publicación de los hitos anteriores.
 
 Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por declaración del usuario. HFS-010 implementada; revisión técnica posterior a publicación/fusión autorizada. Las notas de entregas anteriores son históricas. «Observado» acredita código/ejecución; «riesgo» conserva incertidumbre normativa/física. Las tareas indican seguimiento; las correcciones ejecutadas se identifican expresamente. La [matriz HFS-002](../normative/hfs002-applicability.md) y su [contraste/riesgos](../normative/hfs002-implementation.md) conservan el diagnóstico, sin reescribir findings HFS-000.
 
@@ -8,7 +13,7 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 |---|---|---|---|---|
 | F-01 | P0 | HFS-010 bloquea el PASS sin interacción; implementación/validación H pendiente. W sin interacción reproducido; H1.1/2 local incluye familias elegibles no HSS, H2 alternativa según condiciones | HFS-010/034 | Cobertura por combinación y dominio; no copiar HSS indiscriminadamente |
 | F-02 | P0 | Corregido por HFS-010: cero checks/cero cargas explícitas produce INCOMPLETE; cierre demostrado para revisión. Observado: PASS sin checks | HFS-010 | Caso vacío/incompleto nunca PASS |
-| F-03 | P0 | HFS-010 bloquea acreditación de F2 con condiciones desconocidas; selector sigue pendiente HFS-012. F2 sin razones reproducido; F2/B4.1 exigen alas/alma compactas, no default | HFS-012 | Derivación con geometría fiable o bloqueo; fronteras y canal con ancho correcto |
+| F-03 | P0 | Corrección HFS-012 presentada para revisión: no se selecciona F2 con razones desconocidas, inválidas o clases contradictorias; derivación desde dimensiones B4.1 explícitas, canal con ancho completo. [Evidencia](hfs012/report.md). HFS-010 conserva pendientes y checks independientes | HFS-012; auditoría integral HFS-032/040 | Revisar límites, significado/procedencia de dimensiones y alcance declarado; no confundir corrección del fallback con validación de todas las resistencias F |
 | F-04 | P0 | Corregido en contrato HFS-011 para revisión: extras/vacío rechazados, carga parcial documentada | HFS-011 | Evidencia por campo; revisión técnica del contrato/defaults pendiente |
 | F-05 | P0 | Observado: resumen mezcla dimensiones | HFS-014 | Gobernante por DCR con eje/unidad y sin mínimo incompatible |
 | F-06 | P0 | HFS-010 mantiene INCOMPLETE el dominio afectado sin cambiar máximos ni capacidades. H3.2/H3-6 exige máximo de cocientes; max demanda/max capacidad no equivale, contraejemplo independiente 0,5 vs 0,25 | HFS-013/033/034 | Resolver ejes y capacidades con HSS real asimétrico; discrepancia algebraica confirmada, impacto físico por caso pendiente |
@@ -36,7 +41,7 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-28 | P2 | Permisos/erratas pendientes | HFS-030 y revisión documental | Registro verificable de edición, permisos y erratas |
 | F-29 | P1 | Observado: lote vacío PASS | HFS-014 | Cardinalidad/completitud y agregación verificadas |
 | F-30 | P1 | Riesgo de cobertura normativa no auditada | HFS-030–038/041 | Validación independiente; no cierre global por tests verdes |
-| F-31 | **P0** | HFS-010 registra Mux pendiente aunque exista F6 menor; fórmula mayor no añadida. Confirmado en sonda: un check F de eje menor oculta demanda mayor sin evaluar | HFS-002/010; contraste de flexión HFS-032 | Cobertura exigida por componente; caso real y frontera además de sonda |
+| F-31 | **P0** | Mitigado, no cerrado: HFS-010 mantiene Mux pendiente aunque exista F6. HFS-012 añade diagnóstico explícito de selección mayor bloqueada también en biaxial; no añade fórmulas de canal ni valida F6. [Sondas antes/después](hfs012/report.md) | HFS-002/010/012; contraste de flexión HFS-032 | Cobertura por componente, canal real y fronteras; revisar ancho completo en F6 y resistencias de canal antes de acreditar cobertura |
 | F-32 | **P1** | Confirmado: FAIL con exit 0; riesgo para consumidores, no regresión | HFS-022 y documentación CLI al adaptar HFS-021 | Semántica ejecución/diseño documentada y consumidores probados; transición si cambia |
 | F-33 | P0 propuesto | HFS-010 exige interacción incluso Pu=0; rutas H/I completas pendientes. Biaxial sin axial omitida: sonda W y gating H/I; N29/N42 | HFS-010/034/035 | Obligaciones por combinación, incluso Pu=0; ruta por familia validada |
 | F-34 | P0 propuesto | HFS-010 exige resistencia M por eje; cuantía/transferencia no la cubren. Tres roles compuestos con flexión pura 1 y 1 000 000 kNm conservan PASS sin check resistente M | HFS-010/035 | No confundir cuantía/transferencia con flexión; evaluar/bloquear M por eje y etapa |

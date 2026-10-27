@@ -1,0 +1,57 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+  "overrides": {
+    "PYTHONNOUSERSITE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONUTF8": "1"
+  },
+  "branch": {
+    "command": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "90724b2efa8333ab59cd7c863d1052f0d0d1bbfd\n",
+    "stderr": ""
+  },
+  "status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "warning: could not open directory '.tmp_test/tmp0_8yr_64/': Permission denied\nwarning: could not open directory '.tmp_test/tmp2a4bzka6/': Permission denied\nwarning: could not open directory '.tmp_test/tmp5wxraw4a/': Permission denied\nwarning: could not open directory '.tmp_test/tmp7twtefjq/': Permission denied\nwarning: could not open directory '.tmp_test/tmp7z8f7yop/': Permission denied\nwarning: could not open directory '.tmp_test/tmpb5sea0ud/': Permission denied\nwarning: could not open directory '.tmp_test/tmpdavf6e0t/': Permission denied\nwarning: could not open directory '.tmp_test/tmpg2nfbxa4/': Permission denied\nwarning: could not open directory '.tmp_test/tmpqahi728y/': Permission denied\nwarning: could not open directory '.tmp_test/tmpqaod4h_n/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_4rn4de_o/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_6jywjxew/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_ainfdvxk/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_ijzsgdqb/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_k1ipcu4t/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_qqmb2y75/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_16efx1m7/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_3bjrukkv/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_4gy7xx53/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_5g740m8n/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_biqp3kr_/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_bxbq1fqe/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_dkwosl6m/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_dxbzjt36/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_glg8iwj6/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_gnhhrd45/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_hsnte0lm/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_vrs7uucx/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_z9pii8k8/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader__s7gevx_/': Permission denied\n"
+  },
+  "freeze": {
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "freeze",
+      "--all"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "annotated-types==0.8.0\ncolorama==0.4.6\net_xmlfile==2.0.0\niniconfig==2.3.1\nopenpyxl==3.1.5\npackaging==26.3\npip==25.0.1\npluggy==1.7.0\npydantic==2.14.1\npydantic_core==2.50.1\nPygments==2.21.0\npytest==9.1.1\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\n",
+    "stderr": ""
+  },
+  "baseline": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\docs\\audit\\hfs010\\evidence\\after\\engine-results.json",
+  "baseline_sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2"
+}

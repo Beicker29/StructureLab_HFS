@@ -67,6 +67,17 @@ for cls in (composite.CompositeI4_1aEncasedRule, composite.CompositeI4_1bEncased
     _CLAIMS[cls] = ("I.shear.Vu", "I.shear.Vux", "I.shear.Vuy")  # partial, never qualified by this map
 
 
+def record_selection_errors(report, errors):
+    """Annotate existing independent obligations; never derive or discharge them."""
+    report.evaluation_errors.extend(errors)
+    for entry in errors:
+        error = entry["error"]
+        component = error["details"].get("component")
+        for obligation in report.obligations:
+            if obligation.id == f"N11.conditions.{component}":
+                obligation.reason += f" Selection blocked: {error['message']} Details: {error['details']}."
+
+
 def record_evaluation(report, rule, result, index, case, section):
     implementation = type(rule)
     claims = _CLAIMS.get(implementation, ())

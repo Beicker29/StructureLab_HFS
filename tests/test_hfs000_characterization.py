@@ -85,9 +85,10 @@ def test_w_combination_requires_interaction_or_block(repository):
     assert any(o.id == "N29.interaction" and o.status.value == "PENDING" for o in result.coverage.obligations)
 
 
-# HFS-010: global PASS blocked; correction of the F2 selector remains HFS-012.
+# HFS-012: absent, non-derivable compactness blocks F2 itself, as well as PASS.
 def test_missing_slenderness_must_block(repository):
-    section = repository.get("W12X26").model_copy(update={"bf_2tf_ratio": None, "h_tw_ratio": None})
+    section = repository.get("W12X26").model_copy(update={
+        "bf_2tf_ratio": None, "h_tw_ratio": None, "bf": None, "h": None})
     repo = SectionRepository()
     repo.load([section])
     try:
@@ -95,6 +96,7 @@ def test_missing_slenderness_must_block(repository):
     except SteelDesignError:
         return
     assert result.status.value != "PASS"
+    assert not any(c.clause.startswith("F2") for c in result.checks)
 
 
 # HFS-010: missing major component is explicit; no new major-axis implementation.

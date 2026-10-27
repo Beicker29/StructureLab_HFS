@@ -1,0 +1,57 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+  "overrides": {
+    "PYTHONNOUSERSITE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONUTF8": "1"
+  },
+  "branch": {
+    "command": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "90724b2efa8333ab59cd7c863d1052f0d0d1bbfd\n",
+    "stderr": ""
+  },
+  "status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": " M src/steel_design/domain/coverage_evidence.py\n M src/steel_design/domain/routing/profile_router.py\n M src/steel_design/engine.py\n M tests/test_chapter_f_rules.py\n M tests/test_engine_cli_integration.py\n M tests/test_hfs000_characterization.py\n M tests/test_hfs010_coverage.py\n?? docs/audit/hfs012/\n?? tests/test_hfs012_flexure_selection.py\n",
+    "stderr": ""
+  },
+  "freeze": {
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "freeze",
+      "--all"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "annotated-types==0.8.0\ncolorama==0.4.6\net_xmlfile==2.0.0\niniconfig==2.3.1\nopenpyxl==3.1.5\npackaging==26.3\npip==25.0.1\npluggy==1.7.0\npydantic==2.14.1\npydantic_core==2.50.1\nPygments==2.21.0\npytest==9.1.1\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\n",
+    "stderr": ""
+  },
+  "baseline": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs012-before\\engine-results.json",
+  "baseline_sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2"
+}
