@@ -133,3 +133,22 @@ siguen pendientes: no se generaliza esta extracción a D/E/F/H1/I ni al reporte.
 Pruebas independientes y diferencias antes/después en el
 [informe HFS-013](../audit/hfs013/report.md); los oráculos se conservan separados
 del código productivo deliberadamente.
+
+### Revisión final HFS-013 — F-43 y conversión F1
+
+Fuente canónica actual de **Mn→Mc por método**:
+`codes/aisc_360_22/flexure_calc.py::available_flexural_strength`.
+Define una vez φb=0,90 y Ωb=1,67 (F1(a)), convierte N·mm a kN·m y rechaza
+métodos desconocidos. No es otro evaluador de resistencia nominal.
+
+Mapa de consumidores: `_available_flexural_strength` de `combined_hss_rules`
+elige F7/F8 y transmite `case.design_method.value`; H3 y H1 comparten esa función.
+`available_flexural_strength_lrfd` conserva su firma como delegación al mismo
+conversor, por compatibilidad con `_build_flexure_result` y `FlexureEvaluator`,
+cuyas rutas siguen limitadas a LRFD. No se copia 0,90/1,67 en H1/H3 ni se
+recalculan nominales en otro módulo. Los factores de D/E/G/H3 no se fusionan con
+F1 por coincidencia numérica. No se modifican fórmulas nominales F7/F8.
+
+DRY-02 queda aplicado a esta conversión concreta; no cierra las duplicaciones
+restantes de capacidades/clasificación DRY-03/09/19. Oráculos separados y prueba
+de identidad de nominales/LRFD en [suplemento F-43](../audit/hfs013/f1-correction/report.md).

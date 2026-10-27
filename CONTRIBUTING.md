@@ -52,6 +52,13 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+La corrección final F-43 de HFS-013 añade una octava suite separada:
+`tests/test_hfs013_design_method.py`. El wrapper `audit_hfs013.py` la incluye;
+si se usa `audit_hfs011.py`, pasar también ese archivo mediante `--extra-suite`.
+Para esta corrección los 12 ejemplos existentes deben ser idénticos al final
+HFS-013; las diferencias ASD internas se documentan con sondas aparte. No usar
+esas diferencias para habilitar flexión ASD pública. [Reproducción](docs/audit/hfs013/f1-correction/report.md).
+
 HFS-013 añade la séptima suite `tests/test_hfs013_directional_h3.py` y usa
 `scripts/audit_hfs013.py --baseline <captura previa> --out <ruta nueva> --work <copia nueva>`.
 Ejecuta por separado original, caracterización, HFS-011/016/010/012/013. Registra

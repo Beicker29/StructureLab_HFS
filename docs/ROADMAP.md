@@ -1,5 +1,11 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Revisión final HFS-013, F-43:** corrección de conversión F1(a) LRFD/ASD en
+capacidad flexural compartida de H3/H1, base main `abafdbb`. Cierre funcional
+demostrado, pendiente de revisión técnica; [informe y evidencia](audit/hfs013/f1-correction/report.md).
+Prioridad P0 propuesta por exceso de Mc ASD interno del 50,3%; el bloqueo público
+de flexión ASD se conserva. No se inicia otro hito ni se publica automáticamente.
+
 **Entrega HFS-013 (2026-10-27):** ejes G/H3 documentados, F-06 corregido en su
 agregación direccional, H3-6/H3-5 contrastados y dominios no acreditados bloqueados.
 [Informe](audit/hfs013/report.md), [convención](contracts/hfs013-axes.md) y

@@ -224,7 +224,7 @@ def _available_flexural_strength(case: SteelCase, section: Section, axis: str) -
     else:
         raise ValidationError("H1/H3 flexural interaction is scoped to HSS profiles only.", details={"profile_type": profile})
 
-    available = flexure_calc.available_flexural_strength_lrfd(evaluation["Mn_Nmm"])
+    available = flexure_calc.available_flexural_strength(evaluation["Mn_Nmm"], case.design_method.value)
     return {"available_kN_m": available, "evaluation": evaluation}
 
 

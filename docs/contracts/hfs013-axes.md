@@ -101,3 +101,9 @@ calidad de catálogo, ejes de ángulos, cortante circular oblicuo sin torsión,
 detalles G7 y alcance de análisis mantienen pendientes de validación. **F-31
 continúa abierto**: ni esta convención ni G6 implementan la resistencia mayor
 faltante del canal. HFS-012 conserva sus funciones de selección y pruebas.
+
+Revisión final F-43: el evaluador compartido H3/H1 convierte Mn con F1(a):
+Mc=0,90Mn en LRFD y Mc=Mn/1,67 en ASD. Las reglas internas distinguen el método;
+`SteelDesignEngine.run` sigue rechazando casos ASD con Mux o Muy por el alcance
+vigente de Chapter F. Invocar una regla directamente no acredita ese recorrido
+público ni las obligaciones HFS-010. [Evidencia y cierre acotado](../audit/hfs013/f1-correction/report.md).
