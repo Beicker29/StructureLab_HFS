@@ -1,0 +1,19 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs010_coverage.py",
+    "--basetemp=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-after-initial-work\\temp-test_hfs010_coverage",
+    "--junitxml=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-after-initial\\pytest-test_hfs010_coverage.xml"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-after-initial-work",
+  "returncode": 1,
+  "stdout": "..................................................F......                [100%]\n================================== FAILURES ===================================\n_____________ test_f06_directional_hss_combination_stays_pending ______________\ntests\\test_hfs010_coverage.py:242: in test_f06_directional_hss_combination_stays_pending\n    assert obligations(result)[\"N30.interaction\"].executed_checks\nE   AssertionError: assert []\nE    +  where [] = CoverageObligation(id='N30.interaction', normative_ids=['N30'], limit_state='torsion_interaction', component='Pu+Mux+M...nditions', 'H3-6 if Tr/Tc > 0.20'], selected_alternative=None, executed_checks=[], accepted_checks=[], resistance=True).executed_checks\n=========================== short test summary info ===========================\nFAILED tests/test_hfs010_coverage.py::test_f06_directional_hss_combination_stays_pending\n1 failed, 56 passed in 6.36s\n",
+  "stderr": ""
+}

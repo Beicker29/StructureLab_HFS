@@ -9,6 +9,7 @@ Este documento define las unidades que usa el motor y la convencion de signos.
 - Inercia (`Ix`, `Iy`, `Iz`, `Iw`): `mm4`
 - Modulo seccional (`Sx`, `Sy`, `Sz`, `Zx`, `Zy`): `mm3`
 - Constante torsional `J`: `mm4`
+- Constante de resistencia torsional H3 `C`: `mm3`; no confundir con J.
 - Constante de alabeo `Cw`: `mm6`
 - Esfuerzo (`Fy`, `Fu`, `E`, `G`, `Fcr`, `Fe`): `MPa` (`N/mm2`)
 - Fuerza interna nominal (`Pn`): `N`
@@ -19,10 +20,12 @@ Este documento define las unidades que usa el motor y la convencion de signos.
 - `Pu > 0`: compresion
 - `Pu < 0`: tension
 - `Pu = 0`: sin carga axial
-- `Mux`, `Muy`, `Vu`: se ingresan como magnitudes de diseno en `kN-m` y `kN`.
-- `Tu`: se ingresa como magnitud de torsion en `kN-m`.
+- `Mux`, `Muy`, `Tu`: momentos con signo en `kN-m`; `Vux`, `Vuy`, `Vu`: fuerzas con signo en `kN`.
 
 Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda.
+G/H3 conservan el signo de entrada en la traza y usan magnitudes positivas en los cocientes.
+La [convención canónica HFS-013](contracts/hfs013-axes.md) define ejes locales y
+relación entre planos de flexión y fuerzas; no inferir dirección física del sufijo Vx/Vy.
 
 ## 3) Entradas JSON (`SteelCase`)
 
@@ -31,7 +34,7 @@ Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda
 - `loads.Mux`, `loads.Muy`: `kN-m`
 - `loads.Tu`: `kN-m`
 - `loads.Vux`, `loads.Vuy`: `kN`
-- `loads.Vu`: `kN` (legacy, derivado automaticamente de `Vux` y `Vuy` cuando se proveen)
+- `loads.Vu`: `kN` (legacy, alias de Vux; no se deriva de otras componentes ni es una resultante)
 - `lengths.Lx`, `Ly`, `Lz`, `Lb`: `mm`
 - `factors.Kx`, `Ky`, `Kz`, `Cb`: adimensional
 - `factors.xa`, `factors.ya`: `mm` (offset de arriostramiento para E4)
@@ -53,6 +56,10 @@ Nota: para chequeos de tension/flexion el motor usa magnitud absoluta de demanda
 - `Kz` (adimensional): factor de longitud efectiva asociado a `Lz`.
 - `xa` (`mm`): offset de arriostramiento en direccion del eje `x` (usado en E4).
 - `ya` (`mm`): offset de arriostramiento en direccion del eje `y` (usado en E4).
+
+Estas longitudes no representan automáticamente Lv de G5 (distancia de cortante
+máximo a cero) ni L de H3.1 circular (longitud física del miembro). HFS-013 no
+añade campos: bloquea ramas que dependan de esas longitudes desconocidas.
 
 Reglas de ingreso:
 

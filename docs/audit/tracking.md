@@ -1,10 +1,10 @@
-# Seguimiento maestro de hallazgos — HFS-012
+# Seguimiento maestro de hallazgos — HFS-013
 
 Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
 
-Entrega actual: [HFS-012](hfs012/report.md) sobre `main` con HFS-010/011/016
-incorporadas. Corrección F-03 lista para revisión; F-31 sigue abierto. Cambios
-locales sin publicación automática. El párrafo siguiente conserva el contexto
+Entrega actual: [HFS-013](hfs013/report.md) sobre `main` con HFS-012 incorporada
+por declaración del usuario. Correcciones G/H3 y bloqueos listos para revisión;
+F-31 sigue abierto. Cambios locales sin publicación automática. El párrafo siguiente conserva el contexto
 de aceptación y publicación de los hitos anteriores.
 
 Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por declaración del usuario. HFS-010 implementada; revisión técnica posterior a publicación/fusión autorizada. Las notas de entregas anteriores son históricas. «Observado» acredita código/ejecución; «riesgo» conserva incertidumbre normativa/física. Las tareas indican seguimiento; las correcciones ejecutadas se identifican expresamente. La [matriz HFS-002](../normative/hfs002-applicability.md) y su [contraste/riesgos](../normative/hfs002-implementation.md) conservan el diagnóstico, sin reescribir findings HFS-000.
@@ -16,12 +16,12 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-03 | P0 | Corrección HFS-012 presentada para revisión: no se selecciona F2 con razones desconocidas, inválidas o clases contradictorias; derivación desde dimensiones B4.1 explícitas, canal con ancho completo. [Evidencia](hfs012/report.md). HFS-010 conserva pendientes y checks independientes | HFS-012; auditoría integral HFS-032/040 | Revisar límites, significado/procedencia de dimensiones y alcance declarado; no confundir corrección del fallback con validación de todas las resistencias F |
 | F-04 | P0 | Corregido en contrato HFS-011 para revisión: extras/vacío rechazados, carga parcial documentada | HFS-011 | Evidencia por campo; revisión técnica del contrato/defaults pendiente |
 | F-05 | P0 | Observado: resumen mezcla dimensiones | HFS-014 | Gobernante por DCR con eje/unidad y sin mínimo incompatible |
-| F-06 | P0 | HFS-010 mantiene INCOMPLETE el dominio afectado sin cambiar máximos ni capacidades. H3.2/H3-6 exige máximo de cocientes; max demanda/max capacidad no equivale, contraejemplo independiente 0,5 vs 0,25 | HFS-013/033/034 | Resolver ejes y capacidades con HSS real asimétrico; discrepancia algebraica confirmada, impacto físico por caso pendiente |
+| F-06 | P0 | Corregida agregación G/H3 en HFS-013 para revisión: máximo de cocientes con cada par demanda/capacidad, fuente G4/G5 única sin redondeo. Oráculo asimétrico y perfil PTE real; combinación completa 0,97→1,61 incluye también F-39. Global INCOMPLETE | HFS-013; auditoría integral HFS-033/034 | Revisar convención y casos; no acreditar todas las capacidades D/E/F, geometrías y condiciones por corregir la agregación |
 | F-07 | P0 | D1/E2: límites 300/200 son User Notes; E5≤200 sí condiciona alternativa | HFS-015 | Recomendaciones separadas del cumplimiento y contexto de cláusula |
-| F-08 | P0 | Parcial HFS-011: no sobrescribe/fabrica Vu; representaciones activas contradictorias rechazadas | HFS-011/013 | Física de ejes y capacidades pendiente HFS-013; no cierre global |
+| F-08 | P0 | HFS-011 rechazó representaciones contradictorias; HFS-013 define Vu como alias escalar Vux, asociado Mux/fuerza y local. Oráculos positivos/negativos y trazas compartidas; nunca resultante | HFS-011/013; adaptadores HFS-021/022 | Revisar entradas históricas interpretadas como fuerza x/resultante y consumidores I; no cierre de toda transformación externa |
 | F-09 | P0 | Observado: DCR redondeado incompatible visualmente con FAIL | HFS-015 | Valores brutos y presentación diferenciados; fronteras |
 | F-10 | P0 | Parcial HFS-011: finitud en modelos/parser, dominios y sección seleccionada; NaN axial corregido | HFS-011/040 | Calidad/coherencia completa del catálogo y extremos numéricos pendientes; no cierre global |
-| F-11 | P1 | Etiquetas invertidas observadas; física pendiente | HFS-013/033 | Correspondencia matemática eje/demanda/capacidad |
+| F-11 | P1 | HFS-013 aclara sufijo de plano de flexión vs dirección de fuerza; pares G/H3 y trazas explícitos. No permuta cargas. G3 y G6 canal bloqueados por dirección/reparto no acreditados | HFS-013/033 | Revisar convención de adaptadores, orientación real de ángulos y compuesto I; etiquetas solas no acreditan física |
 | F-12 | P1 | Selección ID observada; significado físico pendiente | HFS-033/040 | D/t contrastado con fuente y geometría real |
 | F-13 | **P0** | Sobrescritura corregida en HFS-016, concluida en su alcance y fusionada en main | HFS-016 entregada; calidad integral HFS-040 | get rechaza identidades repetidas con todos los candidatos/procedencia; no se decide qué geometría es correcta. [Evidencia](hfs016/report.md) |
 | F-14 | P1 | Fallback de escala observado; impacto por fuente pendiente | HFS-040 | Unidades de importación inequívocas y pruebas dimensionales |
@@ -49,6 +49,10 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-36 | P0 propuesto | HFS-010 no acredita condiciones/ramas E5; reparación normativa pendiente. E5 implementa rama única y no acredita condiciones; E4 ángulo sin regla registrada | HFS-010/031/041 | Condiciones de conexión y ramas 75/80/200; flexotorsión/áreas y oráculos |
 | F-37 | P1 | IDs parecen ecuaciones; H1-2 usado para interacción de tracción aunque fuente define Pey | HFS-023/024/034/035 | Separar IDs/citas; contrastar fórmula de tracción y todos consumidores |
 | F-38 | P1 | Verificaciones complementarias/condiciones no acreditadas E6/F13/G7/H4/I1/I6, etapas y conexiones | HFS-010/031–038 | Alcance explícito; no omitir precondiciones ni validar por existencia de cualquier check |
+| F-39 | P0 propuesto | Confirmado y corregido HFS-013 para revisión: H3-6 usaba cuadrado del término normal; Specification 16.1-86 exige término lineal. Oráculo normal=0,4 y corte+torsión=0,9: 0,97→1,21 | HFS-013/034 | Revisión de expresión y dominio; Pc/Mc requieren validación separada |
+| F-40 | P1 propuesto | Confirmado y corregido HFS-013: H3-5 4,58→0,458π²; a h/t=100 Fcr=91,6→90,405576 MPa. Extrapolación h/t>260 bloqueada | HFS-013/034 | Revisión de fronteras y alcance del dato h plano mayor; prioridad P1 por exceso ~1,32% de rama, no significa aceptable |
+| F-41 | P0 propuesto | Confirmados fallbacks no acreditados G/H3: Lv desde Lx/Ly, L desde KzLz, C desde 2J/D o exterior reconstruido con planos+3t, t nominal/otra pared. HFS-013 retira esas inferencias; prueba fluencia sin longitud solo por identidad matemática | HFS-013/022/033/034/040 | Definir datos físicos/procedencia que faltan; no completar catálogo artificialmente; revisión de C declarada y espesores |
+| F-42 | P0 propuesto | Confirmado: umbral 20% de H3.2 se presentaba como check PASS y G3 reutilizaba un ala en ambos planos. G6 canal no acredita reparto. HFS-013 bloquea esas evaluaciones y conserva INCOMPLETE y checks independientes | HFS-013/033/034 | Implementar/validar alternativas H1/G y direcciones reales en tarea autorizada, no dar cobertura por presencia de regla |
 
 Las reproducciones, archivos/símbolos y salidas de F-01 a F-32 están en [findings](findings.md). F-31 tiene `test_channel_both_axes_must_block_if_major_axis_is_unsupported`; F-32 se acredita en [examples.json](evidence-clean/examples.json) y `run.py::main`. No se inventa un xfail para F-32: el exit actual es un contrato observable cuyo cambio exige decisión explícita.
 
@@ -60,7 +64,7 @@ Acuerdo documental HFS-002: se registra **HFS-016**, fase 1, dependencias 000/00
 
 **F-31 permanece P0:** omite una componente y puede declarar PASS; la sonda es sintética, por lo que confirmar su impacto en perfiles reales sigue pendiente. **F-32 permanece P1:** exit 0 no significa por sí mismo defecto de cálculo; preservarlo y exigir lectura del JSON es compatible con el contrato actual. Cualquier nueva semántica se revisará con sus consumidores.
 
-HFS-002 precisó F-06 y F-07 con S22 local; sus correcciones y efectos por caso siguen pendientes. F-12/18/19/20/27/28/30 conservan incertidumbres. No se rebaja una prioridad porque falta prueba numérica ni se afirma validación física a partir de una sonda. Una solución DRY de F-15/16/17 tampoco cierra automáticamente problemas de cálculo. Evidencia F-33/34 y contraejemplo F-06: [probes.json](hfs002/probes.json); programa reproducible [probes.py](hfs002/probes.py). F-35/36/37/38 son contrastes estáticos, no nuevas pruebas normativas aprobadas.
+HFS-002 precisó F-06 y F-07 con S22 local; HFS-013 corrige F-06 para revisión; F-07 permanece pendiente. F-12/18/19/20/27/28/30 conservan incertidumbres. No se rebaja una prioridad porque falta prueba numérica ni se afirma validación física a partir de una sonda. Una solución DRY de F-15/16/17 tampoco cierra automáticamente problemas de cálculo. Evidencia F-33/34 y contraejemplo F-06: [probes.json](hfs002/probes.json); programa reproducible [probes.py](hfs002/probes.py). F-35/36/37/38 son contrastes estáticos, no nuevas pruebas normativas aprobadas.
 
 ## Cambios de estado
 
@@ -107,3 +111,15 @@ El usuario autorizó subir y fusionar esta entrega, con revisión posterior; esa
 autorización no equivale a validación ingenieril ni permite iniciar otra tarea.
 F-29/lote vacío sigue en HFS-014 por restricción expresa de alcance. G1 no se
 declara cumplida; HFS-012/013/014 y auditorías normativas continúan pendientes.
+
+
+## Actualización HFS-013
+
+La convención documentada de planos/fuerzas conserva la asociación histórica;
+F-06 se corrige con pares por eje, y H3-6/H3-5 con referencias independientes.
+Los nuevos bloqueos por C/longitudes/dirección ausentes preservan checks
+independientes y cobertura pendiente. No se habilita PASS global en G/H3.
+[Informe y pruebas](hfs013/report.md): 961 aprobadas + 12 subpruebas, 3 xfail
+estrictos F-05/09/29. F-31 sigue abierto; HFS-012 se conserva. F-39–42 son
+hallazgos confirmados con correcciones/bloqueos presentados para revisión,
+no cierres aprobados. Sin HFS-014/015 ni publicación automática.

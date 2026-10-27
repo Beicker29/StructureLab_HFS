@@ -3,6 +3,9 @@ import math
 from ...codes.aisc_360_22 import shear_calc
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
+from ..actions import shear_demand as _shear_demand, shear_trace
+from ..errors import RuleNotImplementedError
+from ..evaluators.hss_shear import evaluate_hss_shear, require_section_values
 
 
 def _nominal_pass(name: str, clause: str) -> CheckResult:
@@ -20,20 +23,9 @@ def _positive(value: float | None) -> float:
     return float(value) if isinstance(value, (int, float)) and value > 0.0 else 0.0
 
 
-def _has_directional_shear(case: SteelCase) -> bool:
-    return abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0
-
-
-def _shear_demand(case: SteelCase, axis: str) -> float:
-    if _has_directional_shear(case):
-        return abs(case.loads.Vux if axis == "x" else case.loads.Vuy)
-    return abs(case.loads.Vu) if axis == "x" else 0.0
-
-
 def _axis_v_label(axis: str) -> str:
-    # Project convention: legacy axis naming in outputs is swapped with respect to
-    # internal axis routing. Keep calculations unchanged and only adjust labels.
-    return "Vy" if axis == "x" else "Vx"
+    # Suffix identifies the bending plane; the force acts along the other axis.
+    return "local y (Vux/Vu, Mux plane)" if axis == "x" else "local x (Vuy, Muy plane)"
 
 
 def _shear_name(clause: str, limit_state: str, context: str) -> str:
@@ -105,29 +97,6 @@ def _g2_design_factors(case: SteelCase, profile: str, h_over_tw: float) -> dict:
     }
 
 
-def _h_for_rect_hss(section: Section, axis: str) -> float:
-    if axis == "x":
-        return _positive(section.h) or _positive(section.b)
-    return _positive(section.b) or _positive(section.h)
-
-
-def _round_hss_diameter(section: Section) -> float:
-    diameter = _positive(section.od) or _positive(section.d)
-    if diameter > 0.0:
-        return diameter
-    ratio = _positive(section.d_t_ratio)
-    t = _positive(section.tdes) or _positive(section.t)
-    return ratio * t if ratio > 0.0 and t > 0.0 else 0.0
-
-
-def _round_hss_thickness(section: Section, diameter: float) -> float:
-    t = _positive(section.tdes) or _positive(section.t)
-    if t > 0.0:
-        return t
-    ratio = _positive(section.d_t_ratio)
-    return diameter / ratio if diameter > 0.0 and ratio > 0.0 else 0.0
-
-
 class ShearG2VxRule:
     """G2: I-shaped members and channels (major-axis web shear)."""
 
@@ -163,6 +132,7 @@ class ShearG2VxRule:
                         "Fy_mpa": fy,
                         "E_mpa": e,
                         "Vux_kn": demand,
+                        **shear_trace(case, "x"),
                         "tw_mm": section.tw,
                         "d_mm": section.d,
                         "h_over_tw": h_over_tw,
@@ -194,63 +164,12 @@ class ShearG3Rule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        axis = self.axis
-        demand = _shear_demand(case, axis)
-        if demand <= 0.0:
-            return _nominal_pass(_shear_name("G3-1", "Leg/Stem Shear", f"Single Angle/Tee {_axis_v_label(axis)}"), "G3-1")
-
-        fy = case.material.Fy
-        e = case.material.E
-        b = _positive(section.b)
-        t = _positive(section.t)
-        ratio = _positive(section.b_t_ratio)
-        h_over_tw = ratio if ratio > 0.0 else (b / t if min(b, t) > 0.0 else 0.0)
-        kv = 1.2
-        cv_data = shear_calc.calculate_cv2_g2_2(h_over_tw=h_over_tw, fy_mpa=fy, e_mpa=e, kv=kv)
-        area_bt = b * t
-        vn_n = shear_calc.calculate_nominal_shear_strength(fy_mpa=fy, aw_mm2=area_bt, cv=float(cv_data["Cv2"]))
-        capacity = shear_calc.calculate_available_shear_strength(
-            vn_n=vn_n,
-            design_method=case.design_method.value,
-            phi_v=0.90,
-            omega_v=1.67,
-        )
-        return _build_result(
-            name=_shear_name("G3-1", "Leg/Stem Shear", f"Single Angle/Tee {_axis_v_label(axis)}"),
-            clause="G3-1",
-            demand_kn=demand,
-            capacity_kn=capacity,
-            details={
-                "memory": {
-                    "clause": "G3",
-                    "inputs": {
-                        "Fy_mpa": fy,
-                        "E_mpa": e,
-                        f"Vu{axis}_kn": demand,
-                        "b_mm": b,
-                        "t_mm": t,
-                        "b_over_t": h_over_tw,
-                        "kv": kv,
-                    },
-                    "intermediate": {
-                        "Cv2": cv_data["Cv2"],
-                        "Cv2_branch": cv_data["branch"],
-                        "Cv2_limit_g2_9": cv_data["limit_g2_9"],
-                        "Cv2_limit_g2_10": cv_data["limit_g2_10"],
-                        "bt_mm2": area_bt,
-                        "Vn_N": vn_n,
-                        "Vn_kN": vn_n / 1000.0,
-                    },
-                    "design_factor": {
-                        "design_method": case.design_method.value,
-                        "phi_v": 0.90,
-                        "omega_v": 1.67,
-                        "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
-                    },
-                    "capacity_kn": capacity,
-                }
-            },
-        )
+        if _shear_demand(case, self.axis) <= 0:
+            return _nominal_pass("G3 no demand", "G3-1")
+        raise RuleNotImplementedError(
+            "G3 needs the actual resisting leg and force resolved along it; one b/t cannot establish both directions or double-angle sharing.",
+            details={"reference": "G3-1", "section": section.name,
+                     "profile_type": section.type, **shear_trace(case, self.axis)})
 
 
 class ShearG3VxRule(ShearG3Rule):
@@ -261,75 +180,28 @@ class ShearG3VyRule(ShearG3Rule):
     axis = "y"
 
 
+def _hss_shear_check(case, section, axis, profile):
+    if section.type.upper() != profile:
+        raise RuleNotImplementedError("Shear rule/profile mismatch.", details={"expected": profile, "section": section.type})
+    demand = _shear_demand(case, axis)
+    clause = "G4-1" if profile == "RECTANGULAR_HSS" else "G5-1"
+    if demand <= 0:
+        return _nominal_pass(_shear_name(clause, "HSS Shear", _axis_v_label(axis)), clause)
+    evaluation = evaluate_hss_shear(case, section, axis)
+    return _build_result(
+        name=_shear_name(clause, "HSS Shear", _axis_v_label(axis)), clause=clause,
+        demand_kn=demand, capacity_kn=evaluation["capacity_kN"],
+        details={"memory": {"clause": clause[:2], "inputs": evaluation["inputs"],
+                            "intermediate": evaluation["intermediate"],
+                            "design_factor": evaluation["design_factor"],
+                            "capacity_kn": evaluation["capacity_kN"]}})
+
+
 class ShearG4Rule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        axis = self.axis
-        demand = _shear_demand(case, axis)
-        if demand <= 0.0:
-            return _nominal_pass(_shear_name("G4-1", "Wall Shear", f"Rectangular HSS {_axis_v_label(axis)}"), "G4-1")
-
-        fy = case.material.Fy
-        e = case.material.E
-        t = _positive(section.tdes)
-        h = _h_for_rect_hss(section, axis)
-        h_over_t = h / t if min(h, t) > 0.0 else 0.0
-        aw = 2.0 * h * t if min(h, t) > 0.0 else 0.0
-        kv = 5.0
-        cv_data = shear_calc.calculate_cv2_g2_2(h_over_tw=h_over_t, fy_mpa=fy, e_mpa=e, kv=kv)
-        vn_n = shear_calc.calculate_nominal_shear_strength(fy_mpa=fy, aw_mm2=aw, cv=float(cv_data["Cv2"]))
-        capacity = shear_calc.calculate_available_shear_strength(
-            vn_n=vn_n,
-            design_method=case.design_method.value,
-            phi_v=0.90,
-            omega_v=1.67,
-        )
-        return _build_result(
-            name=_shear_name("G4-1", "Wall Shear", f"Rectangular HSS {_axis_v_label(axis)}"),
-            clause="G4-1",
-            demand_kn=demand,
-            capacity_kn=capacity,
-            details={
-                "memory": {
-                    "clause": "G4",
-                    "inputs": {
-                        "Fy_mpa": fy,
-                        "E_mpa": e,
-                        "axis": axis,
-                        f"Vu{axis}_kn": demand,
-                        "h_catalog_mm": section.h,
-                        "b_catalog_mm": section.b,
-                        "h_resisting_mm": h,
-                        "tdes_mm": section.tdes,
-                        "t_used_mm": t,
-                        "h_over_t": h_over_t,
-                        "Aw_mm2": aw,
-                        "kv": kv,
-                    },
-                    "intermediate": {
-                        "h_over_t_expression": "h_resisting/tdes",
-                        "h_over_t_substitution": f"{h} / {t}" if min(h, t) > 0.0 else None,
-                        "Aw_expression": "Aw = 2*h_resisting*tdes",
-                        "Aw_substitution": f"2*{h}*{t}" if min(h, t) > 0.0 else None,
-                        "Cv2": cv_data["Cv2"],
-                        "Cv2_branch": cv_data["branch"],
-                        "Cv2_limit_g2_9": cv_data["limit_g2_9"],
-                        "Cv2_limit_g2_10": cv_data["limit_g2_10"],
-                        "Cv2_reference": "G2-9/G2-10/G2-11 with kv=5 and h/t = h_resisting/tdes",
-                        "Vn_N": vn_n,
-                        "Vn_kN": vn_n / 1000.0,
-                    },
-                    "design_factor": {
-                        "design_method": case.design_method.value,
-                        "phi_v": 0.90,
-                        "omega_v": 1.67,
-                        "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
-                    },
-                    "capacity_kn": capacity,
-                }
-            },
-        )
+        return _hss_shear_check(case, section, self.axis, "RECTANGULAR_HSS")
 
 
 class ShearG4VxRule(ShearG4Rule):
@@ -344,69 +216,7 @@ class ShearG5Rule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
-        axis = self.axis
-        demand = _shear_demand(case, axis)
-        if demand <= 0.0:
-            return _nominal_pass(_shear_name("G5-1", "Round HSS Shear", f"Circular HSS {_axis_v_label(axis)}"), "G5-1")
-
-        fy = case.material.Fy
-        e = case.material.E
-        ag = _positive(section.area)
-        diameter = _round_hss_diameter(section)
-        thickness = _round_hss_thickness(section, diameter)
-        lv = case.lengths.Lx if axis == "x" else case.lengths.Ly
-        fcr_data = shear_calc.calculate_round_hss_fcr(
-            e_mpa=e,
-            fy_mpa=fy,
-            lv_mm=lv,
-            diameter_mm=diameter,
-            thickness_mm=thickness,
-        )
-        vn_n = shear_calc.calculate_round_hss_nominal_shear_strength(
-            fcr_mpa=float(fcr_data["Fcr_mpa"]),
-            ag_mm2=ag,
-        )
-        capacity = shear_calc.calculate_available_shear_strength(
-            vn_n=vn_n,
-            design_method=case.design_method.value,
-            phi_v=0.90,
-            omega_v=1.67,
-        )
-        return _build_result(
-            name=_shear_name("G5-1", "Round HSS Shear", f"Circular HSS {_axis_v_label(axis)}"),
-            clause="G5-1",
-            demand_kn=demand,
-            capacity_kn=capacity,
-            details={
-                "memory": {
-                    "clause": "G5",
-                    "inputs": {
-                        "Fy_mpa": fy,
-                        "E_mpa": e,
-                        f"Vu{axis}_kn": demand,
-                        "Ag_mm2": ag,
-                        "D_mm": diameter,
-                        "t_mm": thickness,
-                        "Lv_mm": lv,
-                    },
-                    "intermediate": {
-                        "Fcr_mpa": fcr_data["Fcr_mpa"],
-                        "Fcr_G5_2a_mpa": fcr_data["fcr_g5_2a_mpa"],
-                        "Fcr_G5_2b_mpa": fcr_data["fcr_g5_2b_mpa"],
-                        "Fcr_branch": fcr_data["branch"],
-                        "Vn_N": vn_n,
-                        "Vn_kN": vn_n / 1000.0,
-                    },
-                    "design_factor": {
-                        "design_method": case.design_method.value,
-                        "phi_v": 0.90,
-                        "omega_v": 1.67,
-                        "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)",
-                    },
-                    "capacity_kn": capacity,
-                }
-            },
-        )
+        return _hss_shear_check(case, section, self.axis, "CIRCULAR_HSS")
 
 
 class ShearG5VxRule(ShearG5Rule):
@@ -418,28 +228,24 @@ class ShearG5VyRule(ShearG5Rule):
 
 
 class ShearG6VyRule:
-    """G6: minor-axis shear for W/Channel families (Vy)."""
+    """G6: W minor bending-plane shear (Vuy is a local-x force)."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         demand = _shear_demand(case, "y")
         if demand <= 0.0:
             return _nominal_pass(_shear_name("G6-1", "Minor-Axis Shear", "Minor Axis Vx"), "G6-1")
 
+        if case.loads.Tu or section.type.upper() != "W":
+            raise RuleNotImplementedError(
+                "G6 requires no torsion and a justified distribution to each flange; channel distribution is not represented.",
+                details={"reference": "G6-1", "section": section.name, **shear_trace(case, "y")})
         fy = case.material.Fy
         e = case.material.E
-        bf = _positive(section.bf)
-        tf = _positive(section.tf)
-        profile = section.type.upper()
-        if profile == "CHANNEL":
-            h_over_tw = _positive(section.b_t_ratio)
-            if h_over_tw <= 0.0 and min(bf, tf) > 0.0:
-                h_over_tw = bf / tf
-            elements = 1.0
-        else:
-            h_over_tw = _positive(section.bf_2tf_ratio)
-            if h_over_tw <= 0.0 and min(bf, tf) > 0.0:
-                h_over_tw = bf / (2.0 * tf)
-            elements = 2.0
+        bf, tf = require_section_values(section, ("bf", "tf"), "G6-1")
+        h_over_tw = _positive(section.bf_2tf_ratio)
+        if h_over_tw <= 0.0 and min(bf, tf) > 0.0:
+            h_over_tw = bf / (2.0 * tf)
+        elements = 2.0  # two equal flanges in the declared symmetric W domain
         kv = 1.2
         cv_data = shear_calc.calculate_cv2_g2_2(h_over_tw=h_over_tw, fy_mpa=fy, e_mpa=e, kv=kv)
         aw = elements * bf * tf
@@ -462,6 +268,7 @@ class ShearG6VyRule:
                         "Fy_mpa": fy,
                         "E_mpa": e,
                         "Vuy_kn": demand,
+                        **shear_trace(case, "y"),
                         "bf_mm": bf,
                         "tf_mm": tf,
                         "shear_elements": elements,

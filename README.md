@@ -8,8 +8,8 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 - Capitulo D (tension) implementado.
 - Capitulo E (compresion) implementado para E3, E4, E5 y E7.
 - Capitulo F implementado para F2, F3, F4, F5, F6, F7, F8, F10 y F11.
-- Capitulo G (cortante) implementado para G2, G3, G4, G5 y G6.
-- Capitulo H implementado para H1, H3-1 y H3-2 en perfiles HSS.
+- Capitulo G: evaluaciones parciales G2/G4/G5/G6; G3 y G6 de canales bloqueados por correspondencia direccional no acreditada.
+- Capitulo H: evaluaciones parciales H1/H3 en HSS; condiciones y bloqueos en [HFS-013](docs/audit/hfs013/report.md). Ejecutar un check no acredita cobertura completa.
 - Capitulo I implementado (alcance actual) para I1, I2, I3-1, I3-3, I3-4 e I4 en miembros compuestos `ENCASED_MEMBER`, `FILLED_MEMBER` y `COMPOSITE_BEAM` (sin CPSW).
 - Traccion con D3 estricto (`Ae = U*An`) para todos los perfiles.
 - Secciones macizas custom por JSON (`SOLID_CIRCULAR`, `SOLID_RECTANGULAR`) con alcance axial (D2/E3).
@@ -158,15 +158,17 @@ Para evaluar flexion (`Mux` o `Muy`):
 ## Nota de entrada para cortante (Capitulo G)
 
 - Si se entregan `Vux` y/o `Vuy`, el motor evalua cortante por eje.
-- Si solo se entrega `Vu` (legacy), se interpreta como demanda de cortante en eje mayor (`Vx`).
+- `Vux` es cortante del plano de `Mux` (fuerza local y); `Vuy`, del plano de `Muy` (fuerza local x).
+- `Vu` legacy es alias escalar de `Vux`, nunca resultante vectorial. No combinar representaciones activas.
 - Para perfiles `RECTANGULAR_HSS`, el espesor de calculo es `tdes` (mm).
+- Convención canónica, signos y migración de adaptadores: [ejes y cargas HFS-013](docs/contracts/hfs013-axes.md).
 
 ## Nota de entrada para torsion y combinaciones (Capitulo H)
 
 - Se usa `loads.Tu` en `kN-m` como torsion requerida.
-- `H3-1` evalua torsion pura para `RECTANGULAR_HSS` y `CIRCULAR_HSS`.
-- `H3-2` evalua combinacion de torsion con axial/flexion/cortante.
-- Para perfiles no-HSS con `Tu != 0`, el motor retorna error estructurado (H3-3 fuera de alcance actual).
+- `H3-1` evalua torsion HSS con datos y dominio acreditados: rectangular requiere C explícito; circular no infiere longitud real desde Kz/Lz.
+- `H3-2` aplica H3-6 con máximo de cocientes direccionales y término axial-flexión lineal. La alternativa H1/G cuando Tr/Tc <= 0,20 queda pendiente.
+- Para perfiles no-HSS con `Tu != 0`, registra H3.3 pendiente y conserva checks independientes; resultado INCOMPLETE. Leer cobertura, no solo exit del CLI.
 
 ## Nota de entrada para miembros compuestos (Capitulo I)
 

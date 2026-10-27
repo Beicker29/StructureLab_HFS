@@ -52,6 +52,15 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+HFS-013 añade la séptima suite `tests/test_hfs013_directional_h3.py` y usa
+`scripts/audit_hfs013.py --baseline <captura previa> --out <ruta nueva> --work <copia nueva>`.
+Ejecuta por separado original, caracterización, HFS-011/016/010/012/013. Registra
+igualdad literal fallida de ejemplos **intencionalmente**: G/H3 cambian; el
+comparador exige invariantes D/E/F/H1/I, estado global y obligaciones, y enumera
+todas las diferencias G/H3. La aceptación está en `hfs013-verification.json`,
+no en la comparación literal heredada. Los oráculos independientes están en las
+pruebas, no en este comparador. [Comandos, conteos y ajustes de expectativas](docs/audit/hfs013/report.md).
+
 HFS-012 añade `tests/test_hfs012_flexure_selection.py` como sexta suite separada:
 pasar también `--extra-suite tests/test_hfs012_flexure_selection.py` al capturador.
 No usar `--coverage-transition` para esta corrección: los ejemplos existentes

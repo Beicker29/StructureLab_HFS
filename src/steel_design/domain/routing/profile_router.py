@@ -6,6 +6,7 @@ from ...codes.aisc_360_22 import axial_calc
 from ...models import SteelCase
 from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..actions import shear_demand
 from ..rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
 from ..rules.combined_hss_rules import CombinedH1HssRule, HssCombinedH3_2Rule, HssTorsionH3_1Rule
 from ..rules.composite_rules import (
@@ -126,13 +127,11 @@ def _has_directional_shear(case: SteelCase) -> bool:
 
 
 def _has_major_shear(case: SteelCase, _: Section) -> bool:
-    if _has_directional_shear(case):
-        return abs(case.loads.Vux) > 0.0
-    return abs(case.loads.Vu) > 0.0
+    return shear_demand(case, "x") > 0.0
 
 
 def _has_minor_shear(case: SteelCase, _: Section) -> bool:
-    return _has_directional_shear(case) and abs(case.loads.Vuy) > 0.0
+    return shear_demand(case, "y") > 0.0
 
 
 def _has_shear(case: SteelCase, _: Section) -> bool:
@@ -455,13 +454,15 @@ RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
     "F11-2-Mx": RuleDefinition("F11-2-Mx", FlexureF11LtbMxRule, True, ("zx", "zy", "sx", "sy"), _is_f11_mx_applicable),
     "F11-2-My": RuleDefinition("F11-2-My", FlexureF11LtbMyRule, True, ("zx", "zy", "sx", "sy"), _is_f11_my_applicable),
     "G2-Vx": RuleDefinition("G2-Vx", ShearG2VxRule, True, ("tw", "d"), _is_g2_vx_applicable),
-    "G3-Vx": RuleDefinition("G3-Vx", ShearG3VxRule, True, ("b", "t"), _is_g3_vx_applicable),
-    "G3-Vy": RuleDefinition("G3-Vy", ShearG3VyRule, True, ("b", "t"), _is_g3_vy_applicable),
-    "G4-Vx": RuleDefinition("G4-Vx", ShearG4VxRule, True, ("h", "tdes"), _is_g4_vx_applicable),
-    "G4-Vy": RuleDefinition("G4-Vy", ShearG4VyRule, True, ("b", "tdes"), _is_g4_vy_applicable),
-    "G5-Vx": RuleDefinition("G5-Vx", ShearG5VxRule, True, ("area", "od"), _is_g5_vx_applicable),
-    "G5-Vy": RuleDefinition("G5-Vy", ShearG5VyRule, True, ("area", "od"), _is_g5_vy_applicable),
-    "G6-Vy": RuleDefinition("G6-Vy", ShearG6VyRule, True, ("bf", "tf"), _is_g6_vy_applicable),
+    "G3-Vx": RuleDefinition("G3-Vx", ShearG3VxRule, True, tuple(), _is_g3_vx_applicable),
+    "G3-Vy": RuleDefinition("G3-Vy", ShearG3VyRule, True, tuple(), _is_g3_vy_applicable),
+    # HFS-013: canonical HSS evaluator validates the active direction's data.
+    # Deferred validation preserves independent checks through existing engine errors.
+    "G4-Vx": RuleDefinition("G4-Vx", ShearG4VxRule, True, tuple(), _is_g4_vx_applicable),
+    "G4-Vy": RuleDefinition("G4-Vy", ShearG4VyRule, True, tuple(), _is_g4_vy_applicable),
+    "G5-Vx": RuleDefinition("G5-Vx", ShearG5VxRule, True, tuple(), _is_g5_vx_applicable),
+    "G5-Vy": RuleDefinition("G5-Vy", ShearG5VyRule, True, tuple(), _is_g5_vy_applicable),
+    "G6-Vy": RuleDefinition("G6-Vy", ShearG6VyRule, True, tuple(), _is_g6_vy_applicable),
     "H1": RuleDefinition("H1", CombinedH1HssRule, True, ("area",), _is_h1_hss_applicable),
     "H3-1": RuleDefinition("H3-1", HssTorsionH3_1Rule, True, tuple(), _is_h3_1_hss_applicable),
     "H3-2": RuleDefinition("H3-2", HssCombinedH3_2Rule, True, tuple(), _is_h3_2_hss_applicable),
@@ -581,10 +582,9 @@ def _required_fields_for_e7(profile_type: str) -> Tuple[str, ...]:
 
 
 def _required_fields_for_h3(profile_type: str) -> Tuple[str, ...]:
-    if profile_type == "CIRCULAR_HSS":
-        return ("area", "j", "od", "tdes")
-    if profile_type == "RECTANGULAR_HSS":
-        return ("h", "b", "tdes")
+    # HFS-013: H3.1/H3.2 validate their actual data in the evaluator. J is not
+    # mandatory for declared/User Note C; a missing wall must not erase G4
+    # on the independent wall. Engine records per-rule pending diagnostics.
     return tuple()
 
 

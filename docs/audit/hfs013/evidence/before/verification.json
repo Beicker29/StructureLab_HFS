@@ -1,0 +1,99 @@
+{
+  "suites": {
+    "original": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "80",
+          "time": "37.494",
+          "timestamp": "2026-10-27T09:38:51.573951-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "characterization": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "3",
+          "tests": "12",
+          "time": "4.426",
+          "timestamp": "2026-10-27T09:39:29.568377-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "contracts": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "665",
+          "time": "12.676",
+          "timestamp": "2026-10-27T09:39:34.621768-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs016_catalog_integrity": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "44",
+          "time": "11.206",
+          "timestamp": "2026-10-27T09:39:47.837387-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs010_coverage": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "57",
+          "time": "6.333",
+          "timestamp": "2026-10-27T09:39:59.564040-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs012_flexure_selection": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "61",
+          "time": "0.276",
+          "timestamp": "2026-10-27T09:40:06.483022-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    }
+  },
+  "source_inputs_unchanged_during_capture": true,
+  "examples_identical": true,
+  "case_files": 12,
+  "engine_results_sha256": "584c52add0f13a63f0d43ffd1da07b410f28ce8bb93e03737f88af991da68162",
+  "regression_accepted": true
+}

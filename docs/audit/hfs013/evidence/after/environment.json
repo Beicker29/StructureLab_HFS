@@ -1,0 +1,57 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+  "overrides": {
+    "PYTHONNOUSERSITE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONUTF8": "1"
+  },
+  "branch": {
+    "command": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "3af52aa9848ccb6ff040fd1f8203a4609599f341\n",
+    "stderr": ""
+  },
+  "status": {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": " M src/steel_design/codes/aisc_360_22/combined_hss_calc.py\n M src/steel_design/codes/aisc_360_22/shear_calc.py\n M src/steel_design/domain/coverage.py\n M src/steel_design/domain/routing/profile_router.py\n M src/steel_design/domain/rules/combined_hss_rules.py\n M src/steel_design/domain/rules/shear_rules.py\n M src/steel_design/engine.py\n M src/steel_design/models.py\n M tests/test_chapter_g_rules.py\n M tests/test_chapter_h_rules.py\n M tests/test_hfs010_coverage.py\n?? docs/audit/hfs013/\n?? docs/contracts/hfs013-axes.md\n?? scripts/audit_hfs013.py\n?? scripts/compare_hfs013.py\n?? src/steel_design/domain/actions.py\n?? src/steel_design/domain/evaluators/hss_shear.py\n?? tests/test_hfs013_directional_h3.py\n",
+    "stderr": ""
+  },
+  "freeze": {
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "freeze",
+      "--all"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+    "returncode": 0,
+    "stdout": "annotated-types==0.8.0\ncolorama==0.4.6\net_xmlfile==2.0.0\niniconfig==2.3.1\nopenpyxl==3.1.5\npackaging==26.3\npip==25.0.1\npluggy==1.7.0\npydantic==2.14.1\npydantic_core==2.50.1\nPygments==2.21.0\npytest==9.1.1\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\n",
+    "stderr": ""
+  },
+  "baseline": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-before\\engine-results.json",
+  "baseline_sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2"
+}

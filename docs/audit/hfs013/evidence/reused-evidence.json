@@ -1,0 +1,7 @@
+{
+  "before/engine-results.json": {
+    "canonical": "docs/audit/hfs010/evidence/after/engine-results.json",
+    "sha256": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2",
+    "reason": "Identical existing canonical capture, not copied again; original remains locally."
+  }
+}

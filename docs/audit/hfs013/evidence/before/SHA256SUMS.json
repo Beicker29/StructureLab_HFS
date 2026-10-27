@@ -1,0 +1,20 @@
+{
+  "catalog.json": "5763a182bfaf3f8e43ac646e2fc09ccebd8c009e4f036953083f474320049274",
+  "comparison.json": "d5f7f92e118d1ee13a0256974dfae908856ce25726de04aff0485973f32bce4e",
+  "copied_inputs.json": "99404debc5efd8fc5a89603f0ac1d67302c7bf5545229ae55557609ebff3ee0f",
+  "engine-results.json": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2",
+  "environment.json": "d5d016718304518d378c61d8a5637ef4463029f9250d9246ee8e0249ce054d83",
+  "pytest-characterization.json": "3df9cb9966597c4b1d381b761fe34bc5f3baeaed4f392930412967f289d19c0d",
+  "pytest-characterization.xml": "3c9cb89509d21f2bc8fae1b167a8f75794c46016f73f1a4090db989ac3526737",
+  "pytest-contracts.json": "ff0073c653d8cec0660edc51ffae1d188f6fc1ee666629467b2b70323b6027fc",
+  "pytest-contracts.xml": "9eb17a4d2afb077053581ab6b46c6d36f49a2fe91a1f715ef2424e560d4e4604",
+  "pytest-original.json": "b8b66fb202fafc3403b5ac56f3de0083b969e89261bbea52f5ee37a7f7f7d11c",
+  "pytest-original.xml": "41c8a33bcdf529598079bdfe454a1c82a035f7471c2a4122befce8a39d2e934d",
+  "pytest-test_hfs010_coverage.json": "7ad75c83a6472725a08427cb67ee36b83210dd91867a6dbf5d22632bdfc2da68",
+  "pytest-test_hfs010_coverage.xml": "2cafae240e90ce0b77f3aee6103ad0ddd9e8dd81654535720f553384b83969af",
+  "pytest-test_hfs012_flexure_selection.json": "89a50e9da0b1048e978edd46637f3d42d00028c22b2d84aba5766600b12a03a8",
+  "pytest-test_hfs012_flexure_selection.xml": "7cb6c4ba62a01f31304bd8fca70742ba099b28c7fe1749d13f41cdbb1c45cc7e",
+  "pytest-test_hfs016_catalog_integrity.json": "bc73ee7a30ff65ec5ae6c5d230d07afd10e0fbcf720f58e5d9b3898b0cc4bfa7",
+  "pytest-test_hfs016_catalog_integrity.xml": "4858b3813f5ba743c995755d6b5b89c0301054ba0b42a1e6911512adccf8fffc",
+  "verification.json": "348839995b1152345d9fc58e9b2e20253e5f7e0f005191e1edb956f98ade4b1c"
+}

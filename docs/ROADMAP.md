@@ -1,5 +1,13 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Entrega HFS-013 (2026-10-27):** ejes G/H3 documentados, F-06 corregido en su
+agregación direccional, H3-6/H3-5 contrastados y dominios no acreditados bloqueados.
+[Informe](audit/hfs013/report.md), [convención](contracts/hfs013-axes.md) y
+[seguimiento F-06/08/11/39–42](audit/tracking.md), pendientes de revisión técnica.
+Base main `3af52aa9848ccb6ff040fd1f8203a4609599f341` con HFS-012 incorporada.
+Sin commit/push, sin HFS-014/015. F-31 permanece abierto. Las entregas siguientes
+conservan su contexto histórico, no describen el estado actual completo.
+
 **Entrega HFS-012 (2026-10-27):** corrección acotada de selección F2 presentada
 para revisión en [informe](audit/hfs012/report.md). Base `main` con HFS-010/011/016;
 cambios locales sin commit ni push por instrucción del usuario. Se conserva la
@@ -46,12 +54,12 @@ Los bloques anteriores de estado se conservan como historia de las entregas.
 | F-03 | P0 | C | `domain/routing/profile_router.py::_w_or_channel_major_flexure_selection` | Faltan razones de esbeltez y el código devuelve F2. Nunca asumir sección compacta por ausencia de datos; bloquear. |
 | F-04 | P0 | C | `models.py`, `SteelCase`, `Loads`, Pydantic BaseModel por defecto | Campos desconocidos pueden ignorarse; cargas faltantes son 0. Rechazar campos extra, determinar campos requeridos y semántica de 0. |
 | F-05 | P0 | C | `run.py::_build_global_summary` | Elige la menor capacidad mezclando kN y kN·m. Sustituir por DCR gobernante y agrupar capacidades por dimensión y eje. |
-| F-06 | P0 | C/R | `combined_hss_rules.py::_available_shear_strength` | HFS-002 confirma discrepancia con H3.2: se exige máximo de cocientes por eje, no cociente de máximos. Contraejemplo 0,5 vs 0,25; validación física de ejes/capacidades pendiente. |
+| F-06 | P0 | C/R | `combined_hss_rules.py::_available_shear_strength` | HFS-013 corrige pares y máximo de cocientes; caso combinado DCR 0,97→1,61. Revisión y auditoría integral de capacidades dependientes pendientes. |
 | F-07 | P0 | C | `run.py::_build_chapter_admissibility` | D1 (300) y E2 (200) se presentan como admisibilidad; separar recomendaciones de incumplimientos. Revisar semántica de aplicabilidad de D1/E2. |
-| F-08 | P0 | C/R | `models.py::Loads.normalize_shear` | Sobrescribe `Vu` si hay Vux/Vuy y fabrica resultante vectorial; resolver contradicciones y definir transformación a ejes locales con física explícita. |
+| F-08 | P0 | C/R | `models.py::Loads`; `domain/actions.py` | HFS-011 eliminó resultante/sobrescritura; HFS-013 explicita Vu alias de Vux en el plano Mux, fuerza local y. Revisar consumidores históricos y futuros adaptadores. |
 | F-09 | P0 | C | `domain/rules/*::_build_result`, `round(dcr,3)` | Umbral se evalúa sin redondeo pero DCR se publica redondeado; conservar precisión cruda y diferenciación display vs decisión, especialmente 0.9999/1.0001. |
 | F-10 | P0 | C/R | `domain/routing/profile_router.py::_is_missing_numeric`, `sections/loader.py::_coerce_float` | Ausencia de validación explícita de finitud en varios lugares; probar y prohibir NaN, infinito, números negativos y dimensiones imposibles. |
-| F-11 | P1 | C/R | `domain/rules/shear_rules.py::_axis_v_label` | Comentario indica inversión legacy de etiquetas respecto de routing; documentar y comprobar matemáticamente ejes, componentes y capacidades. No corregir solo nombres. |
+| F-11 | P1 | C/R | `domain/actions.py`; reglas G/H3 | HFS-013 conserva asociación física histórica y añade plano, dirección y entrada a la traza; G3/canal G6 no acreditados se bloquean. Ejes externos y compuesto I pendientes. |
 | F-12 | P1 | C/R | `sections/loader.py`, selección `field_values['id']` para D/t | Revisar que D/t corresponda al diámetro exterior físico, no ID, según familia/convención de catálogo. |
 | F-13 | P0 | C | `sections/repository.py::load`, `docs/audit/catalog-duplicates.json` | Sobrescritura HEA 100 corregida con rechazo por identidad en HFS-016, cierre funcional demostrado para revisión. [Informe](audit/hfs016/report.md). HFS-040 conserva calidad integral y corrección de datos con fuente. |
 | F-14 | P1 | C | `sections/loader.py` | Conversión de unidades por encabezados y fallback `1.0`; definir metadatos por fuente y rechazo si la unidad de entrada es ambigua. |

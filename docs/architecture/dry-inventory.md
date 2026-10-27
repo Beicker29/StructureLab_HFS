@@ -114,3 +114,22 @@ obligaciones ya construidas por el plan independiente; no calcula límites ni
 genera requisitos desde el router. CLI consume el resultado común. El beneficio
 concreto es conservar checks independientes sin perder la causa de una demanda
 no evaluada. Pruebas numéricas y límites en [informe HFS-012](../audit/hfs012/report.md).
+
+## Aplicación acotada HFS-013
+
+| ID / copias | Decisión aplicada y propietario | Consumidores / evidencia / pendiente |
+|---|---|---|
+| DRY-10: demandas legacy en router, G y H3 | **Consolidar** en `domain/actions.py::shear_demand/shear_trace`; Loads conserva validación de representaciones. Convención canónica en `docs/contracts/hfs013-axes.md` | Router consulta demanda; G/H3 comparten valor firmado, magnitud, plano y dirección. Capítulo I conserva agregaciones de otra disposición pendientes de auditoría; no se fusionan por parecido |
+| DRY-04: capacidades G4/G5 copiadas en `combined_hss_rules` | **Consolidar** en función simple `domain/evaluators/hss_shear.py::evaluate_hss_shear` | Dos consumidores reales: reglas G4/G5 y H3. Cálculo bruto, factores y traza comunes; fórmulas numéricas siguen en `shear_calc`. No reutilizar CheckResult redondeado |
+| DRY-06: dimensiones circulares/G/H y rectángulo reconstruido | **Consolidar** validación explícita de OD/tdes en `round_hss_dimensions`; **eliminar** inferencia geométrica no acreditada de C rectangular y sustitución de pared/espesor | G5/H3 comparten dimensiones; H3 rectangular exige C declarada. Constructor geométrico general no creado. `calculate_rectangular_hss_torsional_constant` se conserva como fórmula pura de User Note que exige B/H exteriores explícitos; el motor no inventa esos datos |
+| DRY-02: G4/G5 cálculo vs memoria | **Consolidar** capacidad/factores en la evaluación compartida | LRFD/ASD contrastados por oráculo; memoria de H3 usa esa misma evaluación |
+| G5 y H3 circular: expresiones semejantes con longitud | **Conservar justificadamente** funciones distintas | G5 usa Lv y coeficientes 1,60/0,78; H3 usa L y 1,23/0,60. No helper genérico que borre dominio. Cada una prueba su rama de fluencia sin longitud por identidad matemática |
+
+Los módulos nuevos son funciones sin clases ni registro genérico. Se eliminan
+dos evaluadores H3 de cortante duplicados y sus fallbacks. El beneficio es que
+un cociente H3 conserva exactamente la misma capacidad bruta que su check G.
+No se duplica clasificación ni se toca el selector HFS-012. DRY-03/09/12/13/17/19
+siguen pendientes: no se generaliza esta extracción a D/E/F/H1/I ni al reporte.
+Pruebas independientes y diferencias antes/después en el
+[informe HFS-013](../audit/hfs013/report.md); los oráculos se conservan separados
+del código productivo deliberadamente.

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import math
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
-from ...codes.aisc_360_22 import axial_calc, combined_hss_calc, flexure_calc, shear_calc
+from ...codes.aisc_360_22 import axial_calc, combined_hss_calc, flexure_calc
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
-from ..errors import ValidationError
+from ..errors import ValidationError, IncompleteSectionDataError, RuleNotImplementedError
+from ..actions import shear_demand, shear_trace
+from ..evaluators.hss_shear import evaluate_hss_shear, round_hss_dimensions, require_section_values
 from ..evaluators.tension_evaluator import TensionEvaluator
 
 
@@ -54,47 +56,18 @@ def _slenderness_values(section: Section) -> dict:
     }
 
 
-def _effective_torsion_length(case: SteelCase) -> float:
-    return case.factors.Kz * case.lengths.Lz
-
-
-def _round_hss_dimensions(section: Section) -> Tuple[float, float]:
-    diameter = _positive(section.od) or _positive(section.d)
-    t = _positive(section.tdes) or _positive(section.t)
-    if min(diameter, t) > 0.0:
-        return diameter, t
-    ratio = _positive(section.d_t_ratio)
-    if diameter <= 0.0 and min(ratio, t) > 0.0:
-        diameter = ratio * t
-    elif t <= 0.0 and min(ratio, diameter) > 0.0:
-        t = diameter / ratio
-    return diameter, t
-
-
-def _rectangular_hss_long_flat_width(section: Section) -> float:
-    return max(_positive(section.h), _positive(section.b))
-
-
-def _rectangular_hss_outside_dimensions(section: Section, t: float) -> Tuple[float, float]:
-    # Catalog `h` and `b` are flat widths in this repository.
-    # For user-note C approximation we conservatively recover outside dimensions
-    # assuming outside corner radius ~= 2t -> flat width ~= B-3t.
-    b_flat = _positive(section.b)
-    h_flat = _positive(section.h)
-    if min(b_flat, h_flat, t) <= 0.0:
-        return 0.0, 0.0
-    return b_flat + 3.0 * t, h_flat + 3.0 * t
-
-
 def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]:
     profile = section.type.upper()
     fy = case.material.Fy
     e = case.material.E
-    l_eff = _effective_torsion_length(case)
 
     if profile == "CIRCULAR_HSS":
-        diameter, t = _round_hss_dimensions(section)
-        fcr_data = combined_hss_calc.calculate_round_hss_fcr_h3(E_mpa=e, Fy_mpa=fy, L_mm=l_eff, D_mm=diameter, t_mm=t)
+        diameter, t = round_hss_dimensions(section)
+        fcr_data = combined_hss_calc.calculate_round_hss_fcr_h3(E_mpa=e, Fy_mpa=fy, L_mm=None, D_mm=diameter, t_mm=t)
+        if fcr_data["Fcr_mpa"] is None:
+            raise IncompleteSectionDataError("H3.1 needs member length L; Kz*Lz is not that length.",
+                details={"reference": "H3-2a/b", "section": section.name,
+                         "required": "Physical member length L; input not yet represented", "Fcr_data": fcr_data})
         c_data = combined_hss_calc.calculate_round_hss_torsional_constant(
             D_mm=diameter,
             t_mm=t,
@@ -116,7 +89,7 @@ def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]
             "inputs": {
                 "Fy_mpa": fy,
                 "E_mpa": e,
-                "L_effective_mm": l_eff,
+                "L_member_mm": None,
                 "D_mm": diameter,
                 "t_mm": t,
                 "J_mm4": section.j,
@@ -124,16 +97,17 @@ def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]
             },
         }
 
-    h_long = _rectangular_hss_long_flat_width(section)
-    t = _positive(section.tdes) or _positive(section.t)
-    B_out, H_out = _rectangular_hss_outside_dimensions(section, t)
+    if profile != "RECTANGULAR_HSS":
+        raise RuleNotImplementedError("H3.1 is limited to round/rectangular HSS.", details={"profile_type": profile})
+    h, b, t = require_section_values(section, ("h", "b", "tdes"), "H3.1(b); B4.2")
+    h_long = max(h, b)
     fcr_data = combined_hss_calc.calculate_rectangular_hss_fcr_h3(E_mpa=e, Fy_mpa=fy, h_mm=h_long, t_mm=t)
-    c_data = combined_hss_calc.calculate_rectangular_hss_torsional_constant(
-        B_mm=B_out,
-        H_mm=H_out,
-        t_mm=t,
-        c_catalog_mm3=_positive(section.c),
-    )
+    if fcr_data["Fcr_mpa"] is None:
+        raise RuleNotImplementedError("Rectangular HSS outside H3-5 applicability (h/t > 260).",
+                                      details={"reference": "H3-5", "h_over_t": h_long / t})
+    (c_value,) = require_section_values(section, ("c",), "H3-1: C in mm3")
+    # Flat widths cannot be inverted to exact exterior B/H without corner geometry.
+    c_data = {"C_mm3": c_value, "source": "declared_C_no_outside_geometry_inference"}
     c_mm3 = float(c_data["C_mm3"])
     tn_nmm = combined_hss_calc.calculate_nominal_torsional_strength(fcr_mpa=float(fcr_data["Fcr_mpa"]), c_mm3=c_mm3)
     tc_kn_m = combined_hss_calc.calculate_available_torsional_strength(
@@ -151,8 +125,6 @@ def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]
             "E_mpa": e,
             "h_long_mm": h_long,
             "t_mm": t,
-            "B_outside_mm": B_out,
-            "H_outside_mm": H_out,
             "b_flat_mm": section.b,
             "h_flat_mm": section.h,
             "C_catalog_mm3": section.c,
@@ -256,76 +228,25 @@ def _available_flexural_strength(case: SteelCase, section: Section, axis: str) -
     return {"available_kN_m": available, "evaluation": evaluation}
 
 
-def _rectangular_hss_shear_capacity(case: SteelCase, section: Section, axis: str) -> float:
-    fy = case.material.Fy
-    e = case.material.E
-    t = _positive(section.tdes) or _positive(section.t)
-    h_resisting = _positive(section.h) if axis == "x" else _positive(section.b)
-    if h_resisting <= 0.0:
-        h_resisting = _positive(section.b) if axis == "x" else _positive(section.h)
-    h_over_t = h_resisting / t if min(h_resisting, t) > 0.0 else 0.0
-    aw = 2.0 * h_resisting * t if min(h_resisting, t) > 0.0 else 0.0
-    cv_data = shear_calc.calculate_cv2_g2_2(h_over_tw=h_over_t, fy_mpa=fy, e_mpa=e, kv=5.0)
-    vn_n = shear_calc.calculate_nominal_shear_strength(fy_mpa=fy, aw_mm2=aw, cv=float(cv_data["Cv2"]))
-    return shear_calc.calculate_available_shear_strength(
-        vn_n=vn_n,
-        design_method=case.design_method.value,
-        phi_v=0.90,
-        omega_v=1.67,
-    )
-
-
-def _round_hss_shear_capacity(case: SteelCase, section: Section, axis: str) -> float:
-    fy = case.material.Fy
-    e = case.material.E
-    ag = _positive(section.area)
-    diameter, t = _round_hss_dimensions(section)
-    lv = case.lengths.Lx if axis == "x" else case.lengths.Ly
-    fcr_data = shear_calc.calculate_round_hss_fcr(
-        e_mpa=e,
-        fy_mpa=fy,
-        lv_mm=lv,
-        diameter_mm=diameter,
-        thickness_mm=t,
-    )
-    vn_n = shear_calc.calculate_round_hss_nominal_shear_strength(
-        fcr_mpa=float(fcr_data["Fcr_mpa"]),
-        ag_mm2=ag,
-    )
-    return shear_calc.calculate_available_shear_strength(
-        vn_n=vn_n,
-        design_method=case.design_method.value,
-        phi_v=0.90,
-        omega_v=1.67,
-    )
-
-
-def _required_shear_demand(case: SteelCase) -> float:
-    if abs(case.loads.Vux) > 0.0 or abs(case.loads.Vuy) > 0.0:
-        return max(abs(case.loads.Vux), abs(case.loads.Vuy))
-    return abs(case.loads.Vu)
-
-
 def _available_shear_strength(case: SteelCase, section: Section) -> Dict[str, object]:
-    vr = _required_shear_demand(case)
-    if vr <= 0.0:
-        return {"required_kN": 0.0, "available_kN": math.inf, "axis_capacities": {"x": math.inf, "y": math.inf}}
-
-    profile = section.type.upper()
-    if profile == "RECTANGULAR_HSS":
-        vc_x = _rectangular_hss_shear_capacity(case, section, "x")
-        vc_y = _rectangular_hss_shear_capacity(case, section, "y")
-    elif profile == "CIRCULAR_HSS":
-        vc_x = _round_hss_shear_capacity(case, section, "x")
-        vc_y = _round_hss_shear_capacity(case, section, "y")
-    else:
-        raise ValidationError("H3 shear interaction is scoped to HSS profiles only.", details={"profile_type": profile})
-
-    return {
-        "required_kN": vr,
-        "available_kN": max(vc_x, vc_y),
-        "axis_capacities": {"x": vc_x, "y": vc_y},
-    }
+    # H3-6 specifies the larger RATIO, retaining each demand with its own capacity.
+    evaluations, capacities, demands, ratios = {}, {}, {}, {}
+    for axis in ("x", "y"):
+        demands[axis] = shear_demand(case, axis)
+        if demands[axis] == 0:
+            ratios[axis], capacities[axis] = 0.0, None
+            continue
+        evaluation = evaluate_hss_shear(case, section, axis)
+        evaluations[axis] = evaluation
+        capacities[axis] = evaluation["capacity_kN"]
+        ratios[axis] = _safe_ratio(demand=demands[axis], capacity=capacities[axis], ratio_name=f"Vr{axis}/Vc{axis}")
+    governing = max(ratios, key=ratios.get) if any(demands.values()) else None
+    return {"required_kN": demands[governing] if governing else 0.0,
+            "available_kN": capacities[governing] if governing else None,
+            "ratio": ratios[governing] if governing else 0.0, "governing_axis": governing,
+            "axis_capacities": capacities, "axis_demands": demands, "axis_ratios": ratios,
+            "evaluations": evaluations,
+            "directions": {axis: shear_trace(case, axis) for axis in ("x", "y")}}
 
 
 def _compute_h1_interaction(case: SteelCase, section: Section) -> Dict[str, object]:
@@ -475,36 +396,11 @@ class HssCombinedH3_2Rule:
         torsion_threshold = 0.2 * tc
 
         if tr <= torsion_threshold:
-            h1_interaction = None
-            if case.loads.Pu != 0.0 and (abs(case.loads.Mux) > 0.0 or abs(case.loads.Muy) > 0.0):
-                h1_interaction = _compute_h1_interaction(case, section)
-            return _build_result(
-                name="HSS Combined Actions Threshold (H3-2)",
-                clause="H3-2",
-                demand=tr,
-                capacity=torsion_threshold,
-                details={
-                    "memory": {
-                        "clause": "H3-2",
-                        "inputs": {
-                            "Tr_kN_m": tr,
-                            "Tc_kN_m": tc,
-                        },
-                        "intermediate": {
-                            "Tr_over_Tc": _safe_ratio(demand=tr, capacity=tc, ratio_name="Tr/Tc"),
-                            "threshold_expression": "Tr <= 0.2*Tc",
-                            "threshold_kN_m": torsion_threshold,
-                            "h3_2_mode": "torsion_below_threshold_use_H1_and_G_checks",
-                            "h1_reference": h1_interaction,
-                        },
-                        "design_factor": {
-                            "design_method": case.design_method.value,
-                            "capacity_expression": "0.2*Tc",
-                        },
-                        "capacity_kN_m": torsion_threshold,
-                    }
-                },
-            )
+            raise RuleNotImplementedError(
+                "H3.2 permits neglecting torsional interaction at Tr/Tc <= 0.20, but a qualified H1/G alternative is not established; threshold is not a resistance check.",
+                details={"reference": "H3.2", "Tr_kN_m": tr, "Tc_kN_m": tc,
+                         "Tr_over_Tc": tr / tc, "alternative": "Qualified H1/G checks required",
+                         "component": "Pu+Mux+Muy+V+Tu"})
 
         axial = _available_axial_strength(case, section)
         flex_x = _available_flexural_strength(case, section, "x")
@@ -514,7 +410,7 @@ class HssCombinedH3_2Rule:
         pu_ratio = _safe_ratio(demand=case.loads.Pu, capacity=float(axial["available_kN"]), ratio_name="Pr/Pc")
         mx_ratio = _safe_ratio(demand=case.loads.Mux, capacity=float(flex_x["available_kN_m"]), ratio_name="Mrx/Mcx")
         my_ratio = _safe_ratio(demand=case.loads.Muy, capacity=float(flex_y["available_kN_m"]), ratio_name="Mry/Mcy")
-        vr_ratio = _safe_ratio(demand=float(shear["required_kN"]), capacity=float(shear["available_kN"]), ratio_name="Vr/Vrc")
+        vr_ratio = float(shear["ratio"])
         tr_ratio = _safe_ratio(demand=tr, capacity=tc, ratio_name="Tr/Tc")
 
         normal_ratio = pu_ratio + mx_ratio + my_ratio
@@ -542,12 +438,15 @@ class HssCombinedH3_2Rule:
                     "intermediate": {
                         "Tr_over_Tc": tr_ratio,
                         "Vr_over_Vrc": vr_ratio,
+                        "shear_governing_axis": shear["governing_axis"],
+                        "shear_ratios_by_axis": shear["axis_ratios"],
+                        "normative_equation": "ANSI/AISC 360-22 H3-6",
                         "Pr_over_Pc": pu_ratio,
                         "Mrx_over_Mcx": mx_ratio,
                         "Mry_over_Mcy": my_ratio,
                         "normal_ratio_sum": normal_ratio,
                         "shear_torsion_ratio_sum": shear_torsion_ratio,
-                        "interaction_expression": "(Pr/Pc + Mrx/Mcx + Mry/Mcy)^2 + (Vr/Vrc + Tr/Tc)^2",
+                        "interaction_expression": "(Pr/Pc + Mrx/Mcx + Mry/Mcy) + (max(Vrx/Vcx,Vry/Vcy) + Tr/Tc)^2",
                         "interaction_ratio": interaction,
                     },
                     "capacities": {

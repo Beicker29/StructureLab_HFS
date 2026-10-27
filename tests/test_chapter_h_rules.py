@@ -1,6 +1,7 @@
 import unittest
 
 from src.steel_design.domain.routing.profile_router import ProfileRouter
+from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
 from src.steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule
 from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
 from src.steel_design.sections.models import Section
@@ -78,17 +79,17 @@ class ChapterHRulesTests(unittest.TestCase):
 
     def test_h3_2_uses_threshold_branch_when_tr_not_greater_than_0p2_tc(self):
         case = _case(pu=40.0, mux=2.0, muy=1.0, vux=4.0, tu=0.2)
-        result = HssCombinedH3_2Rule().check(case, _rect_hss_section())
-        self.assertEqual("H3-2", result.clause)
-        self.assertIn("threshold", result.name.lower())
-        self.assertIn("h3_2_mode", result.details["memory"]["intermediate"])
+        # HFS-013: explicit synthetic C isolates the threshold permission.
+        section = _rect_hss_section().model_copy(update={"c": 6000.0})
+        with self.assertRaises(RuleNotImplementedError) as caught:
+            HssCombinedH3_2Rule().check(case, section)
+        self.assertLessEqual(caught.exception.details["Tr_over_Tc"], 0.2)
 
-    def test_h3_2_uses_interaction_equation_when_tr_exceeds_threshold(self):
+    def test_h3_2_missing_c_does_not_reconstruct_outer_dimensions(self):
         case = _case(pu=40.0, mux=2.0, muy=1.0, vux=4.0, tu=5.0)
-        result = HssCombinedH3_2Rule().check(case, _rect_hss_section())
-        self.assertEqual("H3-2", result.clause)
-        self.assertIn("interaction_expression", result.details["memory"]["intermediate"])
-        self.assertGreater(result.demand, 0.0)
+        with self.assertRaises(IncompleteSectionDataError) as caught:
+            HssCombinedH3_2Rule().check(case, _rect_hss_section())
+        self.assertIn("c", caught.exception.details["missing_fields"])
 
 
 if __name__ == "__main__":

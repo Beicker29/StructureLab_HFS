@@ -1,0 +1,312 @@
+{
+  "branch": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "branch",
+      "--show-current"
+    ],
+    "exit": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "head": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stdout": "3af52aa9848ccb6ff040fd1f8203a4609599f341\n",
+    "stderr": ""
+  },
+  "git_status": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "status",
+      "--short",
+      "--untracked-files=all"
+    ],
+    "exit": 0,
+    "stdout": " M CONTRIBUTING.md\n M README.md\n M docs/ROADMAP.md\n M docs/aisc_360_22_traceability.md\n M docs/architecture/dry-inventory.md\n M docs/audit/tracking.md\n M docs/unidades.md\n M src/steel_design/codes/aisc_360_22/combined_hss_calc.py\n M src/steel_design/codes/aisc_360_22/shear_calc.py\n M src/steel_design/domain/coverage.py\n M src/steel_design/domain/routing/profile_router.py\n M src/steel_design/domain/rules/combined_hss_rules.py\n M src/steel_design/domain/rules/shear_rules.py\n M src/steel_design/engine.py\n M src/steel_design/models.py\n M tests/test_chapter_g_rules.py\n M tests/test_chapter_h_rules.py\n M tests/test_hfs010_coverage.py\n?? docs/audit/hfs013/changed-files.md\n?? docs/audit/hfs013/evidence/SHA256SUMS.json\n?? docs/audit/hfs013/evidence/after/SHA256SUMS.json\n?? docs/audit/hfs013/evidence/after/catalog.json\n?? docs/audit/hfs013/evidence/after/comparison.json\n?? docs/audit/hfs013/evidence/after/copied_inputs.json\n?? docs/audit/hfs013/evidence/after/engine-results.json\n?? docs/audit/hfs013/evidence/after/environment.json\n?? docs/audit/hfs013/evidence/after/hfs013-comparison.json\n?? docs/audit/hfs013/evidence/after/hfs013-verification.json\n?? docs/audit/hfs013/evidence/after/pytest-characterization.json\n?? docs/audit/hfs013/evidence/after/pytest-characterization.xml\n?? docs/audit/hfs013/evidence/after/pytest-contracts.json\n?? docs/audit/hfs013/evidence/after/pytest-contracts.xml\n?? docs/audit/hfs013/evidence/after/pytest-original.json\n?? docs/audit/hfs013/evidence/after/pytest-original.xml\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs010_coverage.json\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs010_coverage.xml\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs012_flexure_selection.json\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs012_flexure_selection.xml\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs013_directional_h3.json\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs013_directional_h3.xml\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs016_catalog_integrity.json\n?? docs/audit/hfs013/evidence/after/pytest-test_hfs016_catalog_integrity.xml\n?? docs/audit/hfs013/evidence/after/verification.json\n?? docs/audit/hfs013/evidence/before/SHA256SUMS.json\n?? docs/audit/hfs013/evidence/before/catalog.json\n?? docs/audit/hfs013/evidence/before/comparison.json\n?? docs/audit/hfs013/evidence/before/copied_inputs.json\n?? docs/audit/hfs013/evidence/before/environment.json\n?? docs/audit/hfs013/evidence/before/pytest-characterization.json\n?? docs/audit/hfs013/evidence/before/pytest-characterization.xml\n?? docs/audit/hfs013/evidence/before/pytest-contracts.json\n?? docs/audit/hfs013/evidence/before/pytest-contracts.xml\n?? docs/audit/hfs013/evidence/before/pytest-original.json\n?? docs/audit/hfs013/evidence/before/pytest-original.xml\n?? docs/audit/hfs013/evidence/before/pytest-test_hfs010_coverage.json\n?? docs/audit/hfs013/evidence/before/pytest-test_hfs010_coverage.xml\n?? docs/audit/hfs013/evidence/before/pytest-test_hfs012_flexure_selection.json\n?? docs/audit/hfs013/evidence/before/pytest-test_hfs012_flexure_selection.xml\n?? docs/audit/hfs013/evidence/before/pytest-test_hfs016_catalog_integrity.json\n?? docs/audit/hfs013/evidence/before/pytest-test_hfs016_catalog_integrity.xml\n?? docs/audit/hfs013/evidence/before/verification.json\n?? docs/audit/hfs013/evidence/final-verification.json\n?? docs/audit/hfs013/evidence/final/SHA256SUMS.json\n?? docs/audit/hfs013/evidence/final/catalog.json\n?? docs/audit/hfs013/evidence/final/comparison.json\n?? docs/audit/hfs013/evidence/final/copied_inputs.json\n?? docs/audit/hfs013/evidence/final/engine-results.json\n?? docs/audit/hfs013/evidence/final/environment.json\n?? docs/audit/hfs013/evidence/final/hfs013-comparison.json\n?? docs/audit/hfs013/evidence/final/hfs013-verification.json\n?? docs/audit/hfs013/evidence/final/pytest-characterization.json\n?? docs/audit/hfs013/evidence/final/pytest-characterization.xml\n?? docs/audit/hfs013/evidence/final/pytest-contracts.json\n?? docs/audit/hfs013/evidence/final/pytest-contracts.xml\n?? docs/audit/hfs013/evidence/final/pytest-original.json\n?? docs/audit/hfs013/evidence/final/pytest-original.xml\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs010_coverage.json\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs010_coverage.xml\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs012_flexure_selection.json\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs012_flexure_selection.xml\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs013_directional_h3.json\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs013_directional_h3.xml\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs016_catalog_integrity.json\n?? docs/audit/hfs013/evidence/final/pytest-test_hfs016_catalog_integrity.xml\n?? docs/audit/hfs013/evidence/final/verification.json\n?? docs/audit/hfs013/evidence/incidents/initial-hfs010.json\n?? docs/audit/hfs013/evidence/incidents/initial-targeted.json\n?? docs/audit/hfs013/evidence/incidents/initial-verification.json\n?? docs/audit/hfs013/evidence/probes-after.json\n?? docs/audit/hfs013/evidence/probes-before.json\n?? docs/audit/hfs013/evidence/reused-evidence.json\n?? docs/audit/hfs013/probes.py\n?? docs/audit/hfs013/report.md\n?? docs/contracts/hfs013-axes.md\n?? scripts/audit_hfs013.py\n?? scripts/compare_hfs013.py\n?? src/steel_design/domain/actions.py\n?? src/steel_design/domain/evaluators/hss_shear.py\n?? tests/test_hfs013_directional_h3.py\n",
+    "stderr": "warning: could not open directory '.tmp_test/tmp0_8yr_64/': Permission denied\nwarning: could not open directory '.tmp_test/tmp2a4bzka6/': Permission denied\nwarning: could not open directory '.tmp_test/tmp5wxraw4a/': Permission denied\nwarning: could not open directory '.tmp_test/tmp7twtefjq/': Permission denied\nwarning: could not open directory '.tmp_test/tmp7z8f7yop/': Permission denied\nwarning: could not open directory '.tmp_test/tmpb5sea0ud/': Permission denied\nwarning: could not open directory '.tmp_test/tmpdavf6e0t/': Permission denied\nwarning: could not open directory '.tmp_test/tmpg2nfbxa4/': Permission denied\nwarning: could not open directory '.tmp_test/tmpqahi728y/': Permission denied\nwarning: could not open directory '.tmp_test/tmpqaod4h_n/': Permission denied\nwarning: could not open directory 'pytest-cache-files-93oft8sd/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_4rn4de_o/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_6jywjxew/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_ainfdvxk/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_ijzsgdqb/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_k1ipcu4t/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/cli_qqmb2y75/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_16efx1m7/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_3bjrukkv/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_4gy7xx53/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_5g740m8n/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_biqp3kr_/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_bxbq1fqe/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_dkwosl6m/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_dxbzjt36/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_glg8iwj6/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_gnhhrd45/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_hsnte0lm/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_vrs7uucx/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader_z9pii8k8/': Permission denied\nwarning: could not open directory 'tests/.tmp_tests/loader__s7gevx_/': Permission denied\n"
+  },
+  "git_diff_check": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'docs/aisc_360_22_traceability.md', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "index_unchanged": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd\\git.exe",
+      "diff",
+      "--cached",
+      "--name-only"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "protected_files": {
+    "src/steel_design/codes/aisc_360_22/axial_calc.py": {
+      "head_sha256": "8efb06e53cdfa048bbfcb175092e3f6bc773e48d7578c28149103a57ace95ec0",
+      "working_sha256": "8efb06e53cdfa048bbfcb175092e3f6bc773e48d7578c28149103a57ace95ec0",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/codes/aisc_360_22/composite_calc.py": {
+      "head_sha256": "56124cd0c876b672b2f2f52b3f9891058e4e6374cec67c8c29d1e7d3ab49beda",
+      "working_sha256": "7d535e0841a3c0194975968ab670c45533afc32f2a39608cd48493c39a4c4eda",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/codes/aisc_360_22/flexure_calc.py": {
+      "head_sha256": "58b619802daaa765b9aa06061c7d4fff7b119b2b814bdb93233015770012ecc5",
+      "working_sha256": "bf44b8748f59c60fa8853cbcc8c6d2e1fb188cd26c95735067452b3c745ab5c3",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/codes/aisc_360_22/tension_calc.py": {
+      "head_sha256": "356512972e520919974d4337a298058eb337a3e66a5b2e35821c4c897a96a6f0",
+      "working_sha256": "356512972e520919974d4337a298058eb337a3e66a5b2e35821c4c897a96a6f0",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/domain/rules/axial_rules.py": {
+      "head_sha256": "88ed2d67c38130a0aa7d3e8cf11ad4290056f6e2b267473f0ba18ecca04c0e92",
+      "working_sha256": "88ed2d67c38130a0aa7d3e8cf11ad4290056f6e2b267473f0ba18ecca04c0e92",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/domain/rules/composite_rules.py": {
+      "head_sha256": "d45b4f6cf95f07905d0893e874f3208dade22f9d012df11173f03773af62e0d2",
+      "working_sha256": "428eca913ef158b3b1cce03837b50afae74b27fa429829715f0f542b1e5d9464",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/domain/rules/flexure_rule.py": {
+      "head_sha256": "f8263eccbbd1f670a8b10fde63c1bc6352ed8d25db8f1ab8a9a8df894b8a296e",
+      "working_sha256": "7b89a7b889400a057e54f7164e0ac4c89a6be3578c3f4b124df21177b0c45593",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/domain/rules/tension_rule.py": {
+      "head_sha256": "d62d0c330788876f56d28b14f77c1c0031f51150183632cfaf57d5faf3c0b31e",
+      "working_sha256": "78374147a3b990a1ed0ef366a2f49bfb85d7ca72b908fed27ba3c06c76dc7fbb",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/sections/identity.py": {
+      "head_sha256": "971f0290496b80af56bf468bb338bd9c9b32ee1000d117ce16469ef51bbe4dfd",
+      "working_sha256": "7973fb48f29bae3f3a2309bce80b89e389120978b52c08ae97a28047257a577c",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/sections/loader.py": {
+      "head_sha256": "933719f02bb1efe08404f8e4a5eb3733934cf74fcbca0396915d08e856dbe8ed",
+      "working_sha256": "577c2dddb1854b949f9cf7fa917fe3aba09f70785cd5ed94e8e770f59ab2681f",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/sections/models.py": {
+      "head_sha256": "b66287be0f0cf0e535a40210d9d11d542230e880aee2461cd692ce6acb25234d",
+      "working_sha256": "7dc54fac04b3b57f5a0b53ae54de41a8dc74f8b931c0a64beac8442c70114d4d",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/sections/repository.py": {
+      "head_sha256": "37109c604555a6279e0c5505f1036ba7e6a99580b2867382263aa047f5150212",
+      "working_sha256": "ba008d2075c8e8ced370c3f09a06ff869bdc6adf4012795ce97e3be5231107c7",
+      "equal_normalizing_CRLF": true
+    },
+    "data/sections.xlsx": {
+      "head_sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+      "working_sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+      "equal_normalizing_CRLF": true
+    },
+    "a360-22w.pdf": {
+      "head_sha256": "25c4bf59b4c6fd00589e32a6ddac92cc9fd6be30dd5da07fc7c5f7fd475b2361",
+      "working_sha256": "25c4bf59b4c6fd00589e32a6ddac92cc9fd6be30dd5da07fc7c5f7fd475b2361",
+      "equal_normalizing_CRLF": true
+    },
+    "a341-22w.pdf": {
+      "head_sha256": "34cdd4a45360b5e3cb39f9fbb55640af79ece0deb9070a112aaccb938c027e0c",
+      "working_sha256": "34cdd4a45360b5e3cb39f9fbb55640af79ece0deb9070a112aaccb938c027e0c",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/results_model.py": {
+      "head_sha256": "cae8510e4d994fbf38f276048b0a94dd0298b0addadd2ae68a9706d86639b509",
+      "working_sha256": "7326c420ebbdf07dd223600066e48a72163221d45c0079a0ccf90f5e37046177",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/domain/validation.py": {
+      "head_sha256": "cb2087c10a2685c50a1a36dba8d5ab2881b1209a2b05c609b57c604cde9e9158",
+      "working_sha256": "991b35a375b15e4241ccb78dafb155b10a945e76e8b61dc0cd2a01df790ff603",
+      "equal_normalizing_CRLF": true
+    },
+    "src/steel_design/domain/coverage_evidence.py": {
+      "head_sha256": "1c2929bfa3be875634fdd5d8a0835cb88cab82382e8d65cb5e09617dbe9ff0af",
+      "working_sha256": "282c49d19d7d5ddd1e27a05860451bae884c81a007386070b69d33b66db73464",
+      "equal_normalizing_CRLF": true
+    },
+    "tests/test_hfs012_flexure_selection.py": {
+      "head_sha256": "7c29c3757ebe1237b67b9ed316f1fbfe1a1ad3cbf846bb6a36c493e7fe880b91",
+      "working_sha256": "7c29c3757ebe1237b67b9ed316f1fbfe1a1ad3cbf846bb6a36c493e7fe880b91",
+      "equal_normalizing_CRLF": true
+    },
+    "tests/test_hfs000_characterization.py": {
+      "head_sha256": "89437217d49c652ca5c6b295c2394528bd7bd561f24193aaee88356b19d64b84",
+      "working_sha256": "99c9f01b583491ab0556555e45ca0251ec86289784c59f257abfa8865e251cef",
+      "equal_normalizing_CRLF": true
+    }
+  },
+  "protected_symbols": {
+    "src/steel_design/domain/routing/profile_router.py::_classify_element": {
+      "unchanged": true,
+      "sha256": "ba8c1bc84069c4f6507ec8cb4d4e392a0e6877c54919cce4e9d30d80b6e6580d"
+    },
+    "src/steel_design/domain/routing/profile_router.py::_flexure_ratio": {
+      "unchanged": true,
+      "sha256": "4cd08e50dd4bc0301393932b8ac51826105818d59c390464052ae9f32995a852"
+    },
+    "src/steel_design/domain/routing/profile_router.py::_w_or_channel_major_flexure_selection": {
+      "unchanged": true,
+      "sha256": "be78897945b5f2ae7df9651da33c99cc4bb6b4c3a281d3754dd7618bac2eb907"
+    },
+    "src/steel_design/domain/routing/profile_router.py::ProfileRouter": {
+      "unchanged": true,
+      "sha256": "2dd15020a4fe653836aeb0f28ac36c822e983ec8677c174de07b1362966cb927"
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py::_available_axial_strength": {
+      "unchanged": true,
+      "sha256": "6a7b3e03179dc4436d621b70966bd6251b5e0f4e8529dea243aac998d1d82036"
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py::_available_flexural_strength": {
+      "unchanged": true,
+      "sha256": "a4d8c1901dc53a124e05db20c168b244667f8bf354805c03e1306890667dbf3a"
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py::_compute_h1_interaction": {
+      "unchanged": true,
+      "sha256": "f9c1353551ca270245e82da16d38a245793660f9de31f4e96ff05f632fb64c17"
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py::CombinedH1HssRule": {
+      "unchanged": true,
+      "sha256": "821780a966b7a414c3f53d58cdda869149cfb3d3860ed486b2352828a4b9d721"
+    },
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py::calculate_nominal_torsional_strength": {
+      "unchanged": true,
+      "sha256": "fc3ac8caaf90b5faf98e3e3e91bd4b25d5d1f83de9ddca2bb2cb5a9acd348685"
+    },
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py::calculate_available_torsional_strength": {
+      "unchanged": true,
+      "sha256": "67348258a14b854a2b8dd395c5bc347044cc7e941ce0cde16eb79fbdc93b7869"
+    },
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py::calculate_rectangular_hss_torsional_constant": {
+      "unchanged": true,
+      "sha256": "3bfef3ddb2fe62fd1097485c9b4f02c69c9c7bf22dc8cd7493920b7c57e95784"
+    }
+  },
+  "coverage_AST_unchanged_except_two_reasons": true,
+  "runtime_matches_final_capture": true,
+  "modified_tracked": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/ROADMAP.md",
+    "docs/aisc_360_22_traceability.md",
+    "docs/architecture/dry-inventory.md",
+    "docs/audit/tracking.md",
+    "docs/unidades.md",
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py",
+    "src/steel_design/codes/aisc_360_22/shear_calc.py",
+    "src/steel_design/domain/coverage.py",
+    "src/steel_design/domain/routing/profile_router.py",
+    "src/steel_design/domain/rules/combined_hss_rules.py",
+    "src/steel_design/domain/rules/shear_rules.py",
+    "src/steel_design/engine.py",
+    "src/steel_design/models.py",
+    "tests/test_chapter_g_rules.py",
+    "tests/test_chapter_h_rules.py",
+    "tests/test_hfs010_coverage.py"
+  ],
+  "new_files_observed": [
+    "docs/audit/hfs013/changed-files.md",
+    "docs/audit/hfs013/evidence/SHA256SUMS.json",
+    "docs/audit/hfs013/evidence/after/SHA256SUMS.json",
+    "docs/audit/hfs013/evidence/after/catalog.json",
+    "docs/audit/hfs013/evidence/after/comparison.json",
+    "docs/audit/hfs013/evidence/after/copied_inputs.json",
+    "docs/audit/hfs013/evidence/after/engine-results.json",
+    "docs/audit/hfs013/evidence/after/environment.json",
+    "docs/audit/hfs013/evidence/after/hfs013-comparison.json",
+    "docs/audit/hfs013/evidence/after/hfs013-verification.json",
+    "docs/audit/hfs013/evidence/after/pytest-characterization.json",
+    "docs/audit/hfs013/evidence/after/pytest-characterization.xml",
+    "docs/audit/hfs013/evidence/after/pytest-contracts.json",
+    "docs/audit/hfs013/evidence/after/pytest-contracts.xml",
+    "docs/audit/hfs013/evidence/after/pytest-original.json",
+    "docs/audit/hfs013/evidence/after/pytest-original.xml",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs010_coverage.json",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs010_coverage.xml",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs012_flexure_selection.json",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs012_flexure_selection.xml",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs013_directional_h3.json",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs013_directional_h3.xml",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs016_catalog_integrity.json",
+    "docs/audit/hfs013/evidence/after/pytest-test_hfs016_catalog_integrity.xml",
+    "docs/audit/hfs013/evidence/after/verification.json",
+    "docs/audit/hfs013/evidence/before/SHA256SUMS.json",
+    "docs/audit/hfs013/evidence/before/catalog.json",
+    "docs/audit/hfs013/evidence/before/comparison.json",
+    "docs/audit/hfs013/evidence/before/copied_inputs.json",
+    "docs/audit/hfs013/evidence/before/environment.json",
+    "docs/audit/hfs013/evidence/before/pytest-characterization.json",
+    "docs/audit/hfs013/evidence/before/pytest-characterization.xml",
+    "docs/audit/hfs013/evidence/before/pytest-contracts.json",
+    "docs/audit/hfs013/evidence/before/pytest-contracts.xml",
+    "docs/audit/hfs013/evidence/before/pytest-original.json",
+    "docs/audit/hfs013/evidence/before/pytest-original.xml",
+    "docs/audit/hfs013/evidence/before/pytest-test_hfs010_coverage.json",
+    "docs/audit/hfs013/evidence/before/pytest-test_hfs010_coverage.xml",
+    "docs/audit/hfs013/evidence/before/pytest-test_hfs012_flexure_selection.json",
+    "docs/audit/hfs013/evidence/before/pytest-test_hfs012_flexure_selection.xml",
+    "docs/audit/hfs013/evidence/before/pytest-test_hfs016_catalog_integrity.json",
+    "docs/audit/hfs013/evidence/before/pytest-test_hfs016_catalog_integrity.xml",
+    "docs/audit/hfs013/evidence/before/verification.json",
+    "docs/audit/hfs013/evidence/final-verification.json",
+    "docs/audit/hfs013/evidence/final/SHA256SUMS.json",
+    "docs/audit/hfs013/evidence/final/catalog.json",
+    "docs/audit/hfs013/evidence/final/comparison.json",
+    "docs/audit/hfs013/evidence/final/copied_inputs.json",
+    "docs/audit/hfs013/evidence/final/engine-results.json",
+    "docs/audit/hfs013/evidence/final/environment.json",
+    "docs/audit/hfs013/evidence/final/hfs013-comparison.json",
+    "docs/audit/hfs013/evidence/final/hfs013-verification.json",
+    "docs/audit/hfs013/evidence/final/pytest-characterization.json",
+    "docs/audit/hfs013/evidence/final/pytest-characterization.xml",
+    "docs/audit/hfs013/evidence/final/pytest-contracts.json",
+    "docs/audit/hfs013/evidence/final/pytest-contracts.xml",
+    "docs/audit/hfs013/evidence/final/pytest-original.json",
+    "docs/audit/hfs013/evidence/final/pytest-original.xml",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs010_coverage.json",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs010_coverage.xml",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs012_flexure_selection.json",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs012_flexure_selection.xml",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs013_directional_h3.json",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs013_directional_h3.xml",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs016_catalog_integrity.json",
+    "docs/audit/hfs013/evidence/final/pytest-test_hfs016_catalog_integrity.xml",
+    "docs/audit/hfs013/evidence/final/verification.json",
+    "docs/audit/hfs013/evidence/incidents/initial-hfs010.json",
+    "docs/audit/hfs013/evidence/incidents/initial-targeted.json",
+    "docs/audit/hfs013/evidence/incidents/initial-verification.json",
+    "docs/audit/hfs013/evidence/probes-after.json",
+    "docs/audit/hfs013/evidence/probes-before.json",
+    "docs/audit/hfs013/evidence/reused-evidence.json",
+    "docs/audit/hfs013/probes.py",
+    "docs/audit/hfs013/report.md",
+    "docs/contracts/hfs013-axes.md",
+    "scripts/audit_hfs013.py",
+    "scripts/compare_hfs013.py",
+    "src/steel_design/domain/actions.py",
+    "src/steel_design/domain/evaluators/hss_shear.py",
+    "tests/test_hfs013_directional_h3.py"
+  ],
+  "local_links_checked": 98,
+  "missing_links": [],
+  "probe_repeat_identical": true,
+  "access_note": "Historic access-limited directories untouched. New pytest-cache-files-93oft8sd is a generated cache directory: rg reports Access denied; not inspected/deleted, no ACL changes.",
+  "inventory_exact_match": true
+}
