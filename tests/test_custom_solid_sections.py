@@ -28,7 +28,8 @@ class CustomSolidSectionsTests(unittest.TestCase):
 
         result = engine.run(case)
 
-        self.assertEqual("PASS", result.status.value)
+        # HFS-010: E3 execution is preserved, but full applicability is not accredited.
+        self.assertEqual("INCOMPLETE", result.status.value)
         self.assertEqual(1, len(result.checks))
         clauses = {check.clause for check in result.checks}
         self.assertIn("E3-1", clauses)
@@ -47,7 +48,8 @@ class CustomSolidSectionsTests(unittest.TestCase):
 
         result = engine.run(case)
 
-        self.assertEqual("PASS", result.status.value)
+        # HFS-010: no tension_scope evidence was supplied; D2 values remain unchanged.
+        self.assertEqual("INCOMPLETE", result.status.value)
         self.assertEqual(2, len(result.checks))
         clauses = {check.clause for check in result.checks}
         self.assertIn("D2-1", clauses)

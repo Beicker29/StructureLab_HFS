@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs011\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs010_coverage.py",
+    "--basetemp=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs010-final-work\\temp-test_hfs010_coverage",
+    "--junitxml=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs010-final\\pytest-test_hfs010_coverage.xml"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\hfs010-final-work",
+  "returncode": 1,
+  "stdout": "..........F..............................................                [100%]\n================================== FAILURES ===================================\n_________ test_declaration_cannot_qualify_net_area_larger_than_gross __________\ntests\\test_hfs010_coverage.py:98: in test_declaration_cannot_qualify_net_area_larger_than_gross\n    result = SteelDesignEngine(SectionRepository()).run(tie(connection=dict(An=1200, U=.5)))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsrc\\steel_design\\engine.py:99: in run\n    validate_case_section(case, section)\nsrc\\steel_design\\domain\\validation.py:135: in validate_case_section\n    raise ValidationError(\"Net area An cannot exceed gross area Ag.\", details={\nE   src.steel_design.domain.errors.ValidationError: Net area An cannot exceed gross area Ag.\n=========================== short test summary info ===========================\nFAILED tests/test_hfs010_coverage.py::test_declaration_cannot_qualify_net_area_larger_than_gross\n1 failed, 56 passed in 3.61s\n",
+  "stderr": ""
+}

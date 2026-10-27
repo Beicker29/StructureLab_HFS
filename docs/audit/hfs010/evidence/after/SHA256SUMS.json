@@ -1,0 +1,19 @@
+{
+  "catalog.json": "5763a182bfaf3f8e43ac646e2fc09ccebd8c009e4f036953083f474320049274",
+  "comparison.json": "b1bc362d1e193e73e210ad7bab9fcc529e1ef65c7cc31194eeafe7e300b87a68",
+  "copied_inputs.json": "9b5eae2b875c2a3f9832c2b6b4f64e2587435823b1a8f66df10551b451e0a003",
+  "coverage-transition.json": "c3c1df0a6a80065840ef2dbcdceac5fca335016d0d3b4810fa5ede5a294470bb",
+  "engine-results.json": "d4ffba78e13fb18feb16b198e0f071c950ef4af4ce0102c0675cdbea643e0ea2",
+  "environment.json": "a0a2a9753e850c1ea89ddc814552daa775b65c7660a99fcd50cbcca4dd80bfe4",
+  "pytest-characterization.json": "ba555572955091fba37c62e8bf4f7f3446f8a62b770652d3b26122bfcc4a479a",
+  "pytest-characterization.xml": "b9d860d6486064dcdc705504449ade3c09148e693c9a617cb86954177641ffc5",
+  "pytest-contracts.json": "1cc959e50b3c2a14a3fc80009dc25937575662515b9eae6efcfefa1d1c00ce5d",
+  "pytest-contracts.xml": "ffb1268ee049fd76264184dfb0233d031e520436bcf68a18e6ee5dd067bbe08b",
+  "pytest-original.json": "55dfac9624cd3f4dd49ac53e8eb67b018743771e7aeaab32e7a13ec946ff4af2",
+  "pytest-original.xml": "d6f618316456c85c79671d2dcfe9cf0727053bc4aeb5fc988f6c1520bc33a189",
+  "pytest-test_hfs010_coverage.json": "ee1cf5999b1425567d8450b2147f4776ebd078c8803367502f19e5bff72dded1",
+  "pytest-test_hfs010_coverage.xml": "28b6a59832c7d344fa449b9cddbb1402eb6d20f688ca587b13eb820863e0aa1c",
+  "pytest-test_hfs016_catalog_integrity.json": "7d713ed40f0f10647518b39e4c37e58a032d0d3a88fce22646845136effe7b2f",
+  "pytest-test_hfs016_catalog_integrity.xml": "1a3068696efbf63107daf15dce75f3f46afaed0dfe420e7695141af095c7e05b",
+  "verification.json": "753facd86690f7f2f92ce82978f4b8d36a21dccc65d22c7c4ed40dada5eab76b"
+}
