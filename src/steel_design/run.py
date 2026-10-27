@@ -16,7 +16,7 @@ from .engine import SteelDesignEngine
 from .sections.models import Section
 from .sections.loader import load_sections_from_excel
 from .sections.repository import SectionRepository
-from .domain.errors import SteelDesignError
+from .domain.errors import SteelDesignError, ValidationError
 
 
 class OutputOptions(InputModel):
@@ -62,25 +62,49 @@ def _sanitize_filename(text: str) -> str:
 
 
 def _build_global_summary(result) -> dict:
-    checks = result.checks or []
-    positive_capacity_checks = [
-        check
-        for check in checks
-        if (check.capacity or 0.0) > 0.0 and not str(check.clause).upper().startswith(("H1", "H3-2", "I5"))
-    ]
-    if not positive_capacity_checks:
-        return {
-            "governing_capacity_kn_or_knm": None,
-            "governing_clauses": [],
-            "governing_check_names": [],
-        }
+    """Observed ranking only: consume published DCR, never recompute resistance.
 
-    min_capacity = min(check.capacity for check in positive_capacity_checks)
-    governing_checks = [check for check in positive_capacity_checks if abs(check.capacity - min_capacity) <= 1e-9]
+    Coverage links identify executed resistance checks, not accreditation. When
+    no coverage metadata exists (legacy/direct caller), numeric checks are only
+    provisional candidates. No units or roles are inferred from clause text.
+    """
+    checks = result.checks or []
+    resistance_indices = None
+    if result.coverage is not None:
+        resistance_indices = {index for obligation in result.coverage.obligations if obligation.resistance
+                              for index in obligation.executed_checks}
+    candidates, failures, excluded = [], [], []
+    for index, check in enumerate(checks):
+        entry = {"check_index": index, "clause": check.clause, "name": check.name,
+                 "dcr_published": check.dcr if math.isfinite(check.dcr) else None,
+                 "status": check.status.value}
+        if check.status.value == "FAIL":
+            failures.append(entry)
+        reason = None
+        if resistance_indices is not None and index not in resistance_indices:
+            reason = "no_executed_resistance_obligation"
+        elif not (math.isfinite(check.demand) and abs(check.demand) > 0
+                  and math.isfinite(check.capacity) and check.capacity > 0):
+            reason = "no_positive_resistance_with_active_demand"
+        elif not math.isfinite(check.dcr) or check.dcr < 0:
+            reason = "no_finite_nonnegative_published_dcr"
+        if reason:
+            excluded.append({"check_index": index, "reason": reason})
+        else:
+            candidates.append(entry)
+    maximum = max((c["dcr_published"] for c in candidates), default=None)
     return {
-        "governing_capacity_kn_or_knm": min_capacity,
-        "governing_clauses": [check.clause for check in governing_checks],
-        "governing_check_names": [check.name for check in governing_checks],
+        "version": "HFS-014-v1",
+        "overall_status": result.status.value,
+        "scope": "executed_checks_only",
+        "description": "Observed governing checks among executed checks; not a definitive governing limit state for the structure.",
+        "ranking_basis": "published_dcr; exact ties retained; raw DCR not reconstructed",
+        "eligibility_basis": "executed_resistance_obligations" if resistance_indices is not None
+                             else "provisional_numeric_checks_without_coverage",
+        "max_dcr_published": maximum,
+        "observed_governing_checks": [c for c in candidates if c["dcr_published"] == maximum],
+        "failed_checks": failures,
+        "excluded_checks": excluded,
     }
 
 
@@ -531,6 +555,8 @@ def _write_detailed_results_file(
         output_path = output_dir / f"{safe_section}__{timestamp}.json"
     output_summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
     output_summary["admissibility"] = admissibility
+    global_summary = _build_global_summary(result)
+    output_summary["global_summary"] = global_summary
 
     clause_results = []
     for check in result.checks:
@@ -564,8 +590,7 @@ def _write_detailed_results_file(
         },
         "memory": {
             "global_summary": {
-                **_build_global_summary(result),
-                "overall_status": result.status.value,
+                **global_summary,
                 "admissibility": admissibility,
             },
             "shared_context": shared_context,
@@ -662,6 +687,7 @@ def _run_single_case(
         "status": raw_summary.get("status"),
         "coverage": raw_summary.get("coverage"),
         "known_failures": raw_summary.get("known_failures", []),
+        "global_summary": _build_global_summary(result),
         "admissibility": _build_compact_admissibility(_build_chapter_admissibility(case, section)),
         "checks": raw_summary.get("checks", []),
         "artifacts": {
@@ -707,14 +733,23 @@ def main():
 
     # Run
     try:
+        is_bundle = isinstance(payload, dict) and "cases" in payload
+        if is_bundle:
+            case_definitions = payload["cases"]
+            if not isinstance(case_definitions, list):
+                raise ValidationError("cases must be a list of case objects.", code="INVALID_CASE_BUNDLE",
+                                      details={"field": "cases", "received_type": type(case_definitions).__name__})
+            if not case_definitions:
+                aggregate_case_statuses([])  # canonical empty-bundle policy, before any execution/output
+            for index, definition in enumerate(case_definitions):
+                if not isinstance(definition, dict):
+                    raise ValidationError("Each bundle case must be an object.", code="INVALID_CASE_BUNDLE",
+                                          details={"field": f"cases[{index}]", "received_type": type(definition).__name__})
         execution_results_dir = _build_execution_results_dir(base_results_dir=args.results_dir, input_file=args.input_file)
-        if isinstance(payload, dict) and isinstance(payload.get("cases"), list):
-            case_definitions = payload.get("cases", [])
+        if is_bundle:
             base_payload = {key: value for key, value in payload.items() if key != "cases"}
             summaries = []
             for index, case_definition in enumerate(case_definitions):
-                if not isinstance(case_definition, dict):
-                    raise ValueError(f"cases[{index}] must be an object.")
                 case_tag = str(case_definition.get("name") or f"case_{index+1}")
                 case_override = {k: v for k, v in case_definition.items() if k != "name"}
                 merged_payload = _merge_case_payload(base_payload, case_override)

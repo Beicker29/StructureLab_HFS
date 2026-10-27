@@ -1,5 +1,12 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Entrega HFS-014 (2026-10-27), base main `d3190d4`:** F-05 corregido mediante
+gobernantes observados por DCR publicado, y F-29 mediante rechazo estructurado
+de lotes vacíos antes de ejecutar/publicar. [Informe](audit/hfs014/report.md) y
+[migración JSON](contracts/hfs014-summary-bundles.md). Revisión técnica pendiente;
+sin publicación automática. HFS-017/039 se registran como tareas futuras por
+instrucción del usuario, **sin implementarlas**. HFS-015 no iniciada.
+
 **Revisión final HFS-013, F-43:** corrección de conversión F1(a) LRFD/ASD en
 capacidad flexural compartida de H3/H1, base main `abafdbb`. Cierre funcional
 demostrado, pendiente de revisión técnica; [informe y evidencia](audit/hfs013/f1-correction/report.md).
@@ -59,7 +66,7 @@ Los bloques anteriores de estado se conservan como historia de las entregas.
 | F-02 | P0 | C | `engine.py::run` | `overall_status=PASS` salvo FAIL explícito; no confirma cobertura ni ausencia de checks. Introducir `INCOMPLETE`, plan de verificaciones requeridas y agregación cerrada. |
 | F-03 | P0 | C | `domain/routing/profile_router.py::_w_or_channel_major_flexure_selection` | Faltan razones de esbeltez y el código devuelve F2. Nunca asumir sección compacta por ausencia de datos; bloquear. |
 | F-04 | P0 | C | `models.py`, `SteelCase`, `Loads`, Pydantic BaseModel por defecto | Campos desconocidos pueden ignorarse; cargas faltantes son 0. Rechazar campos extra, determinar campos requeridos y semántica de 0. |
-| F-05 | P0 | C | `run.py::_build_global_summary` | Elige la menor capacidad mezclando kN y kN·m. Sustituir por DCR gobernante y agrupar capacidades por dimensión y eje. |
+| F-05 | P0 | C | `run.py::_build_global_summary` | HFS-014: gobernantes observados por DCR publicado, todos los empates y fallos; se retira capacidad mezclada. Cierre funcional para revisión, precisión pendiente HFS-015. |
 | F-06 | P0 | C/R | `combined_hss_rules.py::_available_shear_strength` | HFS-013 corrige pares y máximo de cocientes; caso combinado DCR 0,97→1,61. Revisión y auditoría integral de capacidades dependientes pendientes. |
 | F-07 | P0 | C | `run.py::_build_chapter_admissibility` | D1 (300) y E2 (200) se presentan como admisibilidad; separar recomendaciones de incumplimientos. Revisar semántica de aplicabilidad de D1/E2. |
 | F-08 | P0 | C/R | `models.py::Loads`; `domain/actions.py` | HFS-011 eliminó resultante/sobrescritura; HFS-013 explicita Vu alias de Vux en el plano Mux, fuerza local y. Revisar consumidores históricos y futuros adaptadores. |
@@ -83,7 +90,7 @@ Los bloques anteriores de estado se conservan como historia de las entregas.
 | F-26 | P1 | C | `docs/aisc_360_22_traceability.md` | Tabla útil pero insuficiente: rastreo automatizado hasta pruebas independientes, fórmulas, versiones y estados. |
 | F-27 | P1 | R | Catálogo `data/sections.xlsx` | Versionar fuente, licencia, método de importación, conversiones, duplicados, geometrías y coherencia de propiedades. |
 | F-28 | P2 | R | Repositorio general | Verificar licencias y permisos de redistribución para normas PDF y tablas/datos; registrar dependencia documental y erratas aplicables. |
-| F-29 | P1 | C | `run.py` modo lote: `aggregate_pass=True` y `cases=[]` | Lote vacío puede declararse PASS; exigir ≥1 caso válido y agregación completa, resultados por caso. |
+| F-29 | P1 | C | `results_model.aggregate_case_statuses`; CLI | HFS-014: lista vacía produce EMPTY_CASE_BUNDLE antes de ejecutar/publicar. Lotes no vacíos conservan precedencia INCOMPLETE y fallos individuales; F-32 intacto. |
 | F-30 | P1 | R | `src/steel_design/codes/aisc_360_22` | Auditoría profunda de E4/E5/E7, F2–F11, G2–G6, H, I; revisar todos los factores, dominios, límites y errores numéricos. No asumir fidelidad por etiqueta de ecuación. |
 | F-31 | P0 | C/R | `domain/routing/profile_router.py::_validate_flexure_selection`; caracterización HFS-000 | Un check F del eje menor evita bloqueo aunque la demanda mayor no se evalúe. Omisión confirmada en sonda sintética; contraste con canal real pendiente. Seguimiento HFS-002/010/032. |
 | F-32 | P1 | C | `run.py::main`, ejemplos HFS-000 | FAIL estructural puede devolver exit 0. Es contrato observable, no regresión. Documentar separación ejecución/cumplimiento y revisar consumidores antes de cambiar exit; HFS-021/022. |
@@ -152,10 +159,11 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-011 | 1 | Endurecer Pydantic: campos extra, faltantes, finitud, dominios | 000 | Implementada para revisión antes de HFS-010 por autorización expresa; [evidencia y rupturas](audit/hfs011/report.md). Typos, NaN, inf, dominios y cortantes contradictorios rechazados; sin validación AISC exhaustiva. |
 | HFS-012 | 1 | Corregir fallback indebido de F2 por esbeltez ausente | 010,011 | Implementada para revisión: ausencia no implica compacidad; derivación explícita B4.1 o bloqueo, ancho completo del canal, pendientes HFS-010 y regresiones. [Informe](audit/hfs012/report.md). |
 | HFS-013 | 1 | Revisar convenciones `Pu,Mux,Muy,Vux,Vuy,Vu,Tu`, ejes y capacidades de cortante H3 | 011 | Ensayos direccionales no confunden ejes; si norma/caso no cubierto -> INCOMPLETE. |
-| HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | DCR gobernante con dimensión válida, `cases=[]` rechazado. |
+| HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | Implementada para revisión: DCR publicado, empates/FAIL conservados, sin inferir unidades; `cases=[]` rechazado. [Informe](audit/hfs014/report.md). |
 | HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Decisiones no cambian por redondeo; avisos no se confunden con incumplimientos. |
 | HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. Implementación entregada para revisión: [contrato](contracts/hfs016-catalog.md) e [informe](audit/hfs016/report.md). Alcance integral sigue HFS-040; no autoriza avance de fase. |
-| HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-016 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |
+| HFS-017 | 1, futura | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014 | Auditar paso del método y rechazo explícito de dominios no habilitados en motor/reglas/adaptadores; factores canónicos y regresiones sin ampliar soporte ASD por accidente. No implementada en HFS-014. |
+| HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |
 | HFS-021 | 2 | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Web y CLI futuros utilizan la misma ejecución; no hay lógica duplicada. |
 | HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021 | JSON round-trip, migración explícita y esquemas generados reproducibles. |
 | HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |
@@ -169,6 +177,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-036 | 3 | Modelo numérico compuesto: convergencia en discretización y equilibrio | 035 | Sensibilidad a franjas/iteraciones; tolerancias documentadas y regresiones reproducibles. |
 | HFS-037 | 3 | Capítulo C y validez del modelo de estabilidad / procedencia de demandas | 030,022 | Métodos admitidos definidos; supuestos no verificados impiden certificación de miembro completo. |
 | HFS-038 | 3 | Definir alcance no implementado de B/J/K y otros estados límite externos | 002,030 | No se declara cumplimiento global más allá de frontera explícita de producto. |
+| HFS-039 | 3, futura | Habilitación ASD por dominios validados, después de auditorías D/E/F/G/H/I | 017,031-035 | Habilitar solo familias/ejes/estados con nominales, factores, contratos y oráculos independientes acreditados; conservar bloqueos restantes. F-43 no equivale a habilitación integral. No implementada en HFS-014. |
 | HFS-040 | 4 | Catálogo canónico, importador Excel opcional, pruebas de unidades y duplicados | 020,022 | Catálogo versionado, sin sobrescrituras; origen trazable; Excel no es dependencia de runtime. |
 | HFS-041 | 4 | Banco de casos oficiales y fixtures independientes con procedencia | 031-037 | Test por disposición crítica y fronteras; tolerancias declaradas, ninguna salida esperada derivada del motor. |
 | HFS-042 | 4 | Pruebas de integración, propiedad/metamórficas y regresión | 041 | Cobertura por escenario técnico (no solo % de líneas); CI bloquea regresiones P0. |

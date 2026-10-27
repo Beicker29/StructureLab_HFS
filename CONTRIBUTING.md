@@ -52,6 +52,15 @@ suites separadas. Reproducción y conteos actuales en el
 
 ## Evidencia, revisión y cierre
 
+HFS-014 añade la novena suite `tests/test_hfs014_summary_bundle.py`.
+`scripts/audit_hfs014.py --baseline <JSON engine previo> --out <nueva> --work <nueva>`
+separa las nueve suites y exige igualdad de resultados del motor. La captura
+CLI/memorias se ejecuta aparte con `scripts/audit_hfs014_cli.py ROOT OUT` y se
+contrasta con `scripts/compare_hfs014_cli.py BEFORE AFTER OUTPUT`; solo admite
+las diferencias de resumen documentadas. Usar rutas de salida cortas en Windows
+para las memorias/diagramas, sin omitir ejemplos ni cambiar fórmulas. F-05/F-29
+son regresiones ordinarias; F-09 conserva xfail estricto. [Evidencia](docs/audit/hfs014/report.md).
+
 La corrección final F-43 de HFS-013 añade una octava suite separada:
 `tests/test_hfs013_design_method.py`. El wrapper `audit_hfs013.py` la incluye;
 si se usa `audit_hfs011.py`, pasar también ese archivo mediante `--extra-suite`.

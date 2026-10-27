@@ -1,5 +1,25 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## Actualización HFS-014: resumen y cardinalidad de lotes
+
+- **DRY-13/F-05:** `run.py::_build_global_summary` sigue como fuente única, ahora
+  ordena por DCR publicado. Consumidores: CLI por caso, `output.global_summary`
+  y `memory.global_summary`. No recalcula DCR desde checks redondeados ni llama
+  al inferidor de unidades. La traza detallada legacy queda pendiente HFS-015/024.
+- **DRY-14/F-29:** `results_model.aggregate_case_statuses` conserva la política
+  única de estados, añadiendo rechazo de lista vacía. CLI la invoca también en
+  la guarda previa de vacío; no mantiene otra decisión de cumplimiento. La
+  validación de tipo de `cases`/objetos es responsabilidad de transporte del CLI.
+- Para distinguir checks resistentes, el resumen consume los vínculos de
+  ejecución ya existentes de coverage (`resistance`, `executed_checks`), sin
+  replicar `_CLAIMS`, inferir roles de cláusulas ni acreditar obligaciones. Sin
+  coverage, los candidatos numéricos son provisionales y se declaran así.
+
+No se crea módulo/framework de reporting ni se reorganiza el CLI (HFS-021).
+No se consolidan capacidades o ecuaciones. Pruebas de consumidores y
+[contrato/migración](../contracts/hfs014-summary-bundles.md), con evidencia en el
+[informe HFS-014](../audit/hfs014/report.md).
+
 Actualización acotada HFS-011 (2026-10-27): el diagnóstico histórico de abajo se conserva. Se aplican únicamente los cambios de propiedad indicados en esta sección; [informe](../audit/hfs011/report.md) y [contrato](../contracts/hfs011-inputs.md).
 
 - **DRY-07:** `input_contracts.py::InputModel` y tipos anotados poseen extras, finitud, tipos numéricos y dominios locales. Consumidores: 16 modelos en `models.py`, `Section` y opciones CLI. El loader usa `TypeAdapter(FiniteNumber)` antes de derivar razones y tras escalar. Se retiran comprobaciones positivas repetidas de concreto/barras/caso. `validate_case` revalida el modelo para defender al motor frente a mutaciones y luego comprueba relaciones.
