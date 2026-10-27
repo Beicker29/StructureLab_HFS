@@ -38,14 +38,12 @@ def _flexure_name(clause: str, limit_state: str, context: str) -> str:
 def _build_flexure_result(*, case: SteelCase, name: str, clause: str, demand: float, evaluation: dict, inputs: dict) -> CheckResult:
     mn_nmm = evaluation["Mn_Nmm"]
     capacity = flexure_calc.available_flexural_strength_lrfd(mn_nmm)
-    dcr = demand / capacity if capacity > 0.0 else float("inf")
-    return CheckResult(
+    return CheckResult.from_values(
+        unit='kN-m',
         name=name,
         clause=clause,
-        demand=round(demand, 3),
-        capacity=round(capacity, 3),
-        dcr=round(dcr, 3),
-        status=CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL,
+        demand=demand,
+        capacity=capacity,
         details={
             "memory": {
                 "chapter_f_selection": clause,

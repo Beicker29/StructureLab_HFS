@@ -145,7 +145,7 @@ def test_mixed_dimension_summary_must_not_report_scalar_minimum():
     assert [c["check_index"] for c in summary["observed_governing_checks"]] == [0]
 
 
-@known_defect("F-09: FAIL is published with dcr=1.0 after rounding")
+# HFS-015: F-09 reproduced in dbd87cb; strict XPASS investigated before removal.
 def test_failed_check_must_retain_dcr_above_one():
     payload = case_payload({"Pu": -310.53105})
     payload.update(section_name="solid", custom_section={"type": "SOLID_RECTANGULAR", "B": 10, "H": 100},

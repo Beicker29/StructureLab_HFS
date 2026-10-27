@@ -1,0 +1,46 @@
+{
+  "loaded": 1228,
+  "repository_count": 1228,
+  "families": {
+    "CHANNEL": 32,
+    "CIRCULAR_HSS": 21,
+    "DOUBLE_ANGLE": 639,
+    "RECTANGULAR_HSS": 80,
+    "SINGLE_ANGLE": 137,
+    "W": 319
+  },
+  "duplicates": {
+    "HEA 100": 2,
+    "PTEXXMM": 5
+  },
+  "sheets": {
+    "README": {
+      "rows": 187,
+      "columns": 13
+    },
+    "W_IPE_HEA_HEB": {
+      "rows": 337,
+      "columns": 81
+    },
+    "2L": {
+      "rows": 640,
+      "columns": 81
+    },
+    "L": {
+      "rows": 138,
+      "columns": 81
+    },
+    "PTE_RECT": {
+      "rows": 289,
+      "columns": 87
+    },
+    "PTE_RED": {
+      "rows": 287,
+      "columns": 85
+    },
+    "C": {
+      "rows": 33,
+      "columns": 81
+    }
+  }
+}

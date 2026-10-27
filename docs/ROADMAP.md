@@ -1,11 +1,17 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
-**Entrega HFS-014 (2026-10-27), base main `d3190d4`:** F-05 corregido mediante
+**Entrega HFS-015 (2026-10-27), base main `dbd87cb`:** F-09 corregido con
+valores originales, display separado, JSON estricto y ranking bruto; F-07 con
+recomendaciones D1/E2 separadas de resistencia y condición E5 explícitamente
+pendiente. [Informe](audit/hfs015/report.md) y [migración](contracts/hfs015-precision-advice.md).
+Cierre funcional para revisión; sin commit/push ni avance a otro hito.
+
+**Entrega previa HFS-014 (2026-10-27), base main `d3190d4`:** F-05 corregido mediante
 gobernantes observados por DCR publicado, y F-29 mediante rechazo estructurado
 de lotes vacíos antes de ejecutar/publicar. [Informe](audit/hfs014/report.md) y
 [migración JSON](contracts/hfs014-summary-bundles.md). Revisión técnica pendiente;
 sin publicación automática. HFS-017/039 se registran como tareas futuras por
-instrucción del usuario, **sin implementarlas**. HFS-015 no iniciada.
+instrucción del usuario, **sin implementarlas**. La nota de entrega HFS-015 precedente actualiza su estado.
 
 **Revisión final HFS-013, F-43:** corrección de conversión F1(a) LRFD/ASD en
 capacidad flexural compartida de H3/H1, base main `abafdbb`. Cierre funcional
@@ -66,11 +72,11 @@ Los bloques anteriores de estado se conservan como historia de las entregas.
 | F-02 | P0 | C | `engine.py::run` | `overall_status=PASS` salvo FAIL explícito; no confirma cobertura ni ausencia de checks. Introducir `INCOMPLETE`, plan de verificaciones requeridas y agregación cerrada. |
 | F-03 | P0 | C | `domain/routing/profile_router.py::_w_or_channel_major_flexure_selection` | Faltan razones de esbeltez y el código devuelve F2. Nunca asumir sección compacta por ausencia de datos; bloquear. |
 | F-04 | P0 | C | `models.py`, `SteelCase`, `Loads`, Pydantic BaseModel por defecto | Campos desconocidos pueden ignorarse; cargas faltantes son 0. Rechazar campos extra, determinar campos requeridos y semántica de 0. |
-| F-05 | P0 | C | `run.py::_build_global_summary` | HFS-014: gobernantes observados por DCR publicado, todos los empates y fallos; se retira capacidad mezclada. Cierre funcional para revisión, precisión pendiente HFS-015. |
+| F-05 | P0 | C | `run.py::_build_global_summary` | HFS-014: gobernantes observados por DCR, empates y fallos preservados; sin capacidad mezclada. HFS-015 entrega precisión original y migración del resumen para revisión. |
 | F-06 | P0 | C/R | `combined_hss_rules.py::_available_shear_strength` | HFS-013 corrige pares y máximo de cocientes; caso combinado DCR 0,97→1,61. Revisión y auditoría integral de capacidades dependientes pendientes. |
-| F-07 | P0 | C | `run.py::_build_chapter_admissibility` | D1 (300) y E2 (200) se presentan como admisibilidad; separar recomendaciones de incumplimientos. Revisar semántica de aplicabilidad de D1/E2. |
+| F-07 | P0 histórico | C | `domain/recommendations.py` | HFS-015: avisos D1/E2 separados de resistencia; longitud fabricada/radio mínimo y excepción rod explícitos. E5 condiciona una alternativa distinta, aún pendiente de validación. |
 | F-08 | P0 | C/R | `models.py::Loads`; `domain/actions.py` | HFS-011 eliminó resultante/sobrescritura; HFS-013 explicita Vu alias de Vux en el plano Mux, fuerza local y. Revisar consumidores históricos y futuros adaptadores. |
-| F-09 | P0 | C | `domain/rules/*::_build_result`, `round(dcr,3)` | Umbral se evalúa sin redondeo pero DCR se publica redondeado; conservar precisión cruda y diferenciación display vs decisión, especialmente 0.9999/1.0001. |
+| F-09 | P0 histórico | C | `models.CheckResult.from_values` | HFS-015: demanda/capacidad/DCR originales, display derivado, umbral sin epsilon, trazas directas y JSON estricto. Fronteras 0.9999/1/1.0001 y propagación I4/I5 verificadas para revisión. |
 | F-10 | P0 | C/R | `domain/routing/profile_router.py::_is_missing_numeric`, `sections/loader.py::_coerce_float` | Ausencia de validación explícita de finitud en varios lugares; probar y prohibir NaN, infinito, números negativos y dimensiones imposibles. |
 | F-11 | P1 | C/R | `domain/actions.py`; reglas G/H3 | HFS-013 conserva asociación física histórica y añade plano, dirección y entrada a la traza; G3/canal G6 no acreditados se bloquean. Ejes externos y compuesto I pendientes. |
 | F-12 | P1 | C/R | `sections/loader.py`, selección `field_values['id']` para D/t | Revisar que D/t corresponda al diámetro exterior físico, no ID, según familia/convención de catálogo. |
@@ -160,7 +166,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-012 | 1 | Corregir fallback indebido de F2 por esbeltez ausente | 010,011 | Implementada para revisión: ausencia no implica compacidad; derivación explícita B4.1 o bloqueo, ancho completo del canal, pendientes HFS-010 y regresiones. [Informe](audit/hfs012/report.md). |
 | HFS-013 | 1 | Revisar convenciones `Pu,Mux,Muy,Vux,Vuy,Vu,Tu`, ejes y capacidades de cortante H3 | 011 | Ensayos direccionales no confunden ejes; si norma/caso no cubierto -> INCOMPLETE. |
 | HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | Implementada para revisión: DCR publicado, empates/FAIL conservados, sin inferir unidades; `cases=[]` rechazado. [Informe](audit/hfs014/report.md). |
-| HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Decisiones no cambian por redondeo; avisos no se confunden con incumplimientos. |
+| HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Implementada para revisión: constructor único sin redondeo, trazas originales, no finitos diagnosticados, recomendaciones D1/E2 y migración HFS-014. Diez suites; [informe](audit/hfs015/report.md). |
 | HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. Implementación entregada para revisión: [contrato](contracts/hfs016-catalog.md) e [informe](audit/hfs016/report.md). Alcance integral sigue HFS-040; no autoriza avance de fase. |
 | HFS-017 | 1, futura | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014 | Auditar paso del método y rechazo explícito de dominios no habilitados en motor/reglas/adaptadores; factores canónicos y regresiones sin ampliar soporte ASD por accidente. No implementada en HFS-014. |
 | HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |

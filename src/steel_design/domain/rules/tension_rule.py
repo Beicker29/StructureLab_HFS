@@ -27,16 +27,13 @@ class TensionRule:
         demand = abs(case.loads.Pu)
         evaluation = self.evaluator.evaluate(case, section)
         capacity = evaluation["yielding_capacity"]
-        dcr = demand / capacity if capacity > 0.0 else float("inf")
-        status = CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL
 
-        return CheckResult(
+        return CheckResult.from_values(
+            unit='kN',
             name="Tension Yielding (D2-1)",
             clause="D2-1",
             demand=demand,
             capacity=capacity,
-            dcr=round(dcr, 3),
-            status=status,
             details={
                 "memory": {
                     "clause": "D2-1",
@@ -68,16 +65,13 @@ class TensionRuptureRule:
         demand = abs(case.loads.Pu)
         evaluation = self.evaluator.evaluate(case, section)
         capacity = evaluation["rupture_capacity"]
-        dcr = demand / capacity if capacity > 0.0 else float("inf")
-        status = CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL
 
-        return CheckResult(
+        return CheckResult.from_values(
+            unit='kN',
             name="Tension Rupture (D2-2/D3)",
             clause="D2-2",
             demand=demand,
             capacity=capacity,
-            dcr=round(dcr, 3),
-            status=status,
             details={
                 "memory": {
                     "clause": "D2-2",

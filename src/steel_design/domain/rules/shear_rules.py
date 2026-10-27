@@ -40,14 +40,12 @@ def _build_result(
     capacity_kn: float,
     details: dict,
 ) -> CheckResult:
-    dcr = demand_kn / capacity_kn if capacity_kn > 0.0 else float("inf")
-    return CheckResult(
+    return CheckResult.from_values(
+        unit='kN',
         name=name,
         clause=clause,
-        demand=round(demand_kn, 3),
-        capacity=round(capacity_kn, 3),
-        dcr=round(dcr, 3),
-        status=CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL,
+        demand=demand_kn,
+        capacity=capacity_kn,
         details=details,
     )
 

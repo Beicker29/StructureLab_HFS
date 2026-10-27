@@ -1,0 +1,159 @@
+{
+  "suites": {
+    "original": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "80",
+          "time": "38.267",
+          "timestamp": "2026-10-27T15:27:49.432429-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "characterization": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "12",
+          "time": "4.156",
+          "timestamp": "2026-10-27T15:28:28.193483-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "contracts": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "665",
+          "time": "12.222",
+          "timestamp": "2026-10-27T15:28:32.923684-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs016_catalog_integrity": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "44",
+          "time": "10.890",
+          "timestamp": "2026-10-27T15:28:45.629433-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs010_coverage": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "57",
+          "time": "6.461",
+          "timestamp": "2026-10-27T15:28:57.029717-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs012_flexure_selection": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "61",
+          "time": "0.292",
+          "timestamp": "2026-10-27T15:29:04.051121-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs013_directional_h3": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "57",
+          "time": "2.088",
+          "timestamp": "2026-10-27T15:29:04.860753-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs013_design_method": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "73",
+          "time": "0.289",
+          "timestamp": "2026-10-27T15:29:07.506410-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs014_summary_bundle": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "72",
+          "time": "24.219",
+          "timestamp": "2026-10-27T15:29:08.263002-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    },
+    "test_hfs015_precision_advice": {
+      "exit": 0,
+      "junit": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "84",
+          "time": "4.744",
+          "timestamp": "2026-10-27T15:29:32.976474-05:00",
+          "hostname": "DBCDST1387"
+        }
+      ]
+    }
+  },
+  "source_inputs_unchanged_during_capture": true,
+  "examples_identical": false,
+  "case_files": 12,
+  "engine_results_sha256": "d6d270c46877c9698d0c4ad0239f378403006fffeddc9f4a984354afae48c02c",
+  "regression_accepted": false
+}

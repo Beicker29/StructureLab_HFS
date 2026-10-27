@@ -14,14 +14,12 @@ def _pass_result(name: str, clause: str) -> CheckResult:
 
 
 def _result(name: str, clause: str, demand: float, capacity: float, details: dict | None = None) -> CheckResult:
-    dcr = demand / capacity if capacity > 0 else float("inf")
-    return CheckResult(
+    return CheckResult.from_values(
+        unit='kN',
         name=name,
         clause=clause,
-        demand=round(demand, 3),
-        capacity=round(capacity, 3),
-        dcr=round(dcr, 3),
-        status=CheckStatus.PASS if dcr <= 1.0 else CheckStatus.FAIL,
+        demand=demand,
+        capacity=capacity,
         details=details,
     )
 

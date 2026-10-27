@@ -1,8 +1,14 @@
-# Seguimiento maestro de hallazgos — HFS-014
+# Seguimiento maestro de hallazgos — HFS-015
 
 Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
 
-Entrega actual HFS-014 sobre `main`/`d3190d4`: F-05 y F-29 corregidos, cierre
+Entrega actual HFS-015 sobre `main`/`dbd87cb`: F-09 y F-07 corregidos para
+revisión técnica. Números originales y display separados; recomendaciones sin
+crédito resistente; E5 no acreditado. Diez suites: 1193 aprobadas + 12 subpruebas,
+sin xfail. [Informe y evidencia](hfs015/report.md). Sin cambios de fórmulas,
+routing, factores F-43, catálogo o plan HFS-010. HFS-017/039 no implementadas.
+
+Entrega previa HFS-014 sobre `main`/`d3190d4`: F-05 y F-29 corregidos, cierre
 funcional demostrado para revisión. [Informe y evidencia](hfs014/report.md).
 Caracterización: 11 aprobadas + 1 xfail estricto F-09. Sin cambios de resistencias,
 selección, HFS-010 o F-32. HFS-017/039 quedan solo en planificación futura.
@@ -26,11 +32,11 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-02 | P0 | Corregido por HFS-010: cero checks/cero cargas explícitas produce INCOMPLETE; cierre demostrado para revisión. Observado: PASS sin checks | HFS-010 | Caso vacío/incompleto nunca PASS |
 | F-03 | P0 | Corrección HFS-012 presentada para revisión: no se selecciona F2 con razones desconocidas, inválidas o clases contradictorias; derivación desde dimensiones B4.1 explícitas, canal con ancho completo. [Evidencia](hfs012/report.md). HFS-010 conserva pendientes y checks independientes | HFS-012; auditoría integral HFS-032/040 | Revisar límites, significado/procedencia de dimensiones y alcance declarado; no confundir corrección del fallback con validación de todas las resistencias F |
 | F-04 | P0 | Corregido en contrato HFS-011 para revisión: extras/vacío rechazados, carga parcial documentada | HFS-011 | Evidencia por campo; revisión técnica del contrato/defaults pendiente |
-| F-05 | P0 histórico | Corregido HFS-014 para revisión: DCR publicado máximo, empates con índice/cláusula/nombre/estado; gobernante observado, sin capacidad mezclada ni inferencia de unidades. Candidatos vacíos no inventan resistencia; todos los FAIL permanecen visibles | HFS-014; precisión HFS-015 y contratos HFS-022/024 pendientes | Revisar migración JSON y límites de precisión/metadata; cierre demostrado por contraejemplo 100 kN/.90 vs 50 kNm/.02 y consumidores CLI/memoria |
+| F-05 | P0 histórico | Corregido HFS-014: DCR máximo, empates trazables y fallos preservados, sin capacidad mezclada. HFS-015 publica y ordena ahora valores originales, con versión/migración explícitas | HFS-014; precisión HFS-015 para revisión; contratos HFS-022/024 pendientes | Revisar migración y límites de metadata; contraejemplo dimensional y 72 regresiones HFS-014 preservados |
 | F-06 | P0 | Corregida agregación G/H3 en HFS-013 para revisión: máximo de cocientes con cada par demanda/capacidad, fuente G4/G5 única sin redondeo. Oráculo asimétrico y perfil PTE real; combinación completa 0,97→1,61 incluye también F-39. Global INCOMPLETE | HFS-013; auditoría integral HFS-033/034 | Revisar convención y casos; no acreditar todas las capacidades D/E/F, geometrías y condiciones por corregir la agregación |
-| F-07 | P0 | D1/E2: límites 300/200 son User Notes; E5≤200 sí condiciona alternativa | HFS-015 | Recomendaciones separadas del cumplimiento y contexto de cláusula |
+| F-07 | P0 histórico | Corregido HFS-015 para revisión: avisos D1/E2 con fuente y estados propios; longitud fabricada/radio mínimo y excepción rod no inferidos. E5(4) sigue NOT_EVALUATED | HFS-015; auditoría E5 HFS-031 pendiente | Revisar migración de admisibilidad y declaraciones externas; no acreditar cobertura desde avisos |
 | F-08 | P0 | HFS-011 rechazó representaciones contradictorias; HFS-013 define Vu como alias escalar Vux, asociado Mux/fuerza y local. Oráculos positivos/negativos y trazas compartidas; nunca resultante | HFS-011/013; adaptadores HFS-021/022 | Revisar entradas históricas interpretadas como fuerza x/resultante y consumidores I; no cierre de toda transformación externa |
-| F-09 | P0 | Observado: DCR redondeado incompatible visualmente con FAIL | HFS-015 | Valores brutos y presentación diferenciados; fronteras |
+| F-09 | P0 histórico | Corregido HFS-015 para revisión: valores originales, decisión única, display con estado/bruto, ranking original, trazas directas y JSON estricto. Xfail retirado tras XPASS investigado | HFS-015; contratos HFS-022/024 pendientes | Fronteras y consumidores pasan; revisar diferencias I4/I5 y migración, sin declarar validación normativa integral |
 | F-10 | P0 | Parcial HFS-011: finitud en modelos/parser, dominios y sección seleccionada; NaN axial corregido | HFS-011/040 | Calidad/coherencia completa del catálogo y extremos numéricos pendientes; no cierre global |
 | F-11 | P1 | HFS-013 aclara sufijo de plano de flexión vs dirección de fuerza; pares G/H3 y trazas explícitos. No permuta cargas. G3 y G6 canal bloqueados por dirección/reparto no acreditados | HFS-013/033 | Revisar convención de adaptadores, orientación real de ángulos y compuesto I; etiquetas solas no acreditan física |
 | F-12 | P1 | Selección ID observada; significado físico pendiente | HFS-033/040 | D/t contrastado con fuente y geometría real |

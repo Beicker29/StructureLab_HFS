@@ -1,7 +1,8 @@
 from enum import Enum
+import math
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, StrictBool, model_validator
+from pydantic import BaseModel, Field, StrictBool, computed_field, field_serializer, model_serializer, model_validator
 
 from .input_contracts import (InputModel, FiniteNumber, PositiveNumber,
                               NonNegativeNumber, UnitFactor, PositiveCount, NonBlankString)
@@ -270,6 +271,13 @@ class TensionScope(InputModel):
     external_checks_reference: Optional[NonBlankString] = None
 
 
+class SlendernessAdviceBasis(InputModel):
+    """Optional external facts for User Notes, never resistance/coverage inputs."""
+    fabricated_length: Optional[PositiveNumber] = Field(None, description="Fabricated member length (mm), not unbraced length")
+    least_radius: Optional[PositiveNumber] = Field(None, description="Least section radius of gyration (mm), including principal axes")
+    is_rod: Optional[StrictBool] = Field(None, description="Whether the D1 rod exception applies; absent means unknown")
+
+
 class SteelCase(InputModel):
     section_name: NonBlankString
     material: Material
@@ -286,18 +294,83 @@ class SteelCase(InputModel):
         description="Optional Chapter I composite member configuration.",
     )
     design_method: DesignMethod = DesignMethod.LRFD
+    slenderness_advice_basis: Optional[SlendernessAdviceBasis] = None
     tension_scope: Optional[TensionScope] = Field(
         None, description="Applicability evidence for ordinary custom solid axial tension; absence means unknown.")
+
+def finite_json_payload(payload: dict) -> dict:
+    """JSON-safe projection, preserving the location and kind of every nonfinite.
+
+    Does not mutate calculation values or replace missing resistance by zero.
+    Used by CheckResult serialization and by the CLI's complete memory payload.
+    """
+    diagnostics = []
+
+    def project(value, path):
+        if isinstance(value, float) and not math.isfinite(value):
+            diagnostics.append({"path": path, "kind": "NaN" if math.isnan(value) else
+                                "Infinity" if value > 0 else "-Infinity"})
+            return None
+        if isinstance(value, dict):
+            return {k: project(v, f"{path}/{k}") for k, v in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [project(v, f"{path}/{i}") for i, v in enumerate(value)]
+        return value
+
+    result = project(payload, "")
+    if diagnostics:
+        result["nonfinite_values"] = result.get("nonfinite_values", []) + diagnostics
+    return result
+
 
 class CheckResult(BaseModel):
     name: str = Field(..., description="Name of the check (e.g., Flexure Major F2)")
     code: str = Field("AISC 360-22", description="Reference code")
     clause: str = Field(..., description="Code clause (e.g., F2-1)")
-    demand: float = Field(..., description="Required strength")
-    capacity: float = Field(..., description="Available strength (phi*Rn or Rn/Omega)")
-    dcr: float = Field(..., description="Demand to capacity ratio")
+    demand: float = Field(..., description="Original unrounded required strength")
+    capacity: float = Field(..., description="Original unrounded available strength (phi*Rn or Rn/Omega)")
+    dcr: float = Field(..., description="Original unrounded ratio used for the decision; not a display value")
+    unit: Optional[Literal["kN", "kN-m", "ratio"]] = None
+    numeric_issue: Optional[str] = None
     status: CheckStatus = Field(..., description="PASS or FAIL status")
     details: Optional[Dict[str, Any]] = Field(
         None,
         description="Structured rule details (e.g., element classification).",
     )
+
+    @classmethod
+    def from_values(cls, *, name, clause, demand, capacity, unit, details=None):
+        """Canonical result decision; capacities/equations remain in their rules."""
+        usable = math.isfinite(demand) and math.isfinite(capacity) and demand >= 0 and capacity > 0
+        dcr = demand / capacity if usable else math.inf
+        return cls(name=name, clause=clause, demand=demand, capacity=capacity, dcr=dcr,
+                   unit=unit, details=details,
+                   status=CheckStatus.PASS if math.isfinite(dcr) and dcr <= 1.0 else CheckStatus.FAIL,
+                   numeric_issue=None if usable and math.isfinite(dcr) else "UNDEFINED_OR_NONFINITE_RATIO")
+
+    @model_validator(mode="after")
+    def reject_undefined_pass(self):
+        if (not all(math.isfinite(v) for v in (self.demand, self.capacity, self.dcr))
+                or (self.demand != 0 and self.capacity <= 0)):
+            self.status = CheckStatus.FAIL
+            self.numeric_issue = self.numeric_issue or "UNDEFINED_OR_NONFINITE_RATIO"
+        return self
+
+    @computed_field
+    @property
+    def display(self) -> dict:
+        def formatted(value):
+            return f"{value:.3f}" if math.isfinite(value) else "undefined"
+        return {"demand": formatted(self.demand), "capacity": formatted(self.capacity),
+                "dcr": formatted(self.dcr),
+                "dcr_label": f"{formatted(self.dcr)} ({self.status.value}; raw={self.dcr!r})"}
+
+    @model_serializer(mode="wrap")
+    def serialize_numbers(self, handler):
+        return finite_json_payload(handler(self))
+
+    @field_serializer("details")
+    def serialize_details(self, value):
+        # Project before Pydantic's Any serializer can turn infinity into null
+        # without its path/type diagnostic in JSON mode.
+        return finite_json_payload(value) if value is not None else None

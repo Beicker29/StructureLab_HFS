@@ -1,0 +1,19 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs014_summary_bundle.py",
+    "--basetemp=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\15bw\\temp-test_hfs014_summary_bundle",
+    "--junitxml=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\15b\\pytest-test_hfs014_summary_bundle.xml"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\15bw",
+  "returncode": 0,
+  "stdout": "........................................................................ [100%]\n72 passed in 25.58s\n",
+  "stderr": ""
+}

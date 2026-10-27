@@ -1,0 +1,230 @@
+{
+  "source_root": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\15bw",
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "scripts/probe_hfs015.py",
+    ".venv/15bw",
+    ".venv/15probe-b.json"
+  ],
+  "input": {
+    "section_name": "solid",
+    "material": {
+      "Fy": 345,
+      "Fu": 450
+    },
+    "custom_section": {
+      "type": "SOLID_RECTANGULAR",
+      "B": 10,
+      "H": 100
+    },
+    "connection": {
+      "An": 1000,
+      "U": 1
+    },
+    "loads": {
+      "Pu": -310.53105
+    },
+    "lengths": {
+      "Lx": 3000,
+      "Ly": 3000,
+      "Lz": 3000,
+      "Lb": 3000
+    }
+  },
+  "F09": {
+    "independent_D2_capacity_kN": 310.5,
+    "independent_ratio": 1.0001,
+    "check": {
+      "name": "Tension Yielding (D2-1)",
+      "code": "AISC 360-22",
+      "clause": "D2-1",
+      "demand": 310.53105,
+      "capacity": 310.5,
+      "dcr": 1.0,
+      "status": "FAIL",
+      "details": {
+        "memory": {
+          "clause": "D2-1",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "Ag_mm2": 1000.0,
+            "Pu_tension_kn": 310.53105
+          },
+          "intermediate": {
+            "Pn_y_N": 345000.0,
+            "yielding_capacity_kn": 310.5
+          },
+          "capacity_kn": 310.5
+        }
+      }
+    },
+    "summary": {
+      "version": "HFS-014-v1",
+      "overall_status": "INCOMPLETE",
+      "scope": "executed_checks_only",
+      "description": "Observed governing checks among executed checks; not a definitive governing limit state for the structure.",
+      "ranking_basis": "published_dcr; exact ties retained; raw DCR not reconstructed",
+      "eligibility_basis": "executed_resistance_obligations",
+      "max_dcr_published": 1.0,
+      "observed_governing_checks": [
+        {
+          "check_index": 0,
+          "clause": "D2-1",
+          "name": "Tension Yielding (D2-1)",
+          "dcr_published": 1.0,
+          "status": "FAIL"
+        }
+      ],
+      "failed_checks": [
+        {
+          "check_index": 0,
+          "clause": "D2-1",
+          "name": "Tension Yielding (D2-1)",
+          "dcr_published": 1.0,
+          "status": "FAIL"
+        }
+      ],
+      "excluded_checks": []
+    }
+  },
+  "F07": [
+    {
+      "Pu": -1,
+      "KL_over_r": 299.999,
+      "advice": {
+        "D1": true,
+        "E2": false,
+        "short": "D.1:SI | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 149.9995,
+          "KL_over_r_y": 299.999,
+          "KL_over_r_governing": 299.999,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": true,
+          "E2": false
+        }
+      }
+    },
+    {
+      "Pu": -1,
+      "KL_over_r": 300,
+      "advice": {
+        "D1": true,
+        "E2": false,
+        "short": "D.1:SI | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 150.0,
+          "KL_over_r_y": 300.0,
+          "KL_over_r_governing": 300.0,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": true,
+          "E2": false
+        }
+      }
+    },
+    {
+      "Pu": -1,
+      "KL_over_r": 300.001,
+      "advice": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 150.0005,
+          "KL_over_r_y": 300.001,
+          "KL_over_r_governing": 300.001,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": true,
+          "E2": false
+        }
+      }
+    },
+    {
+      "Pu": 1,
+      "KL_over_r": 199.999,
+      "advice": {
+        "D1": false,
+        "E2": true,
+        "short": "D.1:NO | E.2:SI",
+        "inputs": {
+          "KL_over_r_x": 99.9995,
+          "KL_over_r_y": 199.999,
+          "KL_over_r_governing": 199.999,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": true
+        }
+      }
+    },
+    {
+      "Pu": 1,
+      "KL_over_r": 200,
+      "advice": {
+        "D1": false,
+        "E2": true,
+        "short": "D.1:NO | E.2:SI",
+        "inputs": {
+          "KL_over_r_x": 100.0,
+          "KL_over_r_y": 200.0,
+          "KL_over_r_governing": 200.0,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": true
+        }
+      }
+    },
+    {
+      "Pu": 1,
+      "KL_over_r": 200.001,
+      "advice": {
+        "D1": false,
+        "E2": false,
+        "short": "D.1:NO | E.2:NO",
+        "inputs": {
+          "KL_over_r_x": 100.0005,
+          "KL_over_r_y": 200.001,
+          "KL_over_r_governing": 200.001,
+          "governing_axis": "y"
+        },
+        "limits": {
+          "D1_max": 300.0,
+          "E2_max": 200.0
+        },
+        "applicability": {
+          "D1": false,
+          "E2": true
+        }
+      }
+    }
+  ]
+}

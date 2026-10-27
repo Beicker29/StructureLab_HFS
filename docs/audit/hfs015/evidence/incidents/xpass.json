@@ -1,0 +1,19 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs000_characterization.py",
+    "-k",
+    "failed_check",
+    "--tb=short"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "exit": 1,
+  "stdout": "F                                                                        [100%]\n================================== FAILURES ===================================\n_________________ test_failed_check_must_retain_dcr_above_one _________________\n[XPASS(strict)] known defect: F-09: FAIL is published with dcr=1.0 after rounding\n---------------------------- Captured stdout call -----------------------------\n{\"name\":\"Tension Yielding (D2-1)\",\"code\":\"AISC 360-22\",\"clause\":\"D2-1\",\"demand\":310.53105,\"capacity\":310.5,\"dcr\":1.0001,\"unit\":\"kN\",\"numeric_issue\":null,\"status\":\"FAIL\",\"details\":{\"memory\":{\"clause\":\"D2-1\",\"inputs\":{\"Fy_mpa\":345.0,\"Ag_mm2\":1000.0,\"Pu_tension_kn\":310.53105},\"intermediate\":{\"Pn_y_N\":345000.0,\"yielding_capacity_kn\":310.5},\"capacity_kn\":310.5}},\"display\":{\"demand\":\"310.531\",\"capacity\":\"310.500\",\"dcr\":\"1.000\",\"dcr_label\":\"1.000 (FAIL; raw=1.0001)\"}}\n=========================== short test summary info ===========================\nFAILED tests/test_hfs000_characterization.py::test_failed_check_must_retain_dcr_above_one\n1 failed, 11 deselected in 0.41s\n",
+  "stderr": ""
+}

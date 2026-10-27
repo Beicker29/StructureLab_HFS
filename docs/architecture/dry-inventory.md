@@ -1,5 +1,31 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## Actualización HFS-015: números originales y recomendaciones
+
+- **DRY-12/13, F-09:** `models.CheckResult.from_values` posee la división y decisión
+  común de resultados resistentes. Los seis grupos D/E/F/G/H/I entregan demanda,
+  capacidad sin redondear y unidad explícita; conservan sus fórmulas y memorias.
+  `demand/capacity/dcr` son la única terna numérica original; `display` es derivado.
+  H1/H3/F-43 conservan sus evaluadores y valores originales. I5 e I4 consumen ahora
+  capacidades originales de los checks I2/I4, eliminando el redondeo intermedio.
+- `models.finite_json_payload` es la proyección común de no finitos a null con
+  ubicación/tipo. Consumidores: serialización CheckResult y memoria completa CLI.
+  No muta cálculos ni reemplaza indefinidos por capacidad cero o PASS.
+- `_build_dcr_trace` consume el check; no divide valores publicados ni extrae una
+  capacidad alternativa de memoria. `_build_global_summary` conserva su lugar y
+  consumidores HFS-014, ordenando ahora por los DCR originales publicados.
+- **F-07:** `domain/recommendations.py::slenderness_recommendations` es la única
+  fuente de avisos D1/E2. CLI compacto y memoria la consumen. Las declaraciones
+  opcionales `SlendernessAdviceBasis` distinguen longitud fabricada, radio mínimo
+  y excepción rod; no se duplican como reglas resistentes ni se usan en coverage.
+
+No se unifican ecuaciones normativas ni se crean servicios/interfaces genéricos.
+Los wrappers por capítulo conservan preparación de trazas y dimensiones.
+Beneficio verificado: una razón/decisión, sin reconstrucción aproximada ni pérdida
+de precisión entre consumidores; avisos separados de resistencia. [Contrato](../contracts/hfs015-precision-advice.md)
+y [evidencia](../audit/hfs015/report.md). HFS-022/024, la consolidación física de
+capacidades y la validación normativa integral siguen pendientes.
+
 ## Actualización HFS-014: resumen y cardinalidad de lotes
 
 - **DRY-13/F-05:** `run.py::_build_global_summary` sigue como fuente única, ahora
