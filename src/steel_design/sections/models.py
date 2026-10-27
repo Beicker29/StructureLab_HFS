@@ -1,10 +1,22 @@
 from typing import Optional
 from pydantic import ConfigDict, Field
-from ..input_contracts import InputModel, FiniteNumber, NonNegativeNumber, NonBlankString
+from ..input_contracts import InputModel, FiniteNumber, NonNegativeNumber, NonBlankString, PositiveCount
+
+
+class SectionSource(InputModel):
+    """Location in the exact workbook read; not a certification of its data."""
+
+    file: NonBlankString
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sheet: NonBlankString
+    row: PositiveCount
+    original_name: NonBlankString
+
 
 class Section(InputModel):
     name: NonBlankString = Field(..., description="Section name (e.g., W14x90)")
     type: NonBlankString = Field("W", description="Shape type")
+    source: Optional[SectionSource] = Field(None, description="Import provenance; None for unsourced programmatic sections")
     
     # Fundamental properties
     area: NonNegativeNumber = Field(..., alias="A", description="Cross-sectional area (mm^2)")

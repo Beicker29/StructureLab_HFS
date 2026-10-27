@@ -43,6 +43,13 @@ Base original: **68 métodos + 12 subpruebas aprobadas**, no 80 métodos. Caract
 
 Registrar comando completo, cwd, SHA, Python/dependencias, códigos de salida y advertencias. Si solo se verificaron hashes o se usó evidencia anterior, indicarlo; no presentarlo como nueva ejecución. Lint/tipos/CI se incorporarán en su tarea; no se exige instalar un sistema adicional para editar documentación.
 
+Para HFS-016, añadir `--ignore=tests/test_hfs011_input_contracts.py` y
+`--ignore=tests/test_hfs016_catalog_integrity.py` al comando de suite original.
+Ejecutar ambos archivos aparte. El capturador `audit_hfs011.py` admite
+`--extra-suite tests/test_hfs016_catalog_integrity.py` para mantener las cuatro
+suites separadas. Reproducción y conteos actuales en el
+[informe HFS-016](docs/audit/hfs016/report.md).
+
 ## Evidencia, revisión y cierre
 
 Para HFS-011 y siguientes, separar también `tests/test_hfs011_input_contracts.py` de la suite original. El capturador [audit_hfs011.py](scripts/audit_hfs011.py) ejecuta las tres suites por separado en una copia nueva y compara los ejemplos con la captura previa; comandos y migración en el [informe HFS-011](docs/audit/hfs011/report.md). No presentar los casos parametrizados nuevos como métodos de la suite histórica ni los xfail como aprobados.
