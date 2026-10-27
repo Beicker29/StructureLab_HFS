@@ -4,6 +4,7 @@ from typing import Dict, Optional
 
 NORMATIVE_E_MPA = 200000.0
 PHI_B_LRFD = 0.90
+OMEGA_B_ASD = 1.67
 
 
 def _clamp(value: float, lower: float, upper: float) -> float:
@@ -104,8 +105,22 @@ def _classify_ratio(value: float, lp: float, lr: float) -> str:
     return "slender"
 
 
+def available_flexural_strength(Mn_Nmm: float, design_method: str) -> float:
+    """F1(a), ANSI/AISC 360-22: available moment in kN-m from nominal N-mm.
+
+    This conversion does not establish applicability or enable an ASD route.
+    Preserve the original LRFD operation order for exact regression stability.
+    """
+    if design_method == "LRFD":
+        return PHI_B_LRFD * Mn_Nmm / 1_000_000.0
+    if design_method == "ASD":
+        return Mn_Nmm / OMEGA_B_ASD / 1_000_000.0
+    raise ValueError(f"Unsupported flexural design method: {design_method!r}")
+
+
 def available_flexural_strength_lrfd(Mn_Nmm: float) -> float:
-    return PHI_B_LRFD * Mn_Nmm / 1_000_000.0
+    """Compatibility entrypoint for the existing LRFD-only Chapter F checks."""
+    return available_flexural_strength(Mn_Nmm, "LRFD")
 
 
 def evaluate_f2(case, section) -> Dict[str, object]:

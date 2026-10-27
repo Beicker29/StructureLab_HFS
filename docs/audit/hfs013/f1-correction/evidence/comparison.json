@@ -1,0 +1,1177 @@
+{
+  "accepted": true,
+  "case_count": 36,
+  "lrfd_identical": 18,
+  "asd_changed": 18,
+  "partial_pass_to_fail": 8,
+  "cases": {
+    "H3/rectangular/LRFD/x/shear=False": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.523,
+      "after_dcr": 0.523,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/rectangular/LRFD/x/shear=True": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.65,
+      "after_dcr": 0.65,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/rectangular/LRFD/y/shear=False": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.323,
+      "after_dcr": 0.323,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/rectangular/LRFD/y/shear=True": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.45,
+      "after_dcr": 0.45,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/rectangular/LRFD/both/shear=False": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.723,
+      "after_dcr": 0.723,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/rectangular/LRFD/both/shear=True": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.85,
+      "after_dcr": 0.85,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H1/rectangular/LRFD/tension": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.75,
+      "after_dcr": 0.75,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H1/rectangular/LRFD/low": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.65,
+      "after_dcr": 0.65,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H1/rectangular/LRFD/high": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.783,
+      "after_dcr": 0.783,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/rectangular/ASD/x/shear=False": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.677,
+      "after_dcr": 0.878,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.677,
+          "after": 0.878
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.677,
+          "after": 0.878
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.6767286025000001,
+          "after": 0.8779286025000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        }
+      ]
+    },
+    "H3/rectangular/ASD/x/shear=True": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.965,
+      "after_dcr": 1.166,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.965,
+          "after": 1.166
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.965,
+          "after": 1.166
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.9647522500000001,
+          "after": 1.1659522500000001
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H3/rectangular/ASD/y/shear=False": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.477,
+      "after_dcr": 0.577,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.477,
+          "after": 0.577
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.477,
+          "after": 0.577
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.47672860249999993,
+          "after": 0.5773286025
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        }
+      ]
+    },
+    "H3/rectangular/ASD/y/shear=True": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.765,
+      "after_dcr": 0.865,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.765,
+          "after": 0.865
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.765,
+          "after": 0.865
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.76475225,
+          "after": 0.8653522499999999
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        }
+      ]
+    },
+    "H3/rectangular/ASD/both/shear=False": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.877,
+      "after_dcr": 1.179,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.877,
+          "after": 1.179
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.877,
+          "after": 1.179
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.8767286025000001,
+          "after": 1.1785286025000001
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.6000000000000002,
+          "after": 0.9018000000000002
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H3/rectangular/ASD/both/shear=True": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 1.165,
+      "after_dcr": 1.467,
+      "before_status": "FAIL",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 1.165,
+          "after": 1.467
+        },
+        {
+          "path": "/rule/demand",
+          "before": 1.165,
+          "after": 1.467
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 1.1647522500000003,
+          "after": 1.4665522500000001
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.6000000000000002,
+          "after": 0.9018000000000002
+        }
+      ]
+    },
+    "H1/rectangular/ASD/tension": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.825,
+      "after_dcr": 1.127,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.825,
+          "after": 1.127
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.825,
+          "after": 1.127
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mux_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Muy_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.8254500000000001,
+          "after": 1.12725
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H1/rectangular/ASD/low": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.675,
+      "after_dcr": 0.977,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.675,
+          "after": 0.977
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.675,
+          "after": 0.977
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mux_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Muy_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.6751500000000002,
+          "after": 0.9769500000000002
+        }
+      ]
+    },
+    "H1/rectangular/ASD/high": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.909,
+      "after_dcr": 1.177,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.909,
+          "after": 1.177
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.909,
+          "after": 1.177
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 22.968,
+          "after": 15.281437125748504
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 14.76,
+          "after": 9.820359281437128
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mux_over_Mcx",
+          "before": 0.40000000000000013,
+          "after": 0.6012000000000002
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Muy_over_Mcy",
+          "before": 0.20000000000000004,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.9090833333333335,
+          "after": 1.1773500000000001
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H3/round/LRFD/x/shear=False": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.522,
+      "after_dcr": 0.522,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/round/LRFD/x/shear=True": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.65,
+      "after_dcr": 0.65,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/round/LRFD/y/shear=False": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.323,
+      "after_dcr": 0.323,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/round/LRFD/y/shear=True": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.45,
+      "after_dcr": 0.45,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/round/LRFD/both/shear=False": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.723,
+      "after_dcr": 0.723,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/round/LRFD/both/shear=True": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.85,
+      "after_dcr": 0.85,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H1/round/LRFD/tension": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.75,
+      "after_dcr": 0.75,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H1/round/LRFD/low": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.65,
+      "after_dcr": 0.65,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H1/round/LRFD/high": {
+      "compatible": true,
+      "method": "LRFD",
+      "public_engine_identical": true,
+      "before_dcr": 0.783,
+      "after_dcr": 0.783,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": []
+    },
+    "H3/round/ASD/x/shear=False": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.677,
+      "after_dcr": 0.878,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.677,
+          "after": 0.878
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.677,
+          "after": 0.878
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.6767286025000001,
+          "after": 0.8779286024999999
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.4,
+          "after": 0.6012
+        }
+      ]
+    },
+    "H3/round/ASD/x/shear=True": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.965,
+      "after_dcr": 1.166,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.965,
+          "after": 1.166
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.965,
+          "after": 1.166
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.9647522500000001,
+          "after": 1.1659522500000001
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H3/round/ASD/y/shear=False": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.477,
+      "after_dcr": 0.577,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.477,
+          "after": 0.577
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.477,
+          "after": 0.577
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.47672860250000004,
+          "after": 0.5773286025
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.2,
+          "after": 0.3006
+        }
+      ]
+    },
+    "H3/round/ASD/y/shear=True": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.765,
+      "after_dcr": 0.865,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.765,
+          "after": 0.865
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.765,
+          "after": 0.865
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.7647522500000001,
+          "after": 0.86535225
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.2,
+          "after": 0.3006
+        }
+      ]
+    },
+    "H3/round/ASD/both/shear=False": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.877,
+      "after_dcr": 1.179,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.877,
+          "after": 1.179
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.877,
+          "after": 1.179
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.8767286025000001,
+          "after": 1.1785286025
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.6000000000000001,
+          "after": 0.9017999999999999
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H3/round/ASD/both/shear=True": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 1.165,
+      "after_dcr": 1.467,
+      "before_status": "FAIL",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 1.165,
+          "after": 1.467
+        },
+        {
+          "path": "/rule/demand",
+          "before": 1.165,
+          "after": 1.467
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mrx_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mry_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 1.1647522500000003,
+          "after": 1.46655225
+        },
+        {
+          "path": "/rule/details/memory/intermediate/normal_ratio_sum",
+          "before": 0.6000000000000001,
+          "after": 0.9017999999999999
+        }
+      ]
+    },
+    "H1/round/ASD/tension": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.825,
+      "after_dcr": 1.127,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.825,
+          "after": 1.127
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.825,
+          "after": 1.127
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mux_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Muy_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.82545,
+          "after": 1.12725
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    },
+    "H1/round/ASD/low": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.675,
+      "after_dcr": 0.977,
+      "before_status": "PASS",
+      "after_status": "PASS",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.675,
+          "after": 0.977
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.675,
+          "after": 0.977
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mux_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Muy_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.67515,
+          "after": 0.9769499999999999
+        }
+      ]
+    },
+    "H1/round/ASD/high": {
+      "compatible": true,
+      "method": "ASD",
+      "public_engine_identical": true,
+      "before_dcr": 0.909,
+      "after_dcr": 1.177,
+      "before_status": "PASS",
+      "after_status": "FAIL",
+      "differences": [
+        {
+          "path": "/rule/dcr",
+          "before": 0.909,
+          "after": 1.177
+        },
+        {
+          "path": "/rule/demand",
+          "before": 0.909,
+          "after": 1.177
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcx_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/capacities/Mcy_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_x/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/components/flexure_y/available_kN_m",
+          "before": 13.008,
+          "after": 8.654690618762475
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Mux_over_Mcx",
+          "before": 0.4,
+          "after": 0.6012
+        },
+        {
+          "path": "/rule/details/memory/intermediate/Muy_over_Mcy",
+          "before": 0.2,
+          "after": 0.3006
+        },
+        {
+          "path": "/rule/details/memory/intermediate/interaction_ratio",
+          "before": 0.9090833333333334,
+          "after": 1.1773499999999997
+        },
+        {
+          "path": "/rule/status",
+          "before": "PASS",
+          "after": "FAIL"
+        }
+      ]
+    }
+  }
+}

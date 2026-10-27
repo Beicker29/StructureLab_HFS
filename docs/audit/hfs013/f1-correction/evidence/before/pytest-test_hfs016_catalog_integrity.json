@@ -1,0 +1,19 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs000\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs016_catalog_integrity.py",
+    "--basetemp=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-f1-before-work\\temp-test_hfs016_catalog_integrity",
+    "--junitxml=D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-f1-before\\pytest-test_hfs016_catalog_integrity.xml"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\hfs013-f1-before-work",
+  "returncode": 0,
+  "stdout": "............................................                             [100%]\n44 passed in 10.61s\n",
+  "stderr": ""
+}

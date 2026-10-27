@@ -2,6 +2,11 @@
 
 Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
 
+Revisión final HFS-013 sobre `abafdbb`: **F-43 corregido, cierre funcional
+demostrado para revisión**. La función compartida H3/H1 aplica F1(a) por método;
+73 pruebas nuevas y ocho suites aprobadas. El motor conserva el rechazo de
+flexión ASD y no acredita nuevas obligaciones. [Suplemento](hfs013/f1-correction/report.md).
+
 Entrega actual: [HFS-013](hfs013/report.md) sobre `main` con HFS-012 incorporada
 por declaración del usuario. Correcciones G/H3 y bloqueos listos para revisión;
 F-31 sigue abierto. Cambios locales sin publicación automática. El párrafo siguiente conserva el contexto
@@ -53,6 +58,7 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-40 | P1 propuesto | Confirmado y corregido HFS-013: H3-5 4,58→0,458π²; a h/t=100 Fcr=91,6→90,405576 MPa. Extrapolación h/t>260 bloqueada | HFS-013/034 | Revisión de fronteras y alcance del dato h plano mayor; prioridad P1 por exceso ~1,32% de rama, no significa aceptable |
 | F-41 | P0 propuesto | Confirmados fallbacks no acreditados G/H3: Lv desde Lx/Ly, L desde KzLz, C desde 2J/D o exterior reconstruido con planos+3t, t nominal/otra pared. HFS-013 retira esas inferencias; prueba fluencia sin longitud solo por identidad matemática | HFS-013/022/033/034/040 | Definir datos físicos/procedencia que faltan; no completar catálogo artificialmente; revisión de C declarada y espesores |
 | F-42 | P0 propuesto | Confirmado: umbral 20% de H3.2 se presentaba como check PASS y G3 reutilizaba un ala en ambos planos. G6 canal no acredita reparto. HFS-013 bloquea esas evaluaciones y conserva INCOMPLETE y checks independientes | HFS-013/033/034 | Implementar/validar alternativas H1/G y direcciones reales en tarea autorizada, no dar cobertura por presencia de regla |
+| F-43 | P0 propuesto; corregido | Revisión independiente confirma Mc=0,90Mn también en ASD dentro de H3/H1. Cierre funcional HFS-013: conversión canónica F1(a), ASD=Mn/1,67, nominales y LRFD preservados. Antes 18 fallos ASD dirigidos; después 73 pruebas nuevas aprobadas. Ocho checks de sondas ASD pasan de PASS a FAIL | Corrección final HFS-013; aprobación técnica pendiente | Revisar cierre acotado al factor F1. El rechazo público de flexión ASD limita exposición, pero no legitima capacidades internas 50,3% excesivas. No habilitar ASD integral ni cerrar F-37/F-31 |
 
 Las reproducciones, archivos/símbolos y salidas de F-01 a F-32 están en [findings](findings.md). F-31 tiene `test_channel_both_axes_must_block_if_major_axis_is_unsupported`; F-32 se acredita en [examples.json](evidence-clean/examples.json) y `run.py::main`. No se inventa un xfail para F-32: el exit actual es un contrato observable cuyo cambio exige decisión explícita.
 

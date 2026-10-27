@@ -1,7 +1,7 @@
 """Reuse separate-suite capture; accept only documented G/H3 differences.
 
-The underlying legacy comparison intentionally reports inequality. This wrapper
-does not hide it: saves the HFS-013 comparison and enforces unrelated invariants.
+Earlier G/H3 fixes intentionally changed examples; the F-43 correction preserves
+them. This wrapper retains the literal comparison and unrelated invariants.
 """
 import argparse
 import json
@@ -19,7 +19,8 @@ if __name__ == "__main__":
     parser.add_argument("--work", required=True)
     args = parser.parse_args()
     args.extra_suite = ["tests/test_hfs016_catalog_integrity.py", "tests/test_hfs010_coverage.py",
-                        "tests/test_hfs012_flexure_selection.py", "tests/test_hfs013_directional_h3.py"]
+                        "tests/test_hfs012_flexure_selection.py", "tests/test_hfs013_directional_h3.py",
+                        "tests/test_hfs013_design_method.py"]
     capture(args)
     out = Path(args.out)
     before = json.loads(Path(args.baseline).read_text(encoding="utf-8"))

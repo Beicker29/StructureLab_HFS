@@ -1,5 +1,12 @@
 # HFS-013 — Ejes, demandas direccionales e interacción H3
 
+**Corrección final de revisión — F-43 (base `abafdbb`):** la conversión de Mn a
+Mc en el consumidor compartido H3/H1 ahora distingue LRFD y ASD según F1(a).
+[Informe complementario, cierre funcional, pruebas e inventario](f1-correction/report.md).
+Esta actualización no habilita flexión ASD en el motor público; conserva su
+bloqueo de alcance y HFS-010. El cuerpo y las capturas siguientes documentan la
+entrega anterior; sus afirmaciones de preservación corresponden a aquella base.
+
 Entrega para **revisión técnica**, 2026-10-27. Base `main`, SHA
 `3af52aa9848ccb6ff040fd1f8203a4609599f341`, inicialmente sin cambios locales.
 HFS-012 incorporada según el usuario. No se hace commit, push, rama ni PR.
