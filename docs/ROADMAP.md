@@ -1,5 +1,12 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Actualización HFS-010 (2026-10-27):** HFS-000/001/002/011/016 concluidas dentro de
+sus alcances. Control mínimo de cobertura implementado en la rama
+`hfs-010-coverage-gate`: [informe](audit/hfs010/report.md) y
+[contrato](contracts/hfs010-coverage.md). El usuario autoriza publicación/fusión
+con revisión técnica posterior; no acredita validación normativa ni G1.
+Los bloques anteriores de estado se conservan como historia de las entregas.
+
 **Estado:** propuesta técnica para ejecución incremental con Codex  
 **Referencia de auditoría:** rama `main`, commit `80a9d3609d452ab3413ad632629b1fadcab8415c` de `Beicker29/StructureLab_HFS`.  
 **Documento:** 26 de octubre de 2026.  
@@ -122,7 +129,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-000 | 0 | Inventario, baseline y congelación de resultados actuales | — | SHA, `pytest`, entornos, CLI ejemplos, hashes/fixtures y limitaciones reproducibles. Sin cambios normativos. |
 | HFS-001 | 0 | `AGENTS.md`, guías de contribución, 3 ADR, matriz de hallazgos | 000 | Arquitectura aprobada, políticas simples, decisiones registradas, fuentes clasificadas como evidencia vs hipótesis. |
 | HFS-002 | 0 | Matriz *familia × demandas × condiciones × estados límite* | 000 | Identifica todos los huecos y casos no implementados; revisión ingenieril requerida. |
-| HFS-010 | 1 | Cierre de cobertura y estados de resultado `INCOMPLETE` | 002 | Cero checks, reglas obligatorias ausentes y métodos no soportados jamás entregan PASS. |
+| HFS-010 | 1 | Cierre de cobertura y estados de resultado `INCOMPLETE` | 002 | Implementada: obligaciones independientes, INCOMPLETE y FAIL conocidos preservados. [Pruebas y límites](audit/hfs010/report.md). Cero checks, obligaciones ausentes y métodos no soportados no acreditan PASS. |
 | HFS-011 | 1 | Endurecer Pydantic: campos extra, faltantes, finitud, dominios | 000 | Implementada para revisión antes de HFS-010 por autorización expresa; [evidencia y rupturas](audit/hfs011/report.md). Typos, NaN, inf, dominios y cortantes contradictorios rechazados; sin validación AISC exhaustiva. |
 | HFS-012 | 1 | Corregir fallback indebido de F2 por esbeltez ausente | 010,011 | Falta de `bf/2tf` o `h/tw` no puede clasificar sección compacta automáticamente. |
 | HFS-013 | 1 | Revisar convenciones `Pu,Mux,Muy,Vux,Vuy,Vu,Tu`, ejes y capacidades de cortante H3 | 011 | Ensayos direccionales no confunden ejes; si norma/caso no cubierto -> INCOMPLETE. |
@@ -223,4 +230,4 @@ Criterio de aceptación: baseline reproducible, evidencias de pruebas reales, ma
 
 Una reescritura de módulo solo se permite si se demuestra al menos una de estas condiciones: (a) defectos sistémicos no corregibles localmente, (b) múltiples duplicaciones semánticas difíciles de mantener, (c) trazabilidad no representable sin rediseño, o (d) incompatibilidad persistente con validación reproducible. Antes de reescribir: ensayo de caracterización, oráculo de referencia, mapa de migración y rollback.
 
-**Prioridad inmediata:** HFS-002 aceptada documentalmente y HFS-011 aprobada; revisar exclusivamente la entrega HFS-016, adelantada por autorización del usuario a HFS-010. Las demás tareas P0 requieren su autorización correspondiente. Los nuevos dominios incompletos deben bloquearse por cobertura antes de su reparación normativa profunda. La app web se inicia únicamente después de la puerta G1.
+**Prioridad inmediata:** publicar/fusionar HFS-010 según la instrucción actual del usuario y someterla a revisión técnica posterior. No iniciar otras tareas sin autorización. HFS-011/016 concluidas dentro de sus alcances. Los nuevos dominios incompletos deben bloquearse por cobertura antes de su reparación normativa profunda. La app web se inicia únicamente después de la puerta G1.

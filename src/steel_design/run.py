@@ -10,6 +10,7 @@ from pathlib import Path
 from pydantic import AliasChoices, Field, StrictBool, ValidationError as PydanticValidationError
 
 from .models import CustomSectionType, SteelCase
+from .results_model import AnalysisStatus, aggregate_case_statuses
 from .input_contracts import InputModel
 from .engine import SteelDesignEngine
 from .sections.models import Section
@@ -659,6 +660,8 @@ def _run_single_case(
     raw_summary = result.model_dump(exclude={"checks": {"__all__": {"details"}}})
     organized_summary = {
         "status": raw_summary.get("status"),
+        "coverage": raw_summary.get("coverage"),
+        "known_failures": raw_summary.get("known_failures", []),
         "admissibility": _build_compact_admissibility(_build_chapter_admissibility(case, section)),
         "checks": raw_summary.get("checks", []),
         "artifacts": {
@@ -709,7 +712,6 @@ def main():
             case_definitions = payload.get("cases", [])
             base_payload = {key: value for key, value in payload.items() if key != "cases"}
             summaries = []
-            aggregate_pass = True
             for index, case_definition in enumerate(case_definitions):
                 if not isinstance(case_definition, dict):
                     raise ValueError(f"cases[{index}] must be an object.")
@@ -730,15 +732,13 @@ def main():
                     case_tag=case_tag,
                 )
                 summaries.append(summary)
-                if summary.get("status") != "PASS":
-                    aggregate_pass = False
 
             print(
                 json.dumps(
                     {
                         "bundle": True,
                         "total_cases": len(summaries),
-                        "status": "PASS" if aggregate_pass else "FAIL",
+                        "status": aggregate_case_statuses([AnalysisStatus(s["status"]) for s in summaries]),
                         "results_run_dir": execution_results_dir,
                         "cases": summaries,
                     },

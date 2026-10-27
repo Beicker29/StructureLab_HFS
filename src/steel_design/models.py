@@ -255,6 +255,21 @@ class Factors(InputModel):
     xa: NonNegativeNumber = Field(0.0, description="Bracing offset distance along x-axis (mm)")
     ya: NonNegativeNumber = Field(0.0, description="Bracing offset distance along y-axis (mm)")
 
+class TensionScope(InputModel):
+    """External basis for the narrow ordinary solid-tie scope (HFS-010).
+
+    None is unknown. References are supplied evidence, not authenticated here.
+    """
+    ordinary_prismatic_member: Optional[StrictBool] = None
+    concentric_axial_force: Optional[StrictBool] = None
+    no_special_conditions: Optional[StrictBool] = None
+    material_reference: Optional[NonBlankString] = None
+    demand_reference: Optional[NonBlankString] = None
+    net_area_reference: Optional[NonBlankString] = None
+    connection_reference: Optional[NonBlankString] = None
+    external_checks_reference: Optional[NonBlankString] = None
+
+
 class SteelCase(InputModel):
     section_name: NonBlankString
     material: Material
@@ -271,6 +286,8 @@ class SteelCase(InputModel):
         description="Optional Chapter I composite member configuration.",
     )
     design_method: DesignMethod = DesignMethod.LRFD
+    tension_scope: Optional[TensionScope] = Field(
+        None, description="Applicability evidence for ordinary custom solid axial tension; absence means unknown.")
 
 class CheckResult(BaseModel):
     name: str = Field(..., description="Name of the check (e.g., Flexure Major F2)")
