@@ -2,9 +2,13 @@ import re
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import openpyxl
+from pydantic import TypeAdapter, ValidationError as PydanticValidationError
+from ..input_contracts import FiniteNumber
 
 from ..domain.errors import CatalogSchemaError
 from .models import Section
+
+_CATALOG_NUMBER = TypeAdapter(FiniteNumber)
 
 
 PLACEHOLDER_VALUES = {
@@ -198,18 +202,18 @@ def _coerce_float(
             )
         return None
 
-    if isinstance(value, (int, float)):
-        return float(value)
-
     try:
-        return float(str(value).replace(",", ""))
+        if isinstance(value, bool):
+            raise ValueError("Boolean is not a catalog magnitude")
+        parsed = float(value) if isinstance(value, (int, float)) else float(str(value).replace(",", ""))
+        return _CATALOG_NUMBER.validate_python(parsed)
     except (TypeError, ValueError):
         raise CatalogSchemaError(
-            "Catalog value cannot be parsed as float.",
+            "Catalog value must be a finite number (not boolean).",
             details={
                 "section": section_name,
                 "field": field_name,
-                "value": value,
+                "value": repr(value),
                 "row_number": row_number,
             },
         )
@@ -247,7 +251,12 @@ def _scaled_float(
     if source_header is not None:
         source_header_clean = source_header.strip()
         scale = UNIT_SCALE_BY_VARIABLE.get(source_header_clean, 1.0)
-    return value * scale
+    try:
+        return _CATALOG_NUMBER.validate_python(value * scale)
+    except PydanticValidationError as exc:
+        raise CatalogSchemaError("Scaled catalog value must be finite.", details={
+            "section": section_name, "field": field_name, "row_number": row_number,
+            "value": repr(value), "scale": scale}) from exc
 
 
 def load_sections_from_excel(filepath: str) -> List[Section]:
@@ -325,52 +334,57 @@ def load_sections_from_excel(filepath: str) -> List[Section]:
                 elif (diameter is not None) and (field_values["t"] not in (None, 0.0)):
                     field_values["d_t_ratio"] = diameter / field_values["t"]
 
-            section = Section(
-                name=section_name,
-                type=section_type,
-                A=field_values["area"],
-                d=field_values["d"],
-                h=field_values["h"],
-                bf=field_values["bf"],
-                b=field_values["b"],
-                OD=field_values["od"],
-                ID=field_values["id"],
-                tf=field_values["tf"],
-                t=field_values["t"],
-                tdes=field_values["tdes"],
-                tw=field_values["tw"],
-                Ix=field_values["ix"],
-                Iy=field_values["iy"],
-                Iz=field_values["iz"],
-                Iw=field_values["iw"],
-                Sx=field_values["sx"],
-                Sy=field_values["sy"],
-                Sz=field_values["sz"],
-                Zx=field_values["zx"],
-                Zy=field_values["zy"],
-                rx=field_values["rx"],
-                ry=field_values["ry"],
-                rz=field_values["rz"],
-                J=field_values["j"],
-                Cw=field_values["cw"],
-                C=field_values["c"],
-                ro=field_values["ro"],
-                H=field_values["H"],
-                rts=field_values["rts"],
-                ho=field_values["ho"],
-                tan_alpha=field_values["tan_alpha"],
-                x=field_values["x"],
-                y=field_values["y"],
-                eo=field_values["eo"],
-                **{
-                    "bf/2tf": field_values["bf_2tf_ratio"],
-                    "b/t": field_values["b_t_ratio"],
-                    "b/tdes": field_values["b_tdes_ratio"],
-                    "h/tw": field_values["h_tw_ratio"],
-                    "h/tdes": field_values["h_tdes_ratio"],
-                    "D/t": field_values["d_t_ratio"],
-                },
-            )
+            try:
+                section = Section(
+                    name=section_name,
+                    type=section_type,
+                    A=field_values["area"],
+                    d=field_values["d"],
+                    h=field_values["h"],
+                    bf=field_values["bf"],
+                    b=field_values["b"],
+                    OD=field_values["od"],
+                    ID=field_values["id"],
+                    tf=field_values["tf"],
+                    t=field_values["t"],
+                    tdes=field_values["tdes"],
+                    tw=field_values["tw"],
+                    Ix=field_values["ix"],
+                    Iy=field_values["iy"],
+                    Iz=field_values["iz"],
+                    Iw=field_values["iw"],
+                    Sx=field_values["sx"],
+                    Sy=field_values["sy"],
+                    Sz=field_values["sz"],
+                    Zx=field_values["zx"],
+                    Zy=field_values["zy"],
+                    rx=field_values["rx"],
+                    ry=field_values["ry"],
+                    rz=field_values["rz"],
+                    J=field_values["j"],
+                    Cw=field_values["cw"],
+                    C=field_values["c"],
+                    ro=field_values["ro"],
+                    H=field_values["H"],
+                    rts=field_values["rts"],
+                    ho=field_values["ho"],
+                    tan_alpha=field_values["tan_alpha"],
+                    x=field_values["x"],
+                    y=field_values["y"],
+                    eo=field_values["eo"],
+                    **{
+                        "bf/2tf": field_values["bf_2tf_ratio"],
+                        "b/t": field_values["b_t_ratio"],
+                        "b/tdes": field_values["b_tdes_ratio"],
+                        "h/tw": field_values["h_tw_ratio"],
+                        "h/tdes": field_values["h_tdes_ratio"],
+                        "D/t": field_values["d_t_ratio"],
+                    },
+                )
+            except PydanticValidationError as exc:
+                raise CatalogSchemaError("Invalid normalized catalog properties.", details={
+                    "section": section_name, "sheet": sheet_name, "row_number": row_number,
+                    "fields": exc.errors(include_url=False, include_context=False, include_input=False)}) from exc
             sections.append(section)
 
     return sections

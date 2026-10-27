@@ -1,5 +1,15 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+Actualización acotada HFS-011 (2026-10-27): el diagnóstico histórico de abajo se conserva. Se aplican únicamente los cambios de propiedad indicados en esta sección; [informe](../audit/hfs011/report.md) y [contrato](../contracts/hfs011-inputs.md).
+
+- **DRY-07:** `input_contracts.py::InputModel` y tipos anotados poseen extras, finitud, tipos numéricos y dominios locales. Consumidores: 16 modelos en `models.py`, `Section` y opciones CLI. El loader usa `TypeAdapter(FiniteNumber)` antes de derivar razones y tras escalar. Se retiran comprobaciones positivas repetidas de concreto/barras/caso. `validate_case` revalida el modelo para defender al motor frente a mutaciones y luego comprueba relaciones.
+- **DRY-10:** `Loads.validate_load_representation` es la política única de representaciones activas. Elimina resultante/sobrescritura. Predicados y agregaciones G/H/I se conservan con sus responsabilidades y defectos físicos F-06/11; no se consolidan capacidades ni se transforman ejes.
+- **Geometría:** `validate_section` distingue registro de catálogo de sección seleccionada; `validate_case_section` posee requisitos entre objetos (An/Ag y datos compuestos). No construye geometría ni calcula capacidades. DRY-05/06 siguen pendientes.
+- **Guardas directas:** `_is_missing_numeric` rechaza también no finitos; es disponibilidad de dato, no selección normativa. Guardas de funciones AISC/reglas y sus helpers `_positive` se conservan: llamadas directas pueden eludir el motor y sus dominios no son intercambiables. No se retiran clamps ni se implementa DRY-08.
+- **Transporte:** `OutputOptions` solo valida opciones CLI; `SteelCase` sigue como contrato ingenieril compartido. Las claves JSON duplicadas se detectan antes de perderlas al construir el diccionario. No se añade otra interfaz de cálculo.
+
+Evidencia: regresión por caso/traza completa, igualdad exacta en los 12 ejemplos, suite original, caracterización y pruebas de contrato separadas. Entradas ahora rechazadas son cambios intencionales, no refactorizaciones neutras. La igualdad de snapshots no es referencia normativa independiente.
+
 Fecha: 2026-10-26. Base inspeccionada: `dae8d76507810362c4e31484a00b8d664525f2e6`; runtime sin cambios respecto a HFS-000. Diagnóstico y decisiones, **ninguna consolidación ejecutada**. DRY significa una fuente de verdad por concepto, no menos líneas ni una función universal. Aplican simplicidad, responsabilidad única y separación de responsabilidades del [ADR-001](../adr/001-engine-architecture.md).
 
 ## Propietarios por responsabilidad

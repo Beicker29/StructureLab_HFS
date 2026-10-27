@@ -95,11 +95,13 @@ class CustomSolidSectionsTests(unittest.TestCase):
         case = SteelCase(
             section_name="SR100X100",
             loads=Loads(Pu=-80.0, Mux=0.0, Muy=0.0, Vu=0.0),
-            connection=Connection(An=5000.0, U=1.2),
+            connection=Connection(An=5000.0, U=1.0),
             custom_section={"type": "SOLID_RECTANGULAR", "H": 100.0, "B": 100.0},
             **_base_case_kwargs(),
         )
 
+        # HFS-011 local validation is tested separately; bypass it to test the engine guard.
+        case.connection = case.connection.model_copy(update={"U": 1.2})
         with self.assertRaises(ValidationError):
             engine.run(case)
 

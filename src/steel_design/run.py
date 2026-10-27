@@ -7,12 +7,31 @@ import copy
 from datetime import datetime, timezone
 from pathlib import Path
 
+from pydantic import AliasChoices, Field, StrictBool, ValidationError as PydanticValidationError
+
 from .models import CustomSectionType, SteelCase
+from .input_contracts import InputModel
 from .engine import SteelDesignEngine
 from .sections.models import Section
 from .sections.loader import load_sections_from_excel
 from .sections.repository import SectionRepository
 from .domain.errors import SteelDesignError
+
+
+class OutputOptions(InputModel):
+    """CLI transport options; the engineering contract remains SteelCase."""
+
+    write_results_json: StrictBool = Field(True, validation_alias=AliasChoices(
+        "write_results_json", "write_detailed_json", "save_results_json"))
+
+
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON field {key!r}; supply exactly one value per field.")
+        result[key] = value
+    return result
 
 
 def _print_structured_error(error: Exception, *, stage: str):
@@ -30,7 +49,11 @@ def _print_structured_error(error: Exception, *, stage: str):
                 "details": error.details,
             }
         )
-    print(json.dumps(payload, indent=2), file=sys.stderr)
+    if isinstance(error, PydanticValidationError):
+        payload["error"]["code"] = "VALIDATION_ERROR"
+        payload["error"]["details"] = {"fields": error.errors(
+            include_url=False, include_context=False, include_input=False)}
+    print(json.dumps(payload, indent=2, allow_nan=False), file=sys.stderr)
 
 
 def _sanitize_filename(text: str) -> str:
@@ -570,13 +593,12 @@ def _merge_case_payload(base_payload: dict, override_payload: dict) -> dict:
 def _extract_output_options(payload: dict) -> tuple[dict, dict]:
     cleaned = copy.deepcopy(payload)
     output_cfg = cleaned.pop("output", {})
-    write_results_json = True
-    if isinstance(output_cfg, dict):
-        for key in ("write_results_json", "write_detailed_json", "save_results_json"):
-            if key in output_cfg:
-                write_results_json = bool(output_cfg[key])
-                break
-    return cleaned, {"write_results_json": write_results_json}
+    try:
+        options = OutputOptions.model_validate(output_cfg)
+    except PydanticValidationError as exc:
+        errors = [dict(error, loc=("output", *error["loc"])) for error in exc.errors(include_url=False)]
+        raise PydanticValidationError.from_exception_data("OutputOptions", errors) from exc
+    return cleaned, options.model_dump()
 
 
 def _build_execution_results_dir(*, base_results_dir: str, input_file: str) -> str:
@@ -675,7 +697,7 @@ def main():
     # Read input payload
     try:
         with open(args.input_file, "r", encoding="utf-8") as f:
-            payload = json.load(f)
+            payload = json.load(f, object_pairs_hook=_unique_json_object)
     except Exception as e:
         _print_structured_error(e, stage="parse_input")
         sys.exit(1)

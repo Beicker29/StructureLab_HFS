@@ -9,6 +9,8 @@
 
 > El diagnóstico inicial del roadmap fue estático. Las pruebas efectivamente ejecutadas se documentan por hito (HFS-000/001/002), sin implicar que todos los ejemplos se hayan recalculado independientemente contra la norma. Distinguir defectos confirmados de riesgos pendientes de validación numérica.
 
+**Actualización HFS-011 (2026-10-27):** el usuario acepta HFS-002 como matriz documental de aplicabilidad y diagnóstico, no como validación normativa exhaustiva. Autoriza exclusivamente HFS-011 antes de HFS-010. Implementación de contratos presentada para revisión en [informe HFS-011](audit/hfs011/report.md) y [migración](contracts/hfs011-inputs.md). HFS-010/016 y web permanecen sin implementar; no se avanza de fase ni se declara G1 cumplida.
+
 ## 1. Principios no negociables
 
 1. **No hay PASS por omisión:** un caso sin checks, con checks obligatorios omitidos o con datos insuficientes es `INCOMPLETE` / `BLOCKED`, nunca `PASS`.
@@ -121,7 +123,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-001 | 0 | `AGENTS.md`, guías de contribución, 3 ADR, matriz de hallazgos | 000 | Arquitectura aprobada, políticas simples, decisiones registradas, fuentes clasificadas como evidencia vs hipótesis. |
 | HFS-002 | 0 | Matriz *familia × demandas × condiciones × estados límite* | 000 | Identifica todos los huecos y casos no implementados; revisión ingenieril requerida. |
 | HFS-010 | 1 | Cierre de cobertura y estados de resultado `INCOMPLETE` | 002 | Cero checks, reglas obligatorias ausentes y métodos no soportados jamás entregan PASS. |
-| HFS-011 | 1 | Endurecer Pydantic: campos extra, faltantes, finitud, dominios | 000 | Typos, NaN, inf, valores imposibles y cargas ambiguas rechazados. |
+| HFS-011 | 1 | Endurecer Pydantic: campos extra, faltantes, finitud, dominios | 000 | Implementada para revisión antes de HFS-010 por autorización expresa; [evidencia y rupturas](audit/hfs011/report.md). Typos, NaN, inf, dominios y cortantes contradictorios rechazados; sin validación AISC exhaustiva. |
 | HFS-012 | 1 | Corregir fallback indebido de F2 por esbeltez ausente | 010,011 | Falta de `bf/2tf` o `h/tw` no puede clasificar sección compacta automáticamente. |
 | HFS-013 | 1 | Revisar convenciones `Pu,Mux,Muy,Vux,Vuy,Vu,Tu`, ejes y capacidades de cortante H3 | 011 | Ensayos direccionales no confunden ejes; si norma/caso no cubierto -> INCOMPLETE. |
 | HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | DCR gobernante con dimensión válida, `cases=[]` rechazado. |

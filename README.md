@@ -39,6 +39,20 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Contratos de entrada (HFS-011)
+
+Se rechazan campos desconocidos (por ejemplo `loads.Mxu`), números no finitos,
+cadenas/booleanos usados como magnitudes y entradas fuera de dominio. `loads: {}`
+no es válido; las componentes omitidas en una carga parcial declaran cero.
+`Vu` no se calcula ni sobrescribe: un `Vu` no nulo no puede coexistir con
+`Vux`/`Vuy` no nulos. STUD exige `Fu`, `Rg` y `Rp` explícitos.
+
+Revisar [contrato, defaults y migración JSON](docs/contracts/hfs011-inputs.md)
+y [pruebas y riesgos residuales](docs/audit/hfs011/report.md).
+HFS-002 fue aceptada como matriz documental y diagnóstico; no como validación
+normativa exhaustiva. HFS-010 sigue pendiente: entradas válidas no garantizan
+cobertura completa y un PASS actual no certifica cumplimiento global AISC.
+
 ## Uso CLI
 
 ```bash
