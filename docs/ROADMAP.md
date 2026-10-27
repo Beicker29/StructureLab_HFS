@@ -1,5 +1,13 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Entrega HFS-017 (2026-10-27), base main `7234df8`:** guardas transversales de
+método, bloqueos F/I directos y rechazo de fallbacks desconocidos; F-43 y
+acreditaciones HFS-010 conservados. Once suites: 1661 aprobadas + 12 subpruebas;
+12 ejemplos/24 consumidores CLI idénticos. [Informe](audit/hfs017/report.md),
+[contrato](contracts/hfs017-design-method.md) y [matriz](audit/hfs017/support-matrix.md).
+Para revisión técnica independiente, sin rama/PR/commit/push. HFS-020 y HFS-039
+no iniciadas. Las notas de entregas anteriores conservan su contexto histórico.
+
 **Entrega HFS-015 (2026-10-27), base main `dbd87cb`:** F-09 corregido con
 valores originales, display separado, JSON estricto y ranking bruto; F-07 con
 recomendaciones D1/E2 separadas de resistencia y condición E5 explícitamente
@@ -168,7 +176,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-014 | 1 | Sustituir resumen de capacidades mezcladas, reglas de agregación de lote vacío | 010 | Implementada para revisión: DCR publicado, empates/FAIL conservados, sin inferir unidades; `cases=[]` rechazado. [Informe](audit/hfs014/report.md). |
 | HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Implementada para revisión: constructor único sin redondeo, trazas originales, no finitos diagnosticados, recomendaciones D1/E2 y migración HFS-014. Diez suites; [informe](audit/hfs015/report.md). |
 | HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. Implementación entregada para revisión: [contrato](contracts/hfs016-catalog.md) e [informe](audit/hfs016/report.md). Alcance integral sigue HFS-040; no autoriza avance de fase. |
-| HFS-017 | 1, futura | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014 | Auditar paso del método y rechazo explícito de dominios no habilitados en motor/reglas/adaptadores; factores canónicos y regresiones sin ampliar soporte ASD por accidente. No implementada en HFS-014. |
+| HFS-017 | 1, implementada para revisión | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014,015 | Guardas canónicas en motor/router/reglas/evaluadores; F/I ASD bloqueados, conversores sin fallback desconocido, factores por disposición, F-43 preservado. Once suites sin regresiones; [evidencia](audit/hfs017/report.md). No habilita nuevos dominios ASD. |
 | HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |
 | HFS-021 | 2 | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Web y CLI futuros utilizan la misma ejecución; no hay lógica duplicada. |
 | HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021 | JSON round-trip, migración explícita y esquemas generados reproducibles. |

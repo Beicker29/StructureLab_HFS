@@ -1,5 +1,32 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## Actualización HFS-017: método y factores por disposición
+
+- **DRY-21 / contrato de método:** `design_methods.DesignMethod` es el enum único,
+  reexportado por `models` para compatibilidad. `require_design_method` reconoce
+  tokens en conversores D/E/G/H; F1 conserva su interfaz estricta previa.
+  `domain/design_methods.require_case_method` posee la guarda de casos y el
+  límite LRFD F/I; `validate_method_scope` combina el alcance público para
+  `validate_case` y `ProfileRouter`. Reglas/evaluadores/helpers directos llaman
+  esa guarda antes del cálculo y de retornos inactivos. CLI no replica política.
+- **DRY-02/03, factores D2/E1:** `tension_calc.tension_design_factor` y
+  `axial_calc.compression_design_factor` son dueños de sus propios factores y
+  trazas, consumidos por conversión disponible y reglas. El helper axial
+  `_design_factor` es un alias de compatibilidad, no otra definición.
+- **DRY-15/F-43:** F1 permanece en `flexure_calc.available_flexural_strength`;
+  reglas F y `FlexureEvaluator` pasan el método validado. H1/H3 conservan uso
+  interno de F1 ASD sin habilitar F pública. Las constantes F1 de traza/cálculo
+  comparten propietario. D/E/G/H/I no se fusionan por igualdad numérica.
+- **DRY-17/19:** las ecuaciones de interacción y nominales E7/I siguen separadas
+  hasta su acreditación; HFS-017 no propaga una corrección normativa supuesta.
+  Los factores fijos I quedan detrás de guardas LRFD, sin extrapolarlos a ASD.
+
+Beneficio y mapa de consumidores: [contrato](../contracts/hfs017-design-method.md).
+Evidencia: [informe](../audit/hfs017/report.md), once suites, 12 ejemplos y 24
+consumidores CLI/memoria sin diferencias; AST de H/I idéntico salvo guardas.
+La separación en dos módulos pequeños evita que conversores puros importen
+Pydantic/casos para reconocer un método; no añade una jerarquía de evaluadores.
+
 ## Actualización HFS-015: números originales y recomendaciones
 
 - **DRY-12/13, F-09:** `models.CheckResult.from_values` posee la división y decisión

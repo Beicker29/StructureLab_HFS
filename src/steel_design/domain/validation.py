@@ -3,6 +3,7 @@ from ..sections.models import Section
 from pydantic import ValidationError as PydanticValidationError
 from ..codes.aisc_360_22.axial_calc import NORMATIVE_E_MPA
 from .errors import ValidationError
+from .design_methods import validate_method_scope
 
 def validate_case(case: SteelCase):
     # Canonical local validation also covers mutated/model_copy/model_construct inputs.
@@ -26,20 +27,8 @@ def validate_case(case: SteelCase):
                 "connection.U is required for tension cases.",
                 details={"required_field": "connection.U"},
             )
-    has_major_flexure = abs(case.loads.Mux) > 0.0
-    has_minor_flexure = abs(case.loads.Muy) > 0.0
-    if (has_major_flexure or has_minor_flexure) and case.design_method.value != "LRFD":
-        raise ValidationError(
-            "Chapter F flexural checks are implemented only for LRFD in the current scope.",
-            details={"design_method_received": case.design_method.value, "design_method_required": "LRFD"},
-        )
+    validate_method_scope(case)
     if case.composite is not None:
-        if case.design_method.value != "LRFD":
-            raise ValidationError(
-                "Chapter I composite checks are implemented only for LRFD in the current scope.",
-                details={"design_method_received": case.design_method.value, "design_method_required": "LRFD"},
-            )
-
         role = case.composite.role.value
         if role == "ENCASED_MEMBER":
             if case.composite.geometry.B is None:

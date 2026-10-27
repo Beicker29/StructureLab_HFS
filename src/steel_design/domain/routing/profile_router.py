@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Tuple, Type
 
 from ...codes.aisc_360_22 import axial_calc
+from ..design_methods import require_case_method, validate_method_scope
 from ...models import SteelCase
 from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
@@ -772,6 +773,7 @@ class ProfileRouter:
 
     @classmethod
     def _get_composite_rules(cls, case: SteelCase, section: Section) -> List:
+        require_case_method(case, chapter="I")
         cls._validate_composite_scope(case, section)
         role = case.composite.role.value
         rules: List = [CompositeI1Rule()]
@@ -830,6 +832,7 @@ class ProfileRouter:
         Engine coverage retains these errors while independent checks can run.
         The default two-argument interface remains strict; no shared router state.
         """
+        validate_method_scope(case)
         if case.composite is not None:
             return cls._get_composite_rules(case, section)
 

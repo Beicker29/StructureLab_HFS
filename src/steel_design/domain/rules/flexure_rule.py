@@ -1,3 +1,4 @@
+from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import flexure_calc
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
@@ -36,8 +37,9 @@ def _flexure_name(clause: str, limit_state: str, context: str) -> str:
 
 
 def _build_flexure_result(*, case: SteelCase, name: str, clause: str, demand: float, evaluation: dict, inputs: dict) -> CheckResult:
+    require_case_method(case, chapter="F")
     mn_nmm = evaluation["Mn_Nmm"]
-    capacity = flexure_calc.available_flexural_strength_lrfd(mn_nmm)
+    capacity = flexure_calc.available_flexural_strength(mn_nmm, case.design_method.value)
     return CheckResult.from_values(
         unit='kN-m',
         name=name,
@@ -50,7 +52,7 @@ def _build_flexure_result(*, case: SteelCase, name: str, clause: str, demand: fl
                 "inputs": inputs,
                 "limit_states": evaluation["limit_states"],
                 "intermediate": evaluation["intermediate"],
-                "design_factor": {"design_method": "LRFD", "phi_b": 0.90, "capacity_expression": "phi_b*Mn"},
+                "design_factor": {"design_method": case.design_method.value, "phi_b": flexure_calc.PHI_B_LRFD, "capacity_expression": "phi_b*Mn"},
                 "Mn_Nmm": mn_nmm,
                 "capacity_kn_m": capacity,
             }
@@ -93,6 +95,7 @@ class FlexureF2YieldRule:
     """F2-1: yielding for compact I-shapes/channels in major-axis flexure."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F2-1", "Yielding", "Major Axis"), "F2-1")
@@ -113,6 +116,7 @@ class FlexureF2LtbRule:
     """F2-2: lateral-torsional buckling for compact I-shapes/channels in major-axis flexure."""
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F2-2", "Lateral-Torsional Buckling", "Major Axis"), "F2-2")
@@ -131,6 +135,7 @@ class FlexureF2LtbRule:
 
 class FlexureF3YieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F3-1", "Yielding", "Major Axis"), "F3-1")
@@ -149,6 +154,7 @@ class FlexureF3YieldRule:
 
 class FlexureF3LtbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F3-2", "Lateral-Torsional Buckling", "Major Axis"), "F3-2")
@@ -167,6 +173,7 @@ class FlexureF3LtbRule:
 
 class FlexureF3FlbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F3-3", "Flange Local Buckling", "Major Axis"), "F3-3")
@@ -189,6 +196,7 @@ class FlexureF3FlbRule:
 
 class FlexureF4CompressionYieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F4-1", "Compression Flange Yielding", "Major Axis"), "F4-1")
@@ -207,6 +215,7 @@ class FlexureF4CompressionYieldRule:
 
 class FlexureF4LtbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F4-2", "Lateral-Torsional Buckling", "Major Axis"), "F4-2")
@@ -225,6 +234,7 @@ class FlexureF4LtbRule:
 
 class FlexureF4FlbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F4-3", "Compression Flange Local Buckling", "Major Axis"), "F4-3")
@@ -243,6 +253,7 @@ class FlexureF4FlbRule:
 
 class FlexureF4TensionYieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F4-4", "Tension Flange Yielding", "Major Axis"), "F4-4")
@@ -263,6 +274,7 @@ class FlexureF4TensionYieldRule:
 
 class FlexureF5CompressionYieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F5-1", "Compression Flange Yielding", "Major Axis"), "F5-1")
@@ -281,6 +293,7 @@ class FlexureF5CompressionYieldRule:
 
 class FlexureF5LtbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F5-2", "Lateral-Torsional Buckling", "Major Axis"), "F5-2")
@@ -299,6 +312,7 @@ class FlexureF5LtbRule:
 
 class FlexureF5FlbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F5-3", "Compression Flange Local Buckling", "Major Axis"), "F5-3")
@@ -317,6 +331,7 @@ class FlexureF5FlbRule:
 
 class FlexureF5TensionYieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _major_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F5-4", "Tension Flange Yielding", "Major Axis"), "F5-4")
@@ -336,6 +351,7 @@ class FlexureF5TensionYieldRule:
 
 class FlexureF6YieldRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _minor_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F6-1", "Yielding", "Minor Axis"), "F6-1")
@@ -360,6 +376,7 @@ class FlexureF6YieldRule:
 
 class FlexureF6FlbRule:
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand = _minor_demand(case)
         if demand <= 0.0:
             return _nominal_pass(_flexure_name("F6-2", "Flange Local Buckling", "Minor Axis"), "F6-2")
@@ -385,6 +402,7 @@ class FlexureF7YieldRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -414,6 +432,7 @@ class FlexureF7FlangeRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -443,6 +462,7 @@ class FlexureF7WebRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -472,6 +492,7 @@ class FlexureF7LtbRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -501,6 +522,7 @@ class FlexureF8YieldRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -530,6 +552,7 @@ class FlexureF8LocalBucklingRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -580,6 +603,7 @@ class FlexureF10YieldRule:
         return axis, restraint
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand_axis = self.axis
         demand = _axis_demand(case, demand_axis)
         if demand <= 0.0:
@@ -610,6 +634,7 @@ class FlexureF10LtbRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand_axis = self.axis
         demand = _axis_demand(case, demand_axis)
         if demand <= 0.0:
@@ -649,6 +674,7 @@ class FlexureF10LegBucklingRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         demand_axis = self.axis
         demand = _axis_demand(case, demand_axis)
         if demand <= 0.0:
@@ -679,6 +705,7 @@ class FlexureF11YieldRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
@@ -708,6 +735,7 @@ class FlexureF11LtbRule:
     axis = "x"
 
     def check(self, case: SteelCase, section: Section) -> CheckResult:
+        require_case_method(case, chapter="F")
         axis = self.axis
         demand = _axis_demand(case, axis)
         if demand <= 0.0:
