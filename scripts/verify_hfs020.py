@@ -29,6 +29,7 @@ SUITES = [
     "test_hfs013_design_method", "test_hfs014_summary_bundle",
     "test_hfs015_precision_advice", "test_hfs017_design_method",
     "test_hfs020_comparison",
+    "test_hfs021_execution",
 ]
 
 

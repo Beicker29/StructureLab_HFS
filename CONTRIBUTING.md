@@ -73,6 +73,13 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-021 mantiene `scripts/verify_hfs020.py` como verificador común de CI y
+desarrollo y añade `tests/test_hfs021_execution.py` como decimotercera suite
+separada. Base HFS-020: 1711 pruebas + 12 subpruebas; nueva suite HFS-021: 51.
+No se cambian expectativas históricas ni la comparación exacta/procedencia de
+entradas. [Reproducción antes/después](docs/audit/hfs021/report.md) y
+[API Python sin transporte](docs/contracts/hfs021-execution.md).
+
 En la copia de trabajo, con el Python del entorno fijado, ejecutar:
 
 ```powershell
