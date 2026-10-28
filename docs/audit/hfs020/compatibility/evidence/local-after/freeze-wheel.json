@@ -1,0 +1,13 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pip",
+    "freeze",
+    "--all"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\empty",
+  "returncode": 0,
+  "stdout": "annotated-types==0.8.0\net_xmlfile==2.0.0\nopenpyxl==3.1.5\npip==25.0.1\npydantic==2.14.1\npydantic_core==2.50.1\nstructurelab-hfs @ file:///C:/Users/LENOVO/Documents/Proyectos%20python/StructureLab_HFS/.venv/20compat-final/dist/structurelab_hfs-0.1.0-py3-none-any.whl#sha256=43dee919d6681a5184fe74da293d91667d7fa998512f85b002dfe922f63e148a\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\n",
+  "stderr": ""
+}

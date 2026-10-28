@@ -14,8 +14,14 @@
   `data/sections.xlsx` permanece externo y canónico, sin copia en la distribución.
 - `scripts/verify_hfs020.py` es el verificador común para desarrollo y CI:
   construcción/inspección, entornos limpios e imports fuera del checkout, once
-  suites separadas y regresión de ejemplos/CLI. Reutiliza utilidades de captura
+  suites históricas más la suite de comparación HFS-020 y regresión de ejemplos/CLI. Reutiliza utilidades de captura
   históricas sin copiar código productivo a la carpeta externa.
+- `scripts/hfs020_comparison.py` posee exclusivamente la comparación JSON exacta
+  y la cadena de procedencia de las entradas para el verificador HFS-020 y sus
+  pruebas. Conserva hashes de bytes y compara semántica sin redondear; no es un
+  serializador del motor. La referencia nueva enlaza los blobs versionados con
+  los hashes históricos, sin reemplazar capturas ni permitir nuevas cargas.
+  [Corrección multiplataforma y mapa de usos](../audit/hfs020/compatibility/report.md).
 
 No cambian responsabilidades normativas, geométricas ni de resultados. La
 distribución preserva íntegros los fuentes; no hay migración general de imports.

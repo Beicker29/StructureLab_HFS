@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs017_design_method.py",
+    "--junitxml=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\20compat-final\\pytest-test_hfs017_design_method.xml",
+    "--basetemp=C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\tmp\\test_hfs017_design_method"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\inputs",
+  "returncode": 0,
+  "stdout": "........................................................................ [ 15%]\n........................................................................ [ 30%]\n........................................................................ [ 46%]\n........................................................................ [ 61%]\n........................................................................ [ 76%]\n........................................................................ [ 92%]\n....................................                                     [100%]\n468 passed in 3.01s\n",
+  "stderr": ""
+}

@@ -1,0 +1,42 @@
+{
+  "artifacts": [
+    {
+      "id": 12786265826,
+      "name": "hfs020-windows-2022",
+      "size_in_bytes": 408297,
+      "url": "https://api.github.com/repos/Beicker29/StructureLab_HFS/actions/artifacts/12786265826",
+      "archive_download_url": "https://api.github.com/repos/Beicker29/StructureLab_HFS/actions/artifacts/12786265826/zip",
+      "expired": false,
+      "created_at": "2026-10-28T01:50:37Z",
+      "expires_at": "2026-11-11T01:50:36Z",
+      "updated_at": "2026-10-28T01:50:37Z",
+      "digest": "sha256:01d86e423b05dea04d5735cf4c992a42f170777f81cbcc340ca9cec1c8d534a4",
+      "workflow_run": {
+        "id": 40617061992,
+        "repository_id": 1203281982,
+        "head_repository_id": 1203281982,
+        "head_branch": "main",
+        "head_sha": "70adc5edf7c5556d0dd5c1be7de915ad0d63b8bf"
+      }
+    },
+    {
+      "id": 12786126188,
+      "name": "hfs020-ubuntu-24.04",
+      "size_in_bytes": 395580,
+      "url": "https://api.github.com/repos/Beicker29/StructureLab_HFS/actions/artifacts/12786126188",
+      "archive_download_url": "https://api.github.com/repos/Beicker29/StructureLab_HFS/actions/artifacts/12786126188/zip",
+      "expired": false,
+      "created_at": "2026-10-28T01:50:24Z",
+      "expires_at": "2026-11-11T01:50:22Z",
+      "updated_at": "2026-10-28T01:50:24Z",
+      "digest": "sha256:b61751b5fd578ff5b42875df86e3754539dba0fa73c87f89738df17f92ec0ef6",
+      "workflow_run": {
+        "id": 40617061992,
+        "repository_id": 1203281982,
+        "head_repository_id": 1203281982,
+        "head_branch": "main",
+        "head_sha": "70adc5edf7c5556d0dd5c1be7de915ad0d63b8bf"
+      }
+    }
+  ]
+}

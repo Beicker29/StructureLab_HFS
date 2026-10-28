@@ -1,0 +1,12 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pip",
+    "check"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\empty",
+  "returncode": 0,
+  "stdout": "No broken requirements found.\n",
+  "stderr": ""
+}

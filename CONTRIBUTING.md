@@ -24,7 +24,8 @@ El verificador exige una salida nueva, construye sdist y wheel desde ese sdist,
 inspecciona contenido, ejecuta `twine check --strict`, crea dos entornos limpios
 y prueba `pip install .` y wheel. Copia solo tests/entradas y utilidades de
 captura a una carpeta temporal **fuera del checkout**, nunca `src`. Allí ejecuta
-las once suites por separado, los 12 ejemplos y los 24 recorridos CLI/memoria.
+las once suites históricas y la suite de comparación HFS-020 por separado,
+los 12 ejemplos y los 24 recorridos CLI/memoria.
 Comprueba imports en `site-packages`, ambos comandos CLI y catálogo externo.
 Requiere acceso a PyPI; conserva logs también cuando falla y no borra la carpeta
 temporal, cuya ruta queda en `environment.json`. No ejecutar limpiezas de ella
@@ -32,8 +33,12 @@ sin verificar primero ruta y necesidad de preservar evidencia.
 
 Las once suites históricas no son tests de empaquetado: las verificaciones de
 construcción, archivos y entornos están en `scripts/verify_hfs020.py`. La primera
-suite produce 68 métodos + 12 subpruebas, no 80 métodos; total actual 1661
-aprobadas + 12 subpruebas. No usar `python -m pytest` desde el checkout como única
+suite produce 68 métodos + 12 subpruebas, no 80 métodos; total histórico 1661
+aprobadas + 12 subpruebas, más 50 pruebas de comparación HFS-020 (1711 + 12).
+Los hashes de bytes se conservan; el contenido JSON se contrasta exactamente
+contra la referencia histórica y HEAD según la
+[política multiplataforma](docs/audit/hfs020/compatibility/report.md).
+No usar `python -m pytest` desde el checkout como única
 prueba de instalación: puede importar los fuentes locales y ocultar un wheel roto.
 
 Ruff aplica E4/E7/E9/F a fuentes, pruebas y scripts actuales, sin formatter ni

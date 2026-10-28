@@ -1,0 +1,16 @@
+{
+  "base_head": "70adc5edf7c5556d0dd5c1be7de915ad0d63b8bf",
+  "note": "Raw working-tree bytes of the reviewed implementation; production sources untouched",
+  "files": {
+    "CONTRIBUTING.md": "8135cea5d8c96c76151b997fcda303b633b1275ec88fe0fda3e53fc06dc9eed2",
+    "docs/architecture/dry-inventory.md": "1b24ea60be2b3fab3cde896d99d32597f2ae5960ee107770a634674b2d45e3a1",
+    "docs/audit/hfs020/changed-files.md": "8e7f5e93f5de4f52c4c9394529cc06b32fa64da8fec5c64149f2a396cbfc4024",
+    "docs/audit/hfs020/compatibility/input-reference.json": "c0f63d09985fb772f8552b1606f979277f0a5475acb905b2bfbfc4bfe11a4f63",
+    "docs/audit/hfs020/compatibility/report.md": "f39b825493082d933a570f6bdcc7a0ce036dd10b53ac2df21bc3eed421ca4d59",
+    "docs/audit/hfs020/report.md": "e900b81657722a04a737ef905d598a2cc0545d0a7b3cef881cace29c8e638438",
+    "docs/ROADMAP.md": "40961cca8eda8ee4707724e8b1a81ff6f8eb9b265bde89163f09dadb426a7fac",
+    "scripts/hfs020_comparison.py": "881c7cb0c5e11ea3e2a4a8d276bf2fc7ccd6d0de8b4765e0f7b82b4c2948c646",
+    "scripts/verify_hfs020.py": "006feee219a43bfdd0177a60ba76c1cc1a82b84de2b15f1b31c31512f7cf0fcb",
+    "tests/test_hfs020_comparison.py": "7a97851650cc3256b9ebae621a81f9b6b6cf2e91dbeef273e490c8a98277b8b5"
+  }
+}

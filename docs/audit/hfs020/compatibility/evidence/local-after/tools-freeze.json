@@ -1,0 +1,13 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\20dev\\Scripts\\python.exe",
+    "-m",
+    "pip",
+    "freeze",
+    "--all"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": "annotated-types==0.8.0\nbuild==1.6.1\ncertifi==2026.10.23\ncharset-normalizer==3.5.2\ncolorama==0.4.6\ndocutils==0.23\net_xmlfile==2.0.0\nid==1.6.1\nidna==3.20\niniconfig==2.3.1\njaraco.classes==3.4.0\njaraco.context==6.1.2\njaraco.functools==4.6.0\nkeyring==25.7.0\nmarkdown-it-py==4.2.0\nmdurl==0.1.2\nmore-itertools==11.2.1\nnh3==0.3.7\nopenpyxl==3.1.5\npackaging==26.3\npip==25.0.1\npluggy==1.7.0\npydantic==2.14.1\npydantic_core==2.50.1\nPygments==2.21.0\npyproject_hooks==1.3.3\npytest==9.1.1\npywin32-ctypes==0.2.3\nreadme_renderer==46.0\nrequests==2.34.2\nrequests-toolbelt==1.0.0\nrfc3986==2.0.0\nrich==15.0.0\nruff==0.17.3\nstructurelab-hfs @ file:///C:/Users/LENOVO/Documents/Proyectos%20python/StructureLab_HFS\ntwine==7.0.0\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\nurllib3==2.8.0\n",
+  "stderr": ""
+}

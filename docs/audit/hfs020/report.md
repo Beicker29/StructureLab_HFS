@@ -1,5 +1,23 @@
 # HFS-020 — Empaquetado, CI y calidad
 
+## Corrección de compatibilidad Windows/Ubuntu — 2026-10-28
+
+Base `main`, HEAD `70adc5edf7c5556d0dd5c1be7de915ad0d63b8bf`, árbol inicial
+limpio. Los artifacts reales de Actions 40617061992 demuestran que los 12
+SHA-256 de entrada difieren únicamente por CRLF/LF. Resultados, cobertura,
+trazas y memorias coinciden. Se conserva cada hash de bytes y se verifica por
+separado contenido JSON exacto contra una referencia vinculada a la captura
+histórica y a los archivos versionados. No cambia el motor ni sus entradas.
+
+Regresión local completa: 1711 aprobadas + 12 subpruebas; cero fallos,
+errores, omitidas o xfail. Doce ejemplos y 24 escenarios CLI/memoria idénticos.
+[Diagnóstico, solución, pruebas, reproducción y riesgos](compatibility/report.md).
+[Inventario actualizado](changed-files.md#corrección-de-compatibilidad-2026-10-28).
+**Pendiente de publicación por el usuario y nueva ejecución remota con ambos
+jobs SUCCESS; HFS-020 no está completamente cerrado.** Sin commit ni push.
+
+## Informe original de implementación (conservado)
+
 Fecha: 2026-10-27. Base `main`, HEAD
 `8af8e435812bfeff23d921c2aa4c860ca98ef4dd`; árbol inicial limpio.
 Alcance exclusivo HFS-020. Sin ramas, PR, commit ni push. Implementación local

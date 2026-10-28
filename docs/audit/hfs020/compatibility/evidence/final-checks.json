@@ -1,0 +1,637 @@
+{
+  "head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stdout": "70adc5edf7c5556d0dd5c1be7de915ad0d63b8bf\n",
+    "stderr": ""
+  },
+  "branch": {
+    "command": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "returncode": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "diff_check": {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'docs/audit/hfs020/changed-files.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audit/hfs020/report.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'scripts/verify_hfs020.py', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "tracked_changes": {
+    "command": [
+      "git",
+      "diff",
+      "--name-only",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stdout": "CONTRIBUTING.md\ndocs/ROADMAP.md\ndocs/architecture/dry-inventory.md\ndocs/audit/hfs020/changed-files.md\ndocs/audit/hfs020/report.md\nscripts/verify_hfs020.py\n",
+    "stderr": "warning: in the working copy of 'docs/audit/hfs020/changed-files.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/audit/hfs020/report.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'scripts/verify_hfs020.py', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "status": {
+    "command": [
+      "git",
+      "status",
+      "--short",
+      "--untracked-files=all"
+    ],
+    "returncode": 0,
+    "stdout": " M CONTRIBUTING.md\n M docs/ROADMAP.md\n M docs/architecture/dry-inventory.md\n M docs/audit/hfs020/changed-files.md\n M docs/audit/hfs020/report.md\n M scripts/verify_hfs020.py\n?? docs/audit/hfs020/compatibility/evidence/diagnosis-before.json\n?? docs/audit/hfs020/compatibility/evidence/local-after.zip\n?? docs/audit/hfs020/compatibility/evidence/local-after/SHA256SUMS.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/archives.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/build.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/check-project.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/check-wheel.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/cli-examples.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/engine-examples.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/engine-results.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/environment.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/external-inputs.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/external-project-console.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/external-project-module.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/external-wheel-console.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/external-wheel-module.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/freeze-project.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/freeze-wheel.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/head.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/help-project-console.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/help-project-module.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/help-wheel-console.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/help-wheel-module.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/imports-project.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/imports-wheel.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/input-provenance.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/install-project.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/install-tests.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/install-wheel.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/missing-default-project.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/missing-default-wheel.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-original.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-original.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs000_characterization.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs000_characterization.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs010_coverage.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs010_coverage.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs011_input_contracts.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs011_input_contracts.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs012_flexure_selection.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs012_flexure_selection.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs013_design_method.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs013_design_method.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs013_directional_h3.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs013_directional_h3.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs014_summary_bundle.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs014_summary_bundle.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs015_precision_advice.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs015_precision_advice.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs016_catalog_integrity.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs016_catalog_integrity.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs017_design_method.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs017_design_method.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs020_comparison.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/pytest-test_hfs020_comparison.xml\n?? docs/audit/hfs020/compatibility/evidence/local-after/ruff.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/status.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/tools-freeze.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/twine.json\n?? docs/audit/hfs020/compatibility/evidence/local-after/verification.json\n?? docs/audit/hfs020/compatibility/evidence/remote-replay-after.json\n?? docs/audit/hfs020/compatibility/evidence/remote/artifacts.json\n?? docs/audit/hfs020/compatibility/evidence/remote/jobs.json\n?? docs/audit/hfs020/compatibility/evidence/remote/ubuntu.zip\n?? docs/audit/hfs020/compatibility/evidence/remote/windows.zip\n?? docs/audit/hfs020/compatibility/evidence/ruff-explicit.json\n?? docs/audit/hfs020/compatibility/evidence/unit-corrected.xml\n?? docs/audit/hfs020/compatibility/evidence/unit-initial.xml\n?? docs/audit/hfs020/compatibility/input-reference.json\n?? docs/audit/hfs020/compatibility/report.md\n?? scripts/hfs020_comparison.py\n?? tests/test_hfs020_comparison.py\n",
+    "stderr": ""
+  },
+  "protected_scope": {
+    "all_tracked_changes_match_inventory": true,
+    "historical_captures_modified": false,
+    "runtime_package_examples_catalog_contracts_modified": false
+  },
+  "ignored_redundant_copies": {
+    "command": [
+      "git",
+      "ls-files",
+      "--others",
+      "--ignored",
+      "--exclude-standard",
+      "docs/audit/hfs020/compatibility"
+    ],
+    "returncode": 0,
+    "stdout": "docs/audit/hfs020/compatibility/evidence/local-after/dist/structurelab_hfs-0.1.0-py3-none-any.whl\ndocs/audit/hfs020/compatibility/evidence/local-after/dist/structurelab_hfs-0.1.0.tar.gz\ndocs/audit/hfs020/compatibility/evidence/remote/ubuntu-job.log\n",
+    "stderr": ""
+  },
+  "archive_recovery": "Ignored standalone distributions are preserved in local-after.zip; ignored ubuntu-job.log is preserved byte-identically as ubuntu-job.txt; no permission or ignore changes",
+  "local_links": {
+    "checked": 134,
+    "missing": [],
+    "records": [
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs020/compatibility/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs020/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs017/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs017-design-method.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs017/support-matrix.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs015/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs015-precision-advice.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs014/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs014-summary-bundles.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs013/f1-correction/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs013/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs013-axes.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/tracking.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs012/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs010/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs010-coverage.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "adr/001-engine-architecture.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "adr/002-contracts-errors.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "adr/003-traceability-testing.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs002/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/tracking.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs011/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs011-inputs.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "architecture/dry-inventory.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs016/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/tracking.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "normative/hfs002-implementation.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "normative/hfs002-applicability.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "normative/hfs002-implementation.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "normative/hfs002-coverage-proposal.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "normative/hfs002-sources.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs010/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs011/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs012/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs014/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs015/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "contracts/hfs016-catalog.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs016/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs017/report.md"
+      },
+      {
+        "document": "docs/ROADMAP.md",
+        "link": "audit/hfs020/report.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../pyproject.toml"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../MANIFEST.in"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../requirements.txt"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../requirements/ci-constraints.txt"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../.github/workflows/ci.yml"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../scripts/verify_hfs020.py"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../README.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../CONTRIBUTING.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../ROADMAP.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../architecture/dry-inventory.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "report.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "changed-files.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "evidence/SHA256SUMS.json"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../scripts/hfs020_comparison.py"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../scripts/verify_hfs020.py"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../tests/test_hfs020_comparison.py"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "compatibility/input-reference.json"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "report.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "compatibility/report.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "changed-files.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../../CONTRIBUTING.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../ROADMAP.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "../../architecture/dry-inventory.md"
+      },
+      {
+        "document": "docs/audit/hfs020/changed-files.md",
+        "link": "compatibility/evidence/"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs020/compatibility/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs020/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../contracts/hfs017-design-method.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs017/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../contracts/hfs015-precision-advice.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs015/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../contracts/hfs014-summary-bundles.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs014/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs011/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../contracts/hfs011-inputs.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../adr/001-engine-architecture.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../contracts/hfs010-coverage.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs010/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../contracts/hfs016-catalog.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs016/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../normative/hfs002-applicability.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../normative/hfs002-applicability.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/tracking.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs012/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs013/report.md"
+      },
+      {
+        "document": "docs/architecture/dry-inventory.md",
+        "link": "../audit/hfs013/f1-correction/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "AGENTS.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/ROADMAP.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/baseline.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/tracking.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs020/compatibility/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs020/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs016/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs017/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs015/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs014/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs013/f1-correction/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs013/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs012/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs010/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "scripts/audit_hfs011.py"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/hfs011/report.md"
+      },
+      {
+        "document": "CONTRIBUTING.md",
+        "link": "docs/audit/evidence-policy.md"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "compatibility/report.md"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "changed-files.md#correcci\u00f3n-de-compatibilidad-2026-10-28"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/protected-files.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/comparison.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/installed/verification.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/development/"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/ruff-initial.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/ruff-debt.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/actionlint-source.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/ubuntu-availability.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/installed/distributions/"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/installed/archives.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/artifact-relocation.json"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "evidence/incidents/first-installed/"
+      },
+      {
+        "document": "docs/audit/hfs020/report.md",
+        "link": "changed-files.md"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/diagnosis-before.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/remote/jobs.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/remote/artifacts.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/remote/ubuntu-job.txt"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/remote/windows.zip"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/remote/ubuntu.zip"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "input-reference.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/local-after/input-provenance.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/local-after/environment.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/local-after/tools-freeze.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/local-after/verification.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/remote-replay-after.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/unit-initial.xml"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/unit-corrected.xml"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/ruff-explicit.json"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "../changed-files.md#correcci\u00f3n-de-compatibilidad-2026-10-28"
+      },
+      {
+        "document": "docs/audit/hfs020/compatibility/report.md",
+        "link": "evidence/local-after.zip"
+      }
+    ],
+    "generated_last": [
+      "evidence/final-checks.json",
+      "evidence/SHA256SUMS.json"
+    ]
+  },
+  "whitespace": {
+    "new_trailing_whitespace": [],
+    "preexisting_unchanged_lines": [
+      "docs/ROADMAP.md:63",
+      "docs/ROADMAP.md:64",
+      "docs/ROADMAP.md:65"
+    ]
+  },
+  "reproduction": {
+    "report_python_block": "executed successfully against both original remote ZIPs",
+    "local_archive": "all 60 members byte-identical, 59 original manifest digests verified"
+  },
+  "log_preservation": {
+    "original": "remote/ubuntu-job.log",
+    "published_copy": "remote/ubuntu-job.txt",
+    "byte_identical": true,
+    "sha256": "5c362b1959248605619c2d8041f287b1734045c4cbb7416fbae05d620bce759a"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs013_directional_h3.py",
+    "--junitxml=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\20compat-final\\pytest-test_hfs013_directional_h3.xml",
+    "--basetemp=C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\tmp\\test_hfs013_directional_h3"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-t41jto96\\inputs",
+  "returncode": 0,
+  "stdout": ".........................................................                [100%]\n57 passed in 1.21s\n",
+  "stderr": ""
+}
