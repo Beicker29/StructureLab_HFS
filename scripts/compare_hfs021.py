@@ -36,9 +36,8 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def compare(before, after):
-    assert git("rev-parse", "HEAD").decode().strip() == BASE
-    assert git("branch", "--show-current").decode().strip() == "main"
+def compare_results(before, after):
+    """Exact captures and SVGs; reusable without historical source-scope assumptions."""
     for label in (before, after):
         assert json.loads((label / "verification.json").read_text())["accepted"]
     baseline_engine = parse_json((before / "engine-results.json").read_bytes())
@@ -55,6 +54,36 @@ def compare(before, after):
         for key in ("normalized_cli", "normalized_details", "source_sha256", "transport_only_detailed_variant"):
             assert_json_equal(prior_cli[label][key], after_cli[label][key], f"{label}/{key}")
         assert prior_cli[label]["execution"]["returncode"] == after_cli[label]["execution"]["returncode"]
+
+    # Optional PNG dependency is not installed in either clean environment.
+    # Compare actual SVG exports byte-for-byte; code identity also covers PNG.
+    graph_evidence = {}
+    raw_captures = [json.loads((p / "cli-examples.json").read_text(encoding="utf-8")) for p in (before, after)]
+    for label in raw_captures[0]:
+        runs = [capture[label]["execution"] for capture in raw_captures]
+        if runs[0]["returncode"]:
+            continue
+        outputs = [json.loads(run["stdout"]) for run in runs]
+        cases = [output.get("cases", [output]) for output in outputs]
+        for index, (old, new) in enumerate(zip(*cases, strict=True)):
+            paths = [item["artifacts"]["interaction_diagram_i5_method2_image"] for item in (old, new)]
+            assert bool(paths[0]) == bool(paths[1]), (label, index)
+            if not paths[0]:
+                continue
+            contents = [Path(p).read_bytes() for p in paths]
+            assert contents[0] == contents[1], (label, index, "diagram bytes")
+            graph_evidence[f"{label}/case-{index}"] = {
+                "before": paths[0], "after": paths[1], "sha256": digest(contents[0]),
+                "bytes": len(contents[0]), "format": Path(paths[0]).suffix,
+            }
+    return {"engine_examples_exact": 12, "cli_memory_scenarios_exact": 24,
+            "diagrams_byte_identical": graph_evidence}
+
+
+def compare(before, after):
+    assert git("rev-parse", "HEAD").decode().strip() == BASE
+    assert git("branch", "--show-current").decode().strip() == "main"
+    regression = compare_results(before, after)
 
     # Formula modules, contracts, catalog and previous tests must be identical
     # as Git text (EOL normalization only) / exact bytes for the catalog.
@@ -94,33 +123,12 @@ def compare(before, after):
         assert dump(old_helpers[name]) == dump(new_helpers[name]), name
         extracted.append(name)
 
-    # Optional PNG dependency is not installed in either clean environment.
-    # Compare actual SVG exports byte-for-byte; code identity also covers PNG.
-    graph_evidence = {}
-    raw_captures = [json.loads((p / "cli-examples.json").read_text(encoding="utf-8")) for p in (before, after)]
-    for label in raw_captures[0]:
-        runs = [capture[label]["execution"] for capture in raw_captures]
-        if runs[0]["returncode"]:
-            continue
-        outputs = [json.loads(run["stdout"]) for run in runs]
-        cases = [output.get("cases", [output]) for output in outputs]
-        for index, (old, new) in enumerate(zip(*cases, strict=True)):
-            paths = [item["artifacts"]["interaction_diagram_i5_method2_image"] for item in (old, new)]
-            assert bool(paths[0]) == bool(paths[1]), (label, index)
-            if not paths[0]:
-                continue
-            contents = [Path(p).read_bytes() for p in paths]
-            assert contents[0] == contents[1], (label, index, "diagram bytes")
-            graph_evidence[f"{label}/case-{index}"] = {
-                "before": paths[0], "after": paths[1], "sha256": digest(contents[0]),
-                "bytes": len(contents[0]), "format": Path(paths[0]).suffix,
-            }
     return {"accepted": True, "base": BASE, "branch": "main",
             "engine_examples_exact": 12, "cli_memory_scenarios_exact": 24,
             "historical_sources_unchanged": unchanged,
             "engine_pipeline_ast_identical_except_context_return": True,
             "geometry_ast_identical": True, "presentation_helpers_ast_identical": extracted,
-            "diagrams_byte_identical": graph_evidence}
+            "diagrams_byte_identical": regression["diagrams_byte_identical"]}
 
 
 if __name__ == "__main__":

@@ -6,12 +6,12 @@ import sys
 
 root,out=map(lambda x:Path(x).resolve(),sys.argv[1:])
 if out.exists(): raise SystemExit("Choose a new output path")
-sys.path.insert(0,str(root))
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
-from src.steel_design.run import _build_chapter_admissibility, _build_global_summary
+sys.path.insert(0,str(root / "src"))
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import SteelCase
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
+from steel_design.run import _build_chapter_admissibility, _build_global_summary
 
 payload=dict(section_name="solid",material=dict(Fy=345,Fu=450),
              custom_section=dict(type="SOLID_RECTANGULAR",B=10,H=100),

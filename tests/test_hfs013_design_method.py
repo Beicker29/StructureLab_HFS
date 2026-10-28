@@ -18,15 +18,15 @@ if __name__ == "__main__":
 
 import pytest
 
-from src.steel_design.codes.aisc_360_22 import flexure_calc
-from src.steel_design.domain.errors import ValidationError
-from src.steel_design.domain.rules.combined_hss_rules import (
+from steel_design.codes.aisc_360_22 import flexure_calc
+from steel_design.domain.errors import ValidationError
+from steel_design.domain.rules.combined_hss_rules import (
     CombinedH1HssRule, HssCombinedH3_2Rule, _available_flexural_strength,
 )
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import SteelCase
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 def reference(family):

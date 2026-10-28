@@ -11,12 +11,12 @@ import math
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError, ValidationError
-from src.steel_design.domain.routing.profile_router import ProfileRouter, _classify_element
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError, ValidationError
+from steel_design.domain.routing.profile_router import ProfileRouter, _classify_element
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import SteelCase
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 def case(**loads):

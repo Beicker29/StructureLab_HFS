@@ -11,17 +11,17 @@ from pathlib import Path
 
 import pytest
 
-from src.steel_design.codes.aisc_360_22 import combined_hss_calc, shear_calc
-from src.steel_design.domain.actions import shear_demand, shear_trace
-from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
-from src.steel_design.domain.evaluators.hss_shear import evaluate_hss_shear
-from src.steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule
-from src.steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG4VxRule, ShearG4VyRule, ShearG5VxRule, ShearG6VyRule
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.loader import load_sections_from_excel
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.codes.aisc_360_22 import combined_hss_calc, shear_calc
+from steel_design.domain.actions import shear_demand, shear_trace
+from steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
+from steel_design.domain.evaluators.hss_shear import evaluate_hss_shear
+from steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule
+from steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG4VxRule, ShearG4VyRule, ShearG5VxRule, ShearG6VyRule
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import SteelCase
+from steel_design.sections.loader import load_sections_from_excel
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 # Independent G4 and H3 references, SI: N/mm2 * mm2 /1000; Nmm /1e6.

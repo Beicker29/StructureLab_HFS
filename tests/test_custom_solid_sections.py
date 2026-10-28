@@ -1,9 +1,9 @@
 import unittest
 
-from src.steel_design.domain.errors import ValidationError
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.domain.errors import ValidationError
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.repository import SectionRepository
 
 
 def _base_case_kwargs() -> dict:

@@ -32,7 +32,7 @@ def capture(args):
         inputs[source.relative_to(ROOT).as_posix()] = sha(source)
     write_json(out / "copied_inputs.json", inputs)
     env = os.environ.copy()
-    env.pop("PYTHONPATH", None)
+    env["PYTHONPATH"] = str(work / "src")  # Explicit capture source; absent in installed verification.
     env.update(PYTHONNOUSERSITE="1", PYTEST_DISABLE_PLUGIN_AUTOLOAD="1", PYTHONUTF8="1")
     write_json(out / "environment.json", {
         "python": sys.version, "executable": sys.executable,

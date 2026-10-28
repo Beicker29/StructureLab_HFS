@@ -1,5 +1,13 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**HFS-021A (2026-10-28), base main `39a7614`:** migración a `steel_design`
+con src-layout, versión 0.2.0 y API pública por módulos; rechazo del namespace
+legado para impedir identidades paralelas. [Informe](audit/hfs021a/report.md)
+y [contrato](contracts/hfs021a-public-api.md). Para revisión independiente;
+CI remoto de este cambio pendiente, sin rama/PR/commit/push ni HFS-022.
+HFS-021 fue aprobado: run 40687160912 SUCCESS Windows/Ubuntu verificado.
+Las notas precedentes de entrega se conservan como contexto histórico.
+
 **Entrega HFS-021 (2026-10-28), base main `f3a5198`:** ejecución compartida
 en memoria, presentación/exportación separada y geometría maciza canónica.
 F-15/F-16 con cierre funcional acotado para revisión; ecuaciones, guardas,
@@ -204,8 +212,9 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. Implementación entregada para revisión: [contrato](contracts/hfs016-catalog.md) e [informe](audit/hfs016/report.md). Alcance integral sigue HFS-040; no autoriza avance de fase. |
 | HFS-017 | 1, implementada para revisión | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014,015 | Guardas canónicas en motor/router/reglas/evaluadores; F/I ASD bloqueados, conversores sin fallback desconocido, factores por disposición, F-43 preservado. Once suites sin regresiones; [evidencia](audit/hfs017/report.md). No habilita nuevos dominios ASD. |
 | HFS-020 | 2, aprobada por el usuario | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Cierre posterior: workflow 40673575334, commit f3a5198, Windows y Ubuntu SUCCESS. Namespace, wheel/sdist, suites y comparación exacta preservados. [Evidencia histórica](audit/hfs020/report.md), [confirmación posterior](audit/hfs021/preparation.md). No certificación normativa. |
-| HFS-021 | 2, implementada para revisión | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Ejecución individual/lotes invocable sin I/O, contexto con Section única, reporting separado y fachadas compatibles. Regresión instalada y propiedades geométricas independientes. [Informe](audit/hfs021/report.md). No habilita nuevos dominios ni contratos HFS-022. |
-| HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021 | JSON round-trip, migración explícita y esquemas generados reproducibles. |
+| HFS-021 | 2, aprobada por el usuario | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Ejecución común y geometría única; 1762 pruebas +12 subpruebas. Run 40687160912 SUCCESS Windows/Ubuntu, commit 39a7614. [Informe histórico](audit/hfs021/report.md). No certificación AISC. |
+| HFS-021A | 2, para revisión | Paquete convencional steel_design y API pública mínima | 021 | Distribución 0.2.0 sin paquete src, imports legados rechazados, una identidad de modelos, instalaciones normal/wheel/editable y regresión exacta. [Informe](audit/hfs021a/report.md). CI remoto nuevo pendiente. |
+| HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021A | JSON round-trip, migración explícita y esquemas generados reproducibles. |
 | HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |
 | HFS-024 | 2 | Trazas de cálculo canónicas y memorias sin inferencia por nombre de cláusula | 022,023 | Variables, unidades, expresiones, fuente y rama normativa recuperables en CLI/JSON/web. |
 | HFS-030 | 3 | AISC 360-22: base documental y erratas, tabla de trazabilidad | 023 | Comparación de PDF del repo con fuente oficial; versión/erratas registradas. |

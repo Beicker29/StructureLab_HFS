@@ -55,12 +55,12 @@ def canonical_hash(value):
 
 def engine_snapshot(work):
     # Import exactly the byte-identical copy under test, not the working checkout.
-    sys.path.insert(0, str(work))
-    from src.steel_design.engine import SteelDesignEngine
-    from src.steel_design.models import SteelCase
-    from src.steel_design.run import _extract_output_options, _merge_case_payload
-    from src.steel_design.sections.loader import load_sections_from_excel
-    from src.steel_design.sections.repository import SectionRepository
+    sys.path.insert(0, str(work / "src"))
+    from steel_design.engine import SteelDesignEngine
+    from steel_design.models import SteelCase
+    from steel_design.run import _extract_output_options, _merge_case_payload
+    from steel_design.sections.loader import load_sections_from_excel
+    from steel_design.sections.repository import SectionRepository
     import openpyxl
 
     sections = load_sections_from_excel(str(work / "data/sections.xlsx"))
@@ -136,7 +136,7 @@ def capture(args):
         raise RuntimeError(freeze)
     (out / "environment-freeze.txt").write_text(freeze["stdout"], encoding="utf-8")
     env = os.environ.copy()
-    env.pop("PYTHONPATH", None)
+    env["PYTHONPATH"] = str(work / "src")  # Explicit capture source; absent in installed verification.
     env["PYTHONNOUSERSITE"] = "1"
     env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
     env["PYTHONUTF8"] = "1"
@@ -162,7 +162,7 @@ def capture(args):
     for repeat in (1, 2):
         records = {}
         for case in sorted((work / "examples").glob("*.json")):
-            command = [sys.executable, "-m", "src.steel_design.run", f"examples/{case.name}",
+            command = [sys.executable, "-m", "steel_design.run", f"examples/{case.name}",
                        "--results-dir", f"audit-results/repeat-{repeat}"]
             run = execute(command, work, env)
             stream = run["stderr"] if run["returncode"] else run["stdout"]

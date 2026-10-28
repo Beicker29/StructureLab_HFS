@@ -1,11 +1,11 @@
 import unittest
 
-from src.steel_design.codes.aisc_360_22 import axial_calc, flexure_calc, tension_calc
-from src.steel_design.domain.rules.axial_rules import AxialE3Rule
-from src.steel_design.domain.rules.flexure_rule import FlexureRule
-from src.steel_design.domain.rules.tension_rule import TensionRuptureRule, TensionRule
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.models import Section
+from steel_design.codes.aisc_360_22 import axial_calc, flexure_calc, tension_calc
+from steel_design.domain.rules.axial_rules import AxialE3Rule
+from steel_design.domain.rules.flexure_rule import FlexureRule
+from steel_design.domain.rules.tension_rule import TensionRuptureRule, TensionRule
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.models import Section
 
 
 class NormativeD2E3F2Tests(unittest.TestCase):

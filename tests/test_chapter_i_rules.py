@@ -1,8 +1,8 @@
 import unittest
 
-from src.steel_design.domain.errors import RuleNotImplementedError
-from src.steel_design.domain.routing.profile_router import ProfileRouter
-from src.steel_design.domain.rules.composite_rules import (
+from steel_design.domain.errors import RuleNotImplementedError
+from steel_design.domain.routing.profile_router import ProfileRouter
+from steel_design.domain.rules.composite_rules import (
     CompositeI2EncasedCompressionRule,
     CompositeI2FilledCompressionRule,
     CompositeI5CombinedRule,
@@ -10,8 +10,8 @@ from src.steel_design.domain.rules.composite_rules import (
     CompositeI4_1EncasedGoverningRule,
     CompositeI4_1FilledRule,
 )
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.models import Section
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.models import Section
 
 
 def _base_case(*, section_name: str, loads: Loads, composite: dict) -> SteelCase:

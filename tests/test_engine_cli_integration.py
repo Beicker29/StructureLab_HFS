@@ -63,7 +63,7 @@ class EngineCliIntegrationTests(unittest.TestCase):
         command = [
             sys.executable,
             "-m",
-            "src.steel_design.run",
+            "steel_design.run",
             str(case_path),
             "--sections",
             str(sections_path),

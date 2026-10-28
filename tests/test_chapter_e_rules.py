@@ -1,11 +1,11 @@
 import unittest
 
-from src.steel_design.domain.errors import IncompleteSectionDataError, ValidationError
-from src.steel_design.domain.rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.domain.errors import IncompleteSectionDataError, ValidationError
+from steel_design.domain.rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 def _compression_case(section_name: str, pu: float, *, e: float = 200000.0, mode=None, xa: float = 0.0, ya: float = 0.0) -> SteelCase:

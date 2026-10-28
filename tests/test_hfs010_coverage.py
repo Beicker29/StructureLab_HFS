@@ -14,14 +14,14 @@ import sys
 import pytest
 from pydantic import ValidationError
 
-from src.steel_design.domain.coverage import build_coverage_plan
-from src.steel_design.domain.errors import RuleNotImplementedError, IncompleteSectionDataError, ValidationError as DomainValidationError
-from src.steel_design.domain.rules.tension_rule import TensionRule, TensionRuptureRule
-from src.steel_design.engine import SteelDesignEngine, _build_custom_section
-from src.steel_design.models import CheckResult, SteelCase, TensionScope
-from src.steel_design.results_model import AnalysisStatus, EngineResult
-from src.steel_design.sections.loader import load_sections_from_excel
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.domain.coverage import build_coverage_plan
+from steel_design.domain.errors import RuleNotImplementedError, IncompleteSectionDataError, ValidationError as DomainValidationError
+from steel_design.domain.rules.tension_rule import TensionRule, TensionRuptureRule
+from steel_design.engine import SteelDesignEngine, _build_custom_section
+from steel_design.models import CheckResult, SteelCase, TensionScope
+from steel_design.results_model import AnalysisStatus, EngineResult
+from steel_design.sections.loader import load_sections_from_excel
+from steel_design.sections.repository import SectionRepository
 
 ROOT = Path(__file__).resolve().parents[1]
 SCOPE = dict(ordinary_prismatic_member=True, concentric_axial_force=True, no_special_conditions=True,
@@ -284,7 +284,7 @@ def test_cli_serializes_coverage_and_propagates_incomplete(tmp_path, bundle):
         case = {**case, "cases": [{"name": "unqualified"}, {"name": "qualified", "tension_scope": SCOPE}]}
     path = tmp_path / "case.json"
     path.write_text(json.dumps(case), encoding="utf-8")
-    run = subprocess.run([sys.executable, "-m", "src.steel_design.run", str(path),
+    run = subprocess.run([sys.executable, "-m", "steel_design.run", str(path),
                           "--results-dir", str(tmp_path / "results")], cwd=ROOT, capture_output=True, text=True)
     assert run.returncode == 0, run.stderr
     data = json.loads(run.stdout)

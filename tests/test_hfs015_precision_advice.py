@@ -14,16 +14,16 @@ import sys
 import pytest
 from pydantic import ValidationError
 
-from src.steel_design.models import CheckResult, SteelCase, SlendernessAdviceBasis
-from src.steel_design.results_model import EngineResult
-from src.steel_design.domain.recommendations import slenderness_recommendations
-from src.steel_design.domain.rules import axial_rules, shear_rules, combined_hss_rules, composite_rules
-from src.steel_design.domain.rules.flexure_rule import _build_flexure_result
-from src.steel_design.domain.rules.tension_rule import TensionRule
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
-from src.steel_design import run as cli
+from steel_design.models import CheckResult, SteelCase, SlendernessAdviceBasis
+from steel_design.results_model import EngineResult
+from steel_design.domain.recommendations import slenderness_recommendations
+from steel_design.domain.rules import axial_rules, shear_rules, combined_hss_rules, composite_rules
+from steel_design.domain.rules.flexure_rule import _build_flexure_result
+from steel_design.domain.rules.tension_rule import TensionRule
+from steel_design.engine import SteelDesignEngine
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
+from steel_design import run as cli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -286,7 +286,7 @@ def test_cli_raw_precision_and_advisory_consumers(tmp_path,write):
     data=case(-310.53105,slenderness_advice_basis=dict(fabricated_length=4000,least_radius=10,is_rod=False)).model_dump(mode="json")
     data["output"]={"write_results_json":write}
     path=tmp_path/"c.json"; path.write_text(json.dumps(data),encoding="utf-8")
-    p=subprocess.run([sys.executable,"-m","src.steel_design.run",str(path),"--sections",
+    p=subprocess.run([sys.executable,"-m","steel_design.run",str(path),"--sections",
         str(ROOT/"data/sections.xlsx"),"--results-dir",str(tmp_path/"r")],cwd=ROOT,
         capture_output=True,text=True,encoding="utf-8")
     assert p.returncode==0,p.stderr
