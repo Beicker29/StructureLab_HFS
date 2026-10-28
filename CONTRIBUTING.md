@@ -77,6 +77,15 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-022R añade `tests/test_hfs022r_review.py` (258 pruebas) a las 2052 previas
+y 12 subpruebas históricas: 2310 pruebas +12 subpruebas, en 17 suites separadas.
+El extra `dev` incluye jsonschema 4.26.0 con constraints para verificar los diez
+esquemas congelados mediante Draft 2020-12, además de las guardas Python.
+No se instala en consumidores runtime. El verificador común ejecuta la nueva
+suite con wheel y editable, ambas desde fuera del checkout; conserva separadas
+la suite original, caracterización y todas las regresiones anteriores.
+[Decisión y evidencia reproducible](docs/audit/hfs022/architecture-review/report.md).
+
 HFS-022 añade `tests/test_hfs022_contracts.py` como suite separada, conservando
 las 1819 pruebas previas y las 12 subpruebas históricas. El verificador común
 copia esquemas y el fixture histórico completo a la carpeta externa de pruebas;

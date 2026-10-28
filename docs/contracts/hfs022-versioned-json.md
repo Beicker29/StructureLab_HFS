@@ -1,13 +1,14 @@
 # HFS-022 — Contratos JSON optativos, versión 1.0
 
-Estado: implementación para revisión independiente; cierre condicionado a CI
-remota Windows/Ubuntu sobre la publicación final. No certificación AISC.
-Base `main c91e55d5a194dfb8e80777d9e41efa1ee4b7fe02`.
+Estado: base HFS-022 aprobada `main bae64633751ae96bd9780ce626045f2da0c66cc9`,
+CI 40777094705 SUCCESS Windows/Ubuntu. Suplemento HFS-022R para revisión;
+cierre de este suplemento condicionado a CI sobre su publicación final.
+No certificación AISC. Base histórica de implementación HFS-022: `c91e55d5`.
 
 ## Diagnóstico y decisión
 
 El JSON vigente no tiene versión de transporte. `SteelCase` valida entradas;
-`execution` prepara casos/bundles; los modelos de salida tienen serializadores,
+`preparation` prepara casos/bundles (`execution` conserva reexports); los modelos de salida tienen serializadores,
 campos calculados y un agregador que puede sustituir un `status` recibido.
 Pydantic permite ignorar extras en salidas. Leerlas directamente no comprueba
 que el estado, `known_failures`, `complete` o `display` declarados coincidan.
@@ -54,7 +55,7 @@ El payload vacío anterior es ilustrativo, no un resultado válido.
 | kind | payload devuelto | Autoridad / alcance |
 |---|---|---|
 | `case_input` | `SteelCase` | Campos, defaults, restricciones y enums canónicos; validación local y `domain.validation.validate_case` |
-| `case_bundle` | `dict[str, Any]` | Fragmentos originales, `cases` y opciones; merge/validación local por `execution.prepare_cases`, guardas de caso compartidas |
+| `case_bundle` | `dict[str, Any]` | Fragmentos originales, `cases` y opciones; merge/validación local por `preparation.prepare_cases`, disponible también en `execution`, guardas de caso compartidas |
 | `coverage_report` | `CoverageReport` | Plan/evidencia, incluyendo `CoverageObligation` y `ExecutedEvaluation`; no se reconstruye un plan |
 | `check_result` | `CheckResult` | Valores originales y decisión, unidades, details, diagnóstico y display canónicos |
 | `engine_result` | `EngineResult` | Checks completos, cobertura, estado agregado y fallos conocidos |
@@ -228,7 +229,45 @@ EffectiveSteelCase en `$defs`; las validaciones posteriores al merge necesitan
 Python. Tampoco JSON Schema expresa todas las relaciones de modelos,
 integridad de índices o comparación de campos derivados. Un validador genérico
 de JSON Schema no sustituye `validate_document`. No se añade otra dependencia
-de validación ni un segundo sistema de reglas.
+de validación runtime ni un segundo sistema de reglas.
+
+## Suplemento HFS-022R: frontera e interoperabilidad
+
+`preparation.py` reúne OutputOptions, merge_case_payload, extract_output_options,
+validate_bundle_shape y prepare_cases, sin modificar sus cuerpos. Las rutas de
+`execution` y fachadas comprometidas de `run` conservan los mismos objetos y
+firmas; no se promueve otra API de cálculo. `contracts` importa preparación,
+modelos y validación de dominio directamente, sin cargar ejecución, motor,
+repositorio, router, reglas o presentación. La validación de dominio mantiene
+su import de `axial_calc.NORMATIVE_E_MPA`; no se invocan sus cálculos ni se
+duplica esa constante para simplificar el grafo.
+
+`jsonschema==4.26.0` es exclusivamente una herramienta del extra `dev`, con
+transitivas fijadas. La suite `tests/test_hfs022r_review.py` aplica
+`Draft202012Validator` a los diez archivos congelados, tanto validation como
+serialization. Comprueba dialecto, referencias, tipos, campos obligatorios,
+extras, enums, null y documentos completos. No fue necesario cambiar los
+esquemas ni la versión 1.0.
+
+Python conserva relaciones entre campos, merge efectivo de bundles, bloqueos
+de método, exactitud de enteros convertidos a float, coherencia de DCR/display,
+estados y enlaces de cobertura. JSON Schema considera `0.0` un número entero;
+la lectura Python estricta de índices exige la representación entera. No se
+edita el esquema para simular una distinción que su sistema de tipos no hace.
+Los mapas dinámicos siguen siendo JSON opaco, no trazas normativas acreditadas.
+
+Se precisan rutas de errores sin cambiar aceptación, códigos ni causas:
+`/payload/checks/0/dcr`, `/payload/coverage/executions/1/check_index`,
+`/payload/coverage/obligations/0/accepted_checks` y `/payload/known_failures`,
+por ejemplo. Para salidas independientes la raíz es `/payload`. Las ubicaciones
+Pydantic/de dominio se proyectan desde el diagnóstico original y este permanece
+en `__cause__`; sin localización se conserva la del objeto, sin inventar un campo.
+En bundles `/payload/cases/i/...` identifica el **caso efectivo**: el valor puede
+proceder de la base común y no existir literalmente en el override. Una forma
+inválida de `cases` apunta a su posición original. Validación optativa examina
+todos los casos; `iter_executions` mantiene el orden y la preparación perezosa.
+
+Reproducción, costos de compatibilidad y riesgos: [suplemento de revisión](../audit/hfs022/architecture-review/report.md).
 
 Inventario, consumidores, eliminación de copias y evidencia real:
 [informe](../audit/hfs022/report.md), [inventario](../audit/hfs022/inventory.md).

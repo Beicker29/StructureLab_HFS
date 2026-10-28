@@ -1,5 +1,28 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-022R: preparación común, sin dependencia de ejecución
+
+Propietario vigente de `OutputOptions`, `merge_case_payload`,
+`extract_output_options`, `validate_bundle_shape` y `prepare_cases`:
+`steel_design.preparation`. Los cuerpos se trasladan juntos sin cambios AST;
+se retiran sus definiciones en execution, que conserva reexports por identidad.
+Consumidores: contracts, execution y fachadas comprometidas de run; no hay
+otro merge, validador de SteelCase ni wrappers nuevos. Las notas HFS-022/021B
+inferiores describen los propietarios históricos de sus respectivas entregas.
+
+Modelos/input_contracts y domain.validation conservan tipos y guardas;
+contracts conserva transporte, integridad, migración y generación. `_strip_derived`
+reutiliza los metadatos Pydantic existentes y no elimina nombres parecidos de
+JSON dinámico. `_validation_path` traduce ubicaciones, sin inferir reglas.
+CheckResult.from_values, EngineResult.aggregate y CoverageReport.complete
+permanecen intactos como autoridades de decisión y agregación.
+
+El validador Draft 2020-12 es una herramienta independiente de pruebas, no
+otro motor productivo. Sus versiones directas pertenecen al extra dev y sus
+transitivas a constraints; el verificador reutiliza esos requisitos al preparar
+los entornos de pruebas. No se copian restricciones semánticas en esquemas.
+[Decisión, consumidores y verificación](../audit/hfs022/architecture-review/report.md).
+
 ## HFS-022: contratos optativos sin otro modelo de ingeniería
 
 `steel_design.contracts` posee únicamente versión/envoltura, integridad de
