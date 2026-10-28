@@ -36,11 +36,48 @@ docs/aisc_360_22_traceability.md Matriz de trazabilidad normativa
 
 ## Instalacion
 
-```bash
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
+HFS-020 conserva el import histórico `src.steel_design` como espacio de nombres
+PEP 420. Se requiere Python 3.12 o posterior; la verificación local de esta
+entrega usa Windows y Python 3.12.10. Ubuntu está configurado en CI y pendiente
+de una ejecución remota comprobada. No se requiere interfaz gráfica.
+
+Desde la raíz del proyecto:
+
+```powershell
+python -m venv .venv/hfs
+.\.venv\hfs\Scripts\python.exe -m pip install .
 ```
+
+Para desarrollo y reproducción de la resolución de dependencias auditada:
+
+```powershell
+.\.venv\hfs\Scripts\python.exe -m pip install -c requirements/ci-constraints.txt ".[dev]"
+.\.venv\hfs\Scripts\python.exe -m build
+.\.venv\hfs\Scripts\python.exe -m ruff check .
+```
+
+`pyproject.toml` es la fuente de dependencias de ejecución/desarrollo.
+`requirements.txt` conserva el comando de instalación anterior desde la raíz,
+delegando al proyecto. Los límites mínimos reflejan las versiones verificadas;
+el archivo de constraints fija también las dependencias transitivas de auditoría.
+El wheel y el sdist no contienen el Excel, PDFs normativos, ejemplos, pruebas
+ni evidencias históricas. No hay publicación automática en PyPI.
+
+Una vez instalado, desde cualquier directorio, con rutas propias de entrada,
+catálogo y salida:
+
+```powershell
+structurelab-hfs C:/casos/w_shape_case.json --sections C:/catalogos/sections.xlsx --results-dir C:/salidas/hfs
+python -m src.steel_design.run C:/casos/w_shape_case.json --sections C:/catalogos/sections.xlsx --results-dir C:/salidas/hfs
+```
+
+Activar el entorno instalado o usar la ruta completa a sus ejecutables. El
+catálogo Excel sigue siendo un **recurso externo** administrado por el consumidor;
+el programa no lo busca dentro del paquete ni descarga una copia. El default
+histórico `data/sections.xlsx` sigue relativo al directorio de ejecución: fuera
+del checkout se debe proporcionar `--sections`. Si falta, CLI informa un error
+de carga con exit 1. Ni instalación ni CI acreditan la validez normativa del
+catálogo o del motor. Véase el [informe HFS-020](docs/audit/hfs020/report.md).
 
 ## Contratos de entrada (HFS-011)
 

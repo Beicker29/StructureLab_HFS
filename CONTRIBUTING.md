@@ -10,6 +10,44 @@ Una propuesta DRY debe nombrar las copias, explicar qué concepto comparten, ide
 
 ## Entorno reproducible
 
+HFS-020 añade instalación/build/CI sin migrar el namespace `src.steel_design`.
+Para la resolución actual de herramientas y runtime, desde el checkout:
+
+```powershell
+python -m venv .venv/hfs-dev
+.\.venv\hfs-dev\Scripts\python.exe -m pip install -c requirements/ci-constraints.txt ".[dev]"
+.\.venv\hfs-dev\Scripts\python.exe -m ruff check .
+.\.venv\hfs-dev\Scripts\python.exe scripts/verify_hfs020.py --out .venv/hfs020-new
+```
+
+El verificador exige una salida nueva, construye sdist y wheel desde ese sdist,
+inspecciona contenido, ejecuta `twine check --strict`, crea dos entornos limpios
+y prueba `pip install .` y wheel. Copia solo tests/entradas y utilidades de
+captura a una carpeta temporal **fuera del checkout**, nunca `src`. Allí ejecuta
+las once suites por separado, los 12 ejemplos y los 24 recorridos CLI/memoria.
+Comprueba imports en `site-packages`, ambos comandos CLI y catálogo externo.
+Requiere acceso a PyPI; conserva logs también cuando falla y no borra la carpeta
+temporal, cuya ruta queda en `environment.json`. No ejecutar limpiezas de ella
+sin verificar primero ruta y necesidad de preservar evidencia.
+
+Las once suites históricas no son tests de empaquetado: las verificaciones de
+construcción, archivos y entornos están en `scripts/verify_hfs020.py`. La primera
+suite produce 68 métodos + 12 subpruebas, no 80 métodos; total actual 1661
+aprobadas + 12 subpruebas. No usar `python -m pytest` desde el checkout como única
+prueba de instalación: puede importar los fuentes locales y ocultar un wheel roto.
+
+Ruff aplica E4/E7/E9/F a fuentes, pruebas y scripts actuales, sin formatter ni
+autofix en CI. Las excepciones por archivo corresponden a 51 incidencias
+preexistentes documentadas en el [informe HFS-020](docs/audit/hfs020/report.md).
+No ampliar esas excepciones para ocultar problemas nuevos. Los módulos normativos
+y las expectativas históricas se preservan íntegros en este hito.
+
+El workflow `.github/workflows/ci.yml` usa Windows 2022 y Ubuntu 24.04 con
+Python 3.12.10, herramientas fijadas y el mismo verificador. Fallos de Ubuntu
+no se ignoran. La configuración/validación estática no equivale a una corrida
+remota aprobada: esta entrega no autoriza commit ni push. Los comandos siguientes
+conservan la reproducción histórica anterior a empaquetado.
+
 Desde la raíz, para reproducir el entorno aceptado, usar una carpeta nueva:
 
 ```powershell

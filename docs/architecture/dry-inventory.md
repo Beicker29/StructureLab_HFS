@@ -1,5 +1,26 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## Actualización HFS-020: distribución y verificación instalada
+
+- `pyproject.toml` posee identidad/versión, requisitos directos de runtime/dev,
+  backend, descubrimiento de namespace, entry point y reglas Ruff.
+  `requirements.txt` delega en el proyecto; no mantiene otra lista de runtime.
+- `requirements/ci-constraints.txt` es una resolución fijada de auditoría, no
+  otra definición del alcance de dependencias. Un paquete allí no se instala
+  salvo que lo requiera runtime/dev; las plataformas no ejecutadas no se dan
+  por soportadas. El freeze real acompaña cada verificación.
+- `structurelab-hfs` llama directamente `src.steel_design.run:main`, igual que
+  el comando histórico. No se introduce otro parser, motor ni regla de catálogo.
+  `data/sections.xlsx` permanece externo y canónico, sin copia en la distribución.
+- `scripts/verify_hfs020.py` es el verificador común para desarrollo y CI:
+  construcción/inspección, entornos limpios e imports fuera del checkout, once
+  suites separadas y regresión de ejemplos/CLI. Reutiliza utilidades de captura
+  históricas sin copiar código productivo a la carpeta externa.
+
+No cambian responsabilidades normativas, geométricas ni de resultados. La
+distribución preserva íntegros los fuentes; no hay migración general de imports.
+[Evidencia, limitaciones y deuda Ruff](../audit/hfs020/report.md).
+
 ## Actualización HFS-017: método y factores por disposición
 
 - **DRY-21 / contrato de método:** `design_methods.DesignMethod` es el enum único,
