@@ -1,0 +1,12 @@
+{
+  "command": [
+    ".venv/20tools/Scripts/python.exe",
+    "-m",
+    "ruff",
+    "check",
+    "."
+  ],
+  "returncode": 0,
+  "stdout": "All checks passed!\n",
+  "stderr": ""
+}

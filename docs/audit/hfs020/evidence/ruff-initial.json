@@ -1,0 +1,1067 @@
+[
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 40,
+      "row": 21
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\audit_hfs017_probes.py",
+    "fix": null,
+    "location": {
+      "column": 39,
+      "row": 21
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 21,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 12,
+      "row": 10
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 11
+          },
+          "location": {
+            "column": 1,
+            "row": 10
+          }
+        }
+      ],
+      "message": "Remove unused import: `math`"
+    },
+    "location": {
+      "column": 8,
+      "row": 10
+    },
+    "message": "`math` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 10,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 49,
+      "row": 19
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 48,
+      "row": 19
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 19,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 31,
+      "row": 21
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 30,
+      "row": 21
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 21,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 13,
+      "row": 26
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 12,
+      "row": 26
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 26,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 14,
+      "row": 48
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 48
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 48,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 24,
+      "row": 107
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 23,
+      "row": 107
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 107,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 78,
+      "row": 113
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 77,
+      "row": 113
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 113,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 33,
+      "row": 121
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 32,
+      "row": 121
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 121,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 70,
+      "row": 122
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 69,
+      "row": 122
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 122,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 31,
+      "row": 128
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 30,
+      "row": 128
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 128,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 51,
+      "row": 128
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 50,
+      "row": 128
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 128,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 70,
+      "row": 131
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 69,
+      "row": 131
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 131,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 33,
+      "row": 136
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 32,
+      "row": 136
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 136,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 62,
+      "row": 147
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 61,
+      "row": 147
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 147,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 80,
+      "row": 159
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 79,
+      "row": 159
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 159,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 26,
+      "row": 161
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 25,
+      "row": 161
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 161,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E731",
+    "end_location": {
+      "column": 60,
+      "row": 162
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs015.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "def load(p):\r\n        return json.loads(p.read_text(encoding='utf-8'))",
+          "end_location": {
+            "column": 60,
+            "row": 162
+          },
+          "location": {
+            "column": 5,
+            "row": 162
+          }
+        }
+      ],
+      "message": "Rewrite `load` as a `def`"
+    },
+    "location": {
+      "column": 5,
+      "row": 162
+    },
+    "message": "Do not assign a `lambda` expression, use a `def`",
+    "name": "lambda-assignment",
+    "noqa_row": 162,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/lambda-assignment"
+  },
+  {
+    "cell": null,
+    "code": "E731",
+    "end_location": {
+      "column": 66,
+      "row": 39
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs017.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "def read(p):\n        return json.loads(Path(p).read_text(encoding=\"utf-8\"))",
+          "end_location": {
+            "column": 66,
+            "row": 39
+          },
+          "location": {
+            "column": 5,
+            "row": 39
+          }
+        }
+      ],
+      "message": "Rewrite `read` as a `def`"
+    },
+    "location": {
+      "column": 5,
+      "row": 39
+    },
+    "message": "Do not assign a `lambda` expression, use a `def`",
+    "name": "lambda-assignment",
+    "noqa_row": 39,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/lambda-assignment"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 24,
+      "row": 41
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\compare_hfs017.py",
+    "fix": null,
+    "location": {
+      "column": 23,
+      "row": 41
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 41,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 17,
+      "row": 8
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\probe_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 16,
+      "row": 8
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 8,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 54,
+      "row": 10
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\probe_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 10
+    },
+    "message": "Module level import not at top of file",
+    "name": "module-import-not-at-top-of-file",
+    "noqa_row": 10,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 46,
+      "row": 11
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\probe_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 11
+    },
+    "message": "Module level import not at top of file",
+    "name": "module-import-not-at-top-of-file",
+    "noqa_row": 11,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 53,
+      "row": 12
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\probe_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 12
+    },
+    "message": "Module level import not at top of file",
+    "name": "module-import-not-at-top-of-file",
+    "noqa_row": 12,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 67,
+      "row": 13
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\probe_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 13
+    },
+    "message": "Module level import not at top of file",
+    "name": "module-import-not-at-top-of-file",
+    "noqa_row": 13,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 85,
+      "row": 14
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\probe_hfs015.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 14
+    },
+    "message": "Module level import not at top of file",
+    "name": "module-import-not-at-top-of-file",
+    "noqa_row": 14,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 65,
+      "row": 21
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\verify_hfs015_scope.py",
+    "fix": null,
+    "location": {
+      "column": 64,
+      "row": 21
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 21,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 26,
+      "row": 46
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\verify_hfs015_scope.py",
+    "fix": null,
+    "location": {
+      "column": 25,
+      "row": 46
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 46,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 40,
+      "row": 63
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\verify_hfs015_scope.py",
+    "fix": null,
+    "location": {
+      "column": 39,
+      "row": 63
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 63,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 39,
+      "row": 68
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\verify_hfs015_scope.py",
+    "fix": null,
+    "location": {
+      "column": 38,
+      "row": 68
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 68,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 42,
+      "row": 69
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\scripts\\verify_hfs015_scope.py",
+    "fix": null,
+    "location": {
+      "column": 41,
+      "row": 69
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 69,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "F841",
+    "end_location": {
+      "column": 22,
+      "row": 726
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\src\\steel_design\\domain\\rules\\composite_rules.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 727
+          },
+          "location": {
+            "column": 1,
+            "row": 726
+          }
+        }
+      ],
+      "message": "Remove assignment to unused variable `state_low`"
+    },
+    "location": {
+      "column": 13,
+      "row": 726
+    },
+    "message": "Local variable `state_low` is assigned to but never used",
+    "name": "unused-variable",
+    "noqa_row": 726,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-variable"
+  },
+  {
+    "cell": null,
+    "code": "F841",
+    "end_location": {
+      "column": 10,
+      "row": 738
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\src\\steel_design\\domain\\rules\\composite_rules.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 13,
+            "row": 738
+          },
+          "location": {
+            "column": 5,
+            "row": 738
+          }
+        }
+      ],
+      "message": "Remove assignment to unused variable `parts`"
+    },
+    "location": {
+      "column": 5,
+      "row": 738
+    },
+    "message": "Local variable `parts` is assigned to but never used",
+    "name": "unused-variable",
+    "noqa_row": 738,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-variable"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 59,
+      "row": 17
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs014_summary_bundle.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from src.steel_design.models import CheckResult",
+          "end_location": {
+            "column": 59,
+            "row": 17
+          },
+          "location": {
+            "column": 1,
+            "row": 17
+          }
+        }
+      ],
+      "message": "Remove unused import: `src.steel_design.models.SteelCase`"
+    },
+    "location": {
+      "column": 50,
+      "row": 17
+    },
+    "message": "`src.steel_design.models.SteelCase` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 17,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 34,
+      "row": 186
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs014_summary_bundle.py",
+    "fix": null,
+    "location": {
+      "column": 33,
+      "row": 186
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 186,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 23,
+      "row": 70
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 22,
+      "row": 70
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 70,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 24,
+      "row": 80
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 23,
+      "row": 80
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 80,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 24,
+      "row": 86
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 23,
+      "row": 86
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 86,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 10,
+      "row": 87
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 87
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 87,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 23,
+      "row": 135
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 22,
+      "row": 135
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 135,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E701",
+    "end_location": {
+      "column": 41,
+      "row": 246
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 40,
+      "row": 246
+    },
+    "message": "Multiple statements on one line (colon)",
+    "name": "multiple-statements-on-one-line-colon",
+    "noqa_row": 246,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-colon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 28,
+      "row": 288
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs015_precision_advice.py",
+    "fix": null,
+    "location": {
+      "column": 27,
+      "row": 288
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 288,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 30,
+      "row": 106
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 29,
+      "row": 106
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 106,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 20,
+      "row": 113
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 19,
+      "row": 113
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 113,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 20,
+      "row": 173
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 19,
+      "row": 173
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 173,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 20,
+      "row": 184
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 19,
+      "row": 184
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 184,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 33,
+      "row": 184
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 32,
+      "row": 184
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 184,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 48,
+      "row": 184
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 47,
+      "row": 184
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 184,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 63,
+      "row": 184
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 62,
+      "row": 184
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 184,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 30,
+      "row": 194
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 29,
+      "row": 194
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 194,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  },
+  {
+    "cell": null,
+    "code": "E702",
+    "end_location": {
+      "column": 33,
+      "row": 207
+    },
+    "filename": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\test_hfs017_design_method.py",
+    "fix": null,
+    "location": {
+      "column": 32,
+      "row": 207
+    },
+    "message": "Multiple statements on one line (semicolon)",
+    "name": "multiple-statements-on-one-line-semicolon",
+    "noqa_row": 207,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-statements-on-one-line-semicolon"
+  }
+]

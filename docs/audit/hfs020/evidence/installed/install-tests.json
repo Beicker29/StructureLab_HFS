@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pip",
+    "install",
+    "-c",
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\requirements\\ci-constraints.txt",
+    "pytest==9.1.1"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\empty",
+  "returncode": 0,
+  "stdout": "Collecting pytest==9.1.1\n  Using cached pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)\nCollecting colorama>=0.4 (from pytest==9.1.1)\n  Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)\nCollecting iniconfig>=1.0.1 (from pytest==9.1.1)\n  Using cached iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)\nCollecting packaging>=22 (from pytest==9.1.1)\n  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)\nCollecting pluggy<2,>=1.5 (from pytest==9.1.1)\n  Using cached pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)\nCollecting pygments>=2.7.2 (from pytest==9.1.1)\n  Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)\nUsing cached pytest-9.1.1-py3-none-any.whl (386 kB)\nUsing cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)\nUsing cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)\nUsing cached packaging-26.3-py3-none-any.whl (129 kB)\nUsing cached pluggy-1.7.0-py3-none-any.whl (27 kB)\nUsing cached pygments-2.21.0-py3-none-any.whl (1.3 MB)\nInstalling collected packages: pygments, pluggy, packaging, iniconfig, colorama, pytest\nSuccessfully installed colorama-0.4.6 iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.1.1\n",
+  "stderr": "\n[notice] A new release of pip is available: 25.0.1 -> 26.2.2\n[notice] To update, run: C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\wheel\\Scripts\\python.exe -m pip install --upgrade pip\n"
+}

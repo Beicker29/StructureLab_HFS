@@ -1,5 +1,11 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**HFS-020 (2026-10-27), base main `8af8e43`:** empaquetado del namespace
+`src.steel_design`, CLI instalado con catálogo externo, Ruff acotado y workflow
+Windows/Ubuntu. [Informe y evidencia](audit/hfs020/report.md). Verificación local
+Windows y revisión técnica; ejecución remota GitHub Actions/Ubuntu pendiente,
+sin commit/push. No se adelantan HFS-021/022/039/040.
+
 **Entrega HFS-017 (2026-10-27), base main `7234df8`:** guardas transversales de
 método, bloqueos F/I directos y rechazo de fallbacks desconocidos; F-43 y
 acreditaciones HFS-010 conservados. Once suites: 1661 aprobadas + 12 subpruebas;
@@ -177,7 +183,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Implementada para revisión: constructor único sin redondeo, trazas originales, no finitos diagnosticados, recomendaciones D1/E2 y migración HFS-014. Diez suites; [informe](audit/hfs015/report.md). |
 | HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. Implementación entregada para revisión: [contrato](contracts/hfs016-catalog.md) e [informe](audit/hfs016/report.md). Alcance integral sigue HFS-040; no autoriza avance de fase. |
 | HFS-017 | 1, implementada para revisión | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014,015 | Guardas canónicas en motor/router/reglas/evaluadores; F/I ASD bloqueados, conversores sin fallback desconocido, factores por disposición, F-43 preservado. Once suites sin regresiones; [evidencia](audit/hfs017/report.md). No habilita nuevos dominios ASD. |
-| HFS-020 | 2 | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Wheel limpio, `pip install .`, CLI y pruebas funcionan fuera del checkout. |
+| HFS-020 | 2, implementación para revisión | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Namespace preservado, wheel/sdist inspeccionados, instalación de proyecto/wheel y once suites fuera del checkout; catálogo externo. [Evidencia](audit/hfs020/report.md). Workflow validado estáticamente; primera ejecución remota y Ubuntu pendientes, sin publicación. |
 | HFS-021 | 2 | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Web y CLI futuros utilizan la misma ejecución; no hay lógica duplicada. |
 | HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021 | JSON round-trip, migración explícita y esquemas generados reproducibles. |
 | HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |

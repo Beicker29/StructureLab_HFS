@@ -1,0 +1,10 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-050u7yla\\project\\Scripts\\structurelab-hfs.exe",
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-050u7yla\\inputs\\examples\\w_shape_case.json"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-050u7yla\\empty",
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "{\n  \"error\": {\n    \"type\": \"FileNotFoundError\",\n    \"message\": \"[Errno 2] No such file or directory: 'data\\\\\\\\sections.xlsx'\",\n    \"stage\": \"load_sections\"\n  }\n}\n"
+}

@@ -1,0 +1,14 @@
+{
+  "pyproject.toml": "98becd8cf73f80d03651fcd5b525b6d164e8e01fe23da05b7cc123d494dbb3e0",
+  "MANIFEST.in": "e190f3c01e62b4c86bc15801c48174dcdcfe0da73db5f983916703e9552c13e8",
+  "requirements.txt": "5251c8f18e8b7e767edc188bc1d69d0d3b8feb33e292d5ac376341dd177a013b",
+  "requirements/ci-constraints.txt": "16b6f1af5b443f0aaed351787d3859e2db317abb8436bdf7250dd96bcb0d4ae5",
+  ".github/workflows/ci.yml": "5c632237df6892bf4d55c554b7f8781203ace4ae0114671af66e1e033a735637",
+  "scripts/verify_hfs020.py": "09ad513ec2f0326e3279aab7bc1983ee04a6b3e11159b46e6317988b5827ab8a",
+  "README.md": "38a657ceca479d744908f0453d43837fb0f521ffe83c976fb46ea0d77fe7b687",
+  "CONTRIBUTING.md": "5ffa15a3dfdf85c2352fed973546b35263f92dbd21753b3e2582d179976cbe65",
+  "docs/ROADMAP.md": "4f14ecdb619f8b9f46a3266326d9936a645a20215f846a4ab6a94a7d18b3360b",
+  "docs/architecture/dry-inventory.md": "bfaf36a65921359f1a2b1b80894c50d0e1835242a82154a330c04ba739475834",
+  "docs/audit/hfs020/report.md": "0bb5a55bef01e755406f82b90f0f455b8ae1ef2cfb9f61d13a637c8102b58d0e",
+  "docs/audit/hfs020/changed-files.md": "60e795e940bad4f36d1eb8873e0fa1c6db06288504953316def47cc04c173696"
+}

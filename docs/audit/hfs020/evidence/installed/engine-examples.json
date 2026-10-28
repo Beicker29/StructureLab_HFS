@@ -1,0 +1,12 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\wheel\\Scripts\\python.exe",
+    "-c",
+    "import sys; sys.path.insert(0,'scripts'); from pathlib import Path; from audit_baseline import engine_snapshot,write_json; catalog,results=engine_snapshot(Path.cwd()); write_json(Path(sys.argv[1]),results)",
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\20v2\\engine-results.json"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\inputs",
+  "returncode": 0,
+  "stdout": "",
+  "stderr": ""
+}

@@ -1,0 +1,22 @@
+{
+  "head": "8af8e435812bfeff23d921c2aa4c860ca98ef4dd",
+  "branch": "main",
+  "no_commit_push": true,
+  "local_links_checked": 111,
+  "git_diff_check_exit": 0,
+  "source_test_input_files_preserved": 67,
+  "source_changes": 0,
+  "suites": 11,
+  "passed": 1661,
+  "original_subtests": 12,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "xfail": 0,
+  "examples_identical": 12,
+  "cli_memory_scenarios_identical": 24,
+  "platform_verified": "Windows/Python 3.12.10",
+  "github_actions_execution": "not run: no commit/push",
+  "ubuntu_execution": "not run: WSL unavailable",
+  "workflow_static_validation": "actionlint 1.7.12 exit 0"
+}

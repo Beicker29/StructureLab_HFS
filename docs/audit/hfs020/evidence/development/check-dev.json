@@ -1,0 +1,12 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\20dev\\Scripts\\python.exe",
+    "-m",
+    "pip",
+    "check"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": "No broken requirements found.\n",
+  "stderr": ""
+}

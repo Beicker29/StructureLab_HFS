@@ -1,0 +1,8 @@
+{
+  "engine_examples": 12,
+  "cli_scenarios": 24,
+  "structural_differences": 0,
+  "all_identical": true,
+  "project_wheel_module_console_identical": true,
+  "normalization": "Only the historical audit_baseline.normalize volatile path/timestamp fields"
+}

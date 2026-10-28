@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-ra",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_hfs010_coverage.py",
+    "--junitxml=C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\20v2\\pytest-test_hfs010_coverage.xml",
+    "--basetemp=C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\tmp\\test_hfs010_coverage"
+  ],
+  "cwd": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-vwq08njx\\inputs",
+  "returncode": 0,
+  "stdout": ".........................................................                [100%]\n57 passed in 6.43s\n",
+  "stderr": ""
+}

@@ -1,0 +1,9 @@
+{
+  "command": [
+    ".venv/20actionlint/bin/actionlint.exe",
+    ".github/workflows/ci.yml"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": ""
+}
