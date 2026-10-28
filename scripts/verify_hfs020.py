@@ -18,6 +18,8 @@ import venv
 import zipfile
 import xml.etree.ElementTree as ET
 
+from hfs020_comparison import (assert_json_equal, compare_cli_records, parse_json,
+                              verify_input_provenance, versioned_examples)
 
 ROOT = Path(__file__).resolve().parents[1]
 SUITES = [
@@ -26,6 +28,7 @@ SUITES = [
     "test_hfs012_flexure_selection", "test_hfs013_directional_h3",
     "test_hfs013_design_method", "test_hfs014_summary_bundle",
     "test_hfs015_precision_advice", "test_hfs017_design_method",
+    "test_hfs020_comparison",
 ]
 
 
@@ -106,10 +109,22 @@ def verify(args):
         for path in (ROOT / folder).glob(pattern):
             shutil.copyfile(path, inputs / folder / path.name)
     (inputs / "scripts").mkdir()
-    for name in ("audit_baseline.py", "audit_hfs014_cli.py"):
+    for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
     write(out / "external-inputs.json", {p.relative_to(inputs).as_posix(): digest(p)
           for p in inputs.rglob("*") if p.is_file()})
+    expected_cli = parse_json((ROOT / "docs/audit/hfs017/evidence/cli/after.json").read_bytes())
+    reference = parse_json((ROOT / "docs/audit/hfs020/compatibility/input-reference.json").read_bytes())
+
+    def input_proof():
+        return verify_input_provenance(
+            versioned_examples(ROOT),
+            {p.name: p.read_bytes() for p in (ROOT / "examples").glob("*.json")},
+            {p.name: p.read_bytes() for p in (inputs / "examples").glob("*.json")},
+            reference["files"], expected_cli)
+
+    provenance = input_proof()
+    write(out / "input-provenance.json", provenance)
     empty = work / "empty"
     empty.mkdir()
     (work / "tmp").mkdir()
@@ -165,19 +180,15 @@ def verify(args):
         "write_json(Path(sys.argv[1]),results)"
     )
     run("engine-examples", [executable, "-c", engine_code, out / "engine-results.json"], inputs)
-    expected_engine = json.loads((ROOT / "docs/audit/hfs017/evidence/after/engine-results.json").read_text(encoding="utf-8"))
-    assert json.loads((out / "engine-results.json").read_text(encoding="utf-8")) == expected_engine
+    expected_engine = parse_json((ROOT / "docs/audit/hfs017/evidence/after/engine-results.json").read_bytes())
+    assert_json_equal(parse_json((out / "engine-results.json").read_bytes()), expected_engine, "engine results changed")
     cli_out = work / "cli"
     run("cli-examples", [executable, inputs / "scripts/audit_hfs014_cli.py", inputs, cli_out], empty)
     shutil.copyfile(cli_out / "cli-examples.json", out / "cli-examples.json")
-    expected_cli = json.loads((ROOT / "docs/audit/hfs017/evidence/cli/after.json").read_text(encoding="utf-8"))
-    actual_cli = json.loads((out / "cli-examples.json").read_text(encoding="utf-8"))
+    actual_cli = parse_json((out / "cli-examples.json").read_bytes())
     assert len(actual_cli) == len(expected_cli) == 24
-    for key, actual in actual_cli.items():
-        expected = expected_cli[key]
-        for field in ("normalized_cli", "normalized_details", "source_sha256"):
-            assert actual[field] == expected[field], (key, field)
-        assert actual["execution"]["returncode"] == expected["execution"]["returncode"]
+    assert input_proof() == provenance, "Input bytes changed during execution"
+    compare_cli_records(actual_cli, expected_cli, provenance)
     write(out / "verification.json", {"accepted": True, "suites": summary,
           "examples_identical": 12, "cli_memory_scenarios_identical": 24,
           "external_work": str(work), "production_source_copied": False,
