@@ -1,6 +1,21 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
-**HFS-021A (2026-10-28), base main `39a7614`:** migración a `steel_design`
+**HFS-021A aprobado y cerrado (2026-10-28):** paquete `steel_design`,
+distribución 0.2.0. Commit final verificado en main
+`35dd7b8e09f05b8ac77af1ba0b7b735d59456b6a`;
+[CI 40736064324](https://github.com/Beicker29/StructureLab_HFS/actions/runs/40736064324)
+SUCCESS en Windows 2022 y Ubuntu 24.04. Corrección SVG CRLF/LF aceptada;
+referencia local aprobada: **1819 pruebas +12 subpruebas**. El cierre acredita
+el alcance de paquete/API/regresión, no validación normativa AISC. **F-31 sigue
+P0 abierto**, junto con los demás defectos normativos pendientes del seguimiento.
+[Confirmación y tarea HFS-021B](audit/hfs021b/report.md).
+
+**HFS-021B (2026-10-28), para revisión:** política de limpieza incremental e
+[inventario de consumidores](audit/hfs021b/cleanup-inventory.md); retirada
+acotada de dos bindings intermedios de run, preservando las fachadas comprometidas.
+Sin incremento de versión, commit/push ni inicio de HFS-022.
+
+**Registro histórico HFS-021A, base main `39a7614`:** migración a `steel_design`
 con src-layout, versión 0.2.0 y API pública por módulos; rechazo del namespace
 legado para impedir identidades paralelas. [Informe](audit/hfs021a/report.md)
 y [contrato](contracts/hfs021a-public-api.md). Para revisión independiente;
@@ -215,7 +230,8 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-017 | 1, implementada para revisión | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014,015 | Guardas canónicas en motor/router/reglas/evaluadores; F/I ASD bloqueados, conversores sin fallback desconocido, factores por disposición, F-43 preservado. Once suites sin regresiones; [evidencia](audit/hfs017/report.md). No habilita nuevos dominios ASD. |
 | HFS-020 | 2, aprobada por el usuario | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Cierre posterior: workflow 40673575334, commit f3a5198, Windows y Ubuntu SUCCESS. Namespace, wheel/sdist, suites y comparación exacta preservados. [Evidencia histórica](audit/hfs020/report.md), [confirmación posterior](audit/hfs021/preparation.md). No certificación normativa. |
 | HFS-021 | 2, aprobada por el usuario | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Ejecución común y geometría única; 1762 pruebas +12 subpruebas. Run 40687160912 SUCCESS Windows/Ubuntu, commit 39a7614. [Informe histórico](audit/hfs021/report.md). No certificación AISC. |
-| HFS-021A | 2, para revisión; cierre remoto pendiente | Paquete convencional steel_design y API pública mínima | 021 | Distribución 0.2.0 sin paquete src, imports legados rechazados, una identidad de modelos, instalaciones normal/wheel/editable y regresión exacta. [Informe histórico](audit/hfs021a/report.md). Run 40694129771: Windows SUCCESS / Ubuntu FAILURE en SVG. [Suplemento CRLF/LF](audit/hfs021a/ci-fix/report.md); requiere nuevo SUCCESS en ambos jobs. |
+| HFS-021A | 2, aprobada y cerrada | Paquete convencional steel_design y API pública mínima | 021 | Distribución 0.2.0; commit final 35dd7b8; CI 40736064324 SUCCESS Windows 2022/Ubuntu 24.04; corrección SVG aceptada y referencia local 1819 +12 subpruebas. [Cierre verificado](audit/hfs021b/report.md). Se preservan el [informe histórico](audit/hfs021a/report.md), el run fallido 40694129771 y su [corrección](audit/hfs021a/ci-fix/report.md). F-31 P0 y restantes defectos normativos siguen abiertos. |
+| HFS-021B | 2, para revisión | Cierre documental y limpieza incremental controlada | 021A | Política permanente, inventario por símbolo/consumidor y retiro exclusivo de bindings sin contrato ni uso. Fachadas comprometidas conservadas, regresión exacta antes/después, sin cambios normativos ni versión nueva. [Informe](audit/hfs021b/report.md), [inventario](audit/hfs021b/cleanup-inventory.md). |
 | HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021A | JSON round-trip, migración explícita y esquemas generados reproducibles. |
 | HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |
 | HFS-024 | 2 | Trazas de cálculo canónicas y memorias sin inferencia por nombre de cláusula | 022,023 | Variables, unidades, expresiones, fuente y rama normativa recuperables en CLI/JSON/web. |

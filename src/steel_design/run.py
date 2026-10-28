@@ -5,6 +5,7 @@ import sys
 
 from pydantic import ValidationError as PydanticValidationError
 
+from . import execution as _execution
 from .models import SteelCase, finite_json_payload
 from .engine import SteelDesignEngine
 from .sections.models import Section
@@ -13,8 +14,7 @@ from .sections.loader import load_sections_from_excel
 from .sections.repository import SectionRepository
 from .domain.errors import SteelDesignError
 from .execution import (execute_case, iter_executions, execution_status, validate_bundle_shape,
-                        OutputOptions as OutputOptions,
-                        extract_output_options, merge_case_payload)
+                        OutputOptions as OutputOptions)
 from .reporting import export_execution
 from .reporting import _sanitize_filename as _sanitize_filename
 from .reporting import _build_global_summary as _build_global_summary
@@ -31,9 +31,9 @@ from .reporting import _write_i5_interaction_diagram_png as _write_i5_interactio
 from .reporting import _write_detailed_results_file as _write_detailed_results_file
 from .reporting import _build_execution_results_dir as _build_execution_results_dir
 
-# Historical imports are aliases to the common preparation functions.
-_extract_output_options = extract_output_options
-_merge_case_payload = merge_case_payload
+# Historical facades refer directly to their canonical owner.
+_extract_output_options = _execution.extract_output_options
+_merge_case_payload = _execution.merge_case_payload
 
 
 def _unique_json_object(pairs):

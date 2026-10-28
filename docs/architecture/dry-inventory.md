@@ -1,5 +1,28 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-021B: limpieza de bindings y compatibilidad con causa explícita
+
+`execution.extract_output_options` y `execution.merge_case_payload` siguen
+siendo los únicos propietarios. Las fachadas comprometidas de `run`,
+`_extract_output_options` y `_merge_case_payload`, apuntan a ese módulo mediante
+un import privado `_execution`. Se retiran los dos bindings de función
+intermedios sin `_`, sin consumidores ni contrato en run. El import de módulo
+es una referencia al dueño existente, no una capa ni implementación nueva.
+No se retiran funciones ni se duplican cálculos.
+
+Las otras fachadas se conservan por consumidores concretos o por el compromiso
+HFS-021/021A, identificado por símbolo en el
+[inventario HFS-021B](../audit/hfs021b/cleanup-inventory.md). Ser privado no
+equivale a ser público ni a ser eliminable sin análisis. `engine._build_custom_section`
+es usado por el pipeline y las sondas de única construcción; `SteelDesignEngine.run`
+es API pública. Los reexports no son segundas implementaciones.
+
+Retirar helpers legacy de inferencia/capacidad requiere decidir compatibilidad
+y revisar los monkeypatch de T014/T015: algunos apuntan al alias de run,
+mientras las funciones ya ejecutan con globals de reporting. Esa deuda queda
+explícita sin borrar pruebas ni reescribir trazas. Versionado, responsabilidades
+normativas y cobertura permanecen iguales. [Regresión y cierre](../audit/hfs021b/report.md).
+
 ## HFS-021A: una identidad importable y API explícita
 
 - `pyproject.toml` define distribución 0.2.0 y descubrimiento convencional de
