@@ -23,6 +23,7 @@ import xml.etree.ElementTree as ET
 from hfs020_comparison import (assert_json_equal, compare_cli_records, parse_json,
                               verify_input_provenance, versioned_examples)
 from audit_baseline import normalize
+from hfs021a_svg_comparison import assert_svg_equal
 
 ROOT = Path(__file__).resolve().parents[1]
 SUITES = [
@@ -34,6 +35,7 @@ SUITES = [
     "test_hfs020_comparison",
     "test_hfs021_execution",
     "test_hfs021a_public_api",
+    "test_hfs021a_svg_comparison",
 ]
 
 
@@ -127,7 +129,8 @@ def verify(args):
             shutil.copyfile(path, inputs / folder / path.name)
     (inputs / "scripts").mkdir()
     for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py",
-                 "hfs021a_invariants.py", "probe_hfs021a_imports.py"):
+                 "hfs021a_invariants.py", "probe_hfs021a_imports.py",
+                 "hfs021a_svg_comparison.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
     write(out / "external-inputs.json", {p.relative_to(inputs).as_posix(): digest(p)
           for p in inputs.rglob("*") if p.is_file()})
@@ -226,10 +229,12 @@ def verify(args):
     assert len(actual_cli) == len(expected_cli) == 24
     assert input_proof() == provenance, "Input bytes changed during execution"
     compare_cli_records(actual_cli, expected_cli, provenance)
-    # Historical SVG bytes, not regenerated expectations or inferred counts.
+    # Historical references stay intact. Preserve original SVGs even on failure;
+    # only the demonstrated CRLF/LF platform representation may differ.
     graph_proof = {}
     raw_cli = json.loads((out / "cli-examples.json").read_text(encoding="utf-8"))
-    with zipfile.ZipFile(ROOT / "docs/audit/hfs021/evidence/diagrams.zip") as diagrams:
+    with (zipfile.ZipFile(ROOT / "docs/audit/hfs021/evidence/diagrams.zip") as diagrams,
+          zipfile.ZipFile(out / "svg-originals.zip", "w", zipfile.ZIP_DEFLATED) as originals):
         expected_graphs = {n for n in diagrams.namelist() if n.startswith("after/")}
         for label, record in raw_cli.items():
             if record["execution"]["returncode"]:
@@ -241,8 +246,10 @@ def verify(args):
                     continue
                 member = f"after/{label}/case-{index}.svg"
                 data = Path(graph).read_bytes()
-                assert data == diagrams.read(member), member
-                graph_proof[member] = hashlib.sha256(data).hexdigest()
+                reference_svg = diagrams.read(member)
+                originals.writestr(f"generated/{member}", data)
+                originals.writestr(f"reference/{member}", reference_svg)
+                graph_proof[member] = assert_svg_equal(data, reference_svg, member)
         assert set(graph_proof) == expected_graphs
     write(out / "svg-comparison.json", graph_proof)
     write(out / "verification.json", {"accepted": True, "suites": summary,

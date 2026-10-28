@@ -1,0 +1,419 @@
+{
+  "accepted": true,
+  "base": "39a7614a413a06eef78f597e142f7ba0e889c123",
+  "head": "ae5f54bff77288731a487f0195e82f0752cd23a7",
+  "engine_examples_exact": 12,
+  "cli_memory_scenarios_exact": 24,
+  "diagrams_byte_identical": {
+    "composite_encased_case.json/original/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-h5pih8a6\\cli\\artifacts\\03o\\COMPOSITE_ENCASED_CASE\\20261028T165749808879Z\\W\\W14X90__20261028T165749810906Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-0h8012qv\\cli\\artifacts\\03o\\COMPOSITE_ENCASED_CASE\\20261028T170339260218Z\\W\\W14X90__20261028T170339262785Z__I5_METHOD2.svg",
+      "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+      "bytes": 4696,
+      "format": ".svg"
+    },
+    "composite_encased_case.json/detailed/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-h5pih8a6\\cli\\artifacts\\03d\\COMPOSITE_ENCASED_CASE\\20261028T165752035942Z\\W\\W14X90__20261028T165752039954Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-0h8012qv\\cli\\artifacts\\03d\\COMPOSITE_ENCASED_CASE\\20261028T170341393331Z\\W\\W14X90__20261028T170341395982Z__I5_METHOD2.svg",
+      "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+      "bytes": 4696,
+      "format": ".svg"
+    },
+    "composite_filled_circular_hss_case.json/original/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-h5pih8a6\\cli\\artifacts\\04o\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T165754209372Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T165755944464Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-0h8012qv\\cli\\artifacts\\04o\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T170343515943Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T170345181042Z__I5_METHOD2.svg",
+      "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+      "bytes": 4754,
+      "format": ".svg"
+    },
+    "composite_filled_circular_hss_case.json/detailed/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-h5pih8a6\\cli\\artifacts\\04d\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T165758243260Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T165759997485Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-0h8012qv\\cli\\artifacts\\04d\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T170347294434Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T170348930658Z__I5_METHOD2.svg",
+      "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+      "bytes": 4754,
+      "format": ".svg"
+    },
+    "composite_filled_rectangular_hss_case.json/original/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-h5pih8a6\\cli\\artifacts\\05o\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T165802313208Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T165804020067Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-0h8012qv\\cli\\artifacts\\05o\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T170351055475Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T170352722290Z__I5_METHOD2.svg",
+      "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+      "bytes": 4750,
+      "format": ".svg"
+    },
+    "composite_filled_rectangular_hss_case.json/detailed/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-h5pih8a6\\cli\\artifacts\\05d\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T165806206440Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T165807851987Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-0h8012qv\\cli\\artifacts\\05d\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T170354839072Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T170356726023Z__I5_METHOD2.svg",
+      "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+      "bytes": 4750,
+      "format": ".svg"
+    }
+  },
+  "protected_sources": {
+    "data/sections.xlsx": {
+      "comparison": "identical_bytes",
+      "base_sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+      "working_sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359"
+    },
+    "examples/channel_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "2edd774aecf8b10ec0994b8685ca08d3c2bdd89c53aff6182d726e472fd0fc8b",
+      "working_sha256": "7975995559cd44494a8ae17285e938e794a77540fcf99a94bfb1e4c4e939d22e"
+    },
+    "examples/circular_hss_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "f74ec443593a5edeead978e2a0377fb60cd8b13d5dc1b97f7c1de61678728d1a",
+      "working_sha256": "60526793c3e98caf4a56364e103cd174ee5e7f5b230e9a5e0bbc5a8a119f627c"
+    },
+    "examples/composite_beam_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "edbdde077bb972f773b56b26b22236adfa093e5339a7a1f07adc85e44a623e6c",
+      "working_sha256": "cc415da55770b1764af8ea3e5c25c455c5f9ec45718ad51e040e32099889c00e"
+    },
+    "examples/composite_encased_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "8eba869a145d32bc338dcc90f5e2d9f99eeb0b41ba74fdbe967b1ec218608046",
+      "working_sha256": "e32027fd26796ff2e6891e0ec86728021aa1dc66c8ec43374314204ff83c4f42"
+    },
+    "examples/composite_filled_circular_hss_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "2e101c28cf0e509b57a907e9918356cbd83cd5055083708393ecc74b20336c7a",
+      "working_sha256": "930452e7316ddabba81adcd160cd492fdb3206c16d184dfe2727c19b01a87236"
+    },
+    "examples/composite_filled_rectangular_hss_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "8ca53bca1624a66e0b95e5a02af90ca48bf83245a1abeaff37b9c1a044e331ad",
+      "working_sha256": "4418bd2d9d67851aaf2273f46ad91872810c72391f4943e67f0a695e21727553"
+    },
+    "examples/double_angle_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "ff93b7293bc77ae2346551a61b4ad017d0af59a69f342fed61479bfaac3f6f5d",
+      "working_sha256": "8d7a87ef0c09115880bd41655ee817f9b01c889058a6a3ca217bf37e35036101"
+    },
+    "examples/rectangular_hss_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "2b53ee4dd258d5dd6d3df9dde2a2bdff89ff6e8490e74f079b0a6df4658d152d",
+      "working_sha256": "7a7d8a728e469dc581faa1b27dc622b4435498d8bea78d31aea1938ad5b62a78"
+    },
+    "examples/single_angle_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "8daff6794171d72ba86b00e9d02c5c8e7430e78c33b3c8c3750c7db2a9080f83",
+      "working_sha256": "7e33420e1de29d477fdaa67e40ae2cfb8cc682b859a8867ccf58336b6c6b7521"
+    },
+    "examples/solid_circular_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "ff94c94b873e25796400c25096452934a235579ecb2e46d6edf423eb6d3ea5f2",
+      "working_sha256": "d9f1d5412d0ea120f14ddcda2c7abebcad0306137a56b7a5a4d44174278cc8ae"
+    },
+    "examples/solid_rectangular_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "35a4a0f0f095fc9baeeab35aff11db7fd9bbe58b8476bb6d6adb75aa86340389",
+      "working_sha256": "0dc0cd0e7e13f7d1f11073564f72d63e317475c1bc50022c1e498ec2d104dcc9"
+    },
+    "examples/w_shape_case.json": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "0bb7ac9feaa6d0e34abb2f2fffc99222a75a08d0e091e8967b3ad18a09b53bba",
+      "working_sha256": "f30939fcd883654402fa7cbe95143622f7c11c10ad08e09b0a9c3b91c0badd24"
+    },
+    "scripts/hfs020_comparison.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "881c7cb0c5e11ea3e2a4a8d276bf2fc7ccd6d0de8b4765e0f7b82b4c2948c646",
+      "working_sha256": "63665e6b920b065b7cb526881e591a4ba2cac1ce45dbf371ee80c29e429c3441"
+    },
+    "src/steel_design/codes/aisc_360_22/axial_calc.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "e59822fc45dcd160768cfdd8935a6dd6e3e65aed74fc507cf24c7ec728702b01",
+      "working_sha256": "e43b234fbe661cd8667ba8e4cdef7c6775a9691868d887202c9ec673b136bee7"
+    },
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "b837c40030793038f2ec64680f31487ff3de09bd85b496a38a3c85408f99ab27",
+      "working_sha256": "8d908e7d6a4e88cc726ffbf185585aa6e86e30baa49866e6b86f3b8111571385"
+    },
+    "src/steel_design/codes/aisc_360_22/composite_calc.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "56124cd0c876b672b2f2f52b3f9891058e4e6374cec67c8c29d1e7d3ab49beda",
+      "working_sha256": "7d535e0841a3c0194975968ab670c45533afc32f2a39608cd48493c39a4c4eda"
+    },
+    "src/steel_design/codes/aisc_360_22/flexure_calc.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "6b1d48f63cda2bd2e51264f26930cef0701b2ca9b57547ecac1b602756ec23f5",
+      "working_sha256": "e9711631cdd430440e91745aeed226ed4f0ed3b450d9aee25f40ea1adb6ae1c9"
+    },
+    "src/steel_design/codes/aisc_360_22/shear_calc.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "531556057823c5353c703bdb759c0b182b5f7c615489f7a1532b23acc0a5247c",
+      "working_sha256": "404cebeb4f0ec43bc777188a5f6f51fc3902f6e63425922ac99350ed1062c88c"
+    },
+    "src/steel_design/codes/aisc_360_22/tension_calc.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "c286fb79d528e0073951357c289cf196635cdbf9ca3b6a3b8d5170e1285a0f7c",
+      "working_sha256": "6dc9a85d56dd26c773978ed6f7745d4052d7f101807f9044b8445e7bc5d2a6f3"
+    },
+    "src/steel_design/design_methods.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "1429cba447174438bc00e039d1feadcc6248fc3b643201c008c035447e3ca860",
+      "working_sha256": "02a4caeccd900132d46c6876db82ae9054867a60f18565858b7b52e25c4bb26a"
+    },
+    "src/steel_design/domain/actions.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "b11c6ca6d02360dc22327d3728ea0dd9a5d2e15d03c72e781cb25b191685d951",
+      "working_sha256": "b11c6ca6d02360dc22327d3728ea0dd9a5d2e15d03c72e781cb25b191685d951"
+    },
+    "src/steel_design/domain/coverage.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "285d1fd2bd9cec1420e1677be703e76e7fe9ad2fbcd0dd616dead0837f5baae4",
+      "working_sha256": "4f92ab8888bed06413bd5397ba5a27248439ef21c207182b0339268964328d9c"
+    },
+    "src/steel_design/domain/coverage_evidence.py": {
+      "comparison": "full_AST_with_historical_identifier_adapter_only",
+      "base_sha256": "1c2929bfa3be875634fdd5d8a0835cb88cab82382e8d65cb5e09617dbe9ff0af",
+      "working_sha256": "d951a18fe997b4d14acc5103c2dd3060748fa24f8a5103acf1cc9a9ceeae7aba"
+    },
+    "src/steel_design/domain/design_methods.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "0f747012ea757ce54e094cf74757c590c77eaa31c89b790060f49cc3945d2d3c",
+      "working_sha256": "7d0f93041c3a987c3a9dff70fc40b87ac844bc94aab222ed3d09b3a001d7e751"
+    },
+    "src/steel_design/domain/errors.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "9d564e155a4b7437ce8c9d3719b02b0901fc6c0f18b0d5d106de87b15ca07ee1",
+      "working_sha256": "aad71b4b6dd26a753f6b63dfa782f0bfcc86fcd55aa1509c9a60661146ffb791"
+    },
+    "src/steel_design/domain/evaluators/flexure_evaluator.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "c97637d1ea700727142f1142e78834915ca92b0a1a20be262748cd0ff739ea5e",
+      "working_sha256": "0221aa1f97ce62e3e6d7754f6ecf7b9bb96fd75682d3c7d2bdef7fdc75bc380a"
+    },
+    "src/steel_design/domain/evaluators/hss_shear.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "84ec9ae5cdb5c68437f8bc02c33b3e169c61f2688d0dbc22910500df7c7cabad",
+      "working_sha256": "0f707afd014b796546638d417a41d9aa9eb8fdc10c7a9d68ed360ff994a16735"
+    },
+    "src/steel_design/domain/evaluators/tension_evaluator.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "fe84bf0fd06ee7a624b6383a48aef2eb139937988c4a2412893f6bd8bab006d2",
+      "working_sha256": "8092c1bf74e8cc07347657a49c862232e477b1dd3a9b86a4a3f71cf8544c7da1"
+    },
+    "src/steel_design/domain/recommendations.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "0fd88459ef695c004e6546d4ae579b8359859d563211e55c1b11446fb8acf9bf",
+      "working_sha256": "0fd88459ef695c004e6546d4ae579b8359859d563211e55c1b11446fb8acf9bf"
+    },
+    "src/steel_design/domain/routing/profile_router.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "965136d61ecaa31cf752011b960f5f4460c5d5b39b03e321ec5959334468f887",
+      "working_sha256": "222df31874b2ad5abe71366b3b89ce3717d895667255c35722be6602ed3fabd8"
+    },
+    "src/steel_design/domain/rules/axial_rules.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "7e04d7d95409c7bf730aa29ce39cedaa2b448f6455a6359d5e8e85e67c0179ac",
+      "working_sha256": "0449c66fdc0b1b77c4a34930be458c0c32cb7e50c21297589ea26c8aa3843985"
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "6f733dd268ab2030c73fb9d08a3a3fa4d38db490dd87e5609c35417607f6a57d",
+      "working_sha256": "e2450f881154b019ded05a15c701b38690c9849a15e85d7561241ef40cc6fde0"
+    },
+    "src/steel_design/domain/rules/composite_rules.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "264253a04e78e579fe360f352f0ecd56aef564ad1b841e15dc988366580a49bc",
+      "working_sha256": "f4b5ac474ca3104cb5ec52cb1ddafd181b50cc5536da097761eddf864b697a0c"
+    },
+    "src/steel_design/domain/rules/flexure_rule.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "23a1c4bc2c01e368f997d61c80925cf001b41680b993d3b24e6149a002b6e020",
+      "working_sha256": "43f48f6846ad3af64ec65e16183ca1874d49ba6aea9015a1eb6a193c22cf2987"
+    },
+    "src/steel_design/domain/rules/shear_rules.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "f6d36f110eff290d7a72423e45e6f05aeca5aead554462a4ad1c92af7a8281c3",
+      "working_sha256": "3cec1e991e6ab0c5a34733f4d8768a4aea3f541243ba468a39f04e0d74b525c5"
+    },
+    "src/steel_design/domain/rules/tension_rule.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "d44d1149db4b5ebdfa572918469ed00b8ff3a3472c781bddfa614a665ba5bdce",
+      "working_sha256": "1e7d283cd64c1fbcde05fb2709410d8438970978a4549d34403b69b30335183b"
+    },
+    "src/steel_design/domain/validation.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "2ff3f742b6765f99ec040abb556162f6127a25d05cda14f4b5f327ee81ca940d",
+      "working_sha256": "7ae6510d623e736d71f087548754c8901238be91778dc07253ca275572334a29"
+    },
+    "src/steel_design/engine.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "b2bc447fa428817f810fc9e7d4f1390eb50355acabe8dac8e39bcd358ed4ac1a",
+      "working_sha256": "2b39e0caa24ab49c6a5430abecddcd511f04060f49dedcbce8c003d336e66ef3"
+    },
+    "src/steel_design/execution.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "f35ecce9fd3657326a7f6b3462bfb79966dced51ad999138af77569fce8ee257",
+      "working_sha256": "20b121b8ce214c2019dda5729092cd0da7ca72c6b5d62d4be21a52af8e0f3735"
+    },
+    "src/steel_design/input_contracts.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "a3440412b91e3fe76498a37b45023d5f5d1008568e3a83c80c1f7496b6922e84",
+      "working_sha256": "4163d125edcca9d0422941cb5c4d682891728ed2ae82cc45aeaf36eea657e2b1"
+    },
+    "src/steel_design/models.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "262663585a3e6da1770d77c6972658030de138e3b41ac0745c3122314b536d7d",
+      "working_sha256": "24783fa03e01497810772c57f9e9db127db0c9a7f4084908f73cc49b8511d6d4"
+    },
+    "src/steel_design/reporting.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "b809849ddcf8d5c0fed02ea58ec7d7bf2731597328eb22bb97ff6c8ba1e6f25b",
+      "working_sha256": "c514128bbeb2a8f8ad5bb4dfa49c667fdf563215bed3eaf0b2a74cb3626005a8"
+    },
+    "src/steel_design/results_model.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "25a0eecba59479009ae4be308bf537487a9ef5880a15fb9f81167632843428cc",
+      "working_sha256": "916502d55642f4df5ef24252d3ce97c82b98ab078729340da35d0cedd5405bb1"
+    },
+    "src/steel_design/run.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "9e8c1dce45e0fb300889b2620d8a44b9615a8047116e38d99adb265e0ea5aa61",
+      "working_sha256": "273ce9cdc3c34ca799ebf094ca1ec2d32ec2012d8355a29d996d06709098b7cc"
+    },
+    "src/steel_design/sections/geometry.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "333dc812a86fabf5ac418cad30323a5d806f982aaf5c411db4e7bfc04c5b0103",
+      "working_sha256": "17bf78d86203bdbccdbf3f71cd17c554d434d09694d7de6431c4347a378a25d4"
+    },
+    "src/steel_design/sections/identity.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "971f0290496b80af56bf468bb338bd9c9b32ee1000d117ce16469ef51bbe4dfd",
+      "working_sha256": "7973fb48f29bae3f3a2309bce80b89e389120978b52c08ae97a28047257a577c"
+    },
+    "src/steel_design/sections/loader.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "933719f02bb1efe08404f8e4a5eb3733934cf74fcbca0396915d08e856dbe8ed",
+      "working_sha256": "577c2dddb1854b949f9cf7fa917fe3aba09f70785cd5ed94e8e770f59ab2681f"
+    },
+    "src/steel_design/sections/models.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "b66287be0f0cf0e535a40210d9d11d542230e880aee2461cd692ce6acb25234d",
+      "working_sha256": "7dc54fac04b3b57f5a0b53ae54de41a8dc74f8b931c0a64beac8442c70114d4d"
+    },
+    "src/steel_design/sections/repository.py": {
+      "comparison": "identical_bytes_except_checkout_EOL",
+      "base_sha256": "37109c604555a6279e0c5505f1036ba7e6a99580b2867382263aa047f5150212",
+      "working_sha256": "ba008d2075c8e8ced370c3f09a06ff869bdc6adf4012795ce97e3be5231107c7"
+    },
+    "tests/test_chapter_e_rules.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "79be3cee5d16df34ec35b2c4a16322e93c2a00c827cf0aba108f33c54c0c4f88",
+      "working_sha256": "24ad4e8ee2fb386819898119b0d7335491c1adb403a963dd2a0019924a2d827b"
+    },
+    "tests/test_chapter_f_rules.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "70d100db84c272435381956803e9e8e7f61ee8a66f7431d998ea22e55229b108",
+      "working_sha256": "f614e17c8bab284ae9eca30990a093559094b3c74351b918594cf0c057a0d463"
+    },
+    "tests/test_chapter_g_rules.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "821f08c8a924237d93fbb46d58349c0ec4815aba1b9a8f77585df8e8bc638aac",
+      "working_sha256": "99f019a0cd3db199cfd8459592d019af8a2060b933741da1f1fc3a5686a30692"
+    },
+    "tests/test_chapter_h_rules.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "71499d4cefc2c9efbaa9b4ab57eac977ebd62ccaeb58efca56c5f0814501e853",
+      "working_sha256": "622bb4be3cce25fd479e2b3a1a0f40dcdada918a590fffc04db09452ed133900"
+    },
+    "tests/test_chapter_i_rules.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "761b6bbcfd59aed9226ae0284f679f0446d249ef5e52f8db305c737087bf6806",
+      "working_sha256": "04837dec46cb4ebd9cc0c69ec700943d2a6213a1fc14d9279256c302cf15dbce"
+    },
+    "tests/test_custom_solid_sections.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "57d07160745ee555c3c4fe0f1c2e10363ba25cc9ec0b9af5d120aac97c30bc6e",
+      "working_sha256": "879ef00aafb7279f739875aa62338a367329303b1bcae0582504fc762e989fea"
+    },
+    "tests/test_engine_cli_integration.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "a1e14a08413b0980b07b3938233a6e4ed35914988a25d3f8f6fed4948fe59f4a",
+      "working_sha256": "45714fc1c4a5e60a088941162efd50b8f4f22a1f66c5ba2f1eb93c6edbf5b1ef"
+    },
+    "tests/test_examples_smoke.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "eda452d41567f72eb46ade1e993013ad59ae783cf6a8c1229f42ba0a4bccd0e4",
+      "working_sha256": "8d362b03fac4948156ef7b137bf398c1a7b97e1b94510ec74f3d550c39dadcf2"
+    },
+    "tests/test_hfs000_characterization.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "a8a749b70d4b57eb6657f8410326b5d5ad1cf4c854a7857a846b3e753f193aaa",
+      "working_sha256": "8948d2682984bbe754e404a0359f287f53cb4edecee54a79e90b3f989bea4372"
+    },
+    "tests/test_hfs010_coverage.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "847453d1b0b6c438a82337c1aa8669d4311d98d122f0a15a33376f4d2a7dbd25",
+      "working_sha256": "a4ab1c868df326b6e4aa24b990b9551491fb648b3b384d86083093957d0efb73"
+    },
+    "tests/test_hfs011_input_contracts.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "a1035fd2135bdb1f1590d323166c3e3b5ded1fd4d290e97b1e3fb70456c2642f",
+      "working_sha256": "82ea6cbcd0a1b7da605e2c1061dfbd12f59348de09de1cbaf5ba3231e68e74a9"
+    },
+    "tests/test_hfs012_flexure_selection.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "7c29c3757ebe1237b67b9ed316f1fbfe1a1ad3cbf846bb6a36c493e7fe880b91",
+      "working_sha256": "a19b469aaf8ff54bd525f90057d8b6a74f9d3a250ed88494867d7c7dc5e804c2"
+    },
+    "tests/test_hfs013_design_method.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "d5d5f880e8114876b6c72acbb4ee0ba57e179abb37d14ce371d2362bfa11c1b8",
+      "working_sha256": "b8f4826b3dc3b179f9111405730ada6b6944c348bcdcd00a7102e5995df5a8db"
+    },
+    "tests/test_hfs013_directional_h3.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "f75771b343d3124a4dea37dfbafc1b2f65fda932d94b8f1fa621edc605047849",
+      "working_sha256": "8dc43f6e984bd8cc9242dd01be5a24da6fa36e6932a95e3bd8a61746f7a87e7c"
+    },
+    "tests/test_hfs014_summary_bundle.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "6e0c5c3a08baf289ba5831ede4d57b92f560aec251d03feb5303bfaf120a7a17",
+      "working_sha256": "59ff096999f04902314e59f96bdffa8b2797cc5b996222946091ec03c9a68861"
+    },
+    "tests/test_hfs015_precision_advice.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "eb0f660379bb258db7bb1c410aecc4493583532d71d5ae4f4211900808c0ff85",
+      "working_sha256": "b104ccdcf72a476dcb45da7aebe1254241cd2aedaa57577a3c6775ee58ec3b7a"
+    },
+    "tests/test_hfs016_catalog_integrity.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "67b2f5b0693dcb5c6634f1ce4aa6cdd88c4a88b1eebdac8c045c5ab2474bbc70",
+      "working_sha256": "363a1fb84f4088dcdcb1d969d34e59be7dfbe086f39b187e5f586c69a43d2ced"
+    },
+    "tests/test_hfs017_design_method.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "956815006a3a97fa65fd5c70a543aaa5666b8739cd777c98ccc2dab17b03530d",
+      "working_sha256": "7280426455687e287bc944f5df613929409af91429af7da5afd15487307fbc18"
+    },
+    "tests/test_hfs020_comparison.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "7a97851650cc3256b9ebae621a81f9b6b6cf2e91dbeef273e490c8a98277b8b5",
+      "working_sha256": "115d8255bdd37fdb53654d8d67a0198532360570805a9e2ebe0d26f6d73e908a"
+    },
+    "tests/test_hfs021_execution.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "95d97901bf0cf16db1ddc75346f30ca1f7bdb079f118f5055c742a98090d610e",
+      "working_sha256": "672b59a62b8f48494bd8c1099a10bea7b6584dab55c376383cb1f94b3b6cf1ed"
+    },
+    "tests/test_loader_catalog.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "c31d9ac0e4c755a950a959b6d7a182be1c79d0139e08f247ce87ae5336955177",
+      "working_sha256": "b93a6416c37088dcb331d9e6adc3ef80f78a30ef3704815ad85d6486a34afc24"
+    },
+    "tests/test_normative_d2_e3_f2.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "475baac0e9ed16879f3f9c1abab1b0d2a93597bc0ba7caf4beb7ffb5714c6894",
+      "working_sha256": "ee18779af1213381e2920b2d49c59922e819fcabbf94e1d1b12f30cecdd8f748"
+    },
+    "tests/test_profile_router.py": {
+      "comparison": "full_AST_with_package_prefix_only",
+      "base_sha256": "7d3da91f81eb8443370cf6c684e6867de814940b545b65c825e5051724da14b2",
+      "working_sha256": "2b7a714dd401b5736a22953e0e72868149ee54c98e2e6cd4e471a2093891d0e0"
+    }
+  },
+  "historical_documents_unchanged": true
+}

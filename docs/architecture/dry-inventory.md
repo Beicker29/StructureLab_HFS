@@ -298,3 +298,15 @@ F1 por coincidencia numérica. No se modifican fórmulas nominales F7/F8.
 DRY-02 queda aplicado a esta conversión concreta; no cierra las duplicaciones
 restantes de capacidades/clasificación DRY-03/09/19. Oráculos separados y prueba
 de identidad de nominales/LRFD en [suplemento F-43](../audit/hfs013/f1-correction/report.md).
+
+### HFS-021A — Comparación SVG entre plataformas
+
+La única política de equivalencia CRLF/LF para SVG se define en
+`scripts/hfs021a_svg_comparison.py::assert_svg_equal`; la consumen el verificador
+CI y sus pruebas. Su beneficio es aceptar la representación de texto Linux/Windows
+demostrada, rechazando cualquier diferencia adicional y registrando hashes crudos.
+No pertenece al motor ni modifica el generador o la comparación JSON HFS-020.
+`compare_hfs021.compare_results` conserva su contraste binario antes/después:
+esa prueba más estricta es útil en la captura local de una misma plataforma y
+no define otra normalización. No se generaliza esta política a XML, PNG, JSON
+o cálculos. [Evidencia y límites](../audit/hfs021a/ci-fix/report.md).
