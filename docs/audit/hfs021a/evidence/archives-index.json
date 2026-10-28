@@ -1,0 +1,30 @@
+{
+  "before": {
+    "file": "before.zip",
+    "members": 62,
+    "sha256": "4466421caf2d132b3097649b8dd3b4db406e6487474e5068cfff3d2a40330a3c",
+    "original_manifest_verified": true
+  },
+  "after": {
+    "file": "after.zip",
+    "members": 91,
+    "sha256": "9e5795b4bcd8d93657e2099b6093e141b98cf204319bc5997b002b81d5ffe5ed",
+    "original_manifest_verified": true
+  },
+  "failed_attempts": {
+    "file": "failed-attempts.zip",
+    "members": 127,
+    "sha256": "38b0daf0f653e3bfc5cd96b89cad24565d50746fe36a0c4a37cf815b7ee6a71c",
+    "outcomes": {
+      "1": "exit 1: metadata newline assumption",
+      "2": "exit 1: Pydantic metadata read blocked by probe",
+      "3": "exit 1: actual normal-install namespace contamination",
+      "4": "exit 1: exact comparison catches changed trace identifiers; all tests passed"
+    }
+  },
+  "diagrams": {
+    "file": "diagrams.zip",
+    "members": 12,
+    "sha256": "88e03a845a187abd30b7ca19cfd3620743c64955b5a8c3c5109d31cf07a76534"
+  }
+}

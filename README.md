@@ -36,10 +36,10 @@ docs/aisc_360_22_traceability.md Matriz de trazabilidad normativa
 
 ## Instalacion
 
-HFS-020 conserva el import histórico `src.steel_design` como espacio de nombres
-PEP 420. Se requiere Python 3.12 o posterior; la verificación local de esta
-entrega usa Windows y Python 3.12.10. Ubuntu está configurado en CI y pendiente
-de una ejecución remota comprobada. No se requiere interfaz gráfica.
+Desde HFS-021A, la distribución **0.2.0** se importa como `steel_design`, con
+layout convencional `src/`. Se requiere Python 3.12 o posterior. HFS-021 tuvo
+CI aprobado en Windows y Ubuntu; la migración HFS-021A requiere su propia
+revisión y nueva corrida remota tras publicación. No se requiere interfaz gráfica.
 
 Desde la raíz del proyecto:
 
@@ -51,7 +51,7 @@ python -m venv .venv/hfs
 Para desarrollo y reproducción de la resolución de dependencias auditada:
 
 ```powershell
-.\.venv\hfs\Scripts\python.exe -m pip install -c requirements/ci-constraints.txt ".[dev]"
+.\.venv\hfs\Scripts\python.exe -m pip install -c requirements/ci-constraints.txt -e ".[dev]"
 .\.venv\hfs\Scripts\python.exe -m build
 .\.venv\hfs\Scripts\python.exe -m ruff check .
 ```
@@ -68,7 +68,7 @@ catálogo y salida:
 
 ```powershell
 structurelab-hfs C:/casos/w_shape_case.json --sections C:/catalogos/sections.xlsx --results-dir C:/salidas/hfs
-python -m src.steel_design.run C:/casos/w_shape_case.json --sections C:/catalogos/sections.xlsx --results-dir C:/salidas/hfs
+python -m steel_design.run C:/casos/w_shape_case.json --sections C:/catalogos/sections.xlsx --results-dir C:/salidas/hfs
 ```
 
 Activar el entorno instalado o usar la ruta completa a sus ejecutables. El
@@ -77,7 +77,22 @@ el programa no lo busca dentro del paquete ni descarga una copia. El default
 histórico `data/sections.xlsx` sigue relativo al directorio de ejecución: fuera
 del checkout se debe proporcionar `--sections`. Si falta, CLI informa un error
 de carga con exit 1. Ni instalación ni CI acreditan la validez normativa del
-catálogo o del motor. Véase el [informe HFS-020](docs/audit/hfs020/report.md).
+catálogo o del motor. Véase el [informe HFS-021A](docs/audit/hfs021a/report.md).
+
+El comando `python -m src.steel_design.run` y los imports `src.steel_design`
+quedan retirados. Desde el checkout se rechazan explícitamente antes de cargar
+modelos bajo una identidad paralela. Usar `pip install -e .` para desarrollo;
+estar en la raíz por sí solo no hace importable `steel_design`. No mezclar
+instalaciones 0.1.0 y 0.2.0 ni añadir aliases en `sys.modules`.
+La [API pública Python](docs/contracts/hfs021a-public-api.md) define las rutas
+oficiales por módulo, la compatibilidad y los helpers internos.
+
+Al migrar un checkout que ya construyó 0.1.0, comprobar `build/lib/src` antes de
+`pip install .`: setuptools puede reutilizar esos archivos generados y
+contaminar el wheel. Si existen, archivar/verificar `build/` y mover esa carpeta
+generada fuera de su ubicación activa antes de instalar. No eliminar fuentes
+ni evidencias; el verificador detecta ese residuo y se detiene sin borrarlo.
+Un checkout limpio o el sdist reconstruido no contienen ese build previo.
 
 ## Contratos de entrada (HFS-011)
 
@@ -125,13 +140,13 @@ HFS-010 se entrega para revisión; no implementa HFS-012/013/014 ni acredita G1.
 ## Uso CLI
 
 ```bash
-python -m src.steel_design.run examples/w_shape_case.json
-python -m src.steel_design.run examples/rectangular_hss_case.json
-python -m src.steel_design.run examples/circular_hss_case.json
-python -m src.steel_design.run examples/composite_encased_case.json
-python -m src.steel_design.run examples/composite_filled_rectangular_hss_case.json
-python -m src.steel_design.run examples/composite_filled_circular_hss_case.json
-python -m src.steel_design.run examples/composite_beam_case.json
+python -m steel_design.run examples/w_shape_case.json
+python -m steel_design.run examples/rectangular_hss_case.json
+python -m steel_design.run examples/circular_hss_case.json
+python -m steel_design.run examples/composite_encased_case.json
+python -m steel_design.run examples/composite_filled_rectangular_hss_case.json
+python -m steel_design.run examples/composite_filled_circular_hss_case.json
+python -m steel_design.run examples/composite_beam_case.json
 ```
 
 Salida por consola: resumen de checks (sin `details`).

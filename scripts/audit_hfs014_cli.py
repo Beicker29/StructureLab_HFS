@@ -25,7 +25,7 @@ def capture(root, out):
         raise SystemExit("Use a new evidence path")
     out.mkdir(parents=True)
     env = os.environ.copy()
-    env.pop("PYTHONPATH", None)
+    env["PYTHONPATH"] = str(root / "src")  # Explicit capture source; absent in installed verification.
     env.update(PYTHONNOUSERSITE="1", PYTEST_DISABLE_PLUGIN_AUTOLOAD="1", PYTHONUTF8="1")
     records = {}
     for number, path in enumerate(sorted((root / "examples").glob("*.json"))):
@@ -37,7 +37,7 @@ def capture(root, out):
                 source = out / "inputs" / path.name
                 write_json(source, payload)
             label = f"{path.name}/{'detailed' if detailed else 'original'}"
-            command = [sys.executable, "-m", "src.steel_design.run", str(source),
+            command = [sys.executable, "-m", "steel_design.run", str(source),
                 "--sections", str(root / "data/sections.xlsx"),
                 "--results-dir", str(out / "artifacts" / f"{number:02d}{'d' if detailed else 'o'}")]
             run = execute(command, root, env)
@@ -51,10 +51,10 @@ def capture(root, out):
             records[label] = {"source_sha256": sha(path), "transport_only_detailed_variant": detailed,
                 "execution": run, "normalized_cli": normalize(parsed), "normalized_details": details}
     write_json(out / "cli-examples.json", records)
-    sys.path.insert(0, str(root))
-    from src.steel_design.models import CheckResult
-    from src.steel_design.results_model import EngineResult, aggregate_case_statuses
-    from src.steel_design.run import _build_global_summary
+    sys.path.insert(0, str(root / "src"))
+    from steel_design.models import CheckResult
+    from steel_design.results_model import EngineResult, aggregate_case_statuses
+    from steel_design.run import _build_global_summary
     checks = [CheckResult(name="axial",clause="E3-1",demand=90,capacity=100,dcr=.90,status="PASS"),
               CheckResult(name="flexure",clause="F2-1",demand=1,capacity=50,dcr=.02,status="PASS")]
     try:
@@ -64,7 +64,7 @@ def capture(root, out):
     empty_input = out / "empty.json"
     write_json(empty_input, {"cases": []})
     empty_results = out / "empty-results"
-    empty_cli = execute([sys.executable, "-m", "src.steel_design.run", str(empty_input),
+    empty_cli = execute([sys.executable, "-m", "steel_design.run", str(empty_input),
         "--sections", str(root / "data/sections.xlsx"), "--results-dir", str(empty_results)], root, env)
     write_json(out / "defect-probes.json", {"F05": {"checks": [c.model_dump(mode="json") for c in checks],
         "summary": _build_global_summary(EngineResult(checks=checks))},

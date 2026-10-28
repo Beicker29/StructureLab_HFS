@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "structurelab-hfs"
-version = "0.1.0"
+version = "0.2.0"
 description = "Steel member design engine with explicit AISC 360-22 coverage limits"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -22,17 +22,16 @@ dev = [
 ]
 
 [project.scripts]
-structurelab-hfs = "src.steel_design.run:main"
+structurelab-hfs = "steel_design.run:main"
 
 [tool.setuptools]
 include-package-data = false
 
-# 'src' is an existing PEP 420 namespace, not a conventional src-layout root.
-# Preserve src.steel_design and never discover tests, audit evidence or data.
+# Conventional src-layout; only real steel_design packages are distributed.
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["src.steel_design", "src.steel_design.*"]
-namespaces = true
+where = ["src"]
+include = ["steel_design", "steel_design.*"]
+namespaces = false
 
 [tool.ruff]
 target-version = "py312"

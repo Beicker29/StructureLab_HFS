@@ -12,14 +12,14 @@ import sys
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from src.steel_design.domain.errors import AmbiguousSectionError, SteelDesignError
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import CheckResult, Loads, SteelCase
-from src.steel_design.results_model import EngineResult
-from src.steel_design.run import _build_global_summary
-from src.steel_design.sections.loader import load_sections_from_excel
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.domain.errors import AmbiguousSectionError, SteelDesignError
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import CheckResult, Loads, SteelCase
+from steel_design.results_model import EngineResult
+from steel_design.run import _build_global_summary
+from steel_design.sections.loader import load_sections_from_excel
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -160,7 +160,7 @@ def test_failed_check_must_retain_dcr_above_one():
 def test_empty_bundle_must_not_pass(tmp_path):
     path = tmp_path / "empty.json"
     path.write_text('{"cases": []}', encoding="utf-8")
-    completed = subprocess.run([sys.executable, "-m", "src.steel_design.run", str(path),
+    completed = subprocess.run([sys.executable, "-m", "steel_design.run", str(path),
                                "--sections", str(ROOT / "data/sections.xlsx"),
                                "--results-dir", str(tmp_path / "results")],
                               cwd=ROOT, capture_output=True, text=True, check=False)

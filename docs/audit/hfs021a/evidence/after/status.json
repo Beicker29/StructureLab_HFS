@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "status",
+    "--short"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": " M AGENTS.md\n M CONTRIBUTING.md\n M README.md\n M docs/ROADMAP.md\n M docs/architecture/dry-inventory.md\n M pyproject.toml\n M scripts/audit_baseline.py\n M scripts/audit_hfs011.py\n M scripts/audit_hfs014_cli.py\n M scripts/audit_hfs017_probes.py\n M scripts/compare_hfs021.py\n M scripts/debug_loader.py\n M scripts/probe_hfs015.py\n M scripts/verify_hfs020.py\n M src/steel_design/domain/coverage_evidence.py\n M tests/test_chapter_e_rules.py\n M tests/test_chapter_f_rules.py\n M tests/test_chapter_g_rules.py\n M tests/test_chapter_h_rules.py\n M tests/test_chapter_i_rules.py\n M tests/test_custom_solid_sections.py\n M tests/test_engine_cli_integration.py\n M tests/test_examples_smoke.py\n M tests/test_hfs000_characterization.py\n M tests/test_hfs010_coverage.py\n M tests/test_hfs011_input_contracts.py\n M tests/test_hfs012_flexure_selection.py\n M tests/test_hfs013_design_method.py\n M tests/test_hfs013_directional_h3.py\n M tests/test_hfs014_summary_bundle.py\n M tests/test_hfs015_precision_advice.py\n M tests/test_hfs016_catalog_integrity.py\n M tests/test_hfs017_design_method.py\n M tests/test_hfs021_execution.py\n M tests/test_loader_catalog.py\n M tests/test_normative_d2_e3_f2.py\n M tests/test_profile_router.py\n?? docs/audit/hfs021a/\n?? docs/contracts/hfs021a-public-api.md\n?? scripts/compare_hfs021a.py\n?? scripts/hfs021a_invariants.py\n?? scripts/probe_hfs021a_imports.py\n?? src/steel_design/__init__.py\n?? src/steel_design/codes/__init__.py\n?? src/steel_design/codes/aisc_360_22/__init__.py\n?? src/steel_design/domain/__init__.py\n?? src/steel_design/domain/evaluators/__init__.py\n?? src/steel_design/domain/routing/__init__.py\n?? src/steel_design/domain/rules/__init__.py\n?? src/steel_design/sections/__init__.py\n?? tests/test_hfs021a_public_api.py\n",
+  "stderr": ""
+}

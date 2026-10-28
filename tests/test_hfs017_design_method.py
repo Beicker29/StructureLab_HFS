@@ -12,17 +12,17 @@ import sys
 
 import pytest
 
-from src.steel_design.codes.aisc_360_22 import axial_calc, tension_calc, shear_calc, flexure_calc, combined_hss_calc
-from src.steel_design.domain.errors import ValidationError
-from src.steel_design.domain.rules import axial_rules, tension_rule, shear_rules, flexure_rule, combined_hss_rules, composite_rules
-from src.steel_design.domain.evaluators.flexure_evaluator import FlexureEvaluator
-from src.steel_design.domain.evaluators.tension_evaluator import TensionEvaluator
-from src.steel_design.domain.evaluators.hss_shear import evaluate_hss_shear
-from src.steel_design.domain.routing.profile_router import ProfileRouter
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.codes.aisc_360_22 import axial_calc, tension_calc, shear_calc, flexure_calc, combined_hss_calc
+from steel_design.domain.errors import ValidationError
+from steel_design.domain.rules import axial_rules, tension_rule, shear_rules, flexure_rule, combined_hss_rules, composite_rules
+from steel_design.domain.evaluators.flexure_evaluator import FlexureEvaluator
+from steel_design.domain.evaluators.tension_evaluator import TensionEvaluator
+from steel_design.domain.evaluators.hss_shear import evaluate_hss_shear
+from steel_design.domain.routing.profile_router import ProfileRouter
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import SteelCase
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 def case(method="LRFD", active=False, composite=False):
@@ -205,7 +205,7 @@ def test_cli_and_detailed_memory_preserve_method_and_external_demand(tmp_path,me
                  custom_section=dict(type="SOLID_RECTANGULAR",B=10,H=100),
                  output=dict(write_results_json=True))
     source=tmp_path/'case.json'; source.write_text(json.dumps(payload),encoding="utf-8")
-    run=subprocess.run([sys.executable,"-m","src.steel_design.run",str(source),
+    run=subprocess.run([sys.executable,"-m","steel_design.run",str(source),
                         "--results-dir",str(tmp_path/'out')],capture_output=True,text=True,encoding="utf-8")
     assert run.returncode==0,run.stderr
     cli=json.loads(run.stdout)

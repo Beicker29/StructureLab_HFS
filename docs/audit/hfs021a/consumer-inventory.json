@@ -1,0 +1,1042 @@
+[
+  {
+    "file": "CONTRIBUTING.md",
+    "line": 13,
+    "text": "HFS-020 añade instalación/build/CI sin migrar el namespace `src.steel_design`."
+  },
+  {
+    "file": "MANIFEST.in",
+    "line": 5,
+    "text": "recursive-include src/steel_design *.py"
+  },
+  {
+    "file": "README.md",
+    "line": 28,
+    "text": "src/steel_design/codes           Formulas normativas puras"
+  },
+  {
+    "file": "README.md",
+    "line": 29,
+    "text": "src/steel_design/domain          Reglas, validaciones, enrutamiento, errores"
+  },
+  {
+    "file": "README.md",
+    "line": 30,
+    "text": "src/steel_design/sections        Carga y modelos de secciones"
+  },
+  {
+    "file": "README.md",
+    "line": 31,
+    "text": "src/steel_design/engine.py       Pipeline principal"
+  },
+  {
+    "file": "README.md",
+    "line": 32,
+    "text": "src/steel_design/run.py          CLI"
+  },
+  {
+    "file": "README.md",
+    "line": 39,
+    "text": "HFS-020 conserva el import histórico `src.steel_design` como espacio de nombres"
+  },
+  {
+    "file": "README.md",
+    "line": 71,
+    "text": "python -m src.steel_design.run C:/casos/w_shape_case.json --sections C:/catalogos/sections.xlsx --results-dir C:/salidas/hfs"
+  },
+  {
+    "file": "README.md",
+    "line": 128,
+    "text": "python -m src.steel_design.run examples/w_shape_case.json"
+  },
+  {
+    "file": "README.md",
+    "line": 129,
+    "text": "python -m src.steel_design.run examples/rectangular_hss_case.json"
+  },
+  {
+    "file": "README.md",
+    "line": 130,
+    "text": "python -m src.steel_design.run examples/circular_hss_case.json"
+  },
+  {
+    "file": "README.md",
+    "line": 131,
+    "text": "python -m src.steel_design.run examples/composite_encased_case.json"
+  },
+  {
+    "file": "README.md",
+    "line": 132,
+    "text": "python -m src.steel_design.run examples/composite_filled_rectangular_hss_case.json"
+  },
+  {
+    "file": "README.md",
+    "line": 133,
+    "text": "python -m src.steel_design.run examples/composite_filled_circular_hss_case.json"
+  },
+  {
+    "file": "README.md",
+    "line": 134,
+    "text": "python -m src.steel_design.run examples/composite_beam_case.json"
+  },
+  {
+    "file": "docs/ROADMAP.md",
+    "line": 24,
+    "text": "`src.steel_design`, CLI instalado con catálogo externo, Ruff acotado y workflow"
+  },
+  {
+    "file": "docs/ROADMAP.md",
+    "line": 128,
+    "text": "| F-24 | P1 | C | Raíz: `requirements.txt` y ejecución `python -m src.steel_design.run` | Empaquetado `pyproject.toml`, entrada CLI convencional y pruebas sobre wheel instalado. |"
+  },
+  {
+    "file": "docs/ROADMAP.md",
+    "line": 134,
+    "text": "| F-30 | P1 | R | `src/steel_design/codes/aisc_360_22` | Auditoría profunda de E4/E5/E7, F2–F11, G2–G6, H, I; revisar todos los factores, dominios, límites y errores numéricos. No asumir fidelidad por etiqueta de ecuación. |"
+  },
+  {
+    "file": "docs/architecture/dry-inventory.md",
+    "line": 31,
+    "text": "- `structurelab-hfs` llama directamente `src.steel_design.run:main`, igual que"
+  },
+  {
+    "file": "docs/architecture/dry-inventory.md",
+    "line": 179,
+    "text": "Rutas relativas a `src/steel_design/`, excepto docs/tests. Los símbolos identifican ubicaciones sin depender de desplazamientos de línea. Las consecuencias numéricas no ensayadas se marcan como riesgos, no como defectos de formulación probados."
+  },
+  {
+    "file": "pyproject.toml",
+    "line": 25,
+    "text": "structurelab-hfs = \"src.steel_design.run:main\""
+  },
+  {
+    "file": "pyproject.toml",
+    "line": 31,
+    "text": "# Preserve src.steel_design and never discover tests, audit evidence or data."
+  },
+  {
+    "file": "pyproject.toml",
+    "line": 34,
+    "text": "include = [\"src.steel_design\", \"src.steel_design.*\"]"
+  },
+  {
+    "file": "pyproject.toml",
+    "line": 47,
+    "text": "\"src/steel_design/domain/rules/composite_rules.py\" = [\"F841\"]"
+  },
+  {
+    "file": "scripts/audit_baseline.py",
+    "line": 59,
+    "text": "    from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "scripts/audit_baseline.py",
+    "line": 60,
+    "text": "    from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "scripts/audit_baseline.py",
+    "line": 61,
+    "text": "    from src.steel_design.run import _extract_output_options, _merge_case_payload"
+  },
+  {
+    "file": "scripts/audit_baseline.py",
+    "line": 62,
+    "text": "    from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "scripts/audit_baseline.py",
+    "line": 63,
+    "text": "    from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "scripts/audit_baseline.py",
+    "line": 165,
+    "text": "            command = [sys.executable, \"-m\", \"src.steel_design.run\", f\"examples/{case.name}\","
+  },
+  {
+    "file": "scripts/audit_hfs014_cli.py",
+    "line": 40,
+    "text": "            command = [sys.executable, \"-m\", \"src.steel_design.run\", str(source),"
+  },
+  {
+    "file": "scripts/audit_hfs014_cli.py",
+    "line": 55,
+    "text": "    from src.steel_design.models import CheckResult"
+  },
+  {
+    "file": "scripts/audit_hfs014_cli.py",
+    "line": 56,
+    "text": "    from src.steel_design.results_model import EngineResult, aggregate_case_statuses"
+  },
+  {
+    "file": "scripts/audit_hfs014_cli.py",
+    "line": 57,
+    "text": "    from src.steel_design.run import _build_global_summary"
+  },
+  {
+    "file": "scripts/audit_hfs014_cli.py",
+    "line": 67,
+    "text": "    empty_cli = execute([sys.executable, \"-m\", \"src.steel_design.run\", str(empty_input),"
+  },
+  {
+    "file": "scripts/audit_hfs017_probes.py",
+    "line": 12,
+    "text": "    from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "scripts/audit_hfs017_probes.py",
+    "line": 13,
+    "text": "    from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "scripts/audit_hfs017_probes.py",
+    "line": 14,
+    "text": "    from src.steel_design.domain.rules.flexure_rule import FlexureF11YieldMxRule"
+  },
+  {
+    "file": "scripts/audit_hfs017_probes.py",
+    "line": 15,
+    "text": "    from src.steel_design.domain.rules.composite_rules import CompositeI2EncasedTensionRule, _steel_shear_capacity_k_n"
+  },
+  {
+    "file": "scripts/audit_hfs017_probes.py",
+    "line": 16,
+    "text": "    from src.steel_design.codes.aisc_360_22 import axial_calc, tension_calc, shear_calc, combined_hss_calc"
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 61,
+    "text": "    fixed = git(\"ls-files\", \"src/steel_design/codes\", \"src/steel_design/domain\","
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 62,
+    "text": "                \"src/steel_design/sections\", \"src/steel_design/models.py\","
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 63,
+    "text": "                \"src/steel_design/results_model.py\", \"src/steel_design/input_contracts.py\","
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 64,
+    "text": "                \"src/steel_design/design_methods.py\", \"data/sections.xlsx\","
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 74,
+    "text": "    old_engine = ast.parse(text_at_base(\"src/steel_design/engine.py\"))"
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 75,
+    "text": "    new_engine = ast.parse((ROOT / \"src/steel_design/engine.py\").read_text(encoding=\"utf-8\"))"
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 76,
+    "text": "    old_builder = functions(text_at_base(\"src/steel_design/engine.py\"))[\"_build_custom_section\"]"
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 77,
+    "text": "    new_builder = functions((ROOT / \"src/steel_design/sections/geometry.py\").read_text(encoding=\"utf-8\"))[\"build_custom_section\"]"
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 88,
+    "text": "    old_helpers = functions(text_at_base(\"src/steel_design/run.py\"))"
+  },
+  {
+    "file": "scripts/compare_hfs021.py",
+    "line": 89,
+    "text": "    new_helpers = functions((ROOT / \"src/steel_design/reporting.py\").read_text(encoding=\"utf-8\"))"
+  },
+  {
+    "file": "scripts/debug_loader.py",
+    "line": 3,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "scripts/probe_hfs015.py",
+    "line": 10,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "scripts/probe_hfs015.py",
+    "line": 11,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "scripts/probe_hfs015.py",
+    "line": 12,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "scripts/probe_hfs015.py",
+    "line": 13,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "scripts/probe_hfs015.py",
+    "line": 14,
+    "text": "from src.steel_design.run import _build_chapter_admissibility, _build_global_summary"
+  },
+  {
+    "file": "scripts/verify_hfs015_scope.py",
+    "line": 57,
+    "text": "    allowed={'src/steel_design/models.py','src/steel_design/run.py',"
+  },
+  {
+    "file": "scripts/verify_hfs015_scope.py",
+    "line": 59,
+    "text": "    rules=list(Path('src/steel_design/domain/rules').glob('*.py'))"
+  },
+  {
+    "file": "scripts/verify_hfs020.py",
+    "line": 48,
+    "text": "                for p in (ROOT / \"src/steel_design\").rglob(\"*.py\")}"
+  },
+  {
+    "file": "scripts/verify_hfs020.py",
+    "line": 55,
+    "text": "        assert \"structurelab-hfs = src.steel_design.run:main\" in entry"
+  },
+  {
+    "file": "scripts/verify_hfs020.py",
+    "line": 146,
+    "text": "            \"['src.steel_design.engine','src.steel_design.run','src.steel_design.models',\""
+  },
+  {
+    "file": "scripts/verify_hfs020.py",
+    "line": 147,
+    "text": "            \"'src.steel_design.domain.design_methods','src.steel_design.sections.repository']]; \""
+  },
+  {
+    "file": "scripts/verify_hfs020.py",
+    "line": 155,
+    "text": "        for label, command in ((\"console\", [cli]), (\"module\", [executable, \"-m\", \"src.steel_design.run\"])):"
+  },
+  {
+    "file": "tests/test_chapter_e_rules.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.errors import IncompleteSectionDataError, ValidationError"
+  },
+  {
+    "file": "tests/test_chapter_e_rules.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule"
+  },
+  {
+    "file": "tests/test_chapter_e_rules.py",
+    "line": 5,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_chapter_e_rules.py",
+    "line": 6,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_chapter_e_rules.py",
+    "line": 7,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_chapter_e_rules.py",
+    "line": 8,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_chapter_f_rules.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.errors import ValidationError"
+  },
+  {
+    "file": "tests/test_chapter_f_rules.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter"
+  },
+  {
+    "file": "tests/test_chapter_f_rules.py",
+    "line": 5,
+    "text": "from src.steel_design.domain.rules.flexure_rule import FlexureF10Rule, FlexureF11Rule"
+  },
+  {
+    "file": "tests/test_chapter_f_rules.py",
+    "line": 6,
+    "text": "from src.steel_design.domain.validation import validate_case"
+  },
+  {
+    "file": "tests/test_chapter_f_rules.py",
+    "line": 7,
+    "text": "from src.steel_design.models import ("
+  },
+  {
+    "file": "tests/test_chapter_f_rules.py",
+    "line": 17,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_chapter_g_rules.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter"
+  },
+  {
+    "file": "tests/test_chapter_g_rules.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.errors import RuleNotImplementedError"
+  },
+  {
+    "file": "tests/test_chapter_g_rules.py",
+    "line": 5,
+    "text": "from src.steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG3VxRule, ShearG5VxRule, ShearG6VyRule"
+  },
+  {
+    "file": "tests/test_chapter_g_rules.py",
+    "line": 6,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_chapter_g_rules.py",
+    "line": 7,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_chapter_h_rules.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter"
+  },
+  {
+    "file": "tests/test_chapter_h_rules.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError"
+  },
+  {
+    "file": "tests/test_chapter_h_rules.py",
+    "line": 5,
+    "text": "from src.steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule"
+  },
+  {
+    "file": "tests/test_chapter_h_rules.py",
+    "line": 6,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_chapter_h_rules.py",
+    "line": 7,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_chapter_i_rules.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.errors import RuleNotImplementedError"
+  },
+  {
+    "file": "tests/test_chapter_i_rules.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter"
+  },
+  {
+    "file": "tests/test_chapter_i_rules.py",
+    "line": 5,
+    "text": "from src.steel_design.domain.rules.composite_rules import ("
+  },
+  {
+    "file": "tests/test_chapter_i_rules.py",
+    "line": 13,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_chapter_i_rules.py",
+    "line": 14,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_custom_solid_sections.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.errors import ValidationError"
+  },
+  {
+    "file": "tests/test_custom_solid_sections.py",
+    "line": 4,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_custom_solid_sections.py",
+    "line": 5,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_custom_solid_sections.py",
+    "line": 6,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_engine_cli_integration.py",
+    "line": 66,
+    "text": "            \"src.steel_design.run\","
+  },
+  {
+    "file": "tests/test_examples_smoke.py",
+    "line": 18,
+    "text": "                \"src.steel_design.run\","
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 15,
+    "text": "from src.steel_design.domain.errors import AmbiguousSectionError, SteelDesignError"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 16,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 17,
+    "text": "from src.steel_design.models import CheckResult, Loads, SteelCase"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 18,
+    "text": "from src.steel_design.results_model import EngineResult"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 19,
+    "text": "from src.steel_design.run import _build_global_summary"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 20,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 21,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 22,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs000_characterization.py",
+    "line": 163,
+    "text": "    completed = subprocess.run([sys.executable, \"-m\", \"src.steel_design.run\", str(path),"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 17,
+    "text": "from src.steel_design.domain.coverage import build_coverage_plan"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 18,
+    "text": "from src.steel_design.domain.errors import RuleNotImplementedError, IncompleteSectionDataError, ValidationError as DomainValidationError"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 19,
+    "text": "from src.steel_design.domain.rules.tension_rule import TensionRule, TensionRuptureRule"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 20,
+    "text": "from src.steel_design.engine import SteelDesignEngine, _build_custom_section"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 21,
+    "text": "from src.steel_design.models import CheckResult, SteelCase, TensionScope"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 22,
+    "text": "from src.steel_design.results_model import AnalysisStatus, EngineResult"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 23,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 24,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs010_coverage.py",
+    "line": 287,
+    "text": "    run = subprocess.run([sys.executable, \"-m\", \"src.steel_design.run\", str(path),"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 10,
+    "text": "from src.steel_design import models as m"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 11,
+    "text": "from src.steel_design.domain.errors import CatalogSchemaError, SteelDesignError"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 12,
+    "text": "from src.steel_design.domain.validation import validate_case, validate_section, validate_case_section"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 13,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 14,
+    "text": "from src.steel_design.run import OutputOptions, _extract_output_options, _unique_json_object"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 15,
+    "text": "from src.steel_design.sections.loader import _coerce_float, _scaled_float"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 16,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 17,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs011_input_contracts.py",
+    "line": 276,
+    "text": "    completed = subprocess.run([sys.executable, \"-m\", \"src.steel_design.run\", str(path),"
+  },
+  {
+    "file": "tests/test_hfs012_flexure_selection.py",
+    "line": 14,
+    "text": "from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError, ValidationError"
+  },
+  {
+    "file": "tests/test_hfs012_flexure_selection.py",
+    "line": 15,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter, _classify_element"
+  },
+  {
+    "file": "tests/test_hfs012_flexure_selection.py",
+    "line": 16,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs012_flexure_selection.py",
+    "line": 17,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "tests/test_hfs012_flexure_selection.py",
+    "line": 18,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs012_flexure_selection.py",
+    "line": 19,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 21,
+    "text": "from src.steel_design.codes.aisc_360_22 import flexure_calc"
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 22,
+    "text": "from src.steel_design.domain.errors import ValidationError"
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 23,
+    "text": "from src.steel_design.domain.rules.combined_hss_rules import ("
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 26,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 27,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 28,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs013_design_method.py",
+    "line": 29,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 14,
+    "text": "from src.steel_design.codes.aisc_360_22 import combined_hss_calc, shear_calc"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 15,
+    "text": "from src.steel_design.domain.actions import shear_demand, shear_trace"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 16,
+    "text": "from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 17,
+    "text": "from src.steel_design.domain.evaluators.hss_shear import evaluate_hss_shear"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 18,
+    "text": "from src.steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 19,
+    "text": "from src.steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG4VxRule, ShearG4VyRule, ShearG5VxRule, ShearG6VyRule"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 20,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 21,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 22,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 23,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs013_directional_h3.py",
+    "line": 24,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs014_summary_bundle.py",
+    "line": 16,
+    "text": "from src.steel_design.domain.errors import ValidationError"
+  },
+  {
+    "file": "tests/test_hfs014_summary_bundle.py",
+    "line": 17,
+    "text": "from src.steel_design.models import CheckResult, SteelCase"
+  },
+  {
+    "file": "tests/test_hfs014_summary_bundle.py",
+    "line": 18,
+    "text": "from src.steel_design.results_model import ("
+  },
+  {
+    "file": "tests/test_hfs014_summary_bundle.py",
+    "line": 21,
+    "text": "from src.steel_design import run as cli"
+  },
+  {
+    "file": "tests/test_hfs014_summary_bundle.py",
+    "line": 137,
+    "text": "    process=subprocess.run([sys.executable,\"-m\",\"src.steel_design.run\",str(path),"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 17,
+    "text": "from src.steel_design.models import CheckResult, SteelCase, SlendernessAdviceBasis"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 18,
+    "text": "from src.steel_design.results_model import EngineResult"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 19,
+    "text": "from src.steel_design.domain.recommendations import slenderness_recommendations"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 20,
+    "text": "from src.steel_design.domain.rules import axial_rules, shear_rules, combined_hss_rules, composite_rules"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 21,
+    "text": "from src.steel_design.domain.rules.flexure_rule import _build_flexure_result"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 22,
+    "text": "from src.steel_design.domain.rules.tension_rule import TensionRule"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 23,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 24,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 25,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 26,
+    "text": "from src.steel_design import run as cli"
+  },
+  {
+    "file": "tests/test_hfs015_precision_advice.py",
+    "line": 289,
+    "text": "    p=subprocess.run([sys.executable,\"-m\",\"src.steel_design.run\",str(path),\"--sections\","
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 12,
+    "text": "from src.steel_design.domain.errors import AmbiguousSectionError, ValidationError"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 13,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 14,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 15,
+    "text": "from src.steel_design.sections.identity import section_identity"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 16,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 17,
+    "text": "from src.steel_design.sections.models import Section, SectionSource"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 18,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs016_catalog_integrity.py",
+    "line": 194,
+    "text": "    command = [sys.executable, \"-m\", \"src.steel_design.run\", str(path), \"--results-dir\", str(tmp_path / \"results\")]"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 15,
+    "text": "from src.steel_design.codes.aisc_360_22 import axial_calc, tension_calc, shear_calc, flexure_calc, combined_hss_calc"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 16,
+    "text": "from src.steel_design.domain.errors import ValidationError"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 17,
+    "text": "from src.steel_design.domain.rules import axial_rules, tension_rule, shear_rules, flexure_rule, combined_hss_rules, composite_rules"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 18,
+    "text": "from src.steel_design.domain.evaluators.flexure_evaluator import FlexureEvaluator"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 19,
+    "text": "from src.steel_design.domain.evaluators.tension_evaluator import TensionEvaluator"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 20,
+    "text": "from src.steel_design.domain.evaluators.hss_shear import evaluate_hss_shear"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 21,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 22,
+    "text": "from src.steel_design.engine import SteelDesignEngine"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 23,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 24,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 25,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs017_design_method.py",
+    "line": 208,
+    "text": "    run=subprocess.run([sys.executable,\"-m\",\"src.steel_design.run\",str(source),"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 20,
+    "text": "from src.steel_design import engine as engine_module, reporting, run as cli"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 21,
+    "text": "from src.steel_design.domain.errors import SectionNotFoundError, ValidationError"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 22,
+    "text": "from src.steel_design.engine import SteelDesignEngine, _build_custom_section"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 23,
+    "text": "from src.steel_design.execution import ("
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 27,
+    "text": "from src.steel_design.models import SteelCase"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 28,
+    "text": "from src.steel_design.sections.geometry import build_custom_section"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 29,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 30,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 31,
+    "text": "from src.steel_design.sections.repository import SectionRepository"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 63,
+    "text": "    return subprocess.run([sys.executable, \"-m\", \"src.steel_design.run\", str(source),"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 314,
+    "text": "        f\"importlib.import_module('src.steel_design.{m}')\" for m in modules)"
+  },
+  {
+    "file": "tests/test_hfs021_execution.py",
+    "line": 322,
+    "text": "    module = importlib.import_module(\"src.steel_design.execution\")"
+  },
+  {
+    "file": "tests/test_loader_catalog.py",
+    "line": 10,
+    "text": "from src.steel_design.domain.errors import CatalogSchemaError"
+  },
+  {
+    "file": "tests/test_loader_catalog.py",
+    "line": 11,
+    "text": "from src.steel_design.sections.loader import load_sections_from_excel"
+  },
+  {
+    "file": "tests/test_normative_d2_e3_f2.py",
+    "line": 3,
+    "text": "from src.steel_design.codes.aisc_360_22 import axial_calc, flexure_calc, tension_calc"
+  },
+  {
+    "file": "tests/test_normative_d2_e3_f2.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.rules.axial_rules import AxialE3Rule"
+  },
+  {
+    "file": "tests/test_normative_d2_e3_f2.py",
+    "line": 5,
+    "text": "from src.steel_design.domain.rules.flexure_rule import FlexureRule"
+  },
+  {
+    "file": "tests/test_normative_d2_e3_f2.py",
+    "line": 6,
+    "text": "from src.steel_design.domain.rules.tension_rule import TensionRuptureRule, TensionRule"
+  },
+  {
+    "file": "tests/test_normative_d2_e3_f2.py",
+    "line": 7,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_normative_d2_e3_f2.py",
+    "line": 8,
+    "text": "from src.steel_design.sections.models import Section"
+  },
+  {
+    "file": "tests/test_profile_router.py",
+    "line": 3,
+    "text": "from src.steel_design.domain.errors import IncompleteSectionDataError"
+  },
+  {
+    "file": "tests/test_profile_router.py",
+    "line": 4,
+    "text": "from src.steel_design.domain.routing.profile_router import ProfileRouter"
+  },
+  {
+    "file": "tests/test_profile_router.py",
+    "line": 5,
+    "text": "from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+  },
+  {
+    "file": "tests/test_profile_router.py",
+    "line": 6,
+    "text": "from src.steel_design.sections.models import Section"
+  }
+]

@@ -1,6 +1,6 @@
 from collections import Counter
 
-from src.steel_design.sections.loader import load_sections_from_excel
+from steel_design.sections.loader import load_sections_from_excel
 
 
 def main() -> None:

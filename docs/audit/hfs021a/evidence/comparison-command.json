@@ -1,0 +1,15 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+    "-X",
+    "utf8",
+    "scripts/compare_hfs021a.py",
+    ".venv/21abefore",
+    ".venv/21aafter5",
+    ".venv/21a-comparison.json"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": "HFS-021A: exact results, SVGs, engineering code and historical oracles preserved\n",
+  "stderr": "warning: in the working copy of 'AGENTS.md', LF will be replaced by CRLF the next time Git touches it\n"
+}

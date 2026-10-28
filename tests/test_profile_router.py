@@ -1,9 +1,9 @@
 import unittest
 
-from src.steel_design.domain.errors import IncompleteSectionDataError
-from src.steel_design.domain.routing.profile_router import ProfileRouter
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.models import Section
+from steel_design.domain.errors import IncompleteSectionDataError
+from steel_design.domain.routing.profile_router import ProfileRouter
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.models import Section
 
 
 def _build_case(*, pu: float, mux: float, muy: float, vu: float) -> SteelCase:

@@ -1,10 +1,10 @@
 import unittest
 
-from src.steel_design.domain.routing.profile_router import ProfileRouter
-from src.steel_design.domain.errors import RuleNotImplementedError
-from src.steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG3VxRule, ShearG5VxRule, ShearG6VyRule
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.models import Section
+from steel_design.domain.routing.profile_router import ProfileRouter
+from steel_design.domain.errors import RuleNotImplementedError
+from steel_design.domain.rules.shear_rules import ShearG2VxRule, ShearG3VxRule, ShearG5VxRule, ShearG6VyRule
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.models import Section
 
 
 def _case(*, vux=0.0, vuy=0.0, vu=0.0, method="LRFD") -> SteelCase:

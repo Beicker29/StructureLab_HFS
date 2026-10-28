@@ -5,6 +5,7 @@ No source code is copied into the external test root. Only tests, external input
 and historical capture utilities are copied. Logs survive any failed command.
 """
 import argparse
+from email.parser import Parser
 import hashlib
 import json
 import os
@@ -14,12 +15,14 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
 import venv
 import zipfile
 import xml.etree.ElementTree as ET
 
 from hfs020_comparison import (assert_json_equal, compare_cli_records, parse_json,
                               verify_input_provenance, versioned_examples)
+from audit_baseline import normalize
 
 ROOT = Path(__file__).resolve().parents[1]
 SUITES = [
@@ -30,6 +33,7 @@ SUITES = [
     "test_hfs015_precision_advice", "test_hfs017_design_method",
     "test_hfs020_comparison",
     "test_hfs021_execution",
+    "test_hfs021a_public_api",
 ]
 
 
@@ -44,23 +48,29 @@ def digest(path):
 
 def inspect_archives(wheel, sdist):
     """Allowlist executable payload; source distribution must rebuild standalone."""
-    expected = {p.relative_to(ROOT).as_posix(): p.read_bytes()
+    expected = {p.relative_to(ROOT / "src").as_posix(): p.read_bytes()
                 for p in (ROOT / "src/steel_design").rglob("*.py")}
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    dist_name = project["name"].replace("-", "_")
+    dist_info = f"{dist_name}-{project['version']}.dist-info/"
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
-        code = {n: archive.read(n) for n in names if n.startswith("src/")}
-        assert code == expected, "Wheel must contain exactly the existing namespace Python sources"
-        assert all(n in expected or n.startswith("structurelab_hfs-0.1.0.dist-info/") for n in names)
-        entry = archive.read("structurelab_hfs-0.1.0.dist-info/entry_points.txt").decode()
-        assert "structurelab-hfs = src.steel_design.run:main" in entry
-        metadata = archive.read("structurelab_hfs-0.1.0.dist-info/METADATA").decode()
+        code = {n: archive.read(n) for n in names if n.startswith("steel_design/")}
+        assert code == expected, "Wheel must contain exactly the conventional package sources"
+        assert not any(n.startswith("src/") for n in names)
+        assert all(n in expected or n.startswith(dist_info) for n in names)
+        entry = archive.read(dist_info + "entry_points.txt").decode()
+        assert "structurelab-hfs = steel_design.run:main" in entry
+        metadata = archive.read(dist_info + "METADATA").decode()
+        assert Parser().parsestr(metadata)["Version"] == project["version"]
     with tarfile.open(sdist) as archive:
         files = {m.name.split("/", 1)[1]: archive.extractfile(m).read()
                  for m in archive.getmembers() if m.isfile()}
         for name, content in expected.items():
-            assert files[name] == content, name
+            assert files["src/" + name] == content, name
         permitted = {"README.md", "pyproject.toml", "MANIFEST.in", "PKG-INFO", "setup.cfg"}
-        assert all(n in expected or n in permitted or n.startswith("structurelab_hfs.egg-info/")
+        assert all((n.startswith("src/") and n[4:] in expected) or n in permitted
+                   or n.startswith(f"src/{dist_name}.egg-info/")
                    for n in files), sorted(files)
     return {"wheel": {"file": wheel.name, "sha256": digest(wheel), "members": names},
             "sdist": {"file": sdist.name, "sha256": digest(sdist), "members": sorted(files)},
@@ -72,6 +82,12 @@ def verify(args):
     if out.exists():
         raise SystemExit("Use a new evidence directory")
     out.mkdir(parents=True)
+    legacy_build = ROOT / "build/lib/src"
+    if legacy_build.exists():
+        write(out / "legacy-build-detected.json", {
+            "path": str(legacy_build), "reason": "Setuptools can retain the retired package in an in-place wheel build",
+            "action": "Archive the generated build directory with hashes, then move it out of build/ before retrying. No automatic deletion."})
+        raise RuntimeError("Legacy build/lib/src detected; preserve and relocate the generated build directory before packaging.")
     work = Path(tempfile.mkdtemp(prefix="h20-"))
     assert not work.is_relative_to(ROOT)
     env = os.environ.copy()
@@ -110,7 +126,8 @@ def verify(args):
         for path in (ROOT / folder).glob(pattern):
             shutil.copyfile(path, inputs / folder / path.name)
     (inputs / "scripts").mkdir()
-    for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py"):
+    for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py",
+                 "hfs021a_invariants.py", "probe_hfs021a_imports.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
     write(out / "external-inputs.json", {p.relative_to(inputs).as_posix(): digest(p)
           for p in inputs.rglob("*") if p.is_file()})
@@ -130,40 +147,59 @@ def verify(args):
     empty.mkdir()
     (work / "tmp").mkdir()
     constraints = ROOT / "requirements/ci-constraints.txt"
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
     interpreters = {}
-    for mode, install_target, cwd in (("project", ".", ROOT), ("wheel", wheel, empty)):
+    for mode, install_target, cwd in (("project", ".", ROOT), ("wheel", wheel, empty),
+                                      ("editable", ".", ROOT)):
         prefix = work / mode
         venv.EnvBuilder(with_pip=True).create(prefix)
         executable = prefix / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         cli = executable.parent / ("structurelab-hfs.exe" if os.name == "nt" else "structurelab-hfs")
         interpreters[mode] = executable
-        run(f"install-{mode}", [executable, "-m", "pip", "install", "-c", constraints, install_target], cwd)
+        editable = ["-e"] if mode == "editable" else []
+        run(f"install-{mode}", [executable, "-m", "pip", "install", "-c", constraints, *editable, install_target], cwd)
         run(f"check-{mode}", [executable, "-m", "pip", "check"], empty)
         run(f"freeze-{mode}", [executable, "-m", "pip", "freeze", "--all"], empty)
+        origin = ROOT / "src" if mode == "editable" else prefix
         probe = (
             "import importlib, importlib.metadata, json, pathlib, sys; "
             "mods=[importlib.import_module(n) for n in "
-            "['src.steel_design.engine','src.steel_design.run','src.steel_design.models',"
-            "'src.steel_design.domain.design_methods','src.steel_design.sections.repository']]; "
+            "['steel_design.engine','steel_design.run','steel_design.models',"
+            "'steel_design.domain.design_methods','steel_design.sections.repository']]; "
             "paths=[pathlib.Path(m.__file__).resolve() for m in mods]; "
-            "assert all(p.is_relative_to(pathlib.Path(sys.prefix).resolve()) for p in paths); "
+            f"assert all(p.is_relative_to(pathlib.Path({str(origin)!r}).resolve()) for p in paths); "
+            f"assert importlib.metadata.version('structurelab-hfs') == {version!r}; "
+            "assert not any(str(f).startswith('src/') for f in importlib.metadata.files('structurelab-hfs')); "
             "assert importlib.util.find_spec('matplotlib') is None; "
             "print(json.dumps({'version':importlib.metadata.version('structurelab-hfs'),"
             "'imports':[str(p) for p in paths],'sys_path':sys.path}))"
         )
         run(f"imports-{mode}", [executable, "-I", "-c", probe], empty)
-        for label, command in (("console", [cli]), ("module", [executable, "-m", "src.steel_design.run"])):
+        for location, probe_cwd in (("outside", empty), ("checkout", ROOT)):
+            for order in ("canonical-first", "legacy-first"):
+                run(f"identity-{mode}-{location}-{order}",
+                    [executable, "-B", inputs / "scripts/probe_hfs021a_imports.py",
+                     "--root", probe_cwd, "--order", order], probe_cwd)
+        legacy = run(f"legacy-cli-{mode}", [executable, "-m", "src.steel_design.run", "--help"], ROOT, expected=1)
+        assert "namespace has been retired" in legacy.stderr and not legacy.stdout
+        cli_outputs = []
+        for label, command in (("console", [cli]), ("module", [executable, "-m", "steel_design.run"])):
             run(f"help-{mode}-{label}", [*command, "--help"], empty)
             result = run(f"external-{mode}-{label}", [*command,
                 inputs / "examples/w_shape_case.json", "--sections", inputs / "data/sections.xlsx",
                 "--results-dir", work / f"result-{mode}-{label}"], empty)
             assert json.loads(result.stdout)["status"] == "INCOMPLETE"
+            cli_outputs.append(normalize(json.loads(result.stdout)))
+        assert_json_equal(*cli_outputs, f"{mode} console/module outputs differ")
         missing = run(f"missing-default-{mode}", [cli, inputs / "examples/w_shape_case.json"], empty, expected=1)
         assert json.loads(missing.stderr)["error"]["stage"] == "load_sections"
         assert not (empty / "data").exists()
 
     executable = interpreters["wheel"]
     run("install-tests", [executable, "-m", "pip", "install", "-c", constraints, "pytest==9.1.1"], empty)
+    run("install-editable-tests", [interpreters["editable"], "-m", "pip", "install", "-c", constraints, "pytest==9.1.1"], empty)
+    run("editable-api-tests", [interpreters["editable"], "-m", "pytest", "-q", "-p", "no:cacheprovider",
+        "tests/test_hfs021a_public_api.py", f"--basetemp={work / 'tmp' / 'editable-api'}"], inputs)
     summary = {}
     selections = [("original", [f"--ignore=tests/{name}.py" for name in SUITES])]
     selections += [(name, [f"tests/{name}.py"]) for name in SUITES]
@@ -190,10 +226,30 @@ def verify(args):
     assert len(actual_cli) == len(expected_cli) == 24
     assert input_proof() == provenance, "Input bytes changed during execution"
     compare_cli_records(actual_cli, expected_cli, provenance)
+    # Historical SVG bytes, not regenerated expectations or inferred counts.
+    graph_proof = {}
+    raw_cli = json.loads((out / "cli-examples.json").read_text(encoding="utf-8"))
+    with zipfile.ZipFile(ROOT / "docs/audit/hfs021/evidence/diagrams.zip") as diagrams:
+        expected_graphs = {n for n in diagrams.namelist() if n.startswith("after/")}
+        for label, record in raw_cli.items():
+            if record["execution"]["returncode"]:
+                continue
+            output = json.loads(record["execution"]["stdout"])
+            for index, case in enumerate(output.get("cases", [output])):
+                graph = case["artifacts"]["interaction_diagram_i5_method2_image"]
+                if graph is None:
+                    continue
+                member = f"after/{label}/case-{index}.svg"
+                data = Path(graph).read_bytes()
+                assert data == diagrams.read(member), member
+                graph_proof[member] = hashlib.sha256(data).hexdigest()
+        assert set(graph_proof) == expected_graphs
+    write(out / "svg-comparison.json", graph_proof)
     write(out / "verification.json", {"accepted": True, "suites": summary,
           "examples_identical": 12, "cli_memory_scenarios_identical": 24,
           "external_work": str(work), "production_source_copied": False,
-          "project_and_wheel_installs": True, "external_catalog_explicit": True})
+          "project_and_wheel_installs": True, "editable_install": True,
+          "canonical_package": "steel_design", "external_catalog_explicit": True})
     write(out / "SHA256SUMS.json", {p.relative_to(out).as_posix(): digest(p)
           for p in sorted(out.rglob("*")) if p.is_file() and p.name != "SHA256SUMS.json"})
 

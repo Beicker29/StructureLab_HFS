@@ -8,12 +8,12 @@ def capture(root, output):
     root, output = Path(root).resolve(), Path(output).resolve()
     if output.exists():
         raise SystemExit("Use a new evidence file")
-    sys.path.insert(0, str(root))
-    from src.steel_design.models import SteelCase
-    from src.steel_design.sections.models import Section
-    from src.steel_design.domain.rules.flexure_rule import FlexureF11YieldMxRule
-    from src.steel_design.domain.rules.composite_rules import CompositeI2EncasedTensionRule, _steel_shear_capacity_k_n
-    from src.steel_design.codes.aisc_360_22 import axial_calc, tension_calc, shear_calc, combined_hss_calc
+    sys.path.insert(0, str(root / "src"))
+    from steel_design.models import SteelCase
+    from steel_design.sections.models import Section
+    from steel_design.domain.rules.flexure_rule import FlexureF11YieldMxRule
+    from steel_design.domain.rules.composite_rules import CompositeI2EncasedTensionRule, _steel_shear_capacity_k_n
+    from steel_design.codes.aisc_360_22 import axial_calc, tension_calc, shear_calc, combined_hss_calc
     case = SteelCase(section_name="probe", design_method="ASD", material=dict(Fy=320,Fu=450),
                      loads=dict(Mux=1), lengths=dict(Lx=1000,Ly=1000,Lz=1000,Lb=100))
     section = Section(name="probe",type="SOLID_RECTANGULAR",A=20000,Zx=1000000,Sx=666666.6666666666,

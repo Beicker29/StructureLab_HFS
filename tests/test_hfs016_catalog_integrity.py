@@ -9,13 +9,13 @@ import openpyxl
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from src.steel_design.domain.errors import AmbiguousSectionError, ValidationError
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.identity import section_identity
-from src.steel_design.sections.loader import load_sections_from_excel
-from src.steel_design.sections.models import Section, SectionSource
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.domain.errors import AmbiguousSectionError, ValidationError
+from steel_design.engine import SteelDesignEngine
+from steel_design.models import SteelCase
+from steel_design.sections.identity import section_identity
+from steel_design.sections.loader import load_sections_from_excel
+from steel_design.sections.models import Section, SectionSource
+from steel_design.sections.repository import SectionRepository
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -191,7 +191,7 @@ def test_hfs011_physical_invalidity_still_rejected_when_identity_is_unique(real_
 def test_cli_ambiguous_error_and_valid_profile_recovery(tmp_path, name):
     path = tmp_path / "case.json"
     path.write_text(case(name).model_dump_json(), encoding="utf-8")
-    command = [sys.executable, "-m", "src.steel_design.run", str(path), "--results-dir", str(tmp_path / "results")]
+    command = [sys.executable, "-m", "steel_design.run", str(path), "--results-dir", str(tmp_path / "results")]
     run = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
     assert run.returncode == 1 and not run.stdout
     error = json.loads(run.stderr)["error"]

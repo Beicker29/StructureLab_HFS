@@ -10,23 +10,27 @@ Una propuesta DRY debe nombrar las copias, explicar qué concepto comparten, ide
 
 ## Entorno reproducible
 
-HFS-020 añade instalación/build/CI sin migrar el namespace `src.steel_design`.
+HFS-021A migra a `steel_design` con src-layout y distribución 0.2.0.
+El namespace antiguo `src.steel_design` está retirado. Para ejecutar desde
+checkout se requiere instalación (preferentemente editable), no otro import
+dependiente del cwd. [API y migración](docs/contracts/hfs021a-public-api.md).
 Para la resolución actual de herramientas y runtime, desde el checkout:
 
 ```powershell
 python -m venv .venv/hfs-dev
-.\.venv\hfs-dev\Scripts\python.exe -m pip install -c requirements/ci-constraints.txt ".[dev]"
+.\.venv\hfs-dev\Scripts\python.exe -m pip install -c requirements/ci-constraints.txt -e ".[dev]"
 .\.venv\hfs-dev\Scripts\python.exe -m ruff check .
 .\.venv\hfs-dev\Scripts\python.exe scripts/verify_hfs020.py --out .venv/hfs020-new
 ```
 
 El verificador exige una salida nueva, construye sdist y wheel desde ese sdist,
-inspecciona contenido, ejecuta `twine check --strict`, crea dos entornos limpios
-y prueba `pip install .` y wheel. Copia solo tests/entradas y utilidades de
+inspecciona contenido, ejecuta `twine check --strict`, crea tres entornos limpios
+y prueba `pip install .`, wheel y editable. Copia solo tests/entradas y utilidades de
 captura a una carpeta temporal **fuera del checkout**, nunca `src`. Allí ejecuta
 las once suites históricas y la suite de comparación HFS-020 por separado,
 los 12 ejemplos y los 24 recorridos CLI/memoria.
-Comprueba imports en `site-packages`, ambos comandos CLI y catálogo externo.
+Comprueba imports en `site-packages` (o src explícito en editable), ambos comandos
+CLI convencionales, catálogo externo y rechazo legado sin identidades paralelas.
 Requiere acceso a PyPI; conserva logs también cuando falla y no borra la carpeta
 temporal, cuya ruta queda en `environment.json`. No ejecutar limpiezas de ella
 sin verificar primero ruta y necesidad de preservar evidencia.
@@ -72,6 +76,21 @@ $auditGit = (Get-Command git -ErrorAction Stop).Source
 Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHub Desktop). Si hay restricciones del entorno, registrar el error y usar el mecanismo de permisos disponible; no desactivar pruebas ni cambiar permisos históricos para aparentar éxito.
 
 ## Suites separadas
+
+HFS-021A añade `tests/test_hfs021a_public_api.py` separada de las trece suites
+previas (1762 aprobadas +12 subpruebas). Los tests previos solo migran imports
+y ejecución modular; no cambian oráculos. `compare_hfs021a.py` demuestra AST
+completo equivalente bajo esa única transformación, fuentes ingenieriles y
+comparador HFS-020 intactos, resultados exactos y SVG idénticos.
+La suite nueva también corre desde la instalación editable. El workflow sigue
+llamando `verify_hfs020.py`, sin omitir jobs Windows/Ubuntu.
+
+Los scripts de captura que copian fuentes utilizan explícitamente `<work>/src`
+para ejecutar `steel_design`; los de instalación resuelven el wheel sin fuentes
+productivos en la carpeta externa. Para reproducir un hito anterior con su
+namespace original, usar el commit y entorno documentados, sin reescribir sus
+capturas. `compare_hfs021.py` mantiene su chequeo de extracción histórica; su
+comparación exacta reutilizable es consumida por el nuevo comparador.
 
 HFS-021 mantiene `scripts/verify_hfs020.py` como verificador común de CI y
 desarrollo y añade `tests/test_hfs021_execution.py` como decimotercera suite

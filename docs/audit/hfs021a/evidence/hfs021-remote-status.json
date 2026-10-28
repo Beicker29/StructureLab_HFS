@@ -1,0 +1,12 @@
+{
+  "source": "GitHub fetch_workflow_run_jobs; fields retained from response",
+  "queried_date": "2026-10-28",
+  "repo": "Beicker29/StructureLab_HFS",
+  "run_id": 40687160912,
+  "base_sha_supplied_by_user_and_verified_in_local_git": "39a7614a413a06eef78f597e142f7ba0e889c123",
+  "jobs": [
+    {"id": 122812371832, "name": "Python 3.12 / ubuntu-24.04", "status": "completed", "conclusion": "success", "build_install_test_step": "success"},
+    {"id": 122812372184, "name": "Python 3.12 / windows-2022", "status": "completed", "conclusion": "success", "build_install_test_step": "success"}
+  ],
+  "hfs021a_remote_status": "not_run_unpublished_changes"
+}

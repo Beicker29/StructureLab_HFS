@@ -7,14 +7,14 @@ import sys
 import pytest
 from pydantic import ValidationError
 
-from src.steel_design import models as m
-from src.steel_design.domain.errors import CatalogSchemaError, SteelDesignError
-from src.steel_design.domain.validation import validate_case, validate_section, validate_case_section
-from src.steel_design.engine import SteelDesignEngine
-from src.steel_design.run import OutputOptions, _extract_output_options, _unique_json_object
-from src.steel_design.sections.loader import _coerce_float, _scaled_float
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design import models as m
+from steel_design.domain.errors import CatalogSchemaError, SteelDesignError
+from steel_design.domain.validation import validate_case, validate_section, validate_case_section
+from steel_design.engine import SteelDesignEngine
+from steel_design.run import OutputOptions, _extract_output_options, _unique_json_object
+from steel_design.sections.loader import _coerce_float, _scaled_float
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -273,7 +273,7 @@ def test_catalog_scaling_overflow_controlled():
 def test_cli_errors_have_field_location_and_reason(tmp_path, loads):
     path = tmp_path / "invalid.json"
     path.write_text(json.dumps({**CASE, "loads": loads}), encoding="utf-8")
-    completed = subprocess.run([sys.executable, "-m", "src.steel_design.run", str(path),
+    completed = subprocess.run([sys.executable, "-m", "steel_design.run", str(path),
                                 "--results-dir", str(tmp_path / "results")], cwd=ROOT,
                                capture_output=True, text=True)
     assert completed.returncode == 1

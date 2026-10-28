@@ -13,12 +13,12 @@ import sys
 
 import pytest
 
-from src.steel_design.domain.errors import ValidationError
-from src.steel_design.models import CheckResult, SteelCase
-from src.steel_design.results_model import (
+from steel_design.domain.errors import ValidationError
+from steel_design.models import CheckResult, SteelCase
+from steel_design.results_model import (
     AnalysisStatus, CoverageObligation, CoverageReport, EngineResult, aggregate_case_statuses,
 )
-from src.steel_design import run as cli
+from steel_design import run as cli
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -134,7 +134,7 @@ def invoke(tmp_path, data):
     path=tmp_path/"input.json"
     path.write_text(json.dumps(data),encoding="utf-8")
     output=tmp_path/"results"
-    process=subprocess.run([sys.executable,"-m","src.steel_design.run",str(path),
+    process=subprocess.run([sys.executable,"-m","steel_design.run",str(path),
         "--sections",str(ROOT/"data/sections.xlsx"),"--results-dir",str(output)],
         cwd=ROOT,capture_output=True,text=True,encoding="utf-8")
     return process,output

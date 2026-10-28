@@ -1,0 +1,330 @@
+{
+  "difference_count": 65,
+  "differences": [
+    {
+      "path": "/channel_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/channel_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE4Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE4Rule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE4Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE4Rule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF8YieldMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF8YieldMxRule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF8LocalBucklingMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF8LocalBucklingMxRule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.combined_hss_rules.CombinedH1HssRule",
+      "after": "steel_design.domain.rules.combined_hss_rules.CombinedH1HssRule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/5/implementation",
+      "before": "src.steel_design.domain.rules.combined_hss_rules.HssTorsionH3_1Rule",
+      "after": "steel_design.domain.rules.combined_hss_rules.HssTorsionH3_1Rule"
+    },
+    {
+      "path": "/circular_hss_case.json/0/result/coverage/executions/6/implementation",
+      "before": "src.steel_design.domain.rules.combined_hss_rules.HssCombinedH3_2Rule",
+      "after": "steel_design.domain.rules.combined_hss_rules.HssCombinedH3_2Rule"
+    },
+    {
+      "path": "/composite_beam_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI1Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI1Rule"
+    },
+    {
+      "path": "/composite_beam_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI3_1aRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI3_1aRule"
+    },
+    {
+      "path": "/composite_beam_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI3_1bRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI3_1bRule"
+    },
+    {
+      "path": "/composite_beam_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI3_1cRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI3_1cRule"
+    },
+    {
+      "path": "/composite_beam_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_3BeamDeckSteelOnlyRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_3BeamDeckSteelOnlyRule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI1Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI1Rule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI2EncasedCompressionRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI2EncasedCompressionRule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI5CombinedRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI5CombinedRule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI3_3Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI3_3Rule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_1aEncasedRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_1aEncasedRule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/5/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_1bEncasedRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_1bEncasedRule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/6/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_1cEncasedRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_1cEncasedRule"
+    },
+    {
+      "path": "/composite_encased_case.json/0/result/coverage/executions/7/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_1EncasedGoverningRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_1EncasedGoverningRule"
+    },
+    {
+      "path": "/composite_filled_circular_hss_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI1Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI1Rule"
+    },
+    {
+      "path": "/composite_filled_circular_hss_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI2FilledCompressionRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI2FilledCompressionRule"
+    },
+    {
+      "path": "/composite_filled_circular_hss_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI5CombinedRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI5CombinedRule"
+    },
+    {
+      "path": "/composite_filled_circular_hss_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI3_4Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI3_4Rule"
+    },
+    {
+      "path": "/composite_filled_circular_hss_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_1FilledRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_1FilledRule"
+    },
+    {
+      "path": "/composite_filled_rectangular_hss_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI1Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI1Rule"
+    },
+    {
+      "path": "/composite_filled_rectangular_hss_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI2FilledCompressionRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI2FilledCompressionRule"
+    },
+    {
+      "path": "/composite_filled_rectangular_hss_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI5CombinedRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI5CombinedRule"
+    },
+    {
+      "path": "/composite_filled_rectangular_hss_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI3_4Rule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI3_4Rule"
+    },
+    {
+      "path": "/composite_filled_rectangular_hss_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.composite_rules.CompositeI4_1FilledRule",
+      "after": "steel_design.domain.rules.composite_rules.CompositeI4_1FilledRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE4Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE4Rule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7YieldMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7YieldMxRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7YieldMyRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7YieldMyRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7FlangeMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7FlangeMxRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/5/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7FlangeMyRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7FlangeMyRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/6/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7WebMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7WebMxRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/7/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7WebMyRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7WebMyRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/8/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7LtbMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7LtbMxRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/9/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF7LtbMyRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF7LtbMyRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/10/implementation",
+      "before": "src.steel_design.domain.rules.shear_rules.ShearG4VxRule",
+      "after": "steel_design.domain.rules.shear_rules.ShearG4VxRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/11/implementation",
+      "before": "src.steel_design.domain.rules.shear_rules.ShearG4VyRule",
+      "after": "steel_design.domain.rules.shear_rules.ShearG4VyRule"
+    },
+    {
+      "path": "/rectangular_hss_case.json/0/result/coverage/executions/12/implementation",
+      "before": "src.steel_design.domain.rules.combined_hss_rules.CombinedH1HssRule",
+      "after": "steel_design.domain.rules.combined_hss_rules.CombinedH1HssRule"
+    },
+    {
+      "path": "/single_angle_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/single_angle_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE5Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE5Rule"
+    },
+    {
+      "path": "/single_angle_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF10YieldMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF10YieldMxRule"
+    },
+    {
+      "path": "/single_angle_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF10LtbMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF10LtbMxRule"
+    },
+    {
+      "path": "/single_angle_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF10LegBucklingMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF10LegBucklingMxRule"
+    },
+    {
+      "path": "/solid_circular_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/solid_circular_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF11YieldMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF11YieldMxRule"
+    },
+    {
+      "path": "/solid_circular_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF11LtbMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF11LtbMxRule"
+    },
+    {
+      "path": "/solid_rectangular_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/solid_rectangular_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF11YieldMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF11YieldMxRule"
+    },
+    {
+      "path": "/solid_rectangular_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF11LtbMxRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF11LtbMxRule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/0/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE3Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE3Rule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/1/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE4Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE4Rule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/2/implementation",
+      "before": "src.steel_design.domain.rules.axial_rules.AxialE7Rule",
+      "after": "steel_design.domain.rules.axial_rules.AxialE7Rule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/3/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF2YieldRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF2YieldRule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/4/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF2LtbRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF2LtbRule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/5/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF6YieldRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF6YieldRule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/6/implementation",
+      "before": "src.steel_design.domain.rules.flexure_rule.FlexureF6FlbRule",
+      "after": "steel_design.domain.rules.flexure_rule.FlexureF6FlbRule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/7/implementation",
+      "before": "src.steel_design.domain.rules.shear_rules.ShearG2VxRule",
+      "after": "steel_design.domain.rules.shear_rules.ShearG2VxRule"
+    },
+    {
+      "path": "/w_shape_case.json/0/result/coverage/executions/8/implementation",
+      "before": "src.steel_design.domain.rules.shear_rules.ShearG6VyRule",
+      "after": "steel_design.domain.rules.shear_rules.ShearG6VyRule"
+    }
+  ]
+}

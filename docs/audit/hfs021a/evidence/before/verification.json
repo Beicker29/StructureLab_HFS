@@ -1,0 +1,167 @@
+{
+  "accepted": true,
+  "suites": {
+    "original": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "80",
+        "time": "39.222",
+        "timestamp": "2026-10-28T07:35:50.936716-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs000_characterization": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "12",
+        "time": "4.118",
+        "timestamp": "2026-10-28T07:36:30.661422-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs011_input_contracts": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "665",
+        "time": "11.874",
+        "timestamp": "2026-10-28T07:36:35.368299-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs016_catalog_integrity": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "44",
+        "time": "11.081",
+        "timestamp": "2026-10-28T07:36:47.705408-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs010_coverage": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "57",
+        "time": "6.359",
+        "timestamp": "2026-10-28T07:36:59.264450-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs012_flexure_selection": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "61",
+        "time": "0.278",
+        "timestamp": "2026-10-28T07:37:06.197325-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs013_directional_h3": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "57",
+        "time": "1.953",
+        "timestamp": "2026-10-28T07:37:06.936695-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs013_design_method": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "73",
+        "time": "0.300",
+        "timestamp": "2026-10-28T07:37:09.422266-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs014_summary_bundle": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "72",
+        "time": "25.079",
+        "timestamp": "2026-10-28T07:37:10.192084-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs015_precision_advice": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "84",
+        "time": "5.213",
+        "timestamp": "2026-10-28T07:37:35.715721-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs017_design_method": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "468",
+        "time": "5.260",
+        "timestamp": "2026-10-28T07:37:41.445818-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs020_comparison": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "50",
+        "time": "0.124",
+        "timestamp": "2026-10-28T07:37:47.222813-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs021_execution": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "51",
+        "time": "27.291",
+        "timestamp": "2026-10-28T07:37:47.825092-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ]
+  },
+  "examples_identical": 12,
+  "cli_memory_scenarios_identical": 24,
+  "external_work": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-e7j_ow99",
+  "production_source_copied": false,
+  "project_and_wheel_installs": true,
+  "external_catalog_explicit": true
+}

@@ -15,7 +15,7 @@ class ExampleSmokeTests(unittest.TestCase):
             [
                 sys.executable,
                 "-m",
-                "src.steel_design.run",
+                "steel_design.run",
                 str(self.repo_root / relative_path),
             ],
             cwd=self.repo_root,

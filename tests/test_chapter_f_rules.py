@@ -1,10 +1,10 @@
 import unittest
 
-from src.steel_design.domain.errors import ValidationError
-from src.steel_design.domain.routing.profile_router import ProfileRouter
-from src.steel_design.domain.rules.flexure_rule import FlexureF10Rule, FlexureF11Rule
-from src.steel_design.domain.validation import validate_case
-from src.steel_design.models import (
+from steel_design.domain.errors import ValidationError
+from steel_design.domain.routing.profile_router import ProfileRouter
+from steel_design.domain.rules.flexure_rule import FlexureF10Rule, FlexureF11Rule
+from steel_design.domain.validation import validate_case
+from steel_design.models import (
     AngleFlexureAxis,
     AngleLtbRestraint,
     Connection,
@@ -14,7 +14,7 @@ from src.steel_design.models import (
     Material,
     SteelCase,
 )
-from src.steel_design.sections.models import Section
+from steel_design.sections.models import Section
 
 
 def _case(*, mux=0.0, muy=0.0, design_method="LRFD", connection=None):

@@ -81,8 +81,12 @@ def record_selection_errors(report, errors):
 def record_evaluation(report, rule, result, index, case, section):
     implementation = type(rule)
     claims = _CLAIMS.get(implementation, ())
+    # Preserve the existing JSON identifier, not a Python import alias.
+    # Class identity and all evidence decisions below use the canonical class.
+    module = implementation.__module__
+    identifier_module = "src." + module if module.startswith("steel_design.") else module
     report.executions.append(ExecutedEvaluation(
-        check_index=index, implementation=f"{implementation.__module__}.{implementation.__qualname__}",
+        check_index=index, implementation=f"{identifier_module}.{implementation.__qualname__}",
         obligation_ids=list(claims)))
     basis = next(o for o in report.obligations if o.id == "scope.basis")
     for obligation in report.obligations:

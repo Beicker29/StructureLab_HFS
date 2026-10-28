@@ -1,5 +1,32 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-021A: una identidad importable y API explícita
+
+- `pyproject.toml` define distribución 0.2.0 y descubrimiento convencional de
+  `steel_design` desde `src`, sin namespaces implícitos. No hay otra fuente de
+  versión fija en verificadores ni copia del catálogo en el paquete.
+- `steel_design/__init__.py` solo rechaza inicialización bajo nombre legado;
+  no crea aliases en sys.modules ni reexporta modelos bajo otro nombre. Los
+  siete inicializadores de subpaquetes reales no ejecutan lógica.
+- Los propietarios funcionales de HFS-021 permanecen idénticos. La
+  [API pública](../contracts/hfs021a-public-api.md) identifica sus imports
+  explícitos; las fachadas `_` conservadas son internas, no un segundo servicio.
+- `coverage_evidence.record_evaluation` sigue siendo el único productor del ID
+  de implementación en JSON. Conserva el texto histórico como ID, sin alias
+  Python ni otra clase. La adaptación de nombre no altera `_CLAIMS`, condiciones
+  o acreditación y se verifica por AST y regresión exacta, sin normalizaciones.
+- `hfs020_comparison` conserva íntegra la comparación exacta y procedencia.
+  `compare_hfs021.compare_results` se extrae para reutilizar el mismo contraste
+  de capturas/SVG en `compare_hfs021a`. El comprobador de extracción histórica
+  conserva su alcance original; no se hace pasar contra una base incompatible.
+- `hfs021a_invariants` solo comprueba AST bajo la transformación de prefijo
+  aprobada. No elimina constantes, condiciones, imports o aserciones para
+  aparentar equivalencia. Las pruebas de mutación detectan cambios reales.
+
+No se consolida ningún helper normativo. Los oráculos independientes y
+documentos históricos siguen intactos en significado; solo migran imports
+de pruebas activas. [Mapa y evidencia](../audit/hfs021a/report.md).
+
 ## Aplicación HFS-021: ejecución, geometría y presentación
 
 | Concepto / duplicación | Fuente canónica actual | Consumidores / decisión / verificación |

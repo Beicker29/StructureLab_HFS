@@ -17,18 +17,18 @@ import sys
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from src.steel_design import engine as engine_module, reporting, run as cli
-from src.steel_design.domain.errors import SectionNotFoundError, ValidationError
-from src.steel_design.engine import SteelDesignEngine, _build_custom_section
-from src.steel_design.execution import (
+from steel_design import engine as engine_module, reporting, run as cli
+from steel_design.domain.errors import SectionNotFoundError, ValidationError
+from steel_design.engine import SteelDesignEngine, _build_custom_section
+from steel_design.execution import (
     execute_case, execute_payload, execution_status, iter_executions,
     extract_output_options, merge_case_payload,
 )
-from src.steel_design.models import SteelCase
-from src.steel_design.sections.geometry import build_custom_section
-from src.steel_design.sections.loader import load_sections_from_excel
-from src.steel_design.sections.models import Section
-from src.steel_design.sections.repository import SectionRepository
+from steel_design.models import SteelCase
+from steel_design.sections.geometry import build_custom_section
+from steel_design.sections.loader import load_sections_from_excel
+from steel_design.sections.models import Section
+from steel_design.sections.repository import SectionRepository
 
 ROOT = Path(__file__).resolve().parents[1]
 SCOPE = dict(ordinary_prismatic_member=True, concentric_axial_force=True, no_special_conditions=True,
@@ -60,7 +60,7 @@ def engine():
 def invoke(tmp_path, data, catalog=None):
     source = tmp_path / "input.json"
     source.write_text(json.dumps(data), encoding="utf-8")
-    return subprocess.run([sys.executable, "-m", "src.steel_design.run", str(source),
+    return subprocess.run([sys.executable, "-m", "steel_design.run", str(source),
                            "--sections", str(catalog or ROOT / "data/sections.xlsx"),
                            "--results-dir", str(tmp_path / "out")],
                           capture_output=True, text=True, encoding="utf-8", cwd=ROOT)
@@ -311,7 +311,7 @@ def test_iteration_is_lazy_after_validating_bundle_shape():
 def test_import_orders_without_cycles_or_cli_side_effects(first, tmp_path):
     modules = [first, "execution", "reporting", "run", "engine", "models", "results_model", "sections.geometry"]
     code = f"import importlib, sys; sys.path.insert(0, {str(ROOT)!r}); " + "; ".join(
-        f"importlib.import_module('src.steel_design.{m}')" for m in modules)
+        f"importlib.import_module('steel_design.{m}')" for m in modules)
     result = subprocess.run([sys.executable, "-B", "-c", code], cwd=tmp_path, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert not result.stdout and not result.stderr
@@ -319,5 +319,5 @@ def test_import_orders_without_cycles_or_cli_side_effects(first, tmp_path):
 
 
 def test_execution_module_has_no_transport_dependencies():
-    module = importlib.import_module("src.steel_design.execution")
+    module = importlib.import_module("steel_design.execution")
     assert not any(name in vars(module) for name in ("argparse", "sys", "Path", "datetime", "json", "reporting"))

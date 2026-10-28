@@ -1,10 +1,10 @@
 import unittest
 
-from src.steel_design.domain.routing.profile_router import ProfileRouter
-from src.steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
-from src.steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule
-from src.steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
-from src.steel_design.sections.models import Section
+from steel_design.domain.routing.profile_router import ProfileRouter
+from steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
+from steel_design.domain.rules.combined_hss_rules import HssCombinedH3_2Rule, HssTorsionH3_1Rule
+from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
+from steel_design.sections.models import Section
 
 
 def _case(*, pu=0.0, mux=0.0, muy=0.0, vux=0.0, vuy=0.0, vu=0.0, tu=0.0) -> SteelCase:

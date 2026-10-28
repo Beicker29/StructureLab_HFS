@@ -7,8 +7,8 @@ from pathlib import Path
 
 import openpyxl
 
-from src.steel_design.domain.errors import CatalogSchemaError
-from src.steel_design.sections.loader import load_sections_from_excel
+from steel_design.domain.errors import CatalogSchemaError
+from steel_design.sections.loader import load_sections_from_excel
 
 
 @contextmanager
