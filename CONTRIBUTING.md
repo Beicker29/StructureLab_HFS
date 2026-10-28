@@ -85,6 +85,15 @@ comparador HFS-020 intactos, resultados exactos y SVG idénticos.
 La suite nueva también corre desde la instalación editable. El workflow sigue
 llamando `verify_hfs020.py`, sin omitir jobs Windows/Ubuntu.
 
+La corrección multiplataforma HFS-021A añade una suite separada de 29 pruebas,
+`tests/test_hfs021a_svg_comparison.py`: total 1819 métodos +12 subpruebas.
+Solo para los seis SVG históricos, `hfs021a_svg_comparison.assert_svg_equal`
+permite CRLF frente a LF; cualquier otro byte debe coincidir. Conserva tamaños,
+hashes originales y finales de línea en `svg-comparison.json`; el verificador
+archiva ambos originales en `svg-originals.zip`, también si falla la comparación.
+JSON, números, entradas y referencias mantienen sus controles anteriores.
+[Diagnóstico, reproducción y estado de CI](docs/audit/hfs021a/ci-fix/report.md).
+
 Los scripts de captura que copian fuentes utilizan explícitamente `<work>/src`
 para ejecutar `steel_design`; los de instalación resuelven el wheel sin fuentes
 productivos en la carpeta externa. Para reproducir un hito anterior con su
