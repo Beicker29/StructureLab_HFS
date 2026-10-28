@@ -37,6 +37,7 @@ SUITES = [
     "test_hfs021a_public_api",
     "test_hfs021a_svg_comparison",
     "test_hfs022_contracts",
+    "test_hfs022r_review",
 ]
 
 
@@ -208,10 +209,18 @@ def verify(args):
         assert not (empty / "data").exists()
 
     executable = interpreters["wheel"]
-    run("install-tests", [executable, "-m", "pip", "install", "-c", constraints, "pytest==9.1.1"], empty)
-    run("install-editable-tests", [interpreters["editable"], "-m", "pip", "install", "-c", constraints, "pytest==9.1.1"], empty)
+    # Test tools remain development-only; pyproject owns their direct pins.
+    dev = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["optional-dependencies"]["dev"]
+    test_requirements = [requirement for requirement in dev if requirement.startswith(("pytest==", "jsonschema=="))]
+    run("install-tests", [executable, "-m", "pip", "install", "-c", constraints, *test_requirements], empty)
+    run("install-editable-tests", [interpreters["editable"], "-m", "pip", "install", "-c", constraints, *test_requirements], empty)
+    for mode in ("wheel", "editable"):
+        run(f"check-tests-{mode}", [interpreters[mode], "-m", "pip", "check"], empty)
+        run(f"freeze-tests-{mode}", [interpreters[mode], "-m", "pip", "freeze", "--all"], empty)
     run("editable-api-tests", [interpreters["editable"], "-m", "pytest", "-q", "-p", "no:cacheprovider",
         "tests/test_hfs021a_public_api.py", f"--basetemp={work / 'tmp' / 'editable-api'}"], inputs)
+    run("editable-contract-review-tests", [interpreters["editable"], "-m", "pytest", "-q", "-p", "no:cacheprovider",
+        "tests/test_hfs022r_review.py", f"--basetemp={work / 'tmp' / 'editable-contract-review'}"], inputs)
     summary = {}
     selections = [("original", [f"--ignore=tests/{name}.py" for name in SUITES])]
     selections += [(name, [f"tests/{name}.py"]) for name in SUITES]

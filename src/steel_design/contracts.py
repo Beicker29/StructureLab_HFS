@@ -15,7 +15,7 @@ from pydantic import BaseModel, ValidationError as PydanticValidationError
 
 from .domain.errors import SteelDesignError
 from .domain.validation import validate_case
-from .execution import OutputOptions, extract_output_options, prepare_cases
+from .preparation import OutputOptions, extract_output_options, prepare_cases
 from .input_contracts import unique_json_object
 from .models import CheckResult, SteelCase
 from .results_model import CoverageReport, CoverageStatus, EngineResult
@@ -151,8 +151,9 @@ def _strip_derived(data: Any, annotation: Any) -> Any:
 def _same(declared: Any, actual: Any, path: str = "/payload", *, partial: bool = False) -> None:
     """Exact JSON-value equality, with bool distinct from numbers and signed zero retained."""
     if isinstance(declared, dict) and isinstance(actual, dict):
-        if not (set(declared) <= set(actual) if partial else set(declared) == set(actual)):
-            raise ContractError("INCONSISTENT_PAYLOAD", "Missing, extra or lost fields.", path)
+        different = (set(declared) - set(actual)) | (set() if partial else set(actual) - set(declared))
+        if different:
+            raise ContractError("INCONSISTENT_PAYLOAD", "Missing, extra or lost field.", _pointer(path, sorted(different)[0]))
         for key, value in declared.items():
             _same(value, actual[key], _pointer(path, key), partial=partial)
     elif isinstance(declared, list) and isinstance(actual, list):
@@ -166,39 +167,49 @@ def _same(declared: Any, actual: Any, path: str = "/payload", *, partial: bool =
         raise ContractError("INCONSISTENT_PAYLOAD", "Declared value disagrees with the reconstructed model.", path)
 
 
-def _coverage_integrity(report: CoverageReport, check_count: int | None = None) -> None:
+def _coverage_integrity(report: CoverageReport, check_count: int | None = None, *, path: str = "/payload") -> None:
     """Referential integrity only; never reconstruct or discharge an obligation."""
-    ids = [o.id for o in report.obligations]
-    executions = {e.check_index: e for e in report.executions}
-    if len(set(ids)) != len(ids) or len(executions) != len(report.executions):
-        raise ContractError("COVERAGE_CONFLICT", "Duplicate obligation or execution index.")
+    ids, executions = set(), {}
+    for index, obligation in enumerate(report.obligations):
+        if obligation.id in ids:
+            raise ContractError("COVERAGE_CONFLICT", "Duplicate obligation ID.", f"{path}/obligations/{index}/id")
+        ids.add(obligation.id)
+    for index, entry in enumerate(report.executions):
+        if entry.check_index in executions:
+            raise ContractError("COVERAGE_CONFLICT", "Duplicate execution index.", f"{path}/executions/{index}/check_index")
+        executions[entry.check_index] = entry
     if set(executions) != set(range(len(executions))):
-        raise ContractError("COVERAGE_CONFLICT", "Execution indices must be contiguous and zero-based.")
+        index = next(i for i, e in enumerate(report.executions) if e.check_index not in range(len(executions)))
+        raise ContractError("COVERAGE_CONFLICT", "Execution indices must be contiguous and zero-based.", f"{path}/executions/{index}/check_index")
     if check_count is not None and set(executions) != set(range(check_count)):
-        raise ContractError("COVERAGE_CONFLICT", "Execution indices do not match the checks.")
-    for item in report.obligations:
+        raise ContractError("COVERAGE_CONFLICT", "Execution indices do not match the checks.", f"{path}/executions")
+    for index, item in enumerate(report.obligations):
+        location = f"{path}/obligations/{index}"
         executed, accepted = set(item.executed_checks), set(item.accepted_checks)
-        if (len(executed) != len(item.executed_checks) or len(accepted) != len(item.accepted_checks)
-                or not accepted <= executed or not executed <= executions.keys()):
-            raise ContractError("COVERAGE_CONFLICT", "Invalid executed/accepted check references.")
+        if len(executed) != len(item.executed_checks) or not executed <= executions.keys():
+            raise ContractError("COVERAGE_CONFLICT", "Invalid executed check references.", location + "/executed_checks")
+        if len(accepted) != len(item.accepted_checks) or not accepted <= executed:
+            raise ContractError("COVERAGE_CONFLICT", "Invalid accepted check references.", location + "/accepted_checks")
         linked = {e.check_index for e in report.executions if item.id in e.obligation_ids}
         if linked != executed:
-            raise ContractError("COVERAGE_CONFLICT", "Execution links contradict obligation evidence.")
+            raise ContractError("COVERAGE_CONFLICT", "Execution links contradict obligation evidence.", location + "/executed_checks")
         if ((item.status == CoverageStatus.NOT_APPLICABLE and item.applicability != "FALSE")
-                or (item.status == CoverageStatus.EVALUATED and item.applicability != "TRUE")
-                or (accepted and item.status != CoverageStatus.EVALUATED)
+                or (item.status == CoverageStatus.EVALUATED and item.applicability != "TRUE")):
+            raise ContractError("COVERAGE_CONFLICT", "Applicability and status conflict.", location + "/applicability")
+        if ((accepted and item.status != CoverageStatus.EVALUATED)
                 or (item.status == CoverageStatus.EVALUATED and item.resistance and not accepted)):
-            raise ContractError("COVERAGE_CONFLICT", "Applicability, status and accepted evidence conflict.")
-    for entry in report.executions:
+            raise ContractError("COVERAGE_CONFLICT", "Status and accepted evidence conflict.", location + "/accepted_checks")
+    for index, entry in enumerate(report.executions):
         if len(set(entry.obligation_ids)) != len(entry.obligation_ids):
-            raise ContractError("COVERAGE_CONFLICT", "Duplicate execution claim.")
+            raise ContractError("COVERAGE_CONFLICT", "Duplicate execution claim.", f"{path}/executions/{index}/obligation_ids")
     # Claims about obligations absent from this plan occur legitimately in the
     # current producer. Do not infer new obligations from these strings.
 
 
 def _output_integrity(value: BaseModel) -> None:
     checks = value.checks if isinstance(value, EngineResult) else [value] if isinstance(value, CheckResult) else []
-    for check in checks:
+    for index, check in enumerate(checks):
+        path = f"/payload/checks/{index}" if isinstance(value, EngineResult) else "/payload"
         # Preserve the explicitly represented historical inactive 0/0 check.
         # Otherwise use the existing result constructor, never a second ratio
         # or decision formula. This checks arithmetic consistency, not capacity
@@ -207,45 +218,82 @@ def _output_integrity(value: BaseModel) -> None:
             continue
         expected = CheckResult.from_values(name=check.name, clause=check.clause,
             demand=check.demand, capacity=check.capacity, unit=check.unit)
-        if (check.dcr != expected.dcr or check.status != expected.status
-                or check.numeric_issue != expected.numeric_issue):
-            raise ContractError("CHECK_CONFLICT", "Published check contradicts its canonical raw-value decision.")
+        for field in ("dcr", "status", "numeric_issue"):
+            if getattr(check, field) != getattr(expected, field):
+                raise ContractError("CHECK_CONFLICT", "Published check contradicts its canonical raw-value decision.", _pointer(path, field))
     if isinstance(value, EngineResult):
         if value.coverage is not None:
-            _coverage_integrity(value.coverage, len(value.checks))
-            for obligation in value.coverage.obligations:
+            _coverage_integrity(value.coverage, len(value.checks), path="/payload/coverage")
+            for index, obligation in enumerate(value.coverage.obligations):
                 if obligation.resistance and any(value.checks[i].capacity <= 0 for i in obligation.accepted_checks):
-                    raise ContractError("COVERAGE_CONFLICT", "Accepted resistance cannot reference a zero-capacity placeholder.")
+                    raise ContractError("COVERAGE_CONFLICT", "Accepted resistance cannot reference a zero-capacity placeholder.",
+                                        f"/payload/coverage/obligations/{index}/accepted_checks")
     elif isinstance(value, CoverageReport):
         _coverage_integrity(value)
 
 
-def _case_snapshot(case: SteelCase, payload: dict) -> SteelCase:
+def _case_snapshot(case: SteelCase, payload: dict, *, path: str = "/payload") -> SteelCase:
     value = validate_case(case)
-    _same(payload, _dump_model(value, exclude_unset=True))
+    _same(payload, _dump_model(value, exclude_unset=True), path)
     return value
 
 
+def _validation_path(error: PydanticValidationError | SteelDesignError, path: str) -> str:
+    """Project the producer's first location; never infer a normative rule.
+
+    All original diagnostics remain in __cause__. Bundle paths identify the
+    effective case; inherited values can originate in the common base.
+    """
+    if isinstance(error, PydanticValidationError):
+        fields = error.errors(include_url=False, include_context=False, include_input=False)
+        location = fields[0]["loc"] if fields else ()
+    else:
+        fields = error.details.get("fields", [])
+        field = error.details.get("required_field") or error.details.get("field")
+        if fields:
+            location = fields[0].get("loc", ())
+        elif isinstance(field, str):
+            location = tuple(field.replace("[", ".").replace("]", "").split("."))
+            if location[0] == "cases":
+                path = "/payload"  # Historical early bundle-shape error.
+        else:
+            location = ()
+    for key in location:
+        path = _pointer(path, key)
+    return path
+
+
 def _validate(raw: dict, *, legacy: bool = False) -> ContractDocument:
-    if not {"contract_version", "kind", "payload"} <= raw.keys():
-        raise ContractError("INVALID_DOCUMENT", "contract_version, kind and payload are required.")
+    for required in ("contract_version", "kind", "payload"):
+        if required not in raw:
+            raise ContractError("INVALID_DOCUMENT", "contract_version, kind and payload are required.", _pointer("", required))
     kind, version = raw["kind"], raw["contract_version"]
     model = _select(kind, version)
     allowed = {"contract_version", "kind", "payload"} | ({"output"} if kind == "case_input" else set())
     if raw.keys() - allowed:
-        raise ContractError("EXTRA_FIELD", "Unknown envelope field.")
+        raise ContractError("EXTRA_FIELD", "Unknown envelope field.", _pointer("", sorted(raw.keys() - allowed)[0]))
     payload = raw["payload"]
     if not isinstance(payload, dict):
         raise ContractError("INVALID_PAYLOAD", "payload must be an object.", "/payload")
+    path = "/output"
     try:
         output = OutputOptions.model_validate(raw["output"]) if "output" in raw else None
         if output is not None and not legacy:
             _same(raw["output"], _dump_model(output, exclude_unset=True), "/output")
+        path = "/payload"
         if kind == "case_bundle":
             if "cases" not in payload:
                 raise ContractError("INVALID_PAYLOAD", "Bundle requires cases.", "/payload/cases")
-            for case, case_payload, _, _ in prepare_cases(payload):
-                _case_snapshot(case, case_payload)
+            prepared = prepare_cases(payload)
+            index = 0
+            while True:
+                path = f"/payload/cases/{index}"
+                try:
+                    case, case_payload, _, _ = next(prepared)
+                except StopIteration:
+                    break
+                _case_snapshot(case, case_payload, path=path)
+                index += 1
             value = deepcopy(payload)
         else:
             cleaned = _strip_derived(payload, model)
@@ -256,7 +304,7 @@ def _validate(raw: dict, *, legacy: bool = False) -> ContractDocument:
                 _output_integrity(value)
                 _same(payload, _dump_model(value), partial=legacy)
     except (PydanticValidationError, SteelDesignError) as exc:
-        raise ContractError("INVALID_PAYLOAD", str(exc), "/payload") from exc
+        raise ContractError("INVALID_PAYLOAD", str(exc), _validation_path(exc, path)) from exc
     return ContractDocument(kind=kind, payload=value, contract_version=version, output=output)
 
 
@@ -288,7 +336,7 @@ def dump_json(document: ContractDocument) -> str:
     if (model is None and type(document.payload) is not dict) or (
             model is not None and type(document.payload) is not model):
         raise ContractError("KIND_MISMATCH", "Payload must be the canonical type for kind.")
-    _json_tree(_model_data(document.payload))
+    _json_tree(_model_data(document.payload), "/payload")
     payload = (deepcopy(document.payload) if model is None else
                _dump_model(document.payload, exclude_unset=document.kind == "case_input"))
     raw = dict(contract_version=document.contract_version, kind=document.kind, payload=payload)
@@ -317,7 +365,8 @@ def migrate_legacy(data: str | bytes | dict[str, Any], *, kind: ContractKind) ->
         try:
             cleaned, _ = extract_output_options(payload)
         except PydanticValidationError as exc:
-            raise ContractError("INVALID_PAYLOAD", str(exc), "/output") from exc
+            # extract_output_options already prefixes its canonical loc with output.
+            raise ContractError("INVALID_PAYLOAD", str(exc), _validation_path(exc, "")) from exc
         raw["payload"], raw["output"] = cleaned, payload["output"]
     return _validate(raw, legacy=True)
 

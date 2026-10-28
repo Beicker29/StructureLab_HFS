@@ -55,3 +55,39 @@ Habrá cambios incompatibles que deben declararse: nuevos estados, campos extra 
 ## Riesgos y verificación futura
 
 Validación excesiva puede rechazar entradas legítimas; fijar dominios por fuente/caso. La coexistencia transitoria de formatos exige prueba de lectura/escritura y decisiones explícitas de migración. Un futuro esquema generado debe comprobarse contra el modelo, no actualizarse a mano. Cubrir fallos parciales, lotes, excepciones, límites de redondeo y paridad CLI/API. Nada de ello altera los contratos presentes en HFS-001.
+
+## Suplemento HFS-022R — Preparación y transporte
+
+Fecha: 2026-10-28. Decisión implementada para revisión independiente sobre
+HFS-022 aprobado (`bae6463`); no modifica retrospectivamente HFS-001.
+
+**Problema.** Contratos importaba `execution.prepare_cases`, que importaba el
+motor para anotaciones. Leer JSON cargaba router, reglas y repositorio aunque
+no los utilizara. Los esquemas reproducibles carecían de un consumidor validador
+independiente y varios errores de integridad solo señalaban el payload completo.
+
+**Alternativas.** A: poner el import del motor bajo TYPE_CHECKING y diferir
+anotaciones: menor cambio, pero conserva contratos → ejecución y altera la
+evaluación runtime de anotaciones salvo introducir otra solución para ella.
+B: extraer conjuntamente cinco símbolos de preparación a un único módulo:
+separa una responsabilidad real con dos consumidores, sin duplicar validación.
+No se elige separar contracts por tamaño ni introducir capas genéricas.
+
+**Decisión y justificación.** B, `steel_design.preparation`, con reexports por
+identidad desde execution y fachadas vigentes de run. Preparación mantiene sus
+guardas locales; contratos llama al validador de dominio original. Ejecución
+conserva sus anotaciones, orden y consumo perezoso. JSON Schema se prueba con
+jsonschema Draft 2020-12 solo en desarrollo; modelos/generador siguen siendo
+la única fuente del esquema. Las relaciones semánticas permanecen en Python.
+Los errores señalan campos/índices concretos preservando códigos y causas.
+
+**Consecuencias y riesgos.** Un archivo adicional reduce la dependencia real
+de transporte en ejecución. Cambia `__module__` de los símbolos trasladados;
+se preservan imports, identidad entre reexports, firmas y comportamiento,
+sin prometer persistencia pickle entre versiones. Ninguna fachada sin consumidor
+se añade. La precisión del primer error puede variar si hay varios conflictos
+simultáneos; no se cambia el orden de validación/ejecución legacy. Las rutas de
+casos efectivos pueden referir valores heredados de la base. La interoperabilidad
+no autentica resultados ni acredita AISC; F-31 sigue P0 abierto. Importar la
+constante E desde axial_calc sigue siendo dependencia de la guarda canónica,
+sin cálculo. Evidencia y límites en el [suplemento](../audit/hfs022/architecture-review/report.md).
