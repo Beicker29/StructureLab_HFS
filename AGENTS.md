@@ -17,6 +17,14 @@
 - Una refactorización DRY requiere mapa de usos, pruebas antes/después y procedencia de resultados. Si afecta cálculos o aplicabilidad, requiere además referencias numéricas independientes y revisión ingenieril. Separar la corrección normativa del movimiento de código.
 - Evitar microservicios, motores paralelos, contenedores obligatorios, registro genérico de plugins, base de datos y dependencias sin necesidad demostrada. No migrar carpetas por estética.
 
+## Limpieza incremental obligatoria
+
+- En cada sustitución, revisar consumidores antes de retirar código: llamadas/imports, accesos dinámicos, pruebas, scripts, entry points y compromisos documentados. Registrar símbolo, propietario canónico, decisión, motivo y riesgo dentro del hito autorizado.
+- Eliminar en ese mismo hito el código muerto demostrado; si existe un impedimento, documentarlo y fijar la condición de retiro. Aplicar DRY conservando una sola implementación por concepto, sin mantener copias sustituidas ni código solo porque alguna vez fue necesario.
+- Una fachada de compatibilidad exige un consumidor vigente o un compromiso explícito identificable. Los nombres privados no constituyen automáticamente API pública. Tampoco basta el nombre, la antigüedad o la ausencia de llamadas estáticas para autorizar una eliminación.
+- Toda eliminación debe preservar el comportamiento comprometido y superar la regresión pertinente antes/después según la sección de verificación. Investigar qué protege una prueba que consume una fachada; no eliminarla ni relajarla para facilitar la limpieza.
+- Conservar evidencia histórica, oráculos independientes y documentos normativos conforme a la política de evidencia. Los cambios normativos o numéricos requieren tareas y validaciones independientes; no presentarlos como limpieza interna.
+
 ## Exactitud y evidencia normativa
 
 - Para cambiar una regla, identificar edición, artículo/ecuación, condiciones y unidades. Distinguir Specification, Commentary, User Note, ejemplo auxiliar e inferencia. No convertir una nota o una hipótesis en obligación sin justificarlo.
