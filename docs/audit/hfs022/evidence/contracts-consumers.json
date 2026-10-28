@@ -1,0 +1,6450 @@
+{
+  "base": "c91e55d5a194dfb8e80777d9e41efa1ee4b7fe02",
+  "models": {
+    "steel_design.models.Material": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "Fy": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Yield strength (MPa)"
+        },
+        "Fu": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Ultimate tensile strength (MPa)"
+        },
+        "E": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "200000.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Elastic modulus (MPa)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": [
+        "validate_strength_order"
+      ]
+    },
+    "steel_design.models.Loads": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "Pu": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Required axial strength (kN). Positive is compression."
+        },
+        "Mux": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Required flexural strength, major-axis (kN-m)"
+        },
+        "Muy": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Required flexural strength, minor-axis (kN-m)"
+        },
+        "Tu": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Required torsional strength (kN-m)"
+        },
+        "Vux": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Shear associated with major-axis Mux, force along local y (kN); suffix names bending plane"
+        },
+        "Vuy": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Shear associated with minor-axis Muy, force along local x (kN); suffix names bending plane"
+        },
+        "Vu": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Legacy scalar alias of Vux (local-y force, kN), never a vector resultant"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": [
+        "validate_load_representation"
+      ]
+    },
+    "steel_design.models.Lengths": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "Lx": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Unbraced length for strong axis buckling (mm)"
+        },
+        "Ly": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Unbraced length for weak axis buckling (mm)"
+        },
+        "Lz": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Unbraced length for torsional/flexural-torsional buckling (mm)"
+        },
+        "Lb": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Unbraced length for lateral-torsional buckling (mm)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CustomSection": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "type": {
+          "annotation": "<enum 'CustomSectionType'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "diameter": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Diameter for solid circular section (mm)"
+        },
+        "H": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Height for solid rectangular section (mm)"
+        },
+        "B": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Width for solid rectangular section (mm)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": [
+        "validate_dimensions"
+      ]
+    },
+    "steel_design.models.CompositeConcrete": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "fc": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Specified compressive strength of concrete (MPa)"
+        },
+        "wc": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Concrete unit weight (kg/m3)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CompositeLongitudinalBar": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "count": {
+          "annotation": "<class 'int'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Number of bars at this coordinate"
+        },
+        "db": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Bar diameter (mm)"
+        },
+        "fy": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Bar yield stress (MPa)"
+        },
+        "x": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Bar x coordinate from composite centroid (mm)"
+        },
+        "y": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Bar y coordinate from composite centroid (mm)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CompositeTransverseReinforcement": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "db": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Transverse bar diameter (mm)"
+        },
+        "spacing": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Spacing (mm)"
+        },
+        "fy": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Yield stress (MPa)"
+        },
+        "type": {
+          "annotation": "typing.Literal['ties', 'hoops', 'spirals', 'stirrups']",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Transverse reinforcement type (ties/hoops/spirals/stirrups)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CompositeReinforcement": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "longitudinal_bars": {
+          "annotation": "typing.List[steel_design.models.CompositeLongitudinalBar]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": "Longitudinal reinforcement layout."
+        },
+        "transverse": {
+          "annotation": "typing.Optional[steel_design.models.CompositeTransverseReinforcement]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Minimum transverse reinforcement definition."
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CompositeGeometry": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "B": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Overall composite width for encased members (mm)"
+        },
+        "H": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Overall composite depth for encased members (mm)"
+        },
+        "cover": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Concrete cover to reinforcement (mm)"
+        },
+        "slab_effective_width": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Effective slab width for composite beam (mm)"
+        },
+        "slab_thickness": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Slab thickness for composite beam (mm)"
+        },
+        "deck_present": {
+          "annotation": "typing.Optional[typing.Annotated[bool, Strict(strict=True)]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Whether formed steel deck is present."
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CompositeAnchorGroup": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "type": {
+          "annotation": "<enum 'CompositeAnchorType'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "count": {
+          "annotation": "<class 'int'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Number of anchors in this group"
+        },
+        "segment": {
+          "annotation": "<enum 'CompositeAnchorSegment'>",
+          "required": false,
+          "default": "<CompositeAnchorSegment.POSITIVE: 'positive'>",
+          "factory": null,
+          "alias": "None",
+          "description": "Span segment associated with this anchor group."
+        },
+        "d": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Stud shank diameter (mm)"
+        },
+        "Fu": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Stud ultimate tensile strength (MPa)"
+        },
+        "Rg": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)]), FieldInfo(annotation=NoneType, required=True, metadata=[Le(le=1)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Deck geometry reduction factor for stud anchors"
+        },
+        "Rp": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)]), FieldInfo(annotation=NoneType, required=True, metadata=[Le(le=1)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Deck position reduction factor for stud anchors"
+        },
+        "la": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Channel anchor length (mm)"
+        },
+        "tf": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Channel flange thickness (mm)"
+        },
+        "tw": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Channel web thickness (mm)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": [
+        "validate_anchor_group"
+      ]
+    },
+    "steel_design.models.CompositeAnchors": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "groups": {
+          "annotation": "typing.List[steel_design.models.CompositeAnchorGroup]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CompositeI5Config": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "method": {
+          "annotation": "<enum 'CompositeI5Method'>",
+          "required": false,
+          "default": "<CompositeI5Method.METHOD_1_H1_1: 'METHOD_1_H1_1'>",
+          "factory": null,
+          "alias": "None",
+          "description": "Commentary I5 method selector."
+        },
+        "method2_pc_ratio": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Optional P_C/P_A ratio for Method 2 when not inferred (0 < ratio < 1)."
+        },
+        "method2_mc_ratio": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Optional M_C/M_B ratio for Method 2 when not inferred (0 < ratio)."
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": [
+        "validate_i5_config"
+      ]
+    },
+    "steel_design.models.CompositeConfig": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "role": {
+          "annotation": "<enum 'CompositeRole'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "nominal_strength_method": {
+          "annotation": "<enum 'CompositeNominalStrengthMethod'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "concrete": {
+          "annotation": "<class 'steel_design.models.CompositeConcrete'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "reinforcement": {
+          "annotation": "<class 'steel_design.models.CompositeReinforcement'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "CompositeReinforcement",
+          "alias": "None",
+          "description": null
+        },
+        "geometry": {
+          "annotation": "<class 'steel_design.models.CompositeGeometry'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "CompositeGeometry",
+          "alias": "None",
+          "description": null
+        },
+        "anchors": {
+          "annotation": "<class 'steel_design.models.CompositeAnchors'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "CompositeAnchors",
+          "alias": "None",
+          "description": null
+        },
+        "i5": {
+          "annotation": "<class 'steel_design.models.CompositeI5Config'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "CompositeI5Config",
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.Connection": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "An": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Net area for tension rupture (mm^2)"
+        },
+        "U": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)]), FieldInfo(annotation=NoneType, required=True, metadata=[Le(le=1)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Shear lag factor for tension rupture (0 < U <= 1)"
+        },
+        "angle_compression_mode": {
+          "annotation": "typing.Optional[steel_design.models.AngleCompressionMode]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Connection mode for single-angle compression (E5)."
+        },
+        "angle_flexure_axis": {
+          "annotation": "typing.Optional[steel_design.models.AngleFlexureAxis]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Single-angle flexure axis definition for F10."
+        },
+        "angle_ltb_restraint": {
+          "annotation": "typing.Optional[steel_design.models.AngleLtbRestraint]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Lateral-torsional restraint condition for F10."
+        },
+        "angle_max_tension_location": {
+          "annotation": "typing.Optional[steel_design.models.AngleMaxTensionLocation]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Location of maximum tension for geometric-axis bending in F10."
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.Factors": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "Kx": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "1.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Effective length factor for strong axis"
+        },
+        "Ky": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "1.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Effective length factor for weak axis"
+        },
+        "Kz": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "1.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Effective length factor for torsional/flexural-torsional buckling axis"
+        },
+        "Cb": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "1.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Lateral-torsional buckling modification factor"
+        },
+        "xa": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Bracing offset distance along x-axis (mm)"
+        },
+        "ya": {
+          "annotation": "<class 'float'>",
+          "required": false,
+          "default": "0.0",
+          "factory": null,
+          "alias": "None",
+          "description": "Bracing offset distance along y-axis (mm)"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.TensionScope": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "ordinary_prismatic_member": {
+          "annotation": "typing.Optional[typing.Annotated[bool, Strict(strict=True)]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "concentric_axial_force": {
+          "annotation": "typing.Optional[typing.Annotated[bool, Strict(strict=True)]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "no_special_conditions": {
+          "annotation": "typing.Optional[typing.Annotated[bool, Strict(strict=True)]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "material_reference": {
+          "annotation": "typing.Optional[typing.Annotated[str, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "demand_reference": {
+          "annotation": "typing.Optional[typing.Annotated[str, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "net_area_reference": {
+          "annotation": "typing.Optional[typing.Annotated[str, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "connection_reference": {
+          "annotation": "typing.Optional[typing.Annotated[str, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "external_checks_reference": {
+          "annotation": "typing.Optional[typing.Annotated[str, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.SlendernessAdviceBasis": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "fabricated_length": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Fabricated member length (mm), not unbraced length"
+        },
+        "least_radius": {
+          "annotation": "typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Gt(gt=0)])]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Least section radius of gyration (mm), including principal axes"
+        },
+        "is_rod": {
+          "annotation": "typing.Optional[typing.Annotated[bool, Strict(strict=True)]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Whether the D1 rod exception applies; absent means unknown"
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.SteelCase": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "section_name": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "material": {
+          "annotation": "<class 'steel_design.models.Material'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "loads": {
+          "annotation": "<class 'steel_design.models.Loads'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "lengths": {
+          "annotation": "<class 'steel_design.models.Lengths'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "factors": {
+          "annotation": "<class 'steel_design.models.Factors'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "Factors",
+          "alias": "None",
+          "description": null
+        },
+        "connection": {
+          "annotation": "<class 'steel_design.models.Connection'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "Connection",
+          "alias": "None",
+          "description": null
+        },
+        "custom_section": {
+          "annotation": "typing.Optional[steel_design.models.CustomSection]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Optional custom solid section defined directly in input."
+        },
+        "composite": {
+          "annotation": "typing.Optional[steel_design.models.CompositeConfig]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Optional Chapter I composite member configuration."
+        },
+        "design_method": {
+          "annotation": "<enum 'DesignMethod'>",
+          "required": false,
+          "default": "<DesignMethod.LRFD: 'LRFD'>",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "slenderness_advice_basis": {
+          "annotation": "typing.Optional[steel_design.models.SlendernessAdviceBasis]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "tension_scope": {
+          "annotation": "typing.Optional[steel_design.models.TensionScope]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Applicability evidence for ordinary custom solid axial tension; absence means unknown."
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.models.CheckResult": {
+      "config": {},
+      "fields": {
+        "name": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Name of the check (e.g., Flexure Major F2)"
+        },
+        "code": {
+          "annotation": "<class 'str'>",
+          "required": false,
+          "default": "'AISC 360-22'",
+          "factory": null,
+          "alias": "None",
+          "description": "Reference code"
+        },
+        "clause": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Code clause (e.g., F2-1)"
+        },
+        "demand": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Original unrounded required strength"
+        },
+        "capacity": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Original unrounded available strength (phi*Rn or Rn/Omega)"
+        },
+        "dcr": {
+          "annotation": "<class 'float'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "Original unrounded ratio used for the decision; not a display value"
+        },
+        "unit": {
+          "annotation": "typing.Optional[typing.Literal['kN', 'kN-m', 'ratio']]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "numeric_issue": {
+          "annotation": "typing.Optional[str]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "status": {
+          "annotation": "<enum 'CheckStatus'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": "PASS or FAIL status"
+        },
+        "details": {
+          "annotation": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": "Structured rule details (e.g., element classification)."
+        }
+      },
+      "computed_fields": [
+        "display"
+      ],
+      "serializers": [
+        "serialize_details",
+        "serialize_numbers"
+      ],
+      "validators": [
+        "reject_undefined_pass"
+      ]
+    },
+    "steel_design.results_model.CoverageObligation": {
+      "config": {},
+      "fields": {
+        "id": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "normative_ids": {
+          "annotation": "typing.List[str]",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "limit_state": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "component": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "condition": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "applicability": {
+          "annotation": "typing.Literal['TRUE', 'FALSE', 'UNKNOWN']",
+          "required": false,
+          "default": "'TRUE'",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "status": {
+          "annotation": "<enum 'CoverageStatus'>",
+          "required": false,
+          "default": "<CoverageStatus.PENDING: 'PENDING'>",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "reason": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "required": {
+          "annotation": "typing.List[str]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        },
+        "alternatives": {
+          "annotation": "typing.List[str]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        },
+        "selected_alternative": {
+          "annotation": "str | None",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "executed_checks": {
+          "annotation": "typing.List[int]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        },
+        "accepted_checks": {
+          "annotation": "typing.List[int]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        },
+        "resistance": {
+          "annotation": "<class 'bool'>",
+          "required": false,
+          "default": "True",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.results_model.ExecutedEvaluation": {
+      "config": {},
+      "fields": {
+        "check_index": {
+          "annotation": "<class 'int'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "implementation": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "obligation_ids": {
+          "annotation": "typing.List[str]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.results_model.CoverageReport": {
+      "config": {},
+      "fields": {
+        "version": {
+          "annotation": "typing.Literal['HFS-010-v1']",
+          "required": false,
+          "default": "'HFS-010-v1'",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "source": {
+          "annotation": "<class 'str'>",
+          "required": false,
+          "default": "'docs/normative/hfs002-applicability.md (S22 local; errata reconciliation pending)'",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "declared_scope": {
+          "annotation": "<class 'str'>",
+          "required": false,
+          "default": "'Member resistance for every supplied demand component; no global AISC certification'",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "supported_complete_domain": {
+          "annotation": "<class 'str'>",
+          "required": false,
+          "default": "'Ordinary prismatic custom solid in concentric axial tension, with explicit external evidence'",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "method": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "section_name": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "profile_type": {
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "scope_evidence": {
+          "annotation": "<class 'dict'>",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "dict",
+          "alias": "None",
+          "description": null
+        },
+        "evaluation_context": {
+          "annotation": "<class 'str'>",
+          "required": false,
+          "default": "'One supplied member/load case; no position, combination or construction-stage envelope is inferred'",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "demand_components": {
+          "annotation": "dict[str, float]",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "obligations": {
+          "annotation": "typing.List[steel_design.results_model.CoverageObligation]",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "executions": {
+          "annotation": "typing.List[steel_design.results_model.ExecutedEvaluation]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        },
+        "evaluation_errors": {
+          "annotation": "typing.List[dict]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "list",
+          "alias": "None",
+          "description": null
+        },
+        "external_responsibilities": {
+          "annotation": "typing.List[str]",
+          "required": false,
+          "default": "PydanticUndefined",
+          "factory": "CoverageReport.<lambda>",
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [
+        "complete"
+      ],
+      "serializers": [],
+      "validators": []
+    },
+    "steel_design.results_model.EngineResult": {
+      "config": {},
+      "fields": {
+        "checks": {
+          "annotation": "typing.List[steel_design.models.CheckResult]",
+          "required": true,
+          "default": "PydanticUndefined",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "status": {
+          "annotation": "<enum 'AnalysisStatus'>",
+          "required": false,
+          "default": "<AnalysisStatus.INCOMPLETE: 'INCOMPLETE'>",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        },
+        "coverage": {
+          "annotation": "steel_design.results_model.CoverageReport | None",
+          "required": false,
+          "default": "None",
+          "factory": null,
+          "alias": "None",
+          "description": null
+        }
+      },
+      "computed_fields": [
+        "known_failures"
+      ],
+      "serializers": [],
+      "validators": [
+        "aggregate"
+      ]
+    },
+    "steel_design.execution.OutputOptions": {
+      "config": {
+        "extra": "forbid",
+        "allow_inf_nan": false,
+        "validate_default": true,
+        "revalidate_instances": "always"
+      },
+      "fields": {
+        "write_results_json": {
+          "annotation": "<class 'bool'>",
+          "required": false,
+          "default": "True",
+          "factory": null,
+          "alias": "AliasChoices(choices=['write_results_json', 'write_detailed_json', 'save_results_json'])",
+          "description": null
+        }
+      },
+      "computed_fields": [],
+      "serializers": [],
+      "validators": []
+    }
+  },
+  "consumer_candidates": [
+    {
+      "file": "docs/contracts/hfs010-coverage.md",
+      "line": 22,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "convierte en PASS ni se borra por existir incertidumbre. `EngineResult` sin"
+    },
+    {
+      "file": "docs/contracts/hfs011-inputs.md",
+      "line": 18,
+      "tokens": [
+        "CheckResult",
+        "EngineResult"
+      ],
+      "text": "Son 17 modelos ingenieriles de entrada existentes y un modelo nuevo de opciones CLI. `CheckResult` y `EngineResult` son salidas y conservan sus contratos."
+    },
+    {
+      "file": "docs/contracts/hfs011-inputs.md",
+      "line": 37,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "| `SteelCase`: section_name,material,loads,lengths,factors,connection,custom_section,composite,design_method | Nombre y primeros tres objetos obligatorios. Motor revalida antes de buscar/calcular la sección | factors/connection por sus defaults; custom_section/composite=None; design_method=LRFD histórico |"
+    },
+    {
+      "file": "docs/contracts/hfs011-inputs.md",
+      "line": 39,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "| `OutputOptions` (solo CLI) | Booleano estricto, extras prohibidos; admite un solo nombre entre write_results_json/write_detailed_json/save_results_json | write_results_json=true histórico. `output:null` o no objeto se rechaza |"
+    },
+    {
+      "file": "docs/contracts/hfs011-inputs.md",
+      "line": 41,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "`model_fields_set` y `model_dump(exclude_unset=True)` permiten conservar la distinción entre valores aportados y defaults para consumidores Python. No se añade un modelo de procedencia estructural ni se infiere el análisis que justificó K/Cb/demandas (F-22 sigue abierto). Si una componente es desconocida, el llamador debe completar los datos antes de usar el contrato parcial; omitirla declara cero. Un cero explícito todavía puede obtener PASS sin checks: F-02/HFS-010 sigue abierto."
+    },
+    {
+      "file": "docs/contracts/hfs011-inputs.md",
+      "line": 73,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "- Los esquemas se obtienen de `SteelCase.model_json_schema()`; no hay otro esquema editable. El catálogo y el transporte CLI tienen contratos separados con la misma política local. Un esquema JSON estático no expresa por sí solo todas las relaciones entre campos: ejecutar la validación común sigue siendo necesario."
+    },
+    {
+      "file": "docs/contracts/hfs013-axes.md",
+      "line": 80,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "y H3. La interacción nunca consume capacidades ya redondeadas de CheckResult."
+    },
+    {
+      "file": "docs/contracts/hfs014-summary-bundles.md",
+      "line": 19,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "| `overall_status` | Estado de EngineResult sin reinterpretar: PASS/FAIL/INCOMPLETE |"
+    },
+    {
+      "file": "docs/contracts/hfs014-summary-bundles.md",
+      "line": 80,
+      "tokens": [
+        "CheckResult",
+        "EngineResult"
+      ],
+      "text": "No se modifica CheckResult ni EngineResult JSON del API interno `engine.run`."
+    },
+    {
+      "file": "docs/contracts/hfs015-precision-advice.md",
+      "line": 9,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "`CheckResult.demand`, `capacity` y `dcr` contienen los **valores originales sin"
+    },
+    {
+      "file": "docs/contracts/hfs015-precision-advice.md",
+      "line": 12,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "`CheckResult.from_values`; este calcula una sola razón y decide `dcr <= 1.0`, sin"
+    },
+    {
+      "file": "docs/contracts/hfs015-precision-advice.md",
+      "line": 45,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "La construcción directa histórica `CheckResult(...)` continúa disponible:"
+    },
+    {
+      "file": "docs/contracts/hfs015-precision-advice.md",
+      "line": 67,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "JSON no estándar. `json.dumps(..., allow_nan=False)` se exige en salidas CLI."
+    },
+    {
+      "file": "docs/contracts/hfs015-precision-advice.md",
+      "line": 76,
+      "tokens": [
+        "CheckResult",
+        "model_validate"
+      ],
+      "text": "promete cargarlo sin transformación mediante `CheckResult.model_validate`: la"
+    },
+    {
+      "file": "docs/contracts/hfs016-catalog.md",
+      "line": 67,
+      "tokens": [
+        "SteelCase",
+        "model_dump"
+      ],
+      "text": "`Section.model_dump()` ahora incluye source (None para objetos sin origen); consumidores estrictos de esa serialización deben admitir el campo. No cambian `SteelCase`, capacidades ni estados de resultados. No se habilitan rutas de selección por hoja/fila ni una nueva API web."
+    },
+    {
+      "file": "docs/contracts/hfs017-design-method.md",
+      "line": 9,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "`SteelCase.design_method` continúa aceptando únicamente `\"LRFD\"` o `\"ASD\"`."
+    },
+    {
+      "file": "docs/contracts/hfs017-design-method.md",
+      "line": 50,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "Un `SteelCase` válido contiene ese enum. Una llamada directa con un caso"
+    },
+    {
+      "file": "docs/contracts/hfs017-design-method.md",
+      "line": 52,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "recibe error de contrato: debe validar de nuevo `SteelCase`. No se muta el caso"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 12,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "CaseExecution (caso, Section, EngineResult)"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 40,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "| `execute_case(engine=..., case=SteelCase, input_payload=None, output_options=None, case_tag=None)` | Un `CaseExecution`; ejecuta validación ingenieril exclusivamente en el motor. Los argumentos opcionales aportan contexto de presentación; el resultado nunca depende de ellos |"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 41,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "| `iter_executions(payload, engine)` | Iterador secuencial, un contexto por caso; prepara cada entrada con los modelos existentes. Un error se propaga al avanzar, sin ejecutar los casos restantes |"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 44,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "| `SteelDesignEngine.run(case)` | Mismo `EngineResult` público, sin cambio de firma |"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 45,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "| `SteelDesignEngine.run_with_context(case)` | `(caso_validado, sección_validada, EngineResult)`, una única ejecución del pipeline |"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 54,
+      "tokens": [
+        "SteelCase",
+        "OutputOptions"
+      ],
+      "text": "`execute_payload` valida `OutputOptions` y `SteelCase`; `execute_case` acepta"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 55,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "un SteelCase y contexto explícito de un llamador Python. Ambos pasan por las"
+    },
+    {
+      "file": "docs/contracts/hfs021-execution.md",
+      "line": 94,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "- `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload`,"
+    },
+    {
+      "file": "docs/contracts/hfs021a-public-api.md",
+      "line": 42,
+      "tokens": [
+        "SteelCase",
+        "EngineResult"
+      ],
+      "text": "| `steel_design.engine.SteelDesignEngine` | `run(case) -> EngineResult`; `run_with_context(case) -> (SteelCase, Section, EngineResult)`. Único pipeline con validación, routing, cálculo y cobertura |"
+    },
+    {
+      "file": "docs/contracts/hfs021a-public-api.md",
+      "line": 43,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "| `steel_design.models.SteelCase` | Entrada Pydantic compartida; tipos anidados Material/Loads/etc. permanecen en este mismo módulo |"
+    },
+    {
+      "file": "docs/contracts/hfs021a-public-api.md",
+      "line": 46,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "| `steel_design.execution.execute_case` | Ejecutar un SteelCase con engine y contexto opcional; devuelve CaseExecution |"
+    },
+    {
+      "file": "docs/contracts/hfs021a-public-api.md",
+      "line": 47,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "| `steel_design.execution.iter_executions` | Iteración secuencial de payload individual/bundle; errores propagados al avanzar |"
+    },
+    {
+      "file": "docs/contracts/hfs021a-public-api.md",
+      "line": 54,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "`steel_design.execution.CaseExecution`, `steel_design.results_model.EngineResult`,"
+    },
+    {
+      "file": "docs/contracts/hfs021a-public-api.md",
+      "line": 56,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "Se conservan las firmas de HFS-021, también `OutputOptions` y la exportación"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 28,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path.write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + \"\\n\", encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 52,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(\",\", \":\"),"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 60,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 79,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads(path.read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 87,
+      "tokens": [
+        "SteelCase",
+        "model_dump"
+      ],
+      "text": "result = engine.run(SteelCase(**cleaned)).model_dump(mode=\"json\")"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 170,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = normalize(json.loads(stream))"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 201,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps(verification, indent=2), flush=True)"
+    },
+    {
+      "file": "scripts/audit_hfs011.py",
+      "line": 64,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "before = json.loads(baseline.read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/audit_hfs011.py",
+      "line": 85,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps(summary, indent=2), flush=True)"
+    },
+    {
+      "file": "scripts/audit_hfs013.py",
+      "line": 26,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "before = json.loads(Path(args.baseline).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/audit_hfs013.py",
+      "line": 27,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "after = json.loads((out / \"engine-results.json\").read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/audit_hfs013.py",
+      "line": 30,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "verification = json.loads((out / \"verification.json\").read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 19,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "return json.loads(text, parse_constant=lambda token: {\"nonfinite_json_token\": token})"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 35,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads(path.read_text(encoding=\"utf-8-sig\"))"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 55,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "from steel_design.models import CheckResult"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 56,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "from steel_design.results_model import EngineResult, aggregate_case_statuses"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 58,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "checks = [CheckResult(name=\"axial\",clause=\"E3-1\",demand=90,capacity=100,dcr=.90,status=\"PASS\"),"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 59,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "CheckResult(name=\"flexure\",clause=\"F2-1\",demand=1,capacity=50,dcr=.02,status=\"PASS\")]"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 69,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "write_json(out / \"defect-probes.json\", {\"F05\": {\"checks\": [c.model_dump(mode=\"json\") for c in checks],"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 70,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "\"summary\": _build_global_summary(EngineResult(checks=checks))},"
+    },
+    {
+      "file": "scripts/audit_hfs017_probes.py",
+      "line": 12,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "scripts/audit_hfs017_probes.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase(section_name=\"probe\", design_method=\"ASD\", material=dict(Fy=320,Fu=450),"
+    },
+    {
+      "file": "scripts/audit_hfs017_probes.py",
+      "line": 38,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "records[name]={\"value\":value.model_dump(mode=\"json\") if hasattr(value,\"model_dump\") else value}"
+    },
+    {
+      "file": "scripts/audit_hfs017_probes.py",
+      "line": 42,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "output.write_text(json.dumps(records,indent=2,allow_nan=False),encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/compare_hfs013.py",
+      "line": 63,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "result = compare(json.loads(before.read_text()), json.loads(after.read_text()))"
+    },
+    {
+      "file": "scripts/compare_hfs013.py",
+      "line": 64,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "output.write_text(json.dumps(result, indent=2), encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/compare_hfs014_cli.py",
+      "line": 46,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "result=compare(json.loads(before.read_text(encoding=\"utf-8\")),json.loads(after.read_text(encoding=\"utf-8\")))"
+    },
+    {
+      "file": "scripts/compare_hfs014_cli.py",
+      "line": 47,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "out.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/compare_hfs015.py",
+      "line": 150,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "json.loads(b[\"execution\"][\"stdout\"],parse_constant=lambda token: (_ for _ in ()).throw(AssertionError(token)))"
+    },
+    {
+      "file": "scripts/compare_hfs015.py",
+      "line": 151,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "assert \"nonfinite_json_token\" not in json.dumps(b[\"normalized_details\"])"
+    },
+    {
+      "file": "scripts/compare_hfs015.py",
+      "line": 162,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "load=lambda p:json.loads(p.read_text(encoding='utf-8'))"
+    },
+    {
+      "file": "scripts/compare_hfs017.py",
+      "line": 39,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "read=lambda p:json.loads(Path(p).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/compare_hfs017.py",
+      "line": 53,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "output.write_text(json.dumps({\"accepted\":True,\"engine_case_files\":len(b),"
+    },
+    {
+      "file": "scripts/compare_hfs021.py",
+      "line": 42,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads((label / \"verification.json\").read_text())[\"accepted\"]"
+    },
+    {
+      "file": "scripts/compare_hfs021.py",
+      "line": 50,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "proof = json.loads((directory / \"input-provenance.json\").read_text())"
+    },
+    {
+      "file": "scripts/compare_hfs021.py",
+      "line": 61,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw_captures = [json.loads((p / \"cli-examples.json\").read_text(encoding=\"utf-8\")) for p in (before, after)]"
+    },
+    {
+      "file": "scripts/compare_hfs021.py",
+      "line": 66,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "outputs = [json.loads(run[\"stdout\"]) for run in runs]"
+    },
+    {
+      "file": "scripts/compare_hfs021.py",
+      "line": 142,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "args.output.write_text(json.dumps(result, indent=2) + \"\\n\", encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/compare_hfs021a.py",
+      "line": 59,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "args.output.write_text(json.dumps(result, indent=2) + \"\\n\", encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/dump_headers.py",
+      "line": 15,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(by_sheet, ensure_ascii=False, indent=2),"
+    },
+    {
+      "file": "scripts/generate_hfs022_schemas.py",
+      "line": 17,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(get_schema(kind, mode=mode), ensure_ascii=False, sort_keys=True, indent=2)"
+    },
+    {
+      "file": "scripts/generate_hfs022_schemas.py",
+      "line": 23,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "files[\"manifest.json\"] = (json.dumps(manifest, sort_keys=True, indent=2) + \"\\n\").encode(\"utf-8\")"
+    },
+    {
+      "file": "scripts/generate_hfs022_schemas.py",
+      "line": 36,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps({\"mode\": \"check\", \"differences\": differences, \"files\": len(expected)}))"
+    },
+    {
+      "file": "scripts/generate_hfs022_schemas.py",
+      "line": 41,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps({\"mode\": \"generate\", \"files\": len(expected)}))"
+    },
+    {
+      "file": "scripts/hfs020_comparison.py",
+      "line": 31,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "return json.loads(data, parse_float=Decimal, parse_int=Decimal, object_pairs_hook=_object,"
+    },
+    {
+      "file": "scripts/hfs020_comparison.py",
+      "line": 59,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "return json.dumps(value, ensure_ascii=True)"
+    },
+    {
+      "file": "scripts/hfs020_comparison.py",
+      "line": 63,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "return \"{\" + \",\".join(json.dumps(k, ensure_ascii=True) + \":\" + canonical_value(value[k])"
+    },
+    {
+      "file": "scripts/probe_hfs015.py",
+      "line": 11,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "scripts/probe_hfs015.py",
+      "line": 20,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case=SteelCase(**payload)"
+    },
+    {
+      "file": "scripts/probe_hfs015.py",
+      "line": 25,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "\"check\":check.model_dump(mode=\"json\"),\"summary\":_build_global_summary(result)},\"F07\":[]}"
+    },
+    {
+      "file": "scripts/probe_hfs015.py",
+      "line": 30,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "advice=_build_chapter_admissibility(SteelCase(**data),section)"
+    },
+    {
+      "file": "scripts/probe_hfs015.py",
+      "line": 33,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "out.write_text(json.dumps(records,indent=2,allow_nan=False)+'\\n',encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 15,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "\"models\": (\"SteelCase\",),"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 18,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "\"execution\": (\"execute_case\", \"iter_executions\", \"execute_payload\", \"execution_status\"),"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 78,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 81,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "assert modules[\"models\"].SteelCase is SteelCase"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 88,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "\"class_module\": SteelCase.__module__, \"import_metadata_reads\": reads}"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 96,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps(probe(args.root.resolve(), args.order), indent=2))"
+    },
+    {
+      "file": "scripts/verify_hfs015_scope.py",
+      "line": 25,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "is_result=(isinstance(node.func,ast.Name) and node.func.id==\"CheckResult\" or"
+    },
+    {
+      "file": "scripts/verify_hfs015_scope.py",
+      "line": 27,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "and node.func.value.id==\"CheckResult\" and node.func.attr==\"from_values\")"
+    },
+    {
+      "file": "scripts/verify_hfs015_scope.py",
+      "line": 78,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "inputs=json.loads((args.capture/'copied_inputs.json').read_text())"
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 45,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path.write_text(json.dumps(value, indent=2, ensure_ascii=False) + \"\\n\", encoding=\"utf-8\")"
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 184,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "\"print(json.dumps({'version':importlib.metadata.version('structurelab-hfs'),\""
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 203,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(result.stdout)[\"status\"] == \"INCOMPLETE\""
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 204,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "cli_outputs.append(normalize(json.loads(result.stdout)))"
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 207,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(missing.stderr)[\"error\"][\"stage\"] == \"load_sections\""
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 244,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw_cli = json.loads((out / \"cli-examples.json\").read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 251,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "output = json.loads(record[\"execution\"][\"stdout\"])"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 18,
+      "tokens": [
+        "OutputOptions",
+        "prepare_cases"
+      ],
+      "text": "from .execution import OutputOptions, extract_output_options, prepare_cases"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 19,
+      "tokens": [
+        "unique_json_object"
+      ],
+      "text": "from .input_contracts import unique_json_object"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 20,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from .models import CheckResult, SteelCase"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 21,
+      "tokens": [
+        "EngineResult",
+        "CoverageReport"
+      ],
+      "text": "from .results_model import CoverageReport, CoverageStatus, EngineResult"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 24,
+      "tokens": [
+        "SteelCase",
+        "CheckResult",
+        "EngineResult",
+        "CoverageReport"
+      ],
+      "text": "ContractPayload = SteelCase | dict[str, Any] | CoverageReport | CheckResult | EngineResult"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 53,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "output: OutputOptions | None = None"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 96,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "return json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + \"\\n\""
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 101,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "return value.model_dump(mode=\"json\", exclude_unset=exclude_unset, warnings=\"error\")"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 108,
+      "tokens": [
+        "unique_json_object",
+        "json.load"
+      ],
+      "text": "value = json.loads(data, object_pairs_hook=unique_json_object) if isinstance(data, (str, bytes)) else deepcopy(data)"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 123,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 127,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "return CoverageReport"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 129,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 131,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "return EngineResult"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 169,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "def _coverage_integrity(report: CoverageReport, check_count: int | None = None) -> None:"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 200,
+      "tokens": [
+        "CheckResult",
+        "EngineResult"
+      ],
+      "text": "checks = value.checks if isinstance(value, EngineResult) else [value] if isinstance(value, CheckResult) else []"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 208,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "expected = CheckResult.from_values(name=check.name, clause=check.clause,"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 213,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "if isinstance(value, EngineResult):"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 219,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "elif isinstance(value, CoverageReport):"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 223,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _case_snapshot(case: SteelCase, payload: dict) -> SteelCase:"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 241,
+      "tokens": [
+        "OutputOptions",
+        "model_validate"
+      ],
+      "text": "output = OutputOptions.model_validate(raw[\"output\"]) if \"output\" in raw else None"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 247,
+      "tokens": [
+        "prepare_cases"
+      ],
+      "text": "for case, case_payload, _, _ in prepare_cases(payload):"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 252,
+      "tokens": [
+        "model_validate"
+      ],
+      "text": "value = model.model_validate_json(_encode(cleaned), strict=True, extra=\"forbid\")"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 253,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "if isinstance(value, SteelCase):"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 296,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "if type(document.output) is not OutputOptions:"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 297,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "raise ContractError(\"INVALID_PAYLOAD\", \"output must be OutputOptions.\", \"/output\")"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 336,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "canonical = SteelCase.model_json_schema(mode=mode)"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 338,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "definitions[\"EffectiveSteelCase\"] = canonical"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 341,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "fragments = {key: {} for key in SteelCase.model_fields}"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 349,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "\"$comment\": \"Fragments preserve deep-merge semantics. Each effective case must validate against EffectiveSteelCase and canonical Python guards; schema alone is insufficient.\"}"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 353,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "payload_schema = model.model_json_schema(mode=mode if model is SteelCase else \"serialization\")"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 355,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "if model is not SteelCase:"
+    },
+    {
+      "file": "src/steel_design/contracts.py",
+      "line": 369,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "schema[\"properties\"][\"output\"] = OutputOptions.model_json_schema(mode=mode)"
+    },
+    {
+      "file": "src/steel_design/design_methods.py",
+      "line": 15,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "SteelCase retains its stricter, uppercase JSON contract."
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 7,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from ..models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 8,
+      "tokens": [
+        "CoverageReport",
+        "CoverageObligation"
+      ],
+      "text": "from ..results_model import CoverageObligation, CoverageReport, CoverageStatus"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 12,
+      "tokens": [
+        "SteelCase",
+        "CoverageReport"
+      ],
+      "text": "def build_coverage_plan(case: SteelCase, section: Section) -> CoverageReport:"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 17,
+      "tokens": [
+        "CoverageObligation"
+      ],
+      "text": "item = CoverageObligation("
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 52,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "if not any(loads.model_dump().values()):"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 193,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "return CoverageReport(method=case.design_method.value, section_name=section.name, profile_type=family,"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 194,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "scope_evidence=scope.model_dump() if scope is not None else {},"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 195,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "demand_components=loads.model_dump(), obligations=obligations)"
+    },
+    {
+      "file": "src/steel_design/domain/coverage_evidence.py",
+      "line": 14,
+      "tokens": [
+        "ExecutedEvaluation"
+      ],
+      "text": "from ..results_model import CoverageStatus, ExecutedEvaluation"
+    },
+    {
+      "file": "src/steel_design/domain/coverage_evidence.py",
+      "line": 88,
+      "tokens": [
+        "ExecutedEvaluation"
+      ],
+      "text": "report.executions.append(ExecutedEvaluation("
+    },
+    {
+      "file": "src/steel_design/domain/design_methods.py",
+      "line": 8,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "# A valid SteelCase contains an enum. Reject unsafe model_copy/mutation,"
+    },
+    {
+      "file": "src/steel_design/domain/design_methods.py",
+      "line": 11,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "raise ValidationError(\"Invalid case design method; validate SteelCase before calculation.\","
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/flexure_evaluator.py",
+      "line": 2,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from ...models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/flexure_evaluator.py",
+      "line": 8,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def evaluate(self, case: SteelCase, section: Section) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/tension_evaluator.py",
+      "line": 2,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from ...models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/tension_evaluator.py",
+      "line": 7,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def evaluate(self, case: SteelCase, section: Section) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 7,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from ...models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 103,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "applicability: Callable[[SteelCase, Section], bool]"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 106,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_tension(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 110,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_compression(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 114,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_major_flexure(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 118,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_minor_flexure(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 122,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_any_flexure(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 126,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_directional_shear(case: SteelCase) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 130,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_major_shear(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 134,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_minor_shear(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 138,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_shear(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 142,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_torsion(case: SteelCase, _: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 146,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_h1_hss_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 150,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_h3_1_hss_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 154,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_h3_2_hss_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 160,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _has_interaction(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 217,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _w_or_channel_major_flexure_selection(case: SteelCase, section: Section) -> Optional[str]:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 270,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f2_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 274,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f3_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 278,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f4_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 282,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f5_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 286,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f6_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 291,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f7_mx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 295,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f7_my_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 299,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f8_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 308,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f8_mx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 312,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f8_my_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 316,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f10_mx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 320,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f10_my_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 324,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f11_mx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 328,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_f11_my_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 332,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g2_vx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 336,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g3_vx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 340,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g3_vy_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 344,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g4_vx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 348,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g4_vy_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 352,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g5_vx_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 356,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g5_vy_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 360,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_g6_vy_applicable(case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 651,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _is_e7_applicable(cls, case: SteelCase, section: Section) -> bool:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 668,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _validate_flexure_selection(cls, case: SteelCase, section: Section, selected_rule_ids: List[str]) -> None:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 731,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _validate_composite_scope(cls, case: SteelCase, section: Section) -> None:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 775,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _get_composite_rules(cls, case: SteelCase, section: Section) -> List:"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 829,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def get_rules(cls, case: SteelCase, section: Section, selection_errors: Optional[List[dict]] = None) -> List:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 5,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from ...models import CheckResult, CheckStatus, SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 9,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _compression_demand(case: SteelCase) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 13,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _pass_result(name: str, clause: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 14,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult(name=name, clause=clause, demand=0.0, capacity=0.0, dcr=0.0, status=CheckStatus.PASS)"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 17,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _result(name: str, clause: str, demand: float, capacity: float, details: dict | None = None) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 18,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 46,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _governing_fe_e3(case: SteelCase, section: Section) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 53,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _e3_components(case: SteelCase, section: Section) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 75,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _governing_fe_e4(case: SteelCase, section: Section) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 103,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _e4_components(case: SteelCase, section: Section) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 186,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _compression_details(case: SteelCase, section: Section) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 200,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 254,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 316,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/axial_rules.py",
+      "line": 370,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 8,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from ...models import CheckResult, CheckStatus, SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 20,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _nominal_pass(name: str, clause: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 21,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult(name=name, clause=clause, demand=0.0, capacity=0.0, dcr=0.0, status=CheckStatus.PASS)"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 24,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _build_result(*, name: str, clause: str, demand: float, capacity: float, details: dict, unit: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 25,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 58,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 135,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _available_axial_strength(case: SteelCase, section: Section) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 215,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _available_flexural_strength(case: SteelCase, section: Section, axis: str) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 233,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _available_shear_strength(case: SteelCase, section: Section) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 255,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _compute_h1_interaction(case: SteelCase, section: Section) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 307,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 347,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/combined_hss_rules.py",
+      "line": 389,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 8,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from ...models import CheckResult, CheckStatus, CompositeI5Method, SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 17,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _nominal_pass(name: str, clause: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 18,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult(name=name, clause=clause, demand=0.0, capacity=0.0, dcr=0.0, status=CheckStatus.PASS)"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 21,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _build_result(*, name: str, clause: str, demand: float, capacity: float, details: dict, unit: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 22,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 32,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _ensure_supported_method(case: SteelCase, section: Section) -> str:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 54,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _composite_role(case: SteelCase) -> str:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 60,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _bar_totals(case: SteelCase) -> Dict[str, float]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 77,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _bar_plastic_modulus(case: SteelCase, *, axis: str) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 102,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _composite_section_components(case: SteelCase, section: Section) -> Dict[str, float]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 210,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 244,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _bare_steel_compression_capacity_k_n(case: SteelCase, section: Section) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 308,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _sum_anchor_qn(case: SteelCase, *, segment: str) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 367,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _composite_beam_horizontal_shear(case: SteelCase, section: Section) -> Dict[str, float | list]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 388,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _steel_shear_capacity_k_n(case: SteelCase, section: Section) -> Dict[str, float]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 405,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _required_shear(case: SteelCase) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 453,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _filled_strip_model(case: SteelCase, section: Section, *, axis: str, strips: int = 800) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 730,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _filled_flexural_capacity_i3_axis(case: SteelCase, section: Section, *, axis: str) -> Dict[str, float | str | dict]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 810,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _encased_steel_only_flexural_capacity_axis(case: SteelCase, section: Section, *, axis: str) -> Dict[str, float | str]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 826,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _composite_flexural_capacities_i5(case: SteelCase, section: Section) -> Dict[str, Dict[str, float | str | dict]]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 845,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _composite_axial_capacity_i5(case: SteelCase, section: Section) -> Dict[str, float | str]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 868,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _i5_moment_ratio_sum(case: SteelCase, flex_caps: Dict[str, Dict[str, float | str | dict]]) -> Dict[str, float]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 877,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _i5_method_1_h1_interaction(case: SteelCase, axial_cap_kN: float, m_ratio_sum: float) -> Dict[str, float | str]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 895,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _i5_method2_filled_table_points(case: SteelCase, section: Section, parts: Dict[str, float]) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 940,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1023,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1087,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _i5_method_4_interaction(case: SteelCase, section: Section, axial_cap_kN: float, m_ratio_sum: float) -> Dict[str, object]:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1139,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1185,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1259,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1293,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1408,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1442,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1525,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1552,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1576,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1607,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1633,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1679,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1706,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1744,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1781,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1813,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/composite_rules.py",
+      "line": 1891,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 3,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from ...models import CheckResult, CheckStatus, SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 8,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _nominal_pass(name: str, clause: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 9,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult("
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 19,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _major_demand(case: SteelCase) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 23,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _minor_demand(case: SteelCase) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 27,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _axis_demand(case: SteelCase, axis: str) -> float:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 39,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def _build_flexure_result(*, case: SteelCase, name: str, clause: str, demand: float, evaluation: dict, inputs: dict) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 43,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 65,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 73,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": ") -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 82,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _common_major_inputs(case: SteelCase, section: Section, demand: float) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 97,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 118,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 137,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 156,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 175,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 198,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 217,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 236,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 255,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 276,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 295,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 314,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 333,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 353,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 378,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 404,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 434,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 464,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 494,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 524,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 554,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 585,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _resolve_connection(case: SteelCase):"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 605,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 636,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 676,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 707,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/flexure_rule.py",
+      "line": 737,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 5,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from ...models import CheckResult, CheckStatus, SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 12,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _nominal_pass(name: str, clause: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 13,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult("
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 43,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": ") -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 44,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 79,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _g2_design_factors(case: SteelCase, profile: str, h_over_tw: float) -> dict:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 102,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 166,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 204,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 220,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/shear_rules.py",
+      "line": 236,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 3,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from ...models import CheckResult, CheckStatus, SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 8,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "def _nominal_pass(name: str, clause: str) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 9,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult("
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 25,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 34,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 65,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "def check(self, case: SteelCase, section: Section) -> CheckResult:"
+    },
+    {
+      "file": "src/steel_design/domain/rules/tension_rule.py",
+      "line": 74,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult.from_values("
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 1,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from ..models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 8,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def validate_case(case: SteelCase):"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 11,
+      "tokens": [
+        "SteelCase",
+        "model_validate"
+      ],
+      "text": "case = SteelCase.model_validate(case)"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 97,
+      "tokens": [
+        "model_validate"
+      ],
+      "text": "section = Section.model_validate(section)"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 101,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "zero_fields = [name for name, value in section.model_dump().items()"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 121,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def validate_case_section(case: SteelCase, section: Section) -> None:"
+    },
+    {
+      "file": "src/steel_design/engine.py",
+      "line": 2,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from .models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/engine.py",
+      "line": 3,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "from .results_model import EngineResult"
+    },
+    {
+      "file": "src/steel_design/engine.py",
+      "line": 20,
+      "tokens": [
+        "SteelCase",
+        "EngineResult"
+      ],
+      "text": "def run(self, case: SteelCase) -> EngineResult:"
+    },
+    {
+      "file": "src/steel_design/engine.py",
+      "line": 24,
+      "tokens": [
+        "SteelCase",
+        "EngineResult"
+      ],
+      "text": "def run_with_context(self, case: SteelCase) -> tuple[SteelCase, Section, EngineResult]:"
+    },
+    {
+      "file": "src/steel_design/engine.py",
+      "line": 107,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "return case, section, EngineResult(checks=checks, coverage=coverage)"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 12,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from .models import SteelCase"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 15,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "from .results_model import EngineResult, AnalysisStatus, aggregate_case_statuses"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 19,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "class OutputOptions(InputModel):"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 20,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "\"\"\"Export preferences; the engineering contract remains SteelCase.\"\"\""
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 42,
+      "tokens": [
+        "OutputOptions",
+        "model_validate"
+      ],
+      "text": "options = OutputOptions.model_validate(output_cfg)"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 45,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "raise PydanticValidationError.from_exception_data(\"OutputOptions\", errors) from exc"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 46,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "return cleaned, options.model_dump()"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 53,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 55,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "result: EngineResult"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 78,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def execute_case(*, engine: SteelDesignEngine, case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 83,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "copy.deepcopy(input_payload if input_payload is not None else case.model_dump(mode=\"json\")),"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 84,
+      "tokens": [
+        "OutputOptions",
+        "model_dump"
+      ],
+      "text": "copy.deepcopy(output_options if output_options is not None else OutputOptions().model_dump()),"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 88,
+      "tokens": [
+        "SteelCase",
+        "prepare_cases"
+      ],
+      "text": "def prepare_cases(payload: dict) -> Iterator[tuple[SteelCase, dict, dict, str | None]]:"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 107,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase(**case_payload)"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 111,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "def iter_executions(payload: dict, engine: SteelDesignEngine) -> Iterator[CaseExecution]:"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 113,
+      "tokens": [
+        "prepare_cases"
+      ],
+      "text": "for case, case_payload, options, tag in prepare_cases(payload):"
+    },
+    {
+      "file": "src/steel_design/execution.py",
+      "line": 120,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "return list(iter_executions(payload, engine))"
+    },
+    {
+      "file": "src/steel_design/input_contracts.py",
+      "line": 30,
+      "tokens": [
+        "unique_json_object"
+      ],
+      "text": "def unique_json_object(pairs):"
+    },
+    {
+      "file": "src/steel_design/models.py",
+      "line": 279,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "class SteelCase(InputModel):"
+    },
+    {
+      "file": "src/steel_design/models.py",
+      "line": 303,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "Used by CheckResult serialization and by the CLI's complete memory payload."
+    },
+    {
+      "file": "src/steel_design/models.py",
+      "line": 324,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "class CheckResult(BaseModel):"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 8,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from .models import SteelCase, finite_json_payload"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 67,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _build_chapter_admissibility(case: SteelCase, section: Section | None) -> dict:"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 137,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "\"source\": \"CheckResult original values; not reconstructed from memory/display\","
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 191,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 285,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 355,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 368,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "output_summary = result.model_dump(exclude={\"checks\": {\"__all__\": {\"details\"}}})"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 423,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 448,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "output_path.write_text(json.dumps(payload, indent=2, allow_nan=False), encoding=\"utf-8\")"
+    },
+    {
+      "file": "src/steel_design/reporting.py",
+      "line": 467,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "raw_summary = result.model_dump(exclude={\"checks\": {\"__all__\": {\"details\"}}})"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 6,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "from .models import CheckResult, CheckStatus"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 22,
+      "tokens": [
+        "CoverageObligation"
+      ],
+      "text": "class CoverageObligation(BaseModel):"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 39,
+      "tokens": [
+        "ExecutedEvaluation"
+      ],
+      "text": "class ExecutedEvaluation(BaseModel):"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 45,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "class CoverageReport(BaseModel):"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 56,
+      "tokens": [
+        "CoverageObligation"
+      ],
+      "text": "obligations: List[CoverageObligation]"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 57,
+      "tokens": [
+        "ExecutedEvaluation"
+      ],
+      "text": "executions: List[ExecutedEvaluation] = Field(default_factory=list)"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 77,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "class EngineResult(BaseModel):"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 78,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "checks: List[CheckResult]"
+    },
+    {
+      "file": "src/steel_design/results_model.py",
+      "line": 80,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "coverage: CoverageReport | None = None"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 9,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from .models import SteelCase, finite_json_payload"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 10,
+      "tokens": [
+        "_unique_json_object",
+        "unique_json_object"
+      ],
+      "text": "from .input_contracts import unique_json_object as _unique_json_object"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 17,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "from .execution import (execute_case, iter_executions, execution_status, validate_bundle_shape,"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 18,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "OutputOptions as OutputOptions)"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 59,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps(payload, indent=2, allow_nan=False), file=sys.stderr)"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 63,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | None:"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 72,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case: SteelCase,"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 111,
+      "tokens": [
+        "_unique_json_object",
+        "unique_json_object",
+        "json.load"
+      ],
+      "text": "payload = json.load(f, object_pairs_hook=_unique_json_object)"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 121,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "for execution in iter_executions(payload, engine):"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 129,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps(output, indent=2, allow_nan=False))"
+    },
+    {
+      "file": "src/steel_design/run.py",
+      "line": 131,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps(finite_json_payload(summaries[0]), indent=2, allow_nan=False))"
+    },
+    {
+      "file": "src/steel_design/sections/geometry.py",
+      "line": 4,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from ..models import CustomSectionType, SteelCase"
+    },
+    {
+      "file": "src/steel_design/sections/geometry.py",
+      "line": 9,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def build_custom_section(case: SteelCase) -> Section:"
+    },
+    {
+      "file": "src/steel_design/sections/repository.py",
+      "line": 23,
+      "tokens": [
+        "model_validate"
+      ],
+      "text": "record = Section.model_validate(section).model_copy(deep=True)"
+    },
+    {
+      "file": "src/steel_design/sections/repository.py",
+      "line": 38,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "\"records\": [record.model_dump(mode=\"json\") for record in records],"
+    },
+    {
+      "file": "tests/test_chapter_e_rules.py",
+      "line": 6,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_chapter_e_rules.py",
+      "line": 11,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _compression_case(section_name: str, pu: float, *, e: float = 200000.0, mode=None, xa: float = 0.0, ya: float = 0.0) -> SteelCase:"
+    },
+    {
+      "file": "tests/test_chapter_e_rules.py",
+      "line": 12,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase("
+    },
+    {
+      "file": "tests/test_chapter_f_rules.py",
+      "line": 15,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "SteelCase,"
+    },
+    {
+      "file": "tests/test_chapter_f_rules.py",
+      "line": 21,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase("
+    },
+    {
+      "file": "tests/test_chapter_g_rules.py",
+      "line": 6,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_chapter_g_rules.py",
+      "line": 10,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _case(*, vux=0.0, vuy=0.0, vu=0.0, method=\"LRFD\") -> SteelCase:"
+    },
+    {
+      "file": "tests/test_chapter_g_rules.py",
+      "line": 11,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase("
+    },
+    {
+      "file": "tests/test_chapter_h_rules.py",
+      "line": 6,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_chapter_h_rules.py",
+      "line": 10,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _case(*, pu=0.0, mux=0.0, muy=0.0, vux=0.0, vuy=0.0, vu=0.0, tu=0.0) -> SteelCase:"
+    },
+    {
+      "file": "tests/test_chapter_h_rules.py",
+      "line": 11,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase("
+    },
+    {
+      "file": "tests/test_chapter_i_rules.py",
+      "line": 13,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_chapter_i_rules.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _base_case(*, section_name: str, loads: Loads, composite: dict) -> SteelCase:"
+    },
+    {
+      "file": "tests/test_chapter_i_rules.py",
+      "line": 18,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase("
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 5,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 21,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 41,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 62,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 84,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 97,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_custom_solid_sections.py",
+      "line": 112,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 57,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path.write_text(json.dumps(payload), encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 96,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads(completed.stdout)"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 103,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "detail = json.loads(Path(payload[\"artifacts\"][\"detailed_results_json\"]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 131,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads(completed.stdout)"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 191,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "stdout_payload = json.loads(completed.stdout)"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 210,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "detailed_payload = json.loads(detailed_files[0].read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 222,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "self.assertIn(\"calculations\", json.dumps(detailed_payload))"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 223,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "self.assertNotIn('\"details\":', json.dumps(detailed_payload[\"output\"]))"
+    },
+    {
+      "file": "tests/test_engine_cli_integration.py",
+      "line": 241,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "stdout_payload = json.loads(completed.stdout)"
+    },
+    {
+      "file": "tests/test_examples_smoke.py",
+      "line": 45,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads(completed.stdout)"
+    },
+    {
+      "file": "tests/test_examples_smoke.py",
+      "line": 61,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "error_payload = json.loads(completed.stderr)"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from steel_design.models import CheckResult, Loads, SteelCase"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 18,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "from steel_design.results_model import EngineResult"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 46,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(repository).run(SteelCase(**case_payload(loads)))"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 47,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "print(result.model_dump_json())"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 123,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "print(loads.model_dump())"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 139,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "checks = [CheckResult(name=\"axial\", clause=\"E3-1\", demand=90, capacity=100, dcr=.9, status=\"PASS\"),"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 140,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "CheckResult(name=\"flexure\", clause=\"F2-1\", demand=1, capacity=50, dcr=.02, status=\"PASS\")]"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 141,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "summary = _build_global_summary(EngineResult(checks=checks, status=\"PASS\"))"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 153,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(SectionRepository()).run(SteelCase(**payload))"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 155,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "print(check.model_dump_json())"
+    },
+    {
+      "file": "tests/test_hfs000_characterization.py",
+      "line": 169,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(completed.stderr)[\"error\"][\"code\"] == \"EMPTY_CASE_BUNDLE\""
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 21,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from steel_design.models import CheckResult, SteelCase, TensionScope"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 22,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "from steel_design.results_model import AnalysisStatus, EngineResult"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 45,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(**data)"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 60,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "data = json.loads((ROOT / \"examples\" / f\"{name}_case.json\").read_text(encoding=\"utf-8-sig\"))"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 64,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(**data)"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 131,
+      "tokens": [
+        "EngineResult",
+        "model_dump",
+        "model_validate"
+      ],
+      "text": "assert EngineResult.model_validate_json(result.model_dump_json()).status == result.status"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 146,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult(name=\"Tension Yielding\", clause=\"D2-1\", demand=50, capacity=1000, dcr=.05, status=\"PASS\")"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 175,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(repository).run(SteelCase(**payload(dict(Pu=0, Mux=0, Muy=0, Vu=0, Vux=0, Vuy=0, Tu=0))))"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 182,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(repository).run(SteelCase(**payload(loads)))"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 195,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(repo).run(SteelCase(**payload(dict(Mux=1))))"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 206,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(repo).run(SteelCase(**payload(dict(Mux=1, Muy=1))))"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 226,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(repo).run(SteelCase(**payload(dict(Pu=1))))"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 277,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "assert EngineResult(checks=[], status=\"PASS\").status == AnalysisStatus.INCOMPLETE"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 282,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "case = tie(tension_scope=None).model_dump(mode=\"json\")"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 286,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path.write_text(json.dumps(case), encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 290,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "data = json.loads(run.stdout)"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 294,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "detail = json.loads(Path(summary[\"artifacts\"][\"detailed_results_json\"]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 14,
+      "tokens": [
+        "OutputOptions",
+        "_unique_json_object",
+        "unique_json_object"
+      ],
+      "text": "from steel_design.run import OutputOptions, _extract_output_options, _unique_json_object"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 42,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "m.SteelCase: CASE,"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 44,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "OutputOptions: {},"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 51,
+      "tokens": [
+        "model_validate"
+      ],
+      "text": "model.model_validate({**SAMPLES[model], \"unknown_input\": 10})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 68,
+      "tokens": [
+        "model_validate"
+      ],
+      "text": "model.model_validate(payload)"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 87,
+      "tokens": [
+        "model_validate"
+      ],
+      "text": "model.model_validate({**SAMPLES[model], field: value})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 105,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert loads.model_dump(exclude_unset=True) == {\"Pu\": 0}"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 122,
+      "tokens": [
+        "model_dump",
+        "model_validate"
+      ],
+      "text": "assert m.Loads.model_validate_json(loads.model_dump_json()) == loads"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 151,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "m.SteelCase(**{**CASE, \"loads\": {\"Mxu\": 1000000}})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 160,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = m.SteelCase(**{**CASE, \"design_method\": method, \"loads\": loads,"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 171,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = m.SteelCase(**CASE)"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 176,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = m.SteelCase(**CASE).model_copy(update={\"lengths\": {\"Lx\": 0}})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 205,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads((ROOT / \"examples/composite_encased_case.json\").read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 208,
+      "tokens": [
+        "json.load",
+        "json.dump"
+      ],
+      "text": "bad = json.loads(json.dumps(payload))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 211,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "validate_case(m.SteelCase(**bad))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 213,
+      "tokens": [
+        "json.load",
+        "json.dump"
+      ],
+      "text": "bad = json.loads(json.dumps(payload))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 216,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "validate_case(m.SteelCase(**bad))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 217,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "payload = json.loads((ROOT / \"examples/composite_beam_case.json\").read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 221,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "validate_case(m.SteelCase(**payload))"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 223,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "assert validate_case(m.SteelCase(**payload)).composite.geometry.deck_present is False"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 227,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = m.SteelCase(**{**CASE, \"composite\": SAMPLES[m.CompositeConfig]})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 234,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = m.SteelCase(**{**CASE, \"connection\": {\"An\": 200, \"U\": .1}})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 237,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = m.SteelCase(**{**CASE, \"custom_section\": {\"type\": \"SOLID_CIRCULAR\", \"diameter\": 1e308}})"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 253,
+      "tokens": [
+        "_unique_json_object",
+        "unique_json_object",
+        "json.load"
+      ],
+      "text": "json.loads('{\"loads\":{\"Pu\":1,\"Pu\":2}}', object_pairs_hook=_unique_json_object)"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 262,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(caught.value.to_dict(), allow_nan=False)"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 275,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path.write_text(json.dumps({**CASE, \"loads\": loads}), encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 281,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "error = json.loads(completed.stderr)[\"error\"]"
+    },
+    {
+      "file": "tests/test_hfs012_flexure_selection.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "tests/test_hfs012_flexure_selection.py",
+      "line": 23,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(section_name=\"reference\", material={\"Fy\": 320, \"Fu\": 450, \"E\": 200000},"
+    },
+    {
+      "file": "tests/test_hfs012_flexure_selection.py",
+      "line": 82,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "original = s.model_dump()"
+    },
+    {
+      "file": "tests/test_hfs012_flexure_selection.py",
+      "line": 86,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert s.model_dump() == original  # no catalog/model enrichment"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 27,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 76,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase(section_name=\"F43\", design_method=method,"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 211,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "return call().model_dump(mode=\"json\")"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 220,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "result[key]={\"case\":case.model_dump(mode=\"json\"),\"section\":section.model_dump(mode=\"json\"),"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 225,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "result[f\"H1/{family}/{method}/{axial}\"]={\"case\":case.model_dump(mode=\"json\"),"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 226,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "\"section\":section.model_dump(mode=\"json\"),\"independent_reference\":ref,"
+    },
+    {
+      "file": "tests/test_hfs013_design_method.py",
+      "line": 237,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "output.write_text(json.dumps(snapshot(),ensure_ascii=False,indent=2),encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs013_directional_h3.py",
+      "line": 21,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "tests/test_hfs013_directional_h3.py",
+      "line": 53,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(section_name=\"reference\", design_method=method,"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from steel_design.models import CheckResult, SteelCase"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 19,
+      "tokens": [
+        "EngineResult",
+        "CoverageReport",
+        "CoverageObligation"
+      ],
+      "text": "AnalysisStatus, CoverageObligation, CoverageReport, EngineResult, aggregate_case_statuses,"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 27,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "return CheckResult(name=name,clause=clause,demand=demand,capacity=capacity,dcr=dcr,status=status)"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 32,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "return EngineResult(checks=checks)"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 33,
+      "tokens": [
+        "CoverageObligation"
+      ],
+      "text": "obligations=[CoverageObligation(id=\"resistance\",normative_ids=[\"synthetic\"],"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 36,
+      "tokens": [
+        "EngineResult",
+        "CoverageReport"
+      ],
+      "text": "return EngineResult(checks=checks, coverage=CoverageReport(method=\"LRFD\",section_name=\"synthetic\","
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 84,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(summary,allow_nan=False)"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 91,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "before=r.model_dump(mode=\"json\")"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 96,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert r.model_dump(mode=\"json\")==before"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 135,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path.write_text(json.dumps(data),encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 150,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "bundle=json.loads(process.stdout)"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 161,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "detail=json.loads(Path(item[\"artifacts\"][\"detailed_results_json\"]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 174,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "item=json.loads(process.stdout)"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 186,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path=tmp_path/\"invalid.json\"; path.write_text(json.dumps({\"cases\":cases}),encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 199,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "error=json.loads(streams.err)[\"error\"]"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 207,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "error=json.loads(process.stderr)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from steel_design.models import CheckResult, SteelCase, SlendernessAdviceBasis"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 18,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "from steel_design.results_model import EngineResult"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 38,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(**data)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 44,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "return json.loads(text,parse_constant=forbidden)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 51,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "c=CheckResult.from_values(name=\"opaque\",clause=\"not-a-unit\",demand=demand,capacity=capacity,unit=unit)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 56,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert strict_json(c.model_dump_json())[\"dcr\"]==c.dcr"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 95,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "checks=[CheckResult.from_values(name=str(i),clause=\"opaque\",demand=d,capacity=1,unit=\"ratio\")"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 97,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "r=EngineResult(checks=checks)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 110,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "c=CheckResult(name=\"x\",clause=\"H3\",demand=10,capacity=3,dcr=3.3333333333333335,"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 121,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "c=CheckResult.from_values(name=\"undefined\",clause=\"opaque\",demand=demand,capacity=capacity,unit=\"kN\")"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 123,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "r=EngineResult(checks=[c])"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 125,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "for payload in (c.model_dump(),strict_json(c.model_dump_json()),strict_json(r.model_dump_json())[\"checks\"][0]):"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 126,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(payload,allow_nan=False)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 129,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(cli._build_dcr_trace(c),allow_nan=False)"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 133,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "c=CheckResult.from_values(name=\"x\",clause=\"opaque\",demand=1,capacity=2,unit=\"kN\","
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 135,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "py=c.model_dump(); js=strict_json(c.model_dump_json())"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 234,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "before=engine.run(c).model_dump()"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 237,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "after=engine.run(c).model_dump()"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 255,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "monkeypatch.setattr(cls,\"check\",lambda self,c,s,v=value: CheckResult.from_values("
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 271,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "lambda self,c,s:CheckResult.from_values(name=\"stipulated\",clause=\"I2-1b\",demand=.100049,"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 286,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "data=case(-310.53105,slenderness_advice_basis=dict(fabricated_length=4000,least_radius=10,is_rod=False)).model_dump(mode=\"json\")"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 288,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "path=tmp_path/\"c.json\"; path.write_text(json.dumps(data),encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 14,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 24,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(section_name=name, material={\"Fy\": 345, \"Fu\": 450}, loads={\"Pu\": 1},"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 73,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "json.dumps(caught.value.to_dict(), allow_nan=False)"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 193,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "path.write_text(case(name).model_dump_json(), encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 197,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "error = json.loads(run.stderr)[\"error\"]"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 201,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "path.write_text(case(\"W12X26\").model_dump_json(), encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs016_catalog_integrity.py",
+      "line": 204,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(run.stdout)[\"checks\"]"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 23,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 34,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(**data)"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 207,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "source=tmp_path/'case.json'; source.write_text(json.dumps(payload),encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 211,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "cli=json.loads(run.stdout)"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 212,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "memory=json.loads(Path(cli[\"artifacts\"][\"detailed_results_json\"]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs020_comparison.py",
+      "line": 42,
+      "tokens": [
+        "json.load",
+        "json.dump"
+      ],
+      "text": "json.dumps(json.loads(SOURCE), separators=(\",\", \":\"), sort_keys=True).encode(),"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 24,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "execute_case, execute_payload, execution_status, iter_executions,"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 27,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import SteelCase"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 53,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase(**extract_output_options(data or payload())[0])"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 62,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "source.write_text(json.dumps(data), encoding=\"utf-8\")"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 175,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "actual = json.loads(process.stdout)"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 179,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "detail = json.loads(Path(actual[\"artifacts\"][\"detailed_results_json\"]).read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 192,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "actual = json.loads(process.stdout)"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 198,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(process.stderr)[\"error\"][\"stage\"] == \"run_engine\""
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 213,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "before = execution.result.model_dump()"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 220,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert execution.result.model_dump() == before"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 221,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert e.run(case()).model_dump() == before"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 260,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "data = json.loads((ROOT / \"examples/w_shape_case.json\").read_text(encoding=\"utf-8-sig\"))"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 266,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(process.stdout)[\"checks\"] == reporting.build_compact_summary(execution)[\"checks\"]"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 270,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(process.stderr)[\"error\"][\"code\"] == \"SECTION_NOT_FOUND\""
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 304,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "iterator = iter_executions(data, engine())"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 16,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "(\"engine\", \"SteelDesignEngine\"), (\"models\", \"SteelCase\"),"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 18,
+      "tokens": [
+        "iter_executions"
+      ],
+      "text": "(\"execution\", \"execute_case\"), (\"execution\", \"iter_executions\"),"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 38,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "output = json.loads(process.stdout)"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 49,
+      "tokens": [
+        "OutputOptions"
+      ],
+      "text": "assert run.OutputOptions is execution.OutputOptions"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 55,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "\"from src.steel_design.models import SteelCase\\n\","
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 16,
+      "tokens": [
+        "OutputOptions",
+        "prepare_cases"
+      ],
+      "text": "from steel_design.execution import OutputOptions, execute_payload, prepare_cases"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 17,
+      "tokens": [
+        "SteelCase",
+        "CheckResult"
+      ],
+      "text": "from steel_design.models import CheckResult, SteelCase"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 18,
+      "tokens": [
+        "EngineResult",
+        "CoverageReport"
+      ],
+      "text": "from steel_design.results_model import CoverageReport, EngineResult"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 62,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert json.loads(text)[\"kind\"] == kind"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 76,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"case_input\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 90,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(kind)))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 108,
+      "tokens": [
+        "SteelCase",
+        "model_dump"
+      ],
+      "text": "assert restored.model_dump(mode=\"json\", exclude_unset=True) == SteelCase(**data).model_dump(mode=\"json\", exclude_unset=True)"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 119,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "original = SteelCase(**data)"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 123,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert restored.model_dump(exclude_unset=True) == original.model_dump(exclude_unset=True)"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 132,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "assert type(restored.payload) is SteelCase"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 145,
+      "tokens": [
+        "prepare_cases"
+      ],
+      "text": "before, after = list(prepare_cases(raw)), list(prepare_cases(restored))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 148,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert [x.result.model_dump() for x in execute_payload(raw, engine)] == [x.result.model_dump() for x in execute_payload(restored, engine)]"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 178,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(kind)))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 183,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "load_json(json.dumps(raw))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 195,
+      "tokens": [
+        "CheckResult",
+        "model_dump"
+      ],
+      "text": "raw = CheckResult.from_values(name=\"invalid\", clause=\"test\", demand=1, capacity=0, unit=\"kN\").model_dump(mode=\"json\")"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 204,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"engine_result\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 212,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"engine_result\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 223,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"engine_result\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 233,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"engine_result\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 264,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"engine_result\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 275,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(kind)))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 280,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "assert field in json.loads(dump_json(migrated))[\"payload\"]"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 294,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "result = SteelDesignEngine(SectionRepository()).run(SteelCase(**data))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 297,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert restored.model_dump(mode=\"json\") == result.model_dump(mode=\"json\")"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 302,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "historical = json.loads((ROOT / \"docs/audit/hfs017/evidence/after/engine-results.json\").read_text(encoding=\"utf-8\"))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 319,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert restored.model_dump(mode=\"json\") == result"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 327,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads((ROOT / \"examples\" / filename).read_text(encoding=\"utf-8-sig\"))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 333,
+      "tokens": [
+        "prepare_cases"
+      ],
+      "text": "case, _, options, _ = next(prepare_cases(raw))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 334,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert migrated.payload.model_dump() == case.model_dump()"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 335,
+      "tokens": [
+        "OutputOptions",
+        "model_dump"
+      ],
+      "text": "assert (migrated.output or OutputOptions()).model_dump() == options"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 344,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "assert (json.dumps(schema, ensure_ascii=False, sort_keys=True, indent=2) + \"\\n\").encode() == expected"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 374,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "print(json.dumps({'module': contracts.__file__}))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 389,
+      "tokens": [
+        "json.dump"
+      ],
+      "text": "load_json(json.dumps(case_payload()))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 400,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase(**case_payload()).model_copy(update={\"design_method\": \"wrong\"})"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 407,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "dump_json(ContractDocument(\"check_result\", EngineResult(checks=[])))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 417,
+      "tokens": [
+        "CoverageReport"
+      ],
+      "text": "assert CoverageReport.model_json_schema(mode=\"validation\") != CoverageReport.model_json_schema(mode=\"serialization\")"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 423,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"check_result\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 431,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "check = CheckResult(name=\"inactive\", clause=\"test\", demand=0, capacity=0, dcr=0, status=\"PASS\")"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 432,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "restored = load_json(dump_json(ContractDocument(\"engine_result\", EngineResult(checks=[check])))).payload"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 433,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "assert restored.checks[0].model_dump() == check.model_dump()"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 438,
+      "tokens": [
+        "CheckResult"
+      ],
+      "text": "check = CheckResult(name=\"inactive\", clause=\"test\", demand=0, capacity=0, dcr=0, status=\"PASS\")"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 439,
+      "tokens": [
+        "EngineResult"
+      ],
+      "text": "result = EngineResult(checks=[check], coverage=document(\"engine_result\").payload.coverage)"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 442,
+      "tokens": [
+        "model_dump"
+      ],
+      "text": "raw = dict(contract_version=\"1.0\", kind=\"engine_result\", payload=result.model_dump(mode=\"json\"))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 457,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(\"case_input\")))"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 465,
+      "tokens": [
+        "prepare_cases"
+      ],
+      "text": "prepared = prepare_cases(raw)"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 473,
+      "tokens": [
+        "unique_json_object"
+      ],
+      "text": "from steel_design.input_contracts import unique_json_object"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 474,
+      "tokens": [
+        "_unique_json_object",
+        "unique_json_object"
+      ],
+      "text": "from steel_design.run import _unique_json_object"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 475,
+      "tokens": [
+        "_unique_json_object",
+        "unique_json_object"
+      ],
+      "text": "assert _unique_json_object is unique_json_object"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 477,
+      "tokens": [
+        "unique_json_object"
+      ],
+      "text": "unique_json_object([(\"Pu\", 1), (\"Pu\", 2)])"
+    },
+    {
+      "file": "tests/test_hfs022_contracts.py",
+      "line": 514,
+      "tokens": [
+        "json.load"
+      ],
+      "text": "raw = json.loads(dump_json(document(kind)))[\"payload\"]"
+    },
+    {
+      "file": "tests/test_normative_d2_e3_f2.py",
+      "line": 7,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_normative_d2_e3_f2.py",
+      "line": 36,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_normative_d2_e3_f2.py",
+      "line": 67,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_normative_d2_e3_f2.py",
+      "line": 85,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "case = SteelCase("
+    },
+    {
+      "file": "tests/test_profile_router.py",
+      "line": 5,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase"
+    },
+    {
+      "file": "tests/test_profile_router.py",
+      "line": 9,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "def _build_case(*, pu: float, mux: float, muy: float, vu: float) -> SteelCase:"
+    },
+    {
+      "file": "tests/test_profile_router.py",
+      "line": 10,
+      "tokens": [
+        "SteelCase"
+      ],
+      "text": "return SteelCase("
+    }
+  ],
+  "scope": "Tracked active sources/tests/scripts/contracts plus new HFS-022 modules; text candidates inspected by responsibility. No claim about inaccessible or external consumers."
+}

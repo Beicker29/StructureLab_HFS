@@ -85,8 +85,12 @@ def execute_case(*, engine: SteelDesignEngine, case: SteelCase,
                          case_tag)
 
 
-def iter_executions(payload: dict, engine: SteelDesignEngine) -> Iterator[CaseExecution]:
-    """Yield each executed case; errors propagate unchanged, without I/O."""
+def prepare_cases(payload: dict) -> Iterator[tuple[SteelCase, dict, dict, str | None]]:
+    """Prepare cases lazily without executing; shared by execution and contracts.
+
+    Yield (case, input payload, output options, tag). Preserve partial overrides,
+    explicit fields and historical error order. This is not engine validation.
+    """
     is_bundle = validate_bundle_shape(payload)
     if is_bundle:
         base = {key: value for key, value in payload.items() if key != "cases"}
@@ -101,6 +105,12 @@ def iter_executions(payload: dict, engine: SteelDesignEngine) -> Iterator[CaseEx
             merged = merge_case_payload(base, {k: v for k, v in definition.items() if k != "name"})
         case_payload, options = extract_output_options(merged)
         case = SteelCase(**case_payload)
+        yield case, case_payload, options, tag
+
+
+def iter_executions(payload: dict, engine: SteelDesignEngine) -> Iterator[CaseExecution]:
+    """Yield each executed case; errors propagate unchanged, without I/O."""
+    for case, case_payload, options, tag in prepare_cases(payload):
         yield execute_case(engine=engine, case=case, input_payload=case_payload,
                            output_options=options, case_tag=tag)
 

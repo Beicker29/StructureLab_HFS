@@ -1,0 +1,210 @@
+{
+  "base": "c91e55d5a194dfb8e80777d9e41efa1ee4b7fe02",
+  "changed_or_new_files": [
+    ".gitattributes",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/ROADMAP.md",
+    "docs/architecture/dry-inventory.md",
+    "docs/audit/hfs022/evidence/SHA256SUMS.json",
+    "docs/audit/hfs022/evidence/after.zip",
+    "docs/audit/hfs022/evidence/archives.json",
+    "docs/audit/hfs022/evidence/base-ci.json",
+    "docs/audit/hfs022/evidence/before.zip",
+    "docs/audit/hfs022/evidence/comparison.json",
+    "docs/audit/hfs022/evidence/contracts-consumers.json",
+    "docs/audit/hfs022/evidence/development.zip",
+    "docs/audit/hfs022/evidence/file-inventory.json",
+    "docs/audit/hfs022/evidence/git-status.json",
+    "docs/audit/hfs022/evidence/intermediate.zip",
+    "docs/audit/hfs022/evidence/runtime-wheel.json",
+    "docs/audit/hfs022/evidence/scope.json",
+    "docs/audit/hfs022/inventory.md",
+    "docs/audit/hfs022/report.md",
+    "docs/contracts/hfs022-versioned-json.md",
+    "docs/schemas/contracts/1.0/case_bundle.serialization.json",
+    "docs/schemas/contracts/1.0/case_bundle.validation.json",
+    "docs/schemas/contracts/1.0/case_input.serialization.json",
+    "docs/schemas/contracts/1.0/case_input.validation.json",
+    "docs/schemas/contracts/1.0/check_result.serialization.json",
+    "docs/schemas/contracts/1.0/check_result.validation.json",
+    "docs/schemas/contracts/1.0/coverage_report.serialization.json",
+    "docs/schemas/contracts/1.0/coverage_report.validation.json",
+    "docs/schemas/contracts/1.0/engine_result.serialization.json",
+    "docs/schemas/contracts/1.0/engine_result.validation.json",
+    "docs/schemas/contracts/1.0/manifest.json",
+    "scripts/audit_hfs022.py",
+    "scripts/generate_hfs022_schemas.py",
+    "scripts/verify_hfs020.py",
+    "src/steel_design/contracts.py",
+    "src/steel_design/execution.py",
+    "src/steel_design/input_contracts.py",
+    "src/steel_design/run.py",
+    "tests/test_hfs022_contracts.py"
+  ],
+  "files": {
+    ".gitattributes": {
+      "bytes": 190,
+      "sha256": "bf0b241670f90cc694ce82ad4fa68a4ef6377b6c785dbfeeea08b4a4d29d1fc0"
+    },
+    "AGENTS.md": {
+      "bytes": 7886,
+      "sha256": "2ef97f2692e26d4daf3f330230cd7591dcd29ab2c5dba1e53d9b97b4eef83904"
+    },
+    "CONTRIBUTING.md": {
+      "bytes": 14934,
+      "sha256": "50fb386f9440ef5202988b0132225cbe64983f34f93191583791f77a680437f1"
+    },
+    "README.md": {
+      "bytes": 13533,
+      "sha256": "a3fd042949933adf5b508f51575cddb777d5acc310605ea2103e53145e12c192"
+    },
+    "docs/ROADMAP.md": {
+      "bytes": 39510,
+      "sha256": "bffdb20ab79be48eb6295296f82aece6ebf65b7967f7433ad0317e4fd1bc2921"
+    },
+    "docs/architecture/dry-inventory.md": {
+      "bytes": 41820,
+      "sha256": "9f40db5aa7a06eb1c299e7a5ea41c20353056f3c0e58ce7753ed702f828ea225"
+    },
+    "docs/audit/hfs022/evidence/after.zip": {
+      "bytes": 477725,
+      "sha256": "e6799daa473083979310f00dc83ac26c8c40e530ce273bd199919f7f3c32df22"
+    },
+    "docs/audit/hfs022/evidence/archives.json": {
+      "bytes": 49658,
+      "sha256": "acfd129600a44cbe3d96021f324df27adc32e2366529c8c8e3e8b1ada9f44d4a"
+    },
+    "docs/audit/hfs022/evidence/base-ci.json": {
+      "bytes": 37117,
+      "sha256": "c7d955974c1b43d2b4de0e8c048d40fc571d12efc5dbe0a0bcd9c674dd591025"
+    },
+    "docs/audit/hfs022/evidence/before.zip": {
+      "bytes": 459727,
+      "sha256": "9bb2be9d11f966fbaea817bc90e5eb005d468f50f19ed776157b223e5916e7c0"
+    },
+    "docs/audit/hfs022/evidence/comparison.json": {
+      "bytes": 3949,
+      "sha256": "e4dc4fc57b98584b797202636fd10f4c88d29d5f0ef93161215dde52690359d0"
+    },
+    "docs/audit/hfs022/evidence/contracts-consumers.json": {
+      "bytes": 192055,
+      "sha256": "b09e77bc0382bf1052164688a9283bcf7eb6913fab95b9f39c8a6f5e373c4e3e"
+    },
+    "docs/audit/hfs022/evidence/development.zip": {
+      "bytes": 22126,
+      "sha256": "5f540da748c24fb26e8de52020c723e5e358c595731c45e887ac55ab6049a671"
+    },
+    "docs/audit/hfs022/evidence/git-status.json": {
+      "bytes": 595,
+      "sha256": "baa90002f3f148911b21ba552dceed5e1a2b28e8e70092c979fe5c97179693ee"
+    },
+    "docs/audit/hfs022/evidence/intermediate.zip": {
+      "bytes": 477583,
+      "sha256": "1c01a172f88803138d0ece7cf6c003d03cf77391b2a1afaa381042abd9331815"
+    },
+    "docs/audit/hfs022/evidence/runtime-wheel.json": {
+      "bytes": 156,
+      "sha256": "7023e07dafdda802dafac26300111116dd405ba3ea6be77f51018680c67919a0"
+    },
+    "docs/audit/hfs022/evidence/scope.json": {
+      "bytes": 41796,
+      "sha256": "9ce6dca6fb26b1e723a0007f99ac46bb0479ef5e1cbcb2a96fd8b315e8a6aba2"
+    },
+    "docs/audit/hfs022/inventory.md": {
+      "bytes": 8768,
+      "sha256": "9726ccc0dfdd9d7ac74c53661b6939171522759ff0478a3bf22b85a14f7db37d"
+    },
+    "docs/audit/hfs022/report.md": {
+      "bytes": 13667,
+      "sha256": "351b1c1faf1d97ee0dada98a8bafd0d7a1c3b4e6a1470e1b71792847040edc80"
+    },
+    "docs/contracts/hfs022-versioned-json.md": {
+      "bytes": 13789,
+      "sha256": "a713f1057b368a3f3c67bbe0ba11ee75dbcb8c3077b8603720c5462ca92e05f5"
+    },
+    "docs/schemas/contracts/1.0/case_bundle.serialization.json": {
+      "bytes": 29066,
+      "sha256": "b917dd07dc6337c2d2ee90a114ed26fb3c20921985e55a9251f1bafb1db121eb"
+    },
+    "docs/schemas/contracts/1.0/case_bundle.validation.json": {
+      "bytes": 29060,
+      "sha256": "92375b8637b818e617880e1e1484f3af03b16a4c52dea20c9556627dce352c46"
+    },
+    "docs/schemas/contracts/1.0/case_input.serialization.json": {
+      "bytes": 28116,
+      "sha256": "95ce47cb66567a3ca1904772f905a5aec81e557ff0dca0c2d2c77b120152299d"
+    },
+    "docs/schemas/contracts/1.0/case_input.validation.json": {
+      "bytes": 28110,
+      "sha256": "3a8e9c6f2d053aca480480413c5b8f2e24d5edad192ecd642847a8410624d3f3"
+    },
+    "docs/schemas/contracts/1.0/check_result.serialization.json": {
+      "bytes": 3418,
+      "sha256": "bbe6aa1b52bf09f0acbd1366b92e6dfc76c2e1435ea1688db3b8e94a8273cfb6"
+    },
+    "docs/schemas/contracts/1.0/check_result.validation.json": {
+      "bytes": 3412,
+      "sha256": "138c07ed1ab130865849c9be6af4266bbd50a1e4ed534ea62ac0c3885bd4d0c2"
+    },
+    "docs/schemas/contracts/1.0/coverage_report.serialization.json": {
+      "bytes": 7099,
+      "sha256": "c912a6ddc7d0748bdf53d5eaf770aedfa2d408544ce698d498ae7c53dcf09b4b"
+    },
+    "docs/schemas/contracts/1.0/coverage_report.validation.json": {
+      "bytes": 7093,
+      "sha256": "917880681efda2079fe3865f2ae3b7975d3ad7e04adcb6395ba333be482ee709"
+    },
+    "docs/schemas/contracts/1.0/engine_result.serialization.json": {
+      "bytes": 11016,
+      "sha256": "64b11091d81ea94d134ca8930ad233acd0125fa66e8ebd7460e1f505720df8cb"
+    },
+    "docs/schemas/contracts/1.0/engine_result.validation.json": {
+      "bytes": 11010,
+      "sha256": "fb2605702e95f41f923391aa37c77a95f6d2c961c9271f9e611d5e4f047277eb"
+    },
+    "docs/schemas/contracts/1.0/manifest.json": {
+      "bytes": 1240,
+      "sha256": "9e2feb13abc975766377ffe04694b92c2d7cf964dc3f4861b91fa3636c3e61a5"
+    },
+    "scripts/audit_hfs022.py": {
+      "bytes": 9983,
+      "sha256": "7483edbc8dc5a2f320b384641fce90a80ed2137640df9333176ff05df66211ff"
+    },
+    "scripts/generate_hfs022_schemas.py": {
+      "bytes": 2156,
+      "sha256": "bfe85ecd8150b4a4525889fa5a29cd3935ddaaa1c18bacda70395ed54cac0dfd"
+    },
+    "scripts/verify_hfs020.py": {
+      "bytes": 16075,
+      "sha256": "903124075202236919244132cb503ebcb59c3a1441a435f6f1b45e186f8aad04"
+    },
+    "src/steel_design/contracts.py": {
+      "bytes": 19508,
+      "sha256": "8cf011a59d9d435956e95d105e2f1953f8b63c92461818a9095d13ece22b2d5f"
+    },
+    "src/steel_design/execution.py": {
+      "bytes": 5518,
+      "sha256": "90c584593e8a56a804fddb2c4b9fd22542423506eaec9a9c86e8be0ae14de70e"
+    },
+    "src/steel_design/input_contracts.py": {
+      "bytes": 1537,
+      "sha256": "80b930b44405be8d0682b40ae734728030a32327ed6b6ddd4265dde0fe0af87b"
+    },
+    "src/steel_design/run.py": {
+      "bytes": 6076,
+      "sha256": "45c99f8575388be3bfc880168329f114a1b240e3646e6701a9b6369150d1cac6"
+    },
+    "tests/test_hfs022_contracts.py": {
+      "bytes": 24246,
+      "sha256": "1df8c443493fe16849b1e9ab06486afa0c81130b392df59cd12008be72a87f3a"
+    }
+  },
+  "self_hash_exclusions": [
+    "docs/audit/hfs022/evidence/SHA256SUMS.json",
+    "docs/audit/hfs022/evidence/file-inventory.json"
+  ],
+  "commits_created": false,
+  "pushes_created": false
+}

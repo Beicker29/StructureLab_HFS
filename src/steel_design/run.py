@@ -7,6 +7,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from . import execution as _execution
 from .models import SteelCase, finite_json_payload
+from .input_contracts import unique_json_object as _unique_json_object
 from .engine import SteelDesignEngine
 from .sections.models import Section
 from .sections.geometry import build_custom_section
@@ -34,16 +35,6 @@ from .reporting import _build_execution_results_dir as _build_execution_results_
 # Historical facades refer directly to their canonical owner.
 _extract_output_options = _execution.extract_output_options
 _merge_case_payload = _execution.merge_case_payload
-
-
-def _unique_json_object(pairs):
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError(f"Duplicate JSON field {key!r}; supply exactly one value per field.")
-        result[key] = value
-    return result
-
 
 
 def _print_structured_error(error: Exception, *, stage: str):

@@ -36,6 +36,7 @@ SUITES = [
     "test_hfs021_execution",
     "test_hfs021a_public_api",
     "test_hfs021a_svg_comparison",
+    "test_hfs022_contracts",
 ]
 
 
@@ -130,8 +131,14 @@ def verify(args):
     (inputs / "scripts").mkdir()
     for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py",
                  "hfs021a_invariants.py", "probe_hfs021a_imports.py",
-                 "hfs021a_svg_comparison.py"):
+                 "hfs021a_svg_comparison.py", "generate_hfs022_schemas.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
+    for relative in ("docs/schemas/contracts/1.0", "docs/audit/hfs017/evidence/after"):
+        target = inputs / relative
+        target.mkdir(parents=True)
+        pattern = "*.json" if "schemas" in relative else "engine-results.json"
+        for path in (ROOT / relative).glob(pattern):
+            shutil.copyfile(path, target / path.name)
     write(out / "external-inputs.json", {p.relative_to(inputs).as_posix(): digest(p)
           for p in inputs.rglob("*") if p.is_file()})
     expected_cli = parse_json((ROOT / "docs/audit/hfs017/evidence/cli/after.json").read_bytes())
@@ -178,6 +185,8 @@ def verify(args):
             "'imports':[str(p) for p in paths],'sys_path':sys.path}))"
         )
         run(f"imports-{mode}", [executable, "-I", "-c", probe], empty)
+        run(f"schemas-{mode}", [executable, "-I", inputs / "scripts/generate_hfs022_schemas.py",
+            "--directory", inputs / "docs/schemas/contracts/1.0", "--check"], empty)
         for location, probe_cwd in (("outside", empty), ("checkout", ROOT)):
             for order in ("canonical-first", "legacy-first"):
                 run(f"identity-{mode}-{location}-{order}",

@@ -1,0 +1,48 @@
+{
+  "engine_examples_exact": 12,
+  "cli_memory_scenarios_exact": 24,
+  "diagrams_byte_identical": {
+    "composite_encased_case.json/original/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-tfd894mk\\cli\\artifacts\\03o\\COMPOSITE_ENCASED_CASE\\20261028T184306007794Z\\W\\W14X90__20261028T184306009806Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-dxlvyvpl\\cli\\artifacts\\03o\\COMPOSITE_ENCASED_CASE\\20261028T191356114658Z\\W\\W14X90__20261028T191356116657Z__I5_METHOD2.svg",
+      "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+      "bytes": 4696,
+      "format": ".svg"
+    },
+    "composite_encased_case.json/detailed/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-tfd894mk\\cli\\artifacts\\03d\\COMPOSITE_ENCASED_CASE\\20261028T184308208203Z\\W\\W14X90__20261028T184308208203Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-dxlvyvpl\\cli\\artifacts\\03d\\COMPOSITE_ENCASED_CASE\\20261028T191358190787Z\\W\\W14X90__20261028T191358190787Z__I5_METHOD2.svg",
+      "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+      "bytes": 4696,
+      "format": ".svg"
+    },
+    "composite_filled_circular_hss_case.json/original/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-tfd894mk\\cli\\artifacts\\04o\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T184310440081Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T184312123682Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-dxlvyvpl\\cli\\artifacts\\04o\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T191400308478Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T191401960050Z__I5_METHOD2.svg",
+      "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+      "bytes": 4754,
+      "format": ".svg"
+    },
+    "composite_filled_circular_hss_case.json/detailed/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-tfd894mk\\cli\\artifacts\\04d\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T184314318744Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T184316013948Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-dxlvyvpl\\cli\\artifacts\\04d\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261028T191404065200Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261028T191405734259Z__I5_METHOD2.svg",
+      "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+      "bytes": 4754,
+      "format": ".svg"
+    },
+    "composite_filled_rectangular_hss_case.json/original/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-tfd894mk\\cli\\artifacts\\05o\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T184318252663Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T184320009702Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-dxlvyvpl\\cli\\artifacts\\05o\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T191407823499Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T191409484835Z__I5_METHOD2.svg",
+      "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+      "bytes": 4750,
+      "format": ".svg"
+    },
+    "composite_filled_rectangular_hss_case.json/detailed/case-0": {
+      "before": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-tfd894mk\\cli\\artifacts\\05d\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T184322241171Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T184323945060Z__I5_METHOD2.svg",
+      "after": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-dxlvyvpl\\cli\\artifacts\\05d\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261028T191411593374Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261028T191413256526Z__I5_METHOD2.svg",
+      "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+      "bytes": 4750,
+      "format": ".svg"
+    }
+  }
+}

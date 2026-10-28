@@ -1,0 +1,14 @@
+{
+  "after.zip": "e6799daa473083979310f00dc83ac26c8c40e530ce273bd199919f7f3c32df22",
+  "archives.json": "acfd129600a44cbe3d96021f324df27adc32e2366529c8c8e3e8b1ada9f44d4a",
+  "base-ci.json": "c7d955974c1b43d2b4de0e8c048d40fc571d12efc5dbe0a0bcd9c674dd591025",
+  "before.zip": "9bb2be9d11f966fbaea817bc90e5eb005d468f50f19ed776157b223e5916e7c0",
+  "comparison.json": "e4dc4fc57b98584b797202636fd10f4c88d29d5f0ef93161215dde52690359d0",
+  "contracts-consumers.json": "b09e77bc0382bf1052164688a9283bcf7eb6913fab95b9f39c8a6f5e373c4e3e",
+  "development.zip": "5f540da748c24fb26e8de52020c723e5e358c595731c45e887ac55ab6049a671",
+  "file-inventory.json": "41fb1b45126cce4355023416afe669dcf82631d08bad20676f4257d2d7cabc77",
+  "git-status.json": "baa90002f3f148911b21ba552dceed5e1a2b28e8e70092c979fe5c97179693ee",
+  "intermediate.zip": "1c01a172f88803138d0ece7cf6c003d03cf77391b2a1afaa381042abd9331815",
+  "runtime-wheel.json": "7023e07dafdda802dafac26300111116dd405ba3ea6be77f51018680c67919a0",
+  "scope.json": "9ce6dca6fb26b1e723a0007f99ac46bb0479ef5e1cbcb2a96fd8b315e8a6aba2"
+}

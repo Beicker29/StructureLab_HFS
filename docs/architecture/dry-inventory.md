@@ -1,5 +1,28 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-022: contratos optativos sin otro modelo de ingeniería
+
+`steel_design.contracts` posee únicamente versión/envoltura, integridad de
+transporte, migración explícita y generación de schemas. SteelCase,
+CheckResult, CoverageReport/Obligation/ExecutedEvaluation y EngineResult
+conservan campos, validadores, serializadores y decisiones. La capa compara
+con ellos; no copia DCR, agregación, factores ni acreditaciones. Los mapas
+dinámicos permanecen explícitamente sin tipificación normativa exhaustiva.
+
+La preparación embebida de `execution.iter_executions` se extrae a
+`execution.prepare_cases`, consumida por ejecución y contratos; se retira el
+cuerpo sustituido sin cambiar merge, defaults ni pereza. El parser de claves
+duplicadas de run se traslada a `input_contracts.unique_json_object`; run
+mantiene el alias y el ValueError/texto comprometidos. Una implementación por
+concepto, sin wrappers o clases de ingeniería duplicados. Las fachadas previas
+y los formatos CLI/memoria se conservan por contrato vigente.
+
+`scripts/generate_hfs022_schemas.py` es el único comando de generación/check;
+los archivos en docs/schemas/contracts/1.0 son derivados, no otra autoridad.
+El comparador de auditoría Decimal se conserva independiente del serializador
+productivo. [Inventario de símbolos y consumidores](../audit/hfs022/inventory.md),
+[contrato](../contracts/hfs022-versioned-json.md) y [evidencia](../audit/hfs022/report.md).
+
 ## HFS-021B: limpieza de bindings y compatibilidad con causa explícita
 
 `execution.extract_output_options` y `execution.merge_case_payload` siguen
