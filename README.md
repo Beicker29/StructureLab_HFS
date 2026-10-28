@@ -4,6 +4,13 @@ Motor de diseno estructural en acero basado en AISC 360-22 (`a360-22w.pdf`).
 
 ## Estado actual
 
+- HFS-022: contratos JSON **optativos** 1.0 para entrada, lotes, cobertura,
+  checks y resultados, con migración explícita y esquemas reproducibles.
+  El CLI y las memorias conservan el formato legacy.
+  [API y migración](docs/contracts/hfs022-versioned-json.md),
+  [evidencia y límites](docs/audit/hfs022/report.md). Para revisión; no cierre
+  hasta revisión independiente y CI Windows/Ubuntu de la entrega.
+
 - HFS-015: números originales y presentación separada; avisos D1/E2 sin carácter de incumplimiento resistente. El resumen ordena DCR sin redondear. [Contrato y migración](docs/contracts/hfs015-precision-advice.md).
 
 - Resumen CLI/memoria: gobernantes observados por DCR publicado, conservando empates y fallos. Lotes vacíos rechazados antes de ejecutar/publicar. [Contrato y migración HFS-014](docs/contracts/hfs014-summary-bundles.md).
@@ -38,8 +45,10 @@ docs/aisc_360_22_traceability.md Matriz de trazabilidad normativa
 
 Desde HFS-021A, la distribución **0.2.0** se importa como `steel_design`, con
 layout convencional `src/`. Se requiere Python 3.12 o posterior. HFS-021 tuvo
-CI aprobado en Windows y Ubuntu; la migración HFS-021A requiere su propia
-revisión y nueva corrida remota tras publicación. No se requiere interfaz gráfica.
+CI aprobado en Windows y Ubuntu; HFS-021A también quedó cerrado con la
+[corrección SVG verificada](docs/audit/hfs021b/report.md). HFS-022 mantiene
+0.2.0 durante esta entrega para revisión; contrato JSON 1.0 es otra versión.
+No se requiere interfaz gráfica.
 
 Desde la raíz del proyecto:
 

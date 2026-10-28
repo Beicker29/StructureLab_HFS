@@ -1,0 +1,20 @@
+{
+  "contract_version": "1.0",
+  "dependencies": {
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1"
+  },
+  "generator": "steel_design.contracts.get_schema",
+  "sha256": {
+    "case_bundle.serialization.json": "b917dd07dc6337c2d2ee90a114ed26fb3c20921985e55a9251f1bafb1db121eb",
+    "case_bundle.validation.json": "92375b8637b818e617880e1e1484f3af03b16a4c52dea20c9556627dce352c46",
+    "case_input.serialization.json": "95ce47cb66567a3ca1904772f905a5aec81e557ff0dca0c2d2c77b120152299d",
+    "case_input.validation.json": "3a8e9c6f2d053aca480480413c5b8f2e24d5edad192ecd642847a8410624d3f3",
+    "check_result.serialization.json": "bbe6aa1b52bf09f0acbd1366b92e6dfc76c2e1435ea1688db3b8e94a8273cfb6",
+    "check_result.validation.json": "138c07ed1ab130865849c9be6af4266bbd50a1e4ed534ea62ac0c3885bd4d0c2",
+    "coverage_report.serialization.json": "c912a6ddc7d0748bdf53d5eaf770aedfa2d408544ce698d498ae7c53dcf09b4b",
+    "coverage_report.validation.json": "917880681efda2079fe3865f2ae3b7975d3ad7e04adcb6395ba333be482ee709",
+    "engine_result.serialization.json": "64b11091d81ea94d134ca8930ad233acd0125fa66e8ebd7460e1f505720df8cb",
+    "engine_result.validation.json": "fb2605702e95f41f923391aa37c77a95f6d2c961c9271f9e611d5e4f047277eb"
+  }
+}

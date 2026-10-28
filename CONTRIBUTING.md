@@ -77,6 +77,17 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-022 añade `tests/test_hfs022_contracts.py` como suite separada, conservando
+las 1819 pruebas previas y las 12 subpruebas históricas. El verificador común
+copia esquemas y el fixture histórico completo a la carpeta externa de pruebas;
+valida schemas con instalaciones normal, wheel y editable. Generación:
+`python scripts/generate_hfs022_schemas.py`; verificación sin escritura:
+`python scripts/generate_hfs022_schemas.py --check`. Usar las constraints
+fijadas; los nuevos esquemas tienen UTF-8/LF controlado por Git. La API de
+contratos no ejecuta el motor y no sustituye las regresiones originales.
+[API](docs/contracts/hfs022-versioned-json.md) e
+[informe de revisión](docs/audit/hfs022/report.md).
+
 HFS-021A añade `tests/test_hfs021a_public_api.py` separada de las trece suites
 previas (1762 aprobadas +12 subpruebas). Los tests previos solo migran imports
 y ejecución modular; no cambian oráculos. `compare_hfs021a.py` demuestra AST

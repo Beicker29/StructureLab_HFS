@@ -25,3 +25,16 @@ class InputModel(BaseModel):
         extra="forbid", allow_inf_nan=False, validate_default=True,
         revalidate_instances="always",
     )
+
+
+def unique_json_object(pairs):
+    """Reject duplicate keys before a JSON decoder loses the first value.
+
+    Shared transport policy; keep ValueError/message for the legacy CLI.
+    """
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON field {key!r}; supply exactly one value per field.")
+        result[key] = value
+    return result
