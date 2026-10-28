@@ -1,0 +1,326 @@
+{
+  "base": "35dd7b8e09f05b8ac77af1ba0b7b735d59456b6a",
+  "current_version": "0.2.0",
+  "captures": {
+    "before": {
+      "passed_methods": 1819,
+      "passed_subtests": 12,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xfail": 0,
+      "xpass": 0,
+      "suites": {
+        "original": {
+          "tests": 80,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 12,
+          "passed_methods": 68
+        },
+        "test_hfs000_characterization": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 12
+        },
+        "test_hfs011_input_contracts": {
+          "tests": 665,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 665
+        },
+        "test_hfs016_catalog_integrity": {
+          "tests": 44,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 44
+        },
+        "test_hfs010_coverage": {
+          "tests": 57,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 57
+        },
+        "test_hfs012_flexure_selection": {
+          "tests": 61,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 61
+        },
+        "test_hfs013_directional_h3": {
+          "tests": 57,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 57
+        },
+        "test_hfs013_design_method": {
+          "tests": 73,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 73
+        },
+        "test_hfs014_summary_bundle": {
+          "tests": 72,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 72
+        },
+        "test_hfs015_precision_advice": {
+          "tests": 84,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 84
+        },
+        "test_hfs017_design_method": {
+          "tests": 468,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 468
+        },
+        "test_hfs020_comparison": {
+          "tests": 50,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 50
+        },
+        "test_hfs021_execution": {
+          "tests": 51,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 51
+        },
+        "test_hfs021a_public_api": {
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 28
+        },
+        "test_hfs021a_svg_comparison": {
+          "tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 29
+        }
+      },
+      "environment": {
+        "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "executable": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+        "root": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+        "external_work": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-zd94uobq",
+        "platform": "win32",
+        "overrides": {
+          "PYTHONNOUSERSITE": "1",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+          "PYTHONUTF8": "1"
+        }
+      },
+      "engine_examples": 12,
+      "cli_memory_scenarios": 24,
+      "svg_diagrams": 6,
+      "verification_accepted": true,
+      "editable_api_additional_passed": 28
+    },
+    "after": {
+      "passed_methods": 1819,
+      "passed_subtests": 12,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xfail": 0,
+      "xpass": 0,
+      "suites": {
+        "original": {
+          "tests": 80,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 12,
+          "passed_methods": 68
+        },
+        "test_hfs000_characterization": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 12
+        },
+        "test_hfs011_input_contracts": {
+          "tests": 665,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 665
+        },
+        "test_hfs016_catalog_integrity": {
+          "tests": 44,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 44
+        },
+        "test_hfs010_coverage": {
+          "tests": 57,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 57
+        },
+        "test_hfs012_flexure_selection": {
+          "tests": 61,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 61
+        },
+        "test_hfs013_directional_h3": {
+          "tests": 57,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 57
+        },
+        "test_hfs013_design_method": {
+          "tests": 73,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 73
+        },
+        "test_hfs014_summary_bundle": {
+          "tests": 72,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 72
+        },
+        "test_hfs015_precision_advice": {
+          "tests": 84,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 84
+        },
+        "test_hfs017_design_method": {
+          "tests": 468,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 468
+        },
+        "test_hfs020_comparison": {
+          "tests": 50,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 50
+        },
+        "test_hfs021_execution": {
+          "tests": 51,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 51
+        },
+        "test_hfs021a_public_api": {
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 28
+        },
+        "test_hfs021a_svg_comparison": {
+          "tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "subtests": 0,
+          "passed_methods": 29
+        }
+      },
+      "environment": {
+        "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "executable": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+        "root": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+        "external_work": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-n37xpu_9",
+        "platform": "win32",
+        "overrides": {
+          "PYTHONNOUSERSITE": "1",
+          "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+          "PYTHONUTF8": "1"
+        }
+      },
+      "engine_examples": 12,
+      "cli_memory_scenarios": 24,
+      "svg_diagrams": 6,
+      "verification_accepted": true,
+      "editable_api_additional_passed": 28
+    }
+  },
+  "new_tests_added": 0,
+  "previous_tests_changed": 0,
+  "new_dependencies": 0,
+  "failed_attempt": {
+    "directory": ".venv/21b-after",
+    "exit": 1,
+    "stage": "ruff",
+    "reason": "Two direct renamed compatibility imports flagged F401; corrected using a private canonical module reference. No lint suppressions or test changes."
+  },
+  "results": "Exact before/after under existing policies; same-platform SVG bytes also identical",
+  "hfs021a_ci_closed": 40736064324,
+  "hfs021b_ci_observation": {
+    "note": "Read-only observation after externally created commit; no workflow triggered by agent. Final audit evidence/documentation not yet published.",
+    "runs": [
+      {
+        "id": 40742357144,
+        "head_sha": "3f9669b36a883463aa4b4893a0b4716420b50b0c",
+        "status": "in_progress",
+        "conclusion": null,
+        "html_url": "https://github.com/Beicker29/StructureLab_HFS/actions/runs/40742357144"
+      }
+    ]
+  },
+  "final_evidence_not_published_by_agent": true
+}

@@ -1,0 +1,556 @@
+{
+  "before": {
+    "origin": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-zd94uobq\\wheel\\Lib\\site-packages\\steel_design\\run.py",
+    "run_bindings": {
+      "json": {
+        "kind": "module",
+        "name": "json"
+      },
+      "argparse": {
+        "kind": "module",
+        "name": "argparse"
+      },
+      "sys": {
+        "kind": "module",
+        "name": "sys"
+      },
+      "PydanticValidationError": {
+        "kind": "type",
+        "owner": "pydantic_core._pydantic_core",
+        "qualname": "ValidationError",
+        "signature": "(title, line_errors, input_type='python', hide_input=False)"
+      },
+      "SteelCase": {
+        "kind": "ModelMetaclass",
+        "owner": "steel_design.models",
+        "qualname": "SteelCase",
+        "signature": "(*, section_name: Annotated[str, Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')], material: steel_design.models.Material, loads: steel_design.models.Loads, lengths: steel_design.models.Lengths, factors: steel_design.models.Factors = <factory>, connection: steel_design.models.Connection = <factory>, custom_section: Optional[steel_design.models.CustomSection] = None, composite: Optional[steel_design.models.CompositeConfig] = None, design_method: steel_design.design_methods.DesignMethod = <DesignMethod.LRFD: 'LRFD'>, slenderness_advice_basis: Optional[steel_design.models.SlendernessAdviceBasis] = None, tension_scope: Optional[steel_design.models.TensionScope] = None) -> None"
+      },
+      "finite_json_payload": {
+        "kind": "function",
+        "owner": "steel_design.models",
+        "qualname": "finite_json_payload",
+        "signature": "(payload: dict) -> dict"
+      },
+      "SteelDesignEngine": {
+        "kind": "type",
+        "owner": "steel_design.engine",
+        "qualname": "SteelDesignEngine",
+        "signature": "(repository: steel_design.sections.repository.SectionRepository)"
+      },
+      "Section": {
+        "kind": "ModelMetaclass",
+        "owner": "steel_design.sections.models",
+        "qualname": "Section",
+        "signature": "(*, name: Annotated[str, Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')], type: Annotated[str, Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')] = 'W', source: Optional[steel_design.sections.models.SectionSource] = None, A: Annotated[float, Strict(strict=True), AllowInfNan(allow_inf_nan=False), Ge(ge=0)], d: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, h: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, bf: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, b: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, OD: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ID: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tf: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, t: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tdes: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tw: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Ix: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Iy: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Iz: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Iw: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Sx: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Sy: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Sz: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Zx: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Zy: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, rx: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ry: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, rz: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, J: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Cw: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, C: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ro: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, H: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, rts: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ho: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tan_alpha: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, x: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, y: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, eo: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, bf_2tf_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, b_t_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, b_tdes_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, h_tw_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, h_tdes_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, d_t_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None) -> None"
+      },
+      "build_custom_section": {
+        "kind": "function",
+        "owner": "steel_design.sections.geometry",
+        "qualname": "build_custom_section",
+        "signature": "(case: steel_design.models.SteelCase) -> steel_design.sections.models.Section"
+      },
+      "load_sections_from_excel": {
+        "kind": "function",
+        "owner": "steel_design.sections.loader",
+        "qualname": "load_sections_from_excel",
+        "signature": "(filepath: str) -> List[steel_design.sections.models.Section]"
+      },
+      "SectionRepository": {
+        "kind": "type",
+        "owner": "steel_design.sections.repository",
+        "qualname": "SectionRepository",
+        "signature": "()"
+      },
+      "SteelDesignError": {
+        "kind": "type",
+        "owner": "steel_design.domain.errors",
+        "qualname": "SteelDesignError",
+        "signature": "(message: str, *, code: Optional[str] = None, details: Optional[Dict[str, Any]] = None)"
+      },
+      "execute_case": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "execute_case",
+        "signature": "(*, engine: steel_design.engine.SteelDesignEngine, case: steel_design.models.SteelCase, input_payload: dict | None = None, output_options: dict | None = None, case_tag: str | None = None) -> steel_design.execution.CaseExecution"
+      },
+      "iter_executions": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "iter_executions",
+        "signature": "(payload: dict, engine: steel_design.engine.SteelDesignEngine) -> Iterator[steel_design.execution.CaseExecution]"
+      },
+      "execution_status": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "execution_status",
+        "signature": "(executions: list[steel_design.execution.CaseExecution]) -> steel_design.results_model.AnalysisStatus"
+      },
+      "validate_bundle_shape": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "validate_bundle_shape",
+        "signature": "(payload: dict) -> bool"
+      },
+      "OutputOptions": {
+        "kind": "ModelMetaclass",
+        "owner": "steel_design.execution",
+        "qualname": "OutputOptions",
+        "signature": "(*, write_results_json: Annotated[bool, Strict(strict=True)] = True) -> None"
+      },
+      "extract_output_options": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "extract_output_options",
+        "signature": "(payload: dict) -> tuple[dict, dict]"
+      },
+      "merge_case_payload": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "merge_case_payload",
+        "signature": "(base_payload: dict, override_payload: dict) -> dict"
+      },
+      "export_execution": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "export_execution",
+        "signature": "(execution: steel_design.execution.CaseExecution, *, input_file: str, sections_file: str, results_dir: str) -> dict"
+      },
+      "_sanitize_filename": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_sanitize_filename",
+        "signature": "(text: str) -> str"
+      },
+      "_build_global_summary": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_global_summary",
+        "signature": "(result) -> dict"
+      },
+      "_build_chapter_admissibility": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_chapter_admissibility",
+        "signature": "(case: steel_design.models.SteelCase, section: steel_design.sections.models.Section | None) -> dict"
+      },
+      "_build_compact_admissibility": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_compact_admissibility",
+        "signature": "(admissibility: dict) -> dict"
+      },
+      "_extract_shared_context": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_extract_shared_context",
+        "signature": "(clause_results: list[dict]) -> dict"
+      },
+      "_infer_check_units": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_infer_check_units",
+        "signature": "(clause: str) -> dict"
+      },
+      "_extract_capacity_from_memory": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_extract_capacity_from_memory",
+        "signature": "(memory: dict | None) -> float | None"
+      },
+      "_build_dcr_trace": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_dcr_trace",
+        "signature": "(check) -> dict"
+      },
+      "_extract_i5_method2_points": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_extract_i5_method2_points",
+        "signature": "(result) -> tuple[dict, dict] | None"
+      },
+      "_ordered_pm_points": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_ordered_pm_points",
+        "signature": "(point_payload: dict) -> list[dict]"
+      },
+      "_write_i5_interaction_diagram_svg": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_write_i5_interaction_diagram_svg",
+        "signature": "(*, points_by_axis: dict, case: steel_design.models.SteelCase, output_path: pathlib.Path) -> str"
+      },
+      "_write_i5_interaction_diagram_png": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_write_i5_interaction_diagram_png",
+        "signature": "(*, result, case: steel_design.models.SteelCase, results_dir: str, safe_profile: str, safe_section: str, timestamp: str, safe_case_tag: str | None) -> str | None"
+      },
+      "_write_detailed_results_file": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_write_detailed_results_file",
+        "signature": "(*, result, case: steel_design.models.SteelCase, input_payload: dict, input_file: str, sections_file: str, profile_type: str, results_dir: str, section: steel_design.sections.models.Section | None, timestamp: str, interaction_diagram_path: str | None = None, case_tag: str | None = None) -> pathlib.Path"
+      },
+      "_build_execution_results_dir": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_execution_results_dir",
+        "signature": "(*, base_results_dir: str, input_file: str) -> str"
+      },
+      "_extract_output_options": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "extract_output_options",
+        "signature": "(payload: dict) -> tuple[dict, dict]"
+      },
+      "_merge_case_payload": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "merge_case_payload",
+        "signature": "(base_payload: dict, override_payload: dict) -> dict"
+      },
+      "_unique_json_object": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_unique_json_object",
+        "signature": "(pairs)"
+      },
+      "_print_structured_error": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_print_structured_error",
+        "signature": "(error: Exception, *, stage: str)"
+      },
+      "_build_case_section": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_build_case_section",
+        "signature": "(case: steel_design.models.SteelCase, repo: steel_design.sections.repository.SectionRepository) -> steel_design.sections.models.Section | None"
+      },
+      "_run_single_case": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_run_single_case",
+        "signature": "(*, engine: steel_design.engine.SteelDesignEngine, repo: steel_design.sections.repository.SectionRepository, case: steel_design.models.SteelCase, input_payload: dict, input_file: str, sections_file: str, results_dir: str, write_results_json: bool, case_tag: str | None = None) -> dict"
+      },
+      "main": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "main",
+        "signature": "()"
+      }
+    },
+    "reporting_facades_identity": [
+      "_sanitize_filename",
+      "_build_global_summary",
+      "_build_chapter_admissibility",
+      "_build_compact_admissibility",
+      "_extract_shared_context",
+      "_infer_check_units",
+      "_extract_capacity_from_memory",
+      "_build_dcr_trace",
+      "_extract_i5_method2_points",
+      "_ordered_pm_points",
+      "_write_i5_interaction_diagram_svg",
+      "_write_i5_interaction_diagram_png",
+      "_write_detailed_results_file",
+      "_build_execution_results_dir"
+    ],
+    "execution_facades_identity": true,
+    "engine_geometry_identity": true,
+    "public_engine_methods": {
+      "run": {
+        "kind": "function",
+        "owner": "steel_design.engine",
+        "qualname": "SteelDesignEngine.run",
+        "signature": "(self, case: steel_design.models.SteelCase) -> steel_design.results_model.EngineResult"
+      },
+      "run_with_context": {
+        "kind": "function",
+        "owner": "steel_design.engine",
+        "qualname": "SteelDesignEngine.run_with_context",
+        "signature": "(self, case: steel_design.models.SteelCase) -> tuple[steel_design.models.SteelCase, steel_design.sections.models.Section, steel_design.results_model.EngineResult]"
+      }
+    }
+  },
+  "after": {
+    "origin": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-n37xpu_9\\wheel\\Lib\\site-packages\\steel_design\\run.py",
+    "run_bindings": {
+      "json": {
+        "kind": "module",
+        "name": "json"
+      },
+      "argparse": {
+        "kind": "module",
+        "name": "argparse"
+      },
+      "sys": {
+        "kind": "module",
+        "name": "sys"
+      },
+      "PydanticValidationError": {
+        "kind": "type",
+        "owner": "pydantic_core._pydantic_core",
+        "qualname": "ValidationError",
+        "signature": "(title, line_errors, input_type='python', hide_input=False)"
+      },
+      "_execution": {
+        "kind": "module",
+        "name": "steel_design.execution"
+      },
+      "SteelCase": {
+        "kind": "ModelMetaclass",
+        "owner": "steel_design.models",
+        "qualname": "SteelCase",
+        "signature": "(*, section_name: Annotated[str, Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')], material: steel_design.models.Material, loads: steel_design.models.Loads, lengths: steel_design.models.Lengths, factors: steel_design.models.Factors = <factory>, connection: steel_design.models.Connection = <factory>, custom_section: Optional[steel_design.models.CustomSection] = None, composite: Optional[steel_design.models.CompositeConfig] = None, design_method: steel_design.design_methods.DesignMethod = <DesignMethod.LRFD: 'LRFD'>, slenderness_advice_basis: Optional[steel_design.models.SlendernessAdviceBasis] = None, tension_scope: Optional[steel_design.models.TensionScope] = None) -> None"
+      },
+      "finite_json_payload": {
+        "kind": "function",
+        "owner": "steel_design.models",
+        "qualname": "finite_json_payload",
+        "signature": "(payload: dict) -> dict"
+      },
+      "SteelDesignEngine": {
+        "kind": "type",
+        "owner": "steel_design.engine",
+        "qualname": "SteelDesignEngine",
+        "signature": "(repository: steel_design.sections.repository.SectionRepository)"
+      },
+      "Section": {
+        "kind": "ModelMetaclass",
+        "owner": "steel_design.sections.models",
+        "qualname": "Section",
+        "signature": "(*, name: Annotated[str, Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')], type: Annotated[str, Strict(strict=True), _PydanticGeneralMetadata(pattern='\\\\S')] = 'W', source: Optional[steel_design.sections.models.SectionSource] = None, A: Annotated[float, Strict(strict=True), AllowInfNan(allow_inf_nan=False), Ge(ge=0)], d: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, h: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, bf: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, b: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, OD: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ID: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tf: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, t: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tdes: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tw: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Ix: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Iy: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Iz: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Iw: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Sx: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Sy: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Sz: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Zx: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Zy: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, rx: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ry: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, rz: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, J: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, Cw: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, C: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ro: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, H: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, rts: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, ho: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, tan_alpha: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, x: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, y: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, eo: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)])]] = None, bf_2tf_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, b_t_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, b_tdes_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, h_tw_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, h_tdes_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None, d_t_ratio: Optional[Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), AllowInfNan(allow_inf_nan=False)]), FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0)])]] = None) -> None"
+      },
+      "build_custom_section": {
+        "kind": "function",
+        "owner": "steel_design.sections.geometry",
+        "qualname": "build_custom_section",
+        "signature": "(case: steel_design.models.SteelCase) -> steel_design.sections.models.Section"
+      },
+      "load_sections_from_excel": {
+        "kind": "function",
+        "owner": "steel_design.sections.loader",
+        "qualname": "load_sections_from_excel",
+        "signature": "(filepath: str) -> List[steel_design.sections.models.Section]"
+      },
+      "SectionRepository": {
+        "kind": "type",
+        "owner": "steel_design.sections.repository",
+        "qualname": "SectionRepository",
+        "signature": "()"
+      },
+      "SteelDesignError": {
+        "kind": "type",
+        "owner": "steel_design.domain.errors",
+        "qualname": "SteelDesignError",
+        "signature": "(message: str, *, code: Optional[str] = None, details: Optional[Dict[str, Any]] = None)"
+      },
+      "execute_case": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "execute_case",
+        "signature": "(*, engine: steel_design.engine.SteelDesignEngine, case: steel_design.models.SteelCase, input_payload: dict | None = None, output_options: dict | None = None, case_tag: str | None = None) -> steel_design.execution.CaseExecution"
+      },
+      "iter_executions": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "iter_executions",
+        "signature": "(payload: dict, engine: steel_design.engine.SteelDesignEngine) -> Iterator[steel_design.execution.CaseExecution]"
+      },
+      "execution_status": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "execution_status",
+        "signature": "(executions: list[steel_design.execution.CaseExecution]) -> steel_design.results_model.AnalysisStatus"
+      },
+      "validate_bundle_shape": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "validate_bundle_shape",
+        "signature": "(payload: dict) -> bool"
+      },
+      "OutputOptions": {
+        "kind": "ModelMetaclass",
+        "owner": "steel_design.execution",
+        "qualname": "OutputOptions",
+        "signature": "(*, write_results_json: Annotated[bool, Strict(strict=True)] = True) -> None"
+      },
+      "export_execution": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "export_execution",
+        "signature": "(execution: steel_design.execution.CaseExecution, *, input_file: str, sections_file: str, results_dir: str) -> dict"
+      },
+      "_sanitize_filename": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_sanitize_filename",
+        "signature": "(text: str) -> str"
+      },
+      "_build_global_summary": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_global_summary",
+        "signature": "(result) -> dict"
+      },
+      "_build_chapter_admissibility": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_chapter_admissibility",
+        "signature": "(case: steel_design.models.SteelCase, section: steel_design.sections.models.Section | None) -> dict"
+      },
+      "_build_compact_admissibility": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_compact_admissibility",
+        "signature": "(admissibility: dict) -> dict"
+      },
+      "_extract_shared_context": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_extract_shared_context",
+        "signature": "(clause_results: list[dict]) -> dict"
+      },
+      "_infer_check_units": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_infer_check_units",
+        "signature": "(clause: str) -> dict"
+      },
+      "_extract_capacity_from_memory": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_extract_capacity_from_memory",
+        "signature": "(memory: dict | None) -> float | None"
+      },
+      "_build_dcr_trace": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_dcr_trace",
+        "signature": "(check) -> dict"
+      },
+      "_extract_i5_method2_points": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_extract_i5_method2_points",
+        "signature": "(result) -> tuple[dict, dict] | None"
+      },
+      "_ordered_pm_points": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_ordered_pm_points",
+        "signature": "(point_payload: dict) -> list[dict]"
+      },
+      "_write_i5_interaction_diagram_svg": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_write_i5_interaction_diagram_svg",
+        "signature": "(*, points_by_axis: dict, case: steel_design.models.SteelCase, output_path: pathlib.Path) -> str"
+      },
+      "_write_i5_interaction_diagram_png": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_write_i5_interaction_diagram_png",
+        "signature": "(*, result, case: steel_design.models.SteelCase, results_dir: str, safe_profile: str, safe_section: str, timestamp: str, safe_case_tag: str | None) -> str | None"
+      },
+      "_write_detailed_results_file": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_write_detailed_results_file",
+        "signature": "(*, result, case: steel_design.models.SteelCase, input_payload: dict, input_file: str, sections_file: str, profile_type: str, results_dir: str, section: steel_design.sections.models.Section | None, timestamp: str, interaction_diagram_path: str | None = None, case_tag: str | None = None) -> pathlib.Path"
+      },
+      "_build_execution_results_dir": {
+        "kind": "function",
+        "owner": "steel_design.reporting",
+        "qualname": "_build_execution_results_dir",
+        "signature": "(*, base_results_dir: str, input_file: str) -> str"
+      },
+      "_extract_output_options": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "extract_output_options",
+        "signature": "(payload: dict) -> tuple[dict, dict]"
+      },
+      "_merge_case_payload": {
+        "kind": "function",
+        "owner": "steel_design.execution",
+        "qualname": "merge_case_payload",
+        "signature": "(base_payload: dict, override_payload: dict) -> dict"
+      },
+      "_unique_json_object": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_unique_json_object",
+        "signature": "(pairs)"
+      },
+      "_print_structured_error": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_print_structured_error",
+        "signature": "(error: Exception, *, stage: str)"
+      },
+      "_build_case_section": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_build_case_section",
+        "signature": "(case: steel_design.models.SteelCase, repo: steel_design.sections.repository.SectionRepository) -> steel_design.sections.models.Section | None"
+      },
+      "_run_single_case": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "_run_single_case",
+        "signature": "(*, engine: steel_design.engine.SteelDesignEngine, repo: steel_design.sections.repository.SectionRepository, case: steel_design.models.SteelCase, input_payload: dict, input_file: str, sections_file: str, results_dir: str, write_results_json: bool, case_tag: str | None = None) -> dict"
+      },
+      "main": {
+        "kind": "function",
+        "owner": "steel_design.run",
+        "qualname": "main",
+        "signature": "()"
+      }
+    },
+    "reporting_facades_identity": [
+      "_sanitize_filename",
+      "_build_global_summary",
+      "_build_chapter_admissibility",
+      "_build_compact_admissibility",
+      "_extract_shared_context",
+      "_infer_check_units",
+      "_extract_capacity_from_memory",
+      "_build_dcr_trace",
+      "_extract_i5_method2_points",
+      "_ordered_pm_points",
+      "_write_i5_interaction_diagram_svg",
+      "_write_i5_interaction_diagram_png",
+      "_write_detailed_results_file",
+      "_build_execution_results_dir"
+    ],
+    "execution_facades_identity": true,
+    "engine_geometry_identity": true,
+    "public_engine_methods": {
+      "run": {
+        "kind": "function",
+        "owner": "steel_design.engine",
+        "qualname": "SteelDesignEngine.run",
+        "signature": "(self, case: steel_design.models.SteelCase) -> steel_design.results_model.EngineResult"
+      },
+      "run_with_context": {
+        "kind": "function",
+        "owner": "steel_design.engine",
+        "qualname": "SteelDesignEngine.run_with_context",
+        "signature": "(self, case: steel_design.models.SteelCase) -> tuple[steel_design.models.SteelCase, steel_design.sections.models.Section, steel_design.results_model.EngineResult]"
+      }
+    }
+  },
+  "removed": [
+    "extract_output_options",
+    "merge_case_payload"
+  ],
+  "added": [
+    "_execution"
+  ],
+  "all_retained_binding_owners_signatures_equal": true
+}

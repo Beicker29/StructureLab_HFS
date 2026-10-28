@@ -3,7 +3,19 @@
 Fecha: 2026-10-28. Base verificada: `main`,
 `35dd7b8e09f05b8ac77af1ba0b7b735d59456b6a`. Árbol inicial limpio; permanecen
 las advertencias históricas de acceso, sin limpiezas ni cambios de permisos.
-HFS-021B se entrega para revisión, sin commit, push, rama, PR ni HFS-022.
+HFS-021B se entrega para revisión; el agente no ha creado commits, pushes,
+ramas o PR y no ha iniciado HFS-022.
+
+**Cambio externo de HEAD durante la ejecución:** al terminar las capturas se
+detectó `3f9669b36a883463aa4b4893a0b4716420b50b0c` en main, creado fuera de las
+acciones del agente. Incluye siete archivos de esta tarea, aún antes de completar
+su evidencia. Se preservó y se revisó el delta; ambas capturas habían registrado
+35dd7b8 al comenzar. La guarda de HEAD detuvo correctamente el primer intento de
+comprobación de alcance. Tras revisar el commit descendiente, se mantuvo 35dd7b8
+como base de comparación y se verificó el checkout actual contra el wheel probado.
+[Registro del cambio externo](evidence/head-transition.json). El agente no ejecutó
+commit ni push; la evidencia y los ajustes documentales finales quedan pendientes
+de publicación por el usuario.
 
 ## Cierre documental de HFS-021A
 
@@ -191,9 +203,13 @@ sus aserciones de resultados se conservan, pero no se sobrestima su protección
 negativa. Una retirada posterior requiere revisar ese compromiso y fortalecer
 la prueba en el propietario, sin eliminarla para lograr un resultado verde.
 
-HFS-021B requiere revisión técnica independiente y eventual publicación por el
-usuario. La CI verificada cierra HFS-021A sobre la base publicada; no existe
-todavía una corrida remota del cambio local HFS-021B. No se estudian ni modifican
+HFS-021B requiere revisión técnica independiente y publicación de la evidencia
+final por el usuario. La CI verificada cierra HFS-021A sobre la base publicada.
+El commit externo 3f9669b activó el
+[run 40742357144](https://github.com/Beicker29/StructureLab_HFS/actions/runs/40742357144),
+observado **en curso**, sin atribuirle todavía SUCCESS. Esa corrida no incluye
+la evidencia final agregada después; [consulta conservada](evidence/hfs021b-ci-observation.json).
+El agente no activó ni reejecutó workflows. No se estudian ni modifican
 `composite_rules.py`, solver del eje neutro, importador Excel o reglas de cobertura.
 F-31 y los demás riesgos normativos abiertos siguen en su seguimiento. No se
 inicia HFS-022 ni se declara superada una puerta de validación ingenieril.

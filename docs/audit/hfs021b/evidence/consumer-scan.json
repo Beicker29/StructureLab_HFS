@@ -1,0 +1,2449 @@
+{
+  "base": "35dd7b8e09f05b8ac77af1ba0b7b735d59456b6a",
+  "scope": "Tracked Python, Markdown and package/workflow configuration; historical audit documents classified separately. No inference about inaccessible/unversioned/external consumers.",
+  "symbols": {
+    "OutputOptions": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 155,
+        "text": "- **Transporte:** `OutputOptions` solo valida opciones CLI; `SteelCase` sigue como contrato ingenieril compartido. Las claves JSON duplicadas se detectan antes de perderlas al construir el diccionario. No se añade otra interfaz de cálculo.",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 24,
+        "text": "| `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload` | CLI, HFS-011, `audit_baseline` | Alias estrictos de output, merge profundo de bundle, errores Pydantic con loc output. Los overrides no mutan el base |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs011-inputs.md",
+        "line": 39,
+        "text": "| `OutputOptions` (solo CLI) | Booleano estricto, extras prohibidos; admite un solo nombre entre write_results_json/write_detailed_json/save_results_json | write_results_json=true histórico. `output:null` o no objeto se rechaza |",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 54,
+        "text": "`execute_payload` valida `OutputOptions` y `SteelCase`; `execute_case` acepta",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 94,
+        "text": "- `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload`,",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021a-public-api.md",
+        "line": 56,
+        "text": "Se conservan las firmas de HFS-021, también `OutputOptions` y la exportación",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 19,
+        "text": "class OutputOptions(InputModel):",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 42,
+        "text": "options = OutputOptions.model_validate(output_cfg)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 45,
+        "text": "raise PydanticValidationError.from_exception_data(\"OutputOptions\", errors) from exc",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 84,
+        "text": "copy.deepcopy(output_options if output_options is not None else OutputOptions().model_dump()),",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 16,
+        "text": "OutputOptions as OutputOptions,",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs011_input_contracts.py",
+        "line": 14,
+        "text": "from steel_design.run import OutputOptions, _extract_output_options, _unique_json_object",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs011_input_contracts.py",
+        "line": 44,
+        "text": "OutputOptions: {},",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 49,
+        "text": "assert run.OutputOptions is execution.OutputOptions",
+        "historical": false
+      }
+    ],
+    "_build_case_section": [
+      {
+        "file": "docs/ROADMAP.md",
+        "line": 129,
+        "text": "| F-15 | P1 | C | `run.py::_build_case_section` y `engine.py::_build_custom_section` | Geometría de sección custom duplicada; extracción única a dominio geométrico. |",
+        "historical": false
+      },
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 214,
+        "text": "| DRY-05 / geometría custom | `engine.py::_build_custom_section`; `run.py::_build_case_section` | Área, inercias, radios y módulos del mismo macizo se calculan dos veces (F-15). | Cálculo y memoria pueden representar secciones distintas. | **Consolidar** en una función pura de `sections`; **eliminar después** la copia aritmética del CLI, que recibirá Section ya construida. | Regresión de ambos macizos y geometría calculada independientemente; entradas inválidas. |",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs016/report.md",
+        "line": 74,
+        "text": "Se inspeccionaron `engine.run`, `run._build_case_section`, las suites y",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 22,
+        "text": "| `run._build_case_section` | CLI y HFS-015 | Copia aritmética de geometría; segunda lectura de catálogo. Devuelve None si nombre ausente en uso directo |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs016-catalog.md",
+        "line": 65,
+        "text": "Consumidores auditados: `engine.run` y `run._build_case_section` llaman get y propagan el error existente; no requieren nueva selección. Las suites usan load/get. La sonda F-13 se adapta al rechazo en get y exige la clase/código exactos. `scripts/audit_baseline.engine_snapshot` usa get_all para un contador histórico llamado repository_count: ahora ese contador representa registros retenidos, no identidades. Su archivo histórico no se edita. La evidencia HFS-016 distingue 1228 registros, 1223 identidades y 1221 identidades únicas recuperables. Clientes externos que enumeraban get_all deben consultar get(name) antes de calcular; clientes que esperaban reemplazo o mutación por referencia deben migrar.",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 98,
+        "text": "`run._build_case_section(case, repo)` conserva su lookup directo y None",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021a-public-api.md",
+        "line": 82,
+        "text": "para tests y scripts existentes: `_build_custom_section`, `_build_case_section`,",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 72,
+        "text": "def _build_case_section(case: SteelCase, repo: SectionRepository) -> Section | None:",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 239,
+        "text": "advice=slenderness_recommendations(c,cli._build_case_section(c,SectionRepository()))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 285,
+        "text": "assert cli._build_case_section(case(), SectionRepository()) == build_custom_section(case())",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 288,
+        "text": "assert cli._build_case_section(case(data), SectionRepository()) is None",
+        "historical": false
+      }
+    ],
+    "_build_chapter_admissibility": [
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 26,
+        "text": "| `run._build_global_summary`, `_build_dcr_trace`, `_build_chapter_admissibility` | HFS-000/014/015, pruebas originales, scripts de captura/sondas | Presentan DCR originales y avisos; no cambian estados ni cobertura |",
+        "historical": true
+      },
+      {
+        "file": "scripts/probe_hfs015.py",
+        "line": 14,
+        "text": "from steel_design.run import _build_chapter_admissibility, _build_global_summary",
+        "historical": false
+      },
+      {
+        "file": "scripts/probe_hfs015.py",
+        "line": 30,
+        "text": "advice=_build_chapter_admissibility(SteelCase(**data),section)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 67,
+        "text": "def _build_chapter_admissibility(case: SteelCase, section: Section | None) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 366,
+        "text": "admissibility = _build_chapter_admissibility(case, section)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 473,
+        "text": "\"admissibility\": _build_compact_admissibility(_build_chapter_admissibility(case, section)),",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 21,
+        "text": "from .reporting import _build_chapter_admissibility as _build_chapter_admissibility",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 214,
+        "text": "advice = reporting._build_chapter_admissibility",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 218,
+        "text": "monkeypatch.setattr(reporting, \"_build_chapter_admissibility\", inspect)",
+        "historical": false
+      }
+    ],
+    "_build_compact_admissibility": [
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 73,
+        "text": "def _build_compact_admissibility(admissibility: dict) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 473,
+        "text": "\"admissibility\": _build_compact_admissibility(_build_chapter_admissibility(case, section)),",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 22,
+        "text": "from .reporting import _build_compact_admissibility as _build_compact_admissibility",
+        "historical": false
+      }
+    ],
+    "_build_custom_section": [
+      {
+        "file": "docs/ROADMAP.md",
+        "line": 129,
+        "text": "| F-15 | P1 | C | `run.py::_build_case_section` y `engine.py::_build_custom_section` | Geometría de sección custom duplicada; extracción única a dominio geométrico. |",
+        "historical": false
+      },
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 214,
+        "text": "| DRY-05 / geometría custom | `engine.py::_build_custom_section`; `run.py::_build_case_section` | Área, inercias, radios y módulos del mismo macizo se calculan dos veces (F-15). | Cálculo y memoria pueden representar secciones distintas. | **Consolidar** en una función pura de `sections`; **eliminar después** la copia aritmética del CLI, que recibirá Section ya construida. | Regresión de ambos macizos y geometría calculada independientemente; entradas inválidas. |",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 21,
+        "text": "| `engine._build_custom_section` | Motor y tests HFS-010 | Geometría maciza circular/rectangular; mm, mm², mm³, mm⁴; eje x asociado a H. Error si falta custom; overflow traducido por motor |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 97,
+        "text": "- `engine._build_custom_section` es alias al constructor canónico.",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021a-public-api.md",
+        "line": 82,
+        "text": "para tests y scripts existentes: `_build_custom_section`, `_build_case_section`,",
+        "historical": false
+      },
+      {
+        "file": "scripts/compare_hfs021.py",
+        "line": 105,
+        "text": "old_builder = functions(text_at_base(\"src/steel_design/engine.py\"))[\"_build_custom_section\"]",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/engine.py",
+        "line": 1,
+        "text": "from .sections.geometry import build_custom_section as _build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/engine.py",
+        "line": 38,
+        "text": "section = _build_custom_section(case)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs010_coverage.py",
+        "line": 20,
+        "text": "from steel_design.engine import SteelDesignEngine, _build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs010_coverage.py",
+        "line": 261,
+        "text": "plan = build_coverage_plan(case, _build_custom_section(case))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs010_coverage.py",
+        "line": 272,
+        "text": "plan = build_coverage_plan(case, _build_custom_section(case))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 22,
+        "text": "from steel_design.engine import SteelDesignEngine, _build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 226,
+        "text": "original = engine_module._build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 230,
+        "text": "monkeypatch.setattr(engine_module, \"_build_custom_section\", count)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 281,
+        "text": "assert _build_custom_section is build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 48,
+        "text": "assert engine._build_custom_section is build_custom_section",
+        "historical": false
+      }
+    ],
+    "_build_dcr_trace": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 114,
+        "text": "- `_build_dcr_trace` consume el check; no divide valores publicados ni extrae una",
+        "historical": false
+      },
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 222,
+        "text": "| DRY-13 / presentación y traza | `run.py::_build_dcr_trace/_extract_capacity_from_memory/_build_global_summary`; constructores de reglas | CLI recalcula DCR desde datos reportados/memoria e infiere unidad. | Dos verdades sobre el cálculo y gobernante; F-05/09. | **Eliminar** recomputación al migrar a traza canónica del núcleo; presentación solo formatea. | Paridad valor/decisión/traza, precisión, dimensiones y comparación CLI/API futura. |",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs014/report.md",
+        "line": 107,
+        "text": "La traza legacy `_build_dcr_trace` sigue infiriendo unidades/reconstruyendo datos;",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs015/report.md",
+        "line": 12,
+        "text": "y capacidad. `_build_dcr_trace` reconstruía un supuesto bruto desde demanda",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 26,
+        "text": "| `run._build_global_summary`, `_build_dcr_trace`, `_build_chapter_admissibility` | HFS-000/014/015, pruebas originales, scripts de captura/sondas | Presentan DCR originales y avisos; no cambian estados ni cobertura |",
+        "historical": true
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 132,
+        "text": "def _build_dcr_trace(check) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 386,
+        "text": "\"check_trace\": _build_dcr_trace(check),",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 26,
+        "text": "from .reporting import _build_dcr_trace as _build_dcr_trace",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 103,
+        "text": "monkeypatch.setattr(cli,\"_build_dcr_trace\",forbidden)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 57,
+        "text": "trace=cli._build_dcr_trace(c)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 112,
+        "text": "t=cli._build_dcr_trace(c)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 115,
+        "text": "assert cli._build_dcr_trace(c.model_copy(update={\"unit\":None}))[\"units\"][\"demand\"] is None",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 129,
+        "text": "json.dumps(cli._build_dcr_trace(c),allow_nan=False)",
+        "historical": false
+      }
+    ],
+    "_build_execution_results_dir": [
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 27,
+        "text": "| Exportadores I5/JSON y `_build_execution_results_dir` de run | CLI | mkdir, reloj UTC, nombres saneados, JSON estricto. Matplotlib opcional; fallback SVG si no importa |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 95,
+        "text": "helpers de resumen/trazas/exportación y `_build_execution_results_dir`",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 452,
+        "text": "def _build_execution_results_dir(*, base_results_dir: str, input_file: str) -> str:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 32,
+        "text": "from .reporting import _build_execution_results_dir as _build_execution_results_dir",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 128,
+        "text": "execution_results_dir = _build_execution_results_dir(base_results_dir=args.results_dir, input_file=args.input_file)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 193,
+        "text": "monkeypatch.setattr(cli,\"_build_execution_results_dir\",forbidden)",
+        "historical": false
+      }
+    ],
+    "_build_global_summary": [
+      {
+        "file": "docs/ROADMAP.md",
+        "line": 119,
+        "text": "| F-05 | P0 | C | `run.py::_build_global_summary` | HFS-014: gobernantes observados por DCR, empates y fallos preservados; sin capacidad mezclada. HFS-015 entrega precisión original y migración del resumen para revisión. |",
+        "historical": false
+      },
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 115,
+        "text": "capacidad alternativa de memoria. `_build_global_summary` conserva su lugar y",
+        "historical": false
+      },
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 131,
+        "text": "- **DRY-13/F-05:** `run.py::_build_global_summary` sigue como fuente única, ahora",
+        "historical": false
+      },
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 222,
+        "text": "| DRY-13 / presentación y traza | `run.py::_build_dcr_trace/_extract_capacity_from_memory/_build_global_summary`; constructores de reglas | CLI recalcula DCR desde datos reportados/memoria e infiere unidad. | Dos verdades sobre el cálculo y gobernante; F-05/09. | **Eliminar** recomputación al migrar a traza canónica del núcleo; presentación solo formatea. | Paridad valor/decisión/traza, precisión, dimensiones y comparación CLI/API futura. |",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs014/report.md",
+        "line": 38,
+        "text": "Se conserva la función pequeña existente `run.py::_build_global_summary` como",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 26,
+        "text": "| `run._build_global_summary`, `_build_dcr_trace`, `_build_chapter_admissibility` | HFS-000/014/015, pruebas originales, scripts de captura/sondas | Presentan DCR originales y avisos; no cambian estados ni cobertura |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs014-summary-bundles.md",
+        "line": 8,
+        "text": "`run.py::_build_global_summary(result)` es la única fuente del resumen. Se publica",
+        "historical": false
+      },
+      {
+        "file": "scripts/audit_hfs014_cli.py",
+        "line": 57,
+        "text": "from steel_design.run import _build_global_summary",
+        "historical": false
+      },
+      {
+        "file": "scripts/audit_hfs014_cli.py",
+        "line": 70,
+        "text": "\"summary\": _build_global_summary(EngineResult(checks=checks))},",
+        "historical": false
+      },
+      {
+        "file": "scripts/probe_hfs015.py",
+        "line": 14,
+        "text": "from steel_design.run import _build_chapter_admissibility, _build_global_summary",
+        "historical": false
+      },
+      {
+        "file": "scripts/probe_hfs015.py",
+        "line": 25,
+        "text": "\"check\":check.model_dump(mode=\"json\"),\"summary\":_build_global_summary(result)},\"F07\":[]}",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 19,
+        "text": "def _build_global_summary(result) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 370,
+        "text": "global_summary = _build_global_summary(result)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 472,
+        "text": "\"global_summary\": _build_global_summary(result),",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 20,
+        "text": "from .reporting import _build_global_summary as _build_global_summary",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs000_characterization.py",
+        "line": 19,
+        "text": "from steel_design.run import _build_global_summary",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs000_characterization.py",
+        "line": 141,
+        "text": "summary = _build_global_summary(EngineResult(checks=checks, status=\"PASS\"))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 42,
+        "text": "summary=cli._build_global_summary(r)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 54,
+        "text": "summary=cli._build_global_summary(result(checks))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 61,
+        "text": "summary=cli._build_global_summary(r)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 72,
+        "text": "summary=cli._build_global_summary(r)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 81,
+        "text": "summary=cli._build_global_summary(result(checks))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 92,
+        "text": "summary=cli._build_global_summary(r)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 104,
+        "text": "summary=cli._build_global_summary(result([check(\"opaque\",\"UNKNOWN\",100,1,.1)]))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 98,
+        "text": "s=cli._build_global_summary(r)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 128,
+        "text": "assert cli._build_global_summary(r)[\"observed_governing_checks\"]==[]",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 284,
+        "text": "assert cli._build_global_summary is reporting._build_global_summary",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 50,
+        "text": "assert run._build_global_summary is reporting._build_global_summary",
+        "historical": false
+      }
+    ],
+    "_extract_capacity_from_memory": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 222,
+        "text": "| DRY-13 / presentación y traza | `run.py::_build_dcr_trace/_extract_capacity_from_memory/_build_global_summary`; constructores de reglas | CLI recalcula DCR desde datos reportados/memoria e infiere unidad. | Dos verdades sobre el cálculo y gobernante; F-05/09. | **Eliminar** recomputación al migrar a traza canónica del núcleo; presentación solo formatea. | Paridad valor/decisión/traza, precisión, dimensiones y comparación CLI/API futura. |",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 121,
+        "text": "def _extract_capacity_from_memory(memory: dict | None) -> float | None:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 25,
+        "text": "from .reporting import _extract_capacity_from_memory as _extract_capacity_from_memory",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 109,
+        "text": "monkeypatch.setattr(cli,\"_extract_capacity_from_memory\",forbidden)",
+        "historical": false
+      }
+    ],
+    "_extract_i5_method2_points": [
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 153,
+        "text": "def _extract_i5_method2_points(result) -> tuple[dict, dict] | None:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 292,
+        "text": "extracted = _extract_i5_method2_points(result)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 27,
+        "text": "from .reporting import _extract_i5_method2_points as _extract_i5_method2_points",
+        "historical": false
+      }
+    ],
+    "_extract_output_options": [
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 24,
+        "text": "| `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload` | CLI, HFS-011, `audit_baseline` | Alias estrictos de output, merge profundo de bundle, errores Pydantic con loc output. Los overrides no mutan el base |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 94,
+        "text": "- `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload`,",
+        "historical": false
+      },
+      {
+        "file": "scripts/audit_baseline.py",
+        "line": 61,
+        "text": "from steel_design.run import _extract_output_options, _merge_case_payload",
+        "historical": false
+      },
+      {
+        "file": "scripts/audit_baseline.py",
+        "line": 85,
+        "text": "cleaned, _ = _extract_output_options(merged)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 35,
+        "text": "_extract_output_options = extract_output_options",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs011_input_contracts.py",
+        "line": 14,
+        "text": "from steel_design.run import OutputOptions, _extract_output_options, _unique_json_object",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs011_input_contracts.py",
+        "line": 246,
+        "text": "_extract_output_options({\"output\": output})",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs011_input_contracts.py",
+        "line": 251,
+        "text": "assert _extract_output_options({\"output\": {name: False}})[1] == {\"write_results_json\": False}",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 282,
+        "text": "assert cli._extract_output_options is extract_output_options",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 51,
+        "text": "assert run._extract_output_options is execution.extract_output_options",
+        "historical": false
+      }
+    ],
+    "_extract_shared_context": [
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 79,
+        "text": "def _extract_shared_context(clause_results: list[dict]) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 392,
+        "text": "shared_context = _extract_shared_context(clause_results)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 23,
+        "text": "from .reporting import _extract_shared_context as _extract_shared_context",
+        "historical": false
+      }
+    ],
+    "_infer_check_units": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 220,
+        "text": "| DRY-11 / unidades | `sections/loader.py::UNIT_SCALE_BY_VARIABLE/_scaled_float`; divisiones en `tension_calc`, `axial_calc`, reglas; `composite_calc.py::_n_to_kn/_nmm_to_kn_m`; `run.py::_infer_check_units` | Conversión física repetida y unidad de salida inferida de cláusula; escalado Excel es conocimiento de fuente diferente. | Doble escala, unidades incorrectas o mezcla de capacidades (F-05/14/21). | **Consolidar** conversiones N↔kN/Nmm↔kNm en funciones explícitas si se extraen; loader conserva su mapa por fuente. **Eliminar después** inferencia de unidades del reporte al disponer de resultados tipados. | Ejemplos dimensionales independientes, no doble conversión y metadata de todo tipo de check. |",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 109,
+        "text": "def _infer_check_units(clause: str) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 24,
+        "text": "from .reporting import _infer_check_units as _infer_check_units",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 102,
+        "text": "monkeypatch.setattr(cli,\"_infer_check_units\",forbidden)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs015_precision_advice.py",
+        "line": 108,
+        "text": "monkeypatch.setattr(cli,\"_infer_check_units\",forbidden)",
+        "historical": false
+      }
+    ],
+    "_merge_case_payload": [
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 24,
+        "text": "| `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload` | CLI, HFS-011, `audit_baseline` | Alias estrictos de output, merge profundo de bundle, errores Pydantic con loc output. Los overrides no mutan el base |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 94,
+        "text": "- `run.OutputOptions`, `_extract_output_options`, `_merge_case_payload`,",
+        "historical": false
+      },
+      {
+        "file": "scripts/audit_baseline.py",
+        "line": 61,
+        "text": "from steel_design.run import _extract_output_options, _merge_case_payload",
+        "historical": false
+      },
+      {
+        "file": "scripts/audit_baseline.py",
+        "line": 84,
+        "text": "merged = _merge_case_payload(base, {k: v for k, v in override.items() if k != \"name\"})",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 36,
+        "text": "_merge_case_payload = merge_case_payload",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 283,
+        "text": "assert cli._merge_case_payload is merge_case_payload",
+        "historical": false
+      }
+    ],
+    "_ordered_pm_points": [
+      {
+        "file": "docs/audit/hfs021a/ci-fix/report.md",
+        "line": 31,
+        "text": "las funciones `_ordered_pm_points` y `_write_i5_interaction_diagram_svg` de",
+        "historical": true
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 177,
+        "text": "def _ordered_pm_points(point_payload: dict) -> list[dict]:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 207,
+        "text": "for point in _ordered_pm_points(axis_payload) if isinstance(axis_payload, dict) else []:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 251,
+        "text": "ordered = _ordered_pm_points(axis_payload)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 324,
+        "text": "ordered = _ordered_pm_points(axis_payload)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 28,
+        "text": "from .reporting import _ordered_pm_points as _ordered_pm_points",
+        "historical": false
+      }
+    ],
+    "_run_single_case": [
+      {
+        "file": "docs/audit/hfs021/preparation.md",
+        "line": 25,
+        "text": "| `run._run_single_case` | CLI; instrumentación HFS-014 | Ejecuta, reconstruye sección, prepara resumen, genera gráficos y memoria. write_results_json controla JSON; no desactiva gráficos I5 |",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs021/report.md",
+        "line": 179,
+        "text": "pickles. `_run_single_case` ahora presenta siempre la sección del repositorio",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 100,
+        "text": "- `run._run_single_case` conserva firma y delega en ejecución/exportación.",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021a-public-api.md",
+        "line": 83,
+        "text": "`_run_single_case`, helpers de resumen/memoria y aliases de preparación.",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 77,
+        "text": "def _run_single_case(",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs014_summary_bundle.py",
+        "line": 192,
+        "text": "monkeypatch.setattr(cli,\"_run_single_case\",forbidden)",
+        "historical": false
+      }
+    ],
+    "_sanitize_filename": [
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 14,
+        "text": "def _sanitize_filename(text: str) -> str:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 365,
+        "text": "safe_profile = _sanitize_filename((profile_type or \"UNKNOWN\").upper())",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 434,
+        "text": "safe_section = _sanitize_filename(case.section_name.upper())",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 435,
+        "text": "safe_profile = _sanitize_filename((profile_type or \"UNKNOWN\").upper())",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 436,
+        "text": "safe_case_tag = _sanitize_filename(case_tag.upper()) if case_tag else None",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 454,
+        "text": "example_name = _sanitize_filename(Path(input_file).stem.upper())",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 495,
+        "text": "safe_section = _sanitize_filename(case.section_name.upper())",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 496,
+        "text": "safe_profile = _sanitize_filename((profile_type or \"UNKNOWN\").upper())",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 497,
+        "text": "safe_case_tag = _sanitize_filename(case_tag.upper()) if case_tag else None",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 19,
+        "text": "from .reporting import _sanitize_filename as _sanitize_filename",
+        "historical": false
+      }
+    ],
+    "_write_detailed_results_file": [
+      {
+        "file": "scripts/compare_hfs021.py",
+        "line": 121,
+        "text": "if name == \"_write_detailed_results_file\":",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 420,
+        "text": "def _write_detailed_results_file(",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 509,
+        "text": "detailed_path = _write_detailed_results_file(",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 31,
+        "text": "from .reporting import _write_detailed_results_file as _write_detailed_results_file",
+        "historical": false
+      }
+    ],
+    "_write_i5_interaction_diagram_png": [
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 282,
+        "text": "def _write_i5_interaction_diagram_png(",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 498,
+        "text": "interaction_diagram_path = _write_i5_interaction_diagram_png(",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 30,
+        "text": "from .reporting import _write_i5_interaction_diagram_png as _write_i5_interaction_diagram_png",
+        "historical": false
+      }
+    ],
+    "_write_i5_interaction_diagram_svg": [
+      {
+        "file": "docs/audit/hfs021a/ci-fix/report.md",
+        "line": 31,
+        "text": "las funciones `_ordered_pm_points` y `_write_i5_interaction_diagram_svg` de",
+        "historical": true
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 188,
+        "text": "def _write_i5_interaction_diagram_svg(",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/reporting.py",
+        "line": 308,
+        "text": "return _write_i5_interaction_diagram_svg(points_by_axis=points_by_axis, case=case, output_path=svg_path)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 29,
+        "text": "from .reporting import _write_i5_interaction_diagram_svg as _write_i5_interaction_diagram_svg",
+        "historical": false
+      }
+    ],
+    "build_custom_section": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 34,
+        "text": "| DRY-05, geometría maciza duplicada en engine/run | `sections.geometry.build_custom_section` | Motor y fachadas históricas. Expresiones/ejes/unidades idénticos; oráculos independientes de círculo/rectángulo. El CLI normal consume la Section validada, sin otra construcción |",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs021/report.md",
+        "line": 24,
+        "text": "| Dos constructores macizos | `sections.geometry.build_custom_section`: una función pura con las expresiones exactas anteriores; fachadas importables sin aritmética duplicada |",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 75,
+        "text": "`sections.geometry.build_custom_section(case)` es el único constructor",
+        "historical": false
+      },
+      {
+        "file": "scripts/compare_hfs021.py",
+        "line": 106,
+        "text": "new_builder = functions((ROOT / \"src/steel_design/sections/geometry.py\").read_text(encoding=\"utf-8\"))[\"build_custom_section\"]",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/engine.py",
+        "line": 1,
+        "text": "from .sections.geometry import build_custom_section as _build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 11,
+        "text": "from .sections.geometry import build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 74,
+        "text": "return build_custom_section(case) if case.custom_section is not None else repo.get(case.section_name)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/sections/geometry.py",
+        "line": 9,
+        "text": "def build_custom_section(case: SteelCase) -> Section:",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 28,
+        "text": "from steel_design.sections.geometry import build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 73,
+        "text": "section = build_custom_section(case(data))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 87,
+        "text": "section = build_custom_section(case(data))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 110,
+        "text": "build_custom_section(case(data))",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 281,
+        "text": "assert _build_custom_section is build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 285,
+        "text": "assert cli._build_case_section(case(), SectionRepository()) == build_custom_section(case())",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 47,
+        "text": "from steel_design.sections.geometry import build_custom_section",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 48,
+        "text": "assert engine._build_custom_section is build_custom_section",
+        "historical": false
+      }
+    ],
+    "execute_case": [
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 40,
+        "text": "| `execute_case(engine=..., case=SteelCase, input_payload=None, output_options=None, case_tag=None)` | Un `CaseExecution`; ejecuta validación ingenieril exclusivamente en el motor. Los argumentos opcionales aportan contexto de presentación; el resultado nunca depende de ellos |",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 54,
+        "text": "`execute_payload` valida `OutputOptions` y `SteelCase`; `execute_case` acepta",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021a-public-api.md",
+        "line": 46,
+        "text": "| `steel_design.execution.execute_case` | Ejecutar un SteelCase con engine y contexto opcional; devuelve CaseExecution |",
+        "historical": false
+      },
+      {
+        "file": "scripts/probe_hfs021a_imports.py",
+        "line": 18,
+        "text": "\"execution\": (\"execute_case\", \"iter_executions\", \"execute_payload\", \"execution_status\"),",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 78,
+        "text": "def execute_case(*, engine: SteelDesignEngine, case: SteelCase,",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 104,
+        "text": "yield execute_case(engine=engine, case=case, input_payload=case_payload,",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 15,
+        "text": "from .execution import (execute_case, iter_executions, execution_status, validate_bundle_shape,",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 90,
+        "text": "execution = execute_case(engine=engine, case=case, input_payload=input_payload,",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 24,
+        "text": "execute_case, execute_payload, execution_status, iter_executions,",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 211,
+        "text": "execution = execute_case(engine=e, case=case())",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 18,
+        "text": "(\"execution\", \"execute_case\"), (\"execution\", \"iter_executions\"),",
+        "historical": false
+      }
+    ],
+    "extract_output_options": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 35,
+        "text": "| Preparación individual y bundle, F-16 | `execution.merge_case_payload`, `extract_output_options`, `iter_executions`, `execute_payload` | CLI y llamador Python sin I/O. Modelos compartidos y errores previos; sin lógica de resistencia ni segunda validación ingenieril |",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 38,
+        "text": "def extract_output_options(payload: dict) -> tuple[dict, dict]:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 102,
+        "text": "case_payload, options = extract_output_options(merged)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 17,
+        "text": "extract_output_options, merge_case_payload)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 35,
+        "text": "_extract_output_options = extract_output_options",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 25,
+        "text": "extract_output_options, merge_case_payload,",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 53,
+        "text": "return SteelCase(**extract_output_options(data or payload())[0])",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 282,
+        "text": "assert cli._extract_output_options is extract_output_options",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 298,
+        "text": "clean, options = extract_output_options(merged)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021a_public_api.py",
+        "line": 51,
+        "text": "assert run._extract_output_options is execution.extract_output_options",
+        "historical": false
+      }
+    ],
+    "merge_case_payload": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 35,
+        "text": "| Preparación individual y bundle, F-16 | `execution.merge_case_payload`, `extract_output_options`, `iter_executions`, `execute_payload` | CLI y llamador Python sin I/O. Modelos compartidos y errores previos; sin lógica de resistencia ni segunda validación ingenieril |",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 27,
+        "text": "def merge_case_payload(base_payload: dict, override_payload: dict) -> dict:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 31,
+        "text": "merged[key] = merge_case_payload(merged[key], value)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 101,
+        "text": "merged = merge_case_payload(base, {k: v for k, v in definition.items() if k != \"name\"})",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 17,
+        "text": "extract_output_options, merge_case_payload)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 36,
+        "text": "_merge_case_payload = merge_case_payload",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 25,
+        "text": "extract_output_options, merge_case_payload,",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 283,
+        "text": "assert cli._merge_case_payload is merge_case_payload",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 295,
+        "text": "merged = merge_case_payload(data, override)",
+        "historical": false
+      }
+    ],
+    "run_with_context": [
+      {
+        "file": "docs/architecture/dry-inventory.md",
+        "line": 36,
+        "text": "| Pipeline y contexto | `SteelDesignEngine.run_with_context`, con `run` compatible | Una ejecución devuelve caso/Section/EngineResult. `CaseExecution` transporta contexto; evita cache y geometrías distintas en reporte |",
+        "historical": false
+      },
+      {
+        "file": "docs/audit/hfs021/changed-files.md",
+        "line": 11,
+        "text": "| `src/steel_design/engine.py` | `run_with_context` conserva el pipeline; `run` mantiene contrato. Constructor antiguo reexportado desde geometría |",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs021/report.md",
+        "line": 25,
+        "text": "| `engine.run` descartaba Section después de calcular | `run_with_context` conserva caso/Section/result; `run` mantiene firma y devuelve el mismo EngineResult. No hay cache ni doble pipeline |",
+        "historical": true
+      },
+      {
+        "file": "docs/audit/hfs021/report.md",
+        "line": 59,
+        "text": "La comprobación AST compara el pipeline anterior con `run_with_context`",
+        "historical": true
+      },
+      {
+        "file": "docs/contracts/hfs021-execution.md",
+        "line": 45,
+        "text": "| `SteelDesignEngine.run_with_context(case)` | `(caso_validado, sección_validada, EngineResult)`, una única ejecución del pipeline |",
+        "historical": false
+      },
+      {
+        "file": "docs/contracts/hfs021a-public-api.md",
+        "line": 42,
+        "text": "| `steel_design.engine.SteelDesignEngine` | `run(case) -> EngineResult`; `run_with_context(case) -> (SteelCase, Section, EngineResult)`. Único pipeline con validación, routing, cálculo y cobertura |",
+        "historical": false
+      },
+      {
+        "file": "scripts/compare_hfs021.py",
+        "line": 112,
+        "text": "new_run = next(n for n in new_class.body if isinstance(n, ast.FunctionDef) and n.name == \"run_with_context\")",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/engine.py",
+        "line": 22,
+        "text": "return self.run_with_context(case)[2]",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/engine.py",
+        "line": 24,
+        "text": "def run_with_context(self, case: SteelCase) -> tuple[SteelCase, Section, EngineResult]:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 81,
+        "text": "normalized_case, section, result = engine.run_with_context(case)",
+        "historical": false
+      },
+      {
+        "file": "tests/test_hfs021_execution.py",
+        "line": 157,
+        "text": "monkeypatch.setattr(e, \"run_with_context\", forbidden)",
+        "historical": false
+      }
+    ],
+    "validate_bundle_shape": [
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 61,
+        "text": "def validate_bundle_shape(payload: dict) -> bool:",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/execution.py",
+        "line": 90,
+        "text": "is_bundle = validate_bundle_shape(payload)",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 15,
+        "text": "from .execution import (execute_case, iter_executions, execution_status, validate_bundle_shape,",
+        "historical": false
+      },
+      {
+        "file": "src/steel_design/run.py",
+        "line": 127,
+        "text": "is_bundle = validate_bundle_shape(payload)",
+        "historical": false
+      }
+    ]
+  },
+  "dynamic_references": [
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 90,
+      "code": "getattr(exc, \"code\", None)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/audit_baseline.py",
+      "line": 90,
+      "code": "getattr(exc, \"details\", None)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/audit_hfs011.py",
+      "line": 47,
+      "code": "getattr(args, \"extra_suite\", [])",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/audit_hfs011.py",
+      "line": 72,
+      "code": "getattr(args, \"coverage_transition\", False)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/audit_hfs014_cli.py",
+      "line": 63,
+      "code": "hasattr(error, \"to_dict\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/audit_hfs017_probes.py",
+      "line": 38,
+      "code": "hasattr(value,\"model_dump\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/audit_hfs017_probes.py",
+      "line": 40,
+      "code": "hasattr(exc,\"to_dict\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 64,
+      "code": "importlib.import_module(\"steel_design\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 72,
+      "code": "importlib.import_module(\"steel_design.\" + module)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 31,
+      "code": "importlib.import_module(name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 82,
+      "code": "importlib.import_module(\"steel_design.domain.errors\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/probe_hfs021a_imports.py",
+      "line": 74,
+      "code": "getattr(loaded, symbol)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "scripts/verify_hfs020.py",
+      "line": 70,
+      "code": "archive.getmembers()",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/actions.py",
+      "line": 18,
+      "code": "getattr(case.loads, shear_component(case, axis))",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/actions.py",
+      "line": 23,
+      "code": "getattr(case.loads, component)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 73,
+      "code": "getattr(loads, component)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 79,
+      "code": "getattr(loads, component)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 34,
+      "code": "getattr(scope, field)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 38,
+      "code": "getattr(scope, field)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 127,
+      "code": "getattr(loads, component)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage.py",
+      "line": 160,
+      "code": "getattr(loads, component)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage_evidence.py",
+      "line": 50,
+      "code": "getattr(flexure, class_name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/coverage_evidence.py",
+      "line": 59,
+      "code": "getattr(flexure, f\"FlexureF{number}{member}{axis}Rule\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/hss_shear.py",
+      "line": 21,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/hss_shear.py",
+      "line": 16,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/hss_shear.py",
+      "line": 17,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/hss_shear.py",
+      "line": 15,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/evaluators/hss_shear.py",
+      "line": 17,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 184,
+      "code": "getattr(section, field)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 185,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/routing/profile_router.py",
+      "line": 631,
+      "code": "getattr(section, field, None)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 111,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/domain/validation.py",
+      "line": 139,
+      "code": "getattr(section, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/engine.py",
+      "line": 87,
+      "code": "getattr(case.loads, component)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/models.py",
+      "line": 184,
+      "code": "getattr(self, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "src/steel_design/models.py",
+      "line": 187,
+      "code": "getattr(self, name)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 137,
+      "code": "monkeypatch.setattr(engine.router, \"get_rules\", lambda *args: keep)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 148,
+      "code": "monkeypatch.setattr(engine.router, \"get_rules\", lambda *args: [Fake(), Fake()])",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 157,
+      "code": "monkeypatch.setattr(TensionRule, \"check\", lambda self, case, section: original(self, case, section).model_copy(update=mutation))",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 167,
+      "code": "monkeypatch.setattr(TensionRuptureRule, \"check\", unavailable)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs010_coverage.py",
+      "line": 270,
+      "code": "monkeypatch.setattr(engine.router, \"get_rules\", lambda *args: pytest.fail(\"Planner consulted routing\"))",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs011_input_contracts.py",
+      "line": 121,
+      "code": "getattr(loads, key)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 102,
+      "code": "monkeypatch.setattr(cli,\"_infer_check_units\",forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 103,
+      "code": "monkeypatch.setattr(cli,\"_build_dcr_trace\",forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 188,
+      "code": "monkeypatch.setattr(sys,\"argv\",[\"run\",str(path),\"--results-dir\",str(output)])",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 189,
+      "code": "monkeypatch.setattr(cli,\"load_sections_from_excel\",lambda path:[])",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 192,
+      "code": "monkeypatch.setattr(cli,\"_run_single_case\",forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs014_summary_bundle.py",
+      "line": 193,
+      "code": "monkeypatch.setattr(cli,\"_build_execution_results_dir\",forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 108,
+      "code": "monkeypatch.setattr(cli,\"_infer_check_units\",forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 109,
+      "code": "monkeypatch.setattr(cli,\"_extract_capacity_from_memory\",forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 270,
+      "code": "monkeypatch.setattr(composite_rules.CompositeI2EncasedCompressionRule,\"check\",\r\n        lambda self,c,s:CheckResult.from_values(name=\"stipulated\",clause=\"I2-1b\",demand=.100049,\r\n                                              capacity=raw_capacity,unit=\"kN\"))",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 273,
+      "code": "monkeypatch.setattr(composite_rules,\"_composite_flexural_capacities_i5\",\r\n                        lambda c,s:{\"x\":{\"Mc_kN_m\":1},\"y\":{\"Mc_kN_m\":1}})",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs015_precision_advice.py",
+      "line": 255,
+      "code": "monkeypatch.setattr(cls,\"check\",lambda self,c,s,v=value: CheckResult.from_values(\r\n            name=\"stipulated\",clause=\"opaque\",demand=1.00045,capacity=v,unit=\"kN\"))",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 44,
+      "code": "inspect.getmembers(mod,inspect.isclass)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs017_design_method.py",
+      "line": 45,
+      "code": "hasattr(cls,\"check\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 157,
+      "code": "monkeypatch.setattr(e, \"run_with_context\", forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 210,
+      "code": "monkeypatch.setattr(engine_module, \"build_coverage_plan\", record)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 218,
+      "code": "monkeypatch.setattr(reporting, \"_build_chapter_admissibility\", inspect)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 230,
+      "code": "monkeypatch.setattr(engine_module, \"_build_custom_section\", count)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 247,
+      "code": "monkeypatch.setattr(repo, \"get\", count)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 322,
+      "code": "importlib.import_module(\"steel_design.execution\")",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 80,
+      "code": "getattr(section, key)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 92,
+      "code": "getattr(section, key)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 126,
+      "code": "patch.setattr(owner, name, forbidden)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021_execution.py",
+      "line": 323,
+      "code": "vars(module)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 23,
+      "code": "importlib.import_module(\"steel_design.\" + module)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 24,
+      "code": "getattr(imported, symbol)",
+      "kind": "dynamic_access"
+    },
+    {
+      "file": "tests/test_hfs021a_public_api.py",
+      "line": 27,
+      "code": "importlib.import_module(value.__module__)",
+      "kind": "dynamic_access"
+    }
+  ],
+  "read_errors": [],
+  "files": {
+    ".github/workflows/ci.yml": {
+      "sha256": "cd8f5ca4fa4e19af6a7390edf85ada35f072bd0eca0ca817cd5340f31ccee161",
+      "historical": false
+    },
+    "AGENTS.md": {
+      "sha256": "340236c0df6a278e91d8c616c363f2fee08c84fac03344bcafc630eb4642e107",
+      "historical": false
+    },
+    "CONTRIBUTING.md": {
+      "sha256": "cae3125465c201865b9be7111971411f4db2b9af9cb59220fc70bb133c0a8855",
+      "historical": false
+    },
+    "README.md": {
+      "sha256": "ad24eb00c142a2b141da9f813b0cf1ee0b6134995d2d97055fe61ebd86b63c3d",
+      "historical": false
+    },
+    "docs/ROADMAP.md": {
+      "sha256": "4da734149eaaba6e2151d1be9965ddc8ea5c6bb5989059ab25f3faae28e8e834",
+      "historical": false
+    },
+    "docs/adr/001-engine-architecture.md": {
+      "sha256": "97902f75a2599ad7a40fe50e14c4c58f7772ffe62e9288049051bb1a348df4fd",
+      "historical": false
+    },
+    "docs/adr/002-contracts-errors.md": {
+      "sha256": "176524028ba4cc92899d34e198e507b7665ca27c7676eab62b72d64ae7d76361",
+      "historical": false
+    },
+    "docs/adr/003-traceability-testing.md": {
+      "sha256": "80ae90d49535d3e14a550a8b025d9bfbc2a15f94b98c1b19aa314e78a22aca7f",
+      "historical": false
+    },
+    "docs/aisc_360_22_traceability.md": {
+      "sha256": "ee498268b03673a7e3ec5d8efa36f342af43205165815e1f411d29b8d81a67fd",
+      "historical": false
+    },
+    "docs/architecture/dry-inventory.md": {
+      "sha256": "5386783555943d7e7cc87de75c0991afe2cc76ef007e9f7fbbb3eb2292fc4ee0",
+      "historical": false
+    },
+    "docs/audit/baseline.md": {
+      "sha256": "fa72a438fabbd91cea4ca27e1f8071cffd4c5807f8524093049fa6cc6c5ade3e",
+      "historical": true
+    },
+    "docs/audit/changed-files.md": {
+      "sha256": "c4faf928edff1948d41d2af2cbd74f722240fcb0735dfc0b865fe4194ae30029",
+      "historical": true
+    },
+    "docs/audit/evidence-policy.md": {
+      "sha256": "a0a6af0375f348eed2e4012859d9242b95d9e1ba861f59d619b926d297e34a05",
+      "historical": true
+    },
+    "docs/audit/findings.md": {
+      "sha256": "8f6bcf4c82282408055c7709d2ee2e522de08b2ce0094a0c33b0c52bb55d296b",
+      "historical": true
+    },
+    "docs/audit/hfs001/report.md": {
+      "sha256": "195284a6793984901f6ba50a53b7305eb49a0a17aea6f478691620001038e965",
+      "historical": true
+    },
+    "docs/audit/hfs002/probes.py": {
+      "sha256": "04fa71db0ced6fbb209f6a4c90dec1752180d7b858614360968aa7cb22f3ec4c",
+      "historical": true
+    },
+    "docs/audit/hfs002/report.md": {
+      "sha256": "c85ab48870d135b8817487901416ef0f120400b5eb09bd2da5da6e89449082e8",
+      "historical": true
+    },
+    "docs/audit/hfs010/probes.py": {
+      "sha256": "73950e2db32f1cc8b4d8475d669a0beaaab7be24349ebc902ccff64dde240da9",
+      "historical": true
+    },
+    "docs/audit/hfs010/report.md": {
+      "sha256": "7acfc51a81ee068d0ac65f68e8c779081c581e549e307bf721a5959ccdd46be9",
+      "historical": true
+    },
+    "docs/audit/hfs011/report.md": {
+      "sha256": "a253de5ab1090486a555dae0cae39ca3717e109cac4b7d4187071c632373ad03",
+      "historical": true
+    },
+    "docs/audit/hfs012/probes.py": {
+      "sha256": "4092652f161dbec5bfbd23954931c05ec026292edf17a7b5832519616dd2a451",
+      "historical": true
+    },
+    "docs/audit/hfs012/report.md": {
+      "sha256": "ea8a83990f7eb358df58809e432b2756eda58b447bb61142d3e66adb056e99e3",
+      "historical": true
+    },
+    "docs/audit/hfs013/changed-files.md": {
+      "sha256": "c32b3b171139ebfd96fc8fe8343b0fa4c451399bcd238a51ca4306f2470dc252",
+      "historical": true
+    },
+    "docs/audit/hfs013/f1-correction/changed-files.md": {
+      "sha256": "dde00093d9b9b62ae613f5ca5cc819a364b72283ec3098cf3dada17fad628877",
+      "historical": true
+    },
+    "docs/audit/hfs013/f1-correction/compare.py": {
+      "sha256": "9d3fb97296d9cc87ad99adc554305be3dcdd4f9f7ed9313caa0cb1db6cb83e62",
+      "historical": true
+    },
+    "docs/audit/hfs013/f1-correction/report.md": {
+      "sha256": "552dabc1408ba76d2b2bfba3e7cba5e5ecd4d8645a1eb61500e9a29e07c1ad5c",
+      "historical": true
+    },
+    "docs/audit/hfs013/probes.py": {
+      "sha256": "f8d7021bd5c7f70b86a262f343d8a635c308fffc3ca8e7b4374f1f03111937c5",
+      "historical": true
+    },
+    "docs/audit/hfs013/report.md": {
+      "sha256": "e28adf92eb6f89de8fb554d49a327bdc0751900cdccfdb08d6689407bafd4cb0",
+      "historical": true
+    },
+    "docs/audit/hfs014/changed-files.md": {
+      "sha256": "750947a33aa51b163af3cf5523b8994571a187b7b46786973d0506b9306a5397",
+      "historical": true
+    },
+    "docs/audit/hfs014/report.md": {
+      "sha256": "01d7f8df809954d4516ee575cfa4cd36f6930a9d054d774cb79439c71dd6a8ad",
+      "historical": true
+    },
+    "docs/audit/hfs015/changed-files.md": {
+      "sha256": "e274d94bc57afae398073067aa3465298abb887eb165ab594e28744d6e6886fc",
+      "historical": true
+    },
+    "docs/audit/hfs015/report.md": {
+      "sha256": "aca0510128de814a6329bd99fa8e761385beaaa99c3820f54a8b4172b6763d29",
+      "historical": true
+    },
+    "docs/audit/hfs016/probes.py": {
+      "sha256": "f4ba915812d59f713accb3a2d7c8163402eebb9b3e9133dd9e1eebaff9051d4a",
+      "historical": true
+    },
+    "docs/audit/hfs016/report.md": {
+      "sha256": "2c1baca66d80f62f6ba554f30d413c7f72062fcda33861e623e9b8ec01061627",
+      "historical": true
+    },
+    "docs/audit/hfs017/changed-files.md": {
+      "sha256": "8c27d8c2f02b0a58e7f9225f0af5428acfe4ce1017191505d413549ff76ca2f0",
+      "historical": true
+    },
+    "docs/audit/hfs017/report.md": {
+      "sha256": "4713cc7328edad1ae52fbb6d8b38674b0ab3847718dad8927a65c0694d5d4cf7",
+      "historical": true
+    },
+    "docs/audit/hfs017/support-matrix.md": {
+      "sha256": "158b77fc32f74498025306a50bff4db88cc424f5ab31fc7a02773080ff7e2339",
+      "historical": true
+    },
+    "docs/audit/hfs020/changed-files.md": {
+      "sha256": "4b8542c3924679de08778f02dcbd0e879bd419da438e8e322121621ec652d2b5",
+      "historical": true
+    },
+    "docs/audit/hfs020/compatibility/report.md": {
+      "sha256": "59356200ea95669b9192552bca75f4093ea8c8f2625b0e89a43ec21f6ca6291a",
+      "historical": true
+    },
+    "docs/audit/hfs020/report.md": {
+      "sha256": "8f4de6a94f607862bdf0b0337cc30fe6e4a5dc076c6c56496125ccafd043b554",
+      "historical": true
+    },
+    "docs/audit/hfs021/changed-files.md": {
+      "sha256": "8a032254cc40993f6fcdd93070fd1c42523725d04b48eeed4e69f6866e237918",
+      "historical": true
+    },
+    "docs/audit/hfs021/preparation.md": {
+      "sha256": "5ec6803839d821ab8d394ac184dad8b01e05da0ad1ba2517f3034b0e96d49525",
+      "historical": true
+    },
+    "docs/audit/hfs021/report.md": {
+      "sha256": "9fcd6da029ce2c850f211966a0a5792bca47424ae5dcb6c6d5b652406bc035ce",
+      "historical": true
+    },
+    "docs/audit/hfs021a/changed-files.md": {
+      "sha256": "2ce29cef8f13ffee7c9ee8419787f22e82848b2e96570dbddbd57397dbcb0c42",
+      "historical": true
+    },
+    "docs/audit/hfs021a/ci-fix/report.md": {
+      "sha256": "02f6a8a062430dbe1f9d68c14865e86c915ea2e72f0c3ed79294e70f30021110",
+      "historical": true
+    },
+    "docs/audit/hfs021a/preparation.md": {
+      "sha256": "d958ec64337149843fde99cab3fd151478f5b51d14ad05dabb097469a237f2d8",
+      "historical": true
+    },
+    "docs/audit/hfs021a/report.md": {
+      "sha256": "2ed6c192b870ee6d3db1879e2205cab82eea66c565156345ef7a6aeb5fc002c4",
+      "historical": true
+    },
+    "docs/audit/inventory.md": {
+      "sha256": "1ec842f25d4a4c3edbcacd88a214496a2165043ca2e82bc50173201c7a78db3d",
+      "historical": true
+    },
+    "docs/audit/tracking.md": {
+      "sha256": "c125fdf9f6379c0c0001e2175abeee75c66d8859438f89c6f8edc7175b21fd32",
+      "historical": true
+    },
+    "docs/contracts/hfs010-coverage.md": {
+      "sha256": "3392b4306bf941f79612265aa3d6011d228b3bbf9acc98e23f17a128bcab21f2",
+      "historical": false
+    },
+    "docs/contracts/hfs011-inputs.md": {
+      "sha256": "12579df76f81f8a4ae790a237c608b937106129eda4e2e6556d7ba3f531d1be4",
+      "historical": false
+    },
+    "docs/contracts/hfs013-axes.md": {
+      "sha256": "9ef8d2ba208fc31fe630b5eba8e20345a19b3975b01697ebc5e30ae4c48b01bc",
+      "historical": false
+    },
+    "docs/contracts/hfs014-summary-bundles.md": {
+      "sha256": "46d9922b5bcd09a567cfb26c0e91414c2d2f48cb14b0ea7ad00c26f545a8016d",
+      "historical": false
+    },
+    "docs/contracts/hfs015-precision-advice.md": {
+      "sha256": "5a93de05d7293f6c1a6d29d05729c4353bea2e04f7de6049ff4d76a2703d2bf4",
+      "historical": false
+    },
+    "docs/contracts/hfs016-catalog.md": {
+      "sha256": "268a8dce406ef245e75c417e88efd1a510bd90b1eee1a0945db75e9b04b5b8d0",
+      "historical": false
+    },
+    "docs/contracts/hfs017-design-method.md": {
+      "sha256": "5415e787daf29ba36bd7d2895f459f5778dc17f4ddd9569f7c869a8ff576ef47",
+      "historical": false
+    },
+    "docs/contracts/hfs021-execution.md": {
+      "sha256": "c78deb7b433e1cb8658791e1940699b093fc7dd4d29b6080def1675e38660bfb",
+      "historical": false
+    },
+    "docs/contracts/hfs021a-public-api.md": {
+      "sha256": "884c4e3b5ec022460405002b76e2d1cee516c7347d8b4358568b990a4ba2e1e2",
+      "historical": false
+    },
+    "docs/normative/hfs002-applicability.md": {
+      "sha256": "2966e3fc0e1a16fed7abfb745fe72088687d2ef3c217670cc475eaff20af7482",
+      "historical": false
+    },
+    "docs/normative/hfs002-coverage-proposal.md": {
+      "sha256": "d834c6a3ad79f6407480f26e8cfc9cbc6099cdc8567114099e87c5f3998eec24",
+      "historical": false
+    },
+    "docs/normative/hfs002-implementation.md": {
+      "sha256": "17ed8dadece72309dc1a024e387d5c7cab65de5482387fce1c927fd960fa826a",
+      "historical": false
+    },
+    "docs/normative/hfs002-sources.md": {
+      "sha256": "48dc046b12e36bd26d493298201f62a5b7433fcc1387ff844bd09e37ab08fd47",
+      "historical": false
+    },
+    "docs/unidades.md": {
+      "sha256": "03d9c035e948eadafcc185b3d767091f0ff1662d40a150215f7c0b9daf38cc47",
+      "historical": false
+    },
+    "pyproject.toml": {
+      "sha256": "67840c99367d98b65f407ef284c8d8c849c2119992a0d4229fa08271a6b89c17",
+      "historical": false
+    },
+    "scripts/audit_baseline.py": {
+      "sha256": "80cea31c1a7262800d2a97e39f937623334a8c25c279e89e24fac7a8ffd40fd5",
+      "historical": false
+    },
+    "scripts/audit_hfs011.py": {
+      "sha256": "ab06621b2ae7bb0555bec658d3518e93c7654f1a552e90a9dc6ca3127a33c7e4",
+      "historical": false
+    },
+    "scripts/audit_hfs013.py": {
+      "sha256": "b173ae479bdac4c7baa7e0390407e8d9790fa8d58f57c092c549ed39c81adc3c",
+      "historical": false
+    },
+    "scripts/audit_hfs014.py": {
+      "sha256": "82d4e259642e4ac3f2562b7ce9b7a7183343630d76c4f55986dc9c55f8e55ed0",
+      "historical": false
+    },
+    "scripts/audit_hfs014_cli.py": {
+      "sha256": "d8a52919a48e15b3ab5a370ded0bee3f7234795094a0a508e81d6087f99ab2da",
+      "historical": false
+    },
+    "scripts/audit_hfs017_probes.py": {
+      "sha256": "f32501aa48f2819855b209caebc6b8a8f50a3f9b79ad2c846232994dff14158e",
+      "historical": false
+    },
+    "scripts/compare_hfs010.py": {
+      "sha256": "4103f5943efaa77ed81c836fcebf92bf8647413fbc43242f0c89b67140758cf0",
+      "historical": false
+    },
+    "scripts/compare_hfs013.py": {
+      "sha256": "cf347d82ed96f98cfd7f5c68b0a0f4e69d26942aa118717595ee4eb02b983c5c",
+      "historical": false
+    },
+    "scripts/compare_hfs014_cli.py": {
+      "sha256": "3925f6165e2189a681678ad8615ac41d901fb43cb4d401469baf5ba0e720eb5f",
+      "historical": false
+    },
+    "scripts/compare_hfs015.py": {
+      "sha256": "467e825eae8d020cd72b19ff92a8b6488671f939ddb11fd631730b047fae6511",
+      "historical": false
+    },
+    "scripts/compare_hfs017.py": {
+      "sha256": "e78121daf034a83c72e7f5e51ad888d96582e030945536e1dfcc3092d71efbfb",
+      "historical": false
+    },
+    "scripts/compare_hfs021.py": {
+      "sha256": "7e60545ca1dd6da55419ee290f8e3d2d9318867cfd1937b98c6e9ec7a6383c6f",
+      "historical": false
+    },
+    "scripts/compare_hfs021a.py": {
+      "sha256": "6a05142cf8661cb404cd2ca4f32dcd42aa0cfaa2b5b35c2024c0591ae69c8c56",
+      "historical": false
+    },
+    "scripts/debug_loader.py": {
+      "sha256": "099d38e425fb3cc9355212f8e98e29ce5060746018c36c5f5ae3f5d99bbc7ebe",
+      "historical": false
+    },
+    "scripts/dump_headers.py": {
+      "sha256": "bf8284a569ba8d57e0b95c1716a4d61d00c1e81d61b79a598a0e9d56d3cbec85",
+      "historical": false
+    },
+    "scripts/hfs020_comparison.py": {
+      "sha256": "63665e6b920b065b7cb526881e591a4ba2cac1ce45dbf371ee80c29e429c3441",
+      "historical": false
+    },
+    "scripts/hfs021a_invariants.py": {
+      "sha256": "fad7d00193c0197ae75a0cb7501b77b696308413a506151b4657dda8ed0a4f26",
+      "historical": false
+    },
+    "scripts/hfs021a_svg_comparison.py": {
+      "sha256": "f05517195d8d7142b6e93dd5ee56240da6891190c3718885cb13d2d84cc47063",
+      "historical": false
+    },
+    "scripts/make_dummy_excel.py": {
+      "sha256": "ff7c077da5560de24d306c1cd209f93e7c889425742fdca5748066ca23ec35a9",
+      "historical": false
+    },
+    "scripts/probe_hfs015.py": {
+      "sha256": "3fc140b8ae2f1b3e27544f119a812ffcaed1998c16718848ff634994f3ad732e",
+      "historical": false
+    },
+    "scripts/probe_hfs021a_imports.py": {
+      "sha256": "3a937813238605aee8d24ec398b3295282211f91b4a7b0088ac35c62c0efb76d",
+      "historical": false
+    },
+    "scripts/verify_hfs015_scope.py": {
+      "sha256": "394189548ac66237a9639ced81d5956eaab50b23ddb78d2e0922e07bb1b7f06d",
+      "historical": false
+    },
+    "scripts/verify_hfs020.py": {
+      "sha256": "59dbab4c955d702cd7a51fa6094bfe986326d8bb8deaf10f985f3a4b518cbb3f",
+      "historical": false
+    },
+    "src/steel_design/README.md": {
+      "sha256": "e0e7c8b17e8f6f9d880bd6e0cecbde97fff3907bcbe69c7e1f3bcb092efa7def",
+      "historical": false
+    },
+    "src/steel_design/__init__.py": {
+      "sha256": "b598de9f0a5f356f0eca3d533eff9d985f977cafb0b2d2e96ac5cf7fbd57d403",
+      "historical": false
+    },
+    "src/steel_design/codes/__init__.py": {
+      "sha256": "f63c6c4be3652641dde0e8574cb67adb19d9cb0f15601a6c067a11c4c8d85fdd",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/__init__.py": {
+      "sha256": "d12da3eed0c4b31a99500ed75dea829848df59aefa04a5093ed5974bb481427f",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/axial_calc.py": {
+      "sha256": "e43b234fbe661cd8667ba8e4cdef7c6775a9691868d887202c9ec673b136bee7",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py": {
+      "sha256": "8d908e7d6a4e88cc726ffbf185585aa6e86e30baa49866e6b86f3b8111571385",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/composite_calc.py": {
+      "sha256": "7d535e0841a3c0194975968ab670c45533afc32f2a39608cd48493c39a4c4eda",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/flexure_calc.py": {
+      "sha256": "e9711631cdd430440e91745aeed226ed4f0ed3b450d9aee25f40ea1adb6ae1c9",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/shear_calc.py": {
+      "sha256": "404cebeb4f0ec43bc777188a5f6f51fc3902f6e63425922ac99350ed1062c88c",
+      "historical": false
+    },
+    "src/steel_design/codes/aisc_360_22/tension_calc.py": {
+      "sha256": "6dc9a85d56dd26c773978ed6f7745d4052d7f101807f9044b8445e7bc5d2a6f3",
+      "historical": false
+    },
+    "src/steel_design/design_methods.py": {
+      "sha256": "02a4caeccd900132d46c6876db82ae9054867a60f18565858b7b52e25c4bb26a",
+      "historical": false
+    },
+    "src/steel_design/domain/__init__.py": {
+      "sha256": "e07b9376830ba616a3642cdc3ed3ff53b218ada403099b570aebe5078408d28c",
+      "historical": false
+    },
+    "src/steel_design/domain/actions.py": {
+      "sha256": "b11c6ca6d02360dc22327d3728ea0dd9a5d2e15d03c72e781cb25b191685d951",
+      "historical": false
+    },
+    "src/steel_design/domain/coverage.py": {
+      "sha256": "4f92ab8888bed06413bd5397ba5a27248439ef21c207182b0339268964328d9c",
+      "historical": false
+    },
+    "src/steel_design/domain/coverage_evidence.py": {
+      "sha256": "d951a18fe997b4d14acc5103c2dd3060748fa24f8a5103acf1cc9a9ceeae7aba",
+      "historical": false
+    },
+    "src/steel_design/domain/design_methods.py": {
+      "sha256": "7d0f93041c3a987c3a9dff70fc40b87ac844bc94aab222ed3d09b3a001d7e751",
+      "historical": false
+    },
+    "src/steel_design/domain/errors.py": {
+      "sha256": "aad71b4b6dd26a753f6b63dfa782f0bfcc86fcd55aa1509c9a60661146ffb791",
+      "historical": false
+    },
+    "src/steel_design/domain/evaluators/__init__.py": {
+      "sha256": "58e0730d3caa97639980628f7dc7f157869cb34575b04115f6b2cc2c26312c47",
+      "historical": false
+    },
+    "src/steel_design/domain/evaluators/flexure_evaluator.py": {
+      "sha256": "0221aa1f97ce62e3e6d7754f6ecf7b9bb96fd75682d3c7d2bdef7fdc75bc380a",
+      "historical": false
+    },
+    "src/steel_design/domain/evaluators/hss_shear.py": {
+      "sha256": "0f707afd014b796546638d417a41d9aa9eb8fdc10c7a9d68ed360ff994a16735",
+      "historical": false
+    },
+    "src/steel_design/domain/evaluators/tension_evaluator.py": {
+      "sha256": "8092c1bf74e8cc07347657a49c862232e477b1dd3a9b86a4a3f71cf8544c7da1",
+      "historical": false
+    },
+    "src/steel_design/domain/recommendations.py": {
+      "sha256": "0fd88459ef695c004e6546d4ae579b8359859d563211e55c1b11446fb8acf9bf",
+      "historical": false
+    },
+    "src/steel_design/domain/routing/__init__.py": {
+      "sha256": "fbcd8b7305ec85642354727f6579d20a80e518f5f17cc243566254f30e8d97c4",
+      "historical": false
+    },
+    "src/steel_design/domain/routing/profile_router.py": {
+      "sha256": "222df31874b2ad5abe71366b3b89ce3717d895667255c35722be6602ed3fabd8",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/__init__.py": {
+      "sha256": "dbb61c409b7d8092df8e5ea91365f8db360e9a3baeee3ff9103667fb9a14c5d0",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/axial_rules.py": {
+      "sha256": "0449c66fdc0b1b77c4a34930be458c0c32cb7e50c21297589ea26c8aa3843985",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py": {
+      "sha256": "e2450f881154b019ded05a15c701b38690c9849a15e85d7561241ef40cc6fde0",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/composite_rules.py": {
+      "sha256": "f4b5ac474ca3104cb5ec52cb1ddafd181b50cc5536da097761eddf864b697a0c",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/flexure_rule.py": {
+      "sha256": "43f48f6846ad3af64ec65e16183ca1874d49ba6aea9015a1eb6a193c22cf2987",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/shear_rules.py": {
+      "sha256": "3cec1e991e6ab0c5a34733f4d8768a4aea3f541243ba468a39f04e0d74b525c5",
+      "historical": false
+    },
+    "src/steel_design/domain/rules/tension_rule.py": {
+      "sha256": "1e7d283cd64c1fbcde05fb2709410d8438970978a4549d34403b69b30335183b",
+      "historical": false
+    },
+    "src/steel_design/domain/validation.py": {
+      "sha256": "7ae6510d623e736d71f087548754c8901238be91778dc07253ca275572334a29",
+      "historical": false
+    },
+    "src/steel_design/engine.py": {
+      "sha256": "2b39e0caa24ab49c6a5430abecddcd511f04060f49dedcbce8c003d336e66ef3",
+      "historical": false
+    },
+    "src/steel_design/execution.py": {
+      "sha256": "20b121b8ce214c2019dda5729092cd0da7ca72c6b5d62d4be21a52af8e0f3735",
+      "historical": false
+    },
+    "src/steel_design/input_contracts.py": {
+      "sha256": "4163d125edcca9d0422941cb5c4d682891728ed2ae82cc45aeaf36eea657e2b1",
+      "historical": false
+    },
+    "src/steel_design/models.py": {
+      "sha256": "24783fa03e01497810772c57f9e9db127db0c9a7f4084908f73cc49b8511d6d4",
+      "historical": false
+    },
+    "src/steel_design/reporting.py": {
+      "sha256": "c514128bbeb2a8f8ad5bb4dfa49c667fdf563215bed3eaf0b2a74cb3626005a8",
+      "historical": false
+    },
+    "src/steel_design/results_model.py": {
+      "sha256": "916502d55642f4df5ef24252d3ce97c82b98ab078729340da35d0cedd5405bb1",
+      "historical": false
+    },
+    "src/steel_design/run.py": {
+      "sha256": "273ce9cdc3c34ca799ebf094ca1ec2d32ec2012d8355a29d996d06709098b7cc",
+      "historical": false
+    },
+    "src/steel_design/sections/__init__.py": {
+      "sha256": "4ac2712d5869891f95a658f3b457c83fd7f7cf6e19b422c1bbb872399715647f",
+      "historical": false
+    },
+    "src/steel_design/sections/geometry.py": {
+      "sha256": "17bf78d86203bdbccdbf3f71cd17c554d434d09694d7de6431c4347a378a25d4",
+      "historical": false
+    },
+    "src/steel_design/sections/identity.py": {
+      "sha256": "7973fb48f29bae3f3a2309bce80b89e389120978b52c08ae97a28047257a577c",
+      "historical": false
+    },
+    "src/steel_design/sections/loader.py": {
+      "sha256": "577c2dddb1854b949f9cf7fa917fe3aba09f70785cd5ed94e8e770f59ab2681f",
+      "historical": false
+    },
+    "src/steel_design/sections/models.py": {
+      "sha256": "7dc54fac04b3b57f5a0b53ae54de41a8dc74f8b931c0a64beac8442c70114d4d",
+      "historical": false
+    },
+    "src/steel_design/sections/repository.py": {
+      "sha256": "ba008d2075c8e8ced370c3f09a06ff869bdc6adf4012795ce97e3be5231107c7",
+      "historical": false
+    },
+    "tests/test_chapter_e_rules.py": {
+      "sha256": "24ad4e8ee2fb386819898119b0d7335491c1adb403a963dd2a0019924a2d827b",
+      "historical": false
+    },
+    "tests/test_chapter_f_rules.py": {
+      "sha256": "f614e17c8bab284ae9eca30990a093559094b3c74351b918594cf0c057a0d463",
+      "historical": false
+    },
+    "tests/test_chapter_g_rules.py": {
+      "sha256": "99f019a0cd3db199cfd8459592d019af8a2060b933741da1f1fc3a5686a30692",
+      "historical": false
+    },
+    "tests/test_chapter_h_rules.py": {
+      "sha256": "622bb4be3cce25fd479e2b3a1a0f40dcdada918a590fffc04db09452ed133900",
+      "historical": false
+    },
+    "tests/test_chapter_i_rules.py": {
+      "sha256": "04837dec46cb4ebd9cc0c69ec700943d2a6213a1fc14d9279256c302cf15dbce",
+      "historical": false
+    },
+    "tests/test_custom_solid_sections.py": {
+      "sha256": "879ef00aafb7279f739875aa62338a367329303b1bcae0582504fc762e989fea",
+      "historical": false
+    },
+    "tests/test_engine_cli_integration.py": {
+      "sha256": "45714fc1c4a5e60a088941162efd50b8f4f22a1f66c5ba2f1eb93c6edbf5b1ef",
+      "historical": false
+    },
+    "tests/test_examples_smoke.py": {
+      "sha256": "8d362b03fac4948156ef7b137bf398c1a7b97e1b94510ec74f3d550c39dadcf2",
+      "historical": false
+    },
+    "tests/test_hfs000_characterization.py": {
+      "sha256": "8948d2682984bbe754e404a0359f287f53cb4edecee54a79e90b3f989bea4372",
+      "historical": false
+    },
+    "tests/test_hfs010_coverage.py": {
+      "sha256": "a4ab1c868df326b6e4aa24b990b9551491fb648b3b384d86083093957d0efb73",
+      "historical": false
+    },
+    "tests/test_hfs011_input_contracts.py": {
+      "sha256": "82ea6cbcd0a1b7da605e2c1061dfbd12f59348de09de1cbaf5ba3231e68e74a9",
+      "historical": false
+    },
+    "tests/test_hfs012_flexure_selection.py": {
+      "sha256": "a19b469aaf8ff54bd525f90057d8b6a74f9d3a250ed88494867d7c7dc5e804c2",
+      "historical": false
+    },
+    "tests/test_hfs013_design_method.py": {
+      "sha256": "b8f4826b3dc3b179f9111405730ada6b6944c348bcdcd00a7102e5995df5a8db",
+      "historical": false
+    },
+    "tests/test_hfs013_directional_h3.py": {
+      "sha256": "8dc43f6e984bd8cc9242dd01be5a24da6fa36e6932a95e3bd8a61746f7a87e7c",
+      "historical": false
+    },
+    "tests/test_hfs014_summary_bundle.py": {
+      "sha256": "59ff096999f04902314e59f96bdffa8b2797cc5b996222946091ec03c9a68861",
+      "historical": false
+    },
+    "tests/test_hfs015_precision_advice.py": {
+      "sha256": "b104ccdcf72a476dcb45da7aebe1254241cd2aedaa57577a3c6775ee58ec3b7a",
+      "historical": false
+    },
+    "tests/test_hfs016_catalog_integrity.py": {
+      "sha256": "363a1fb84f4088dcdcb1d969d34e59be7dfbe086f39b187e5f586c69a43d2ced",
+      "historical": false
+    },
+    "tests/test_hfs017_design_method.py": {
+      "sha256": "7280426455687e287bc944f5df613929409af91429af7da5afd15487307fbc18",
+      "historical": false
+    },
+    "tests/test_hfs020_comparison.py": {
+      "sha256": "115d8255bdd37fdb53654d8d67a0198532360570805a9e2ebe0d26f6d73e908a",
+      "historical": false
+    },
+    "tests/test_hfs021_execution.py": {
+      "sha256": "672b59a62b8f48494bd8c1099a10bea7b6584dab55c376383cb1f94b3b6cf1ed",
+      "historical": false
+    },
+    "tests/test_hfs021a_public_api.py": {
+      "sha256": "bfdef9a7fe383b5bcd8f45660c5220967f98132cee24ea6ebb9d8959e6b05a56",
+      "historical": false
+    },
+    "tests/test_hfs021a_svg_comparison.py": {
+      "sha256": "447e9ad6de2f982f43fa5a968f2e5feebc0a8d41cd3b155682ae848bca8bbf49",
+      "historical": false
+    },
+    "tests/test_loader_catalog.py": {
+      "sha256": "b93a6416c37088dcb331d9e6adc3ef80f78a30ef3704815ad85d6486a34afc24",
+      "historical": false
+    },
+    "tests/test_normative_d2_e3_f2.py": {
+      "sha256": "ee18779af1213381e2920b2d49c59922e819fcabbf94e1d1b12f30cecdd8f748",
+      "historical": false
+    },
+    "tests/test_profile_router.py": {
+      "sha256": "2b7a714dd401b5736a22953e0e72868149ee54c98e2e6cd4e471a2093891d0e0",
+      "historical": false
+    }
+  }
+}
