@@ -1,5 +1,24 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## Aplicación HFS-021: ejecución, geometría y presentación
+
+| Concepto / duplicación | Fuente canónica actual | Consumidores / decisión / verificación |
+|---|---|---|
+| DRY-05, geometría maciza duplicada en engine/run | `sections.geometry.build_custom_section` | Motor y fachadas históricas. Expresiones/ejes/unidades idénticos; oráculos independientes de círculo/rectángulo. El CLI normal consume la Section validada, sin otra construcción |
+| Preparación individual y bundle, F-16 | `execution.merge_case_payload`, `extract_output_options`, `iter_executions`, `execute_payload` | CLI y llamador Python sin I/O. Modelos compartidos y errores previos; sin lógica de resistencia ni segunda validación ingenieril |
+| Pipeline y contexto | `SteelDesignEngine.run_with_context`, con `run` compatible | Una ejecución devuelve caso/Section/EngineResult. `CaseExecution` transporta contexto; evita cache y geometrías distintas en reporte |
+| DRY-14, agregación de lote | `results_model.aggregate_case_statuses` | `execution_status` consume estados del motor. No redefine precedencias ni admite lista vacía; cobertura sigue siendo responsabilidad del motor |
+| DRY-13, resúmenes/memoria/exportación | `reporting` | Funciones de datos y exportadores separados. CLI delega; helpers antiguos se reexportan. Ningún recálculo de capacidades/DCR/estados; no se implementa traza HFS-024 |
+| Captura/regresión instalada | `scripts.verify_hfs020` y `hfs020_comparison` | Se añade HFS-021 como suite separada al verificador existente. `compare_hfs021` añade identidad AST/fuentes y SVG, sin duplicar comparador JSON ni procedencia de entradas |
+
+Se eliminan copias semánticas, no se unifican por coincidencia superficial
+formulaciones HSS/E/F/I. No se crean interfaces abstractas, servicios web,
+frameworks o clases de delegación. Los oráculos independientes permanecen
+separados intencionalmente. F-15/F-16 se presentan para revisión, sin cerrar
+riesgos normativos por una extracción arquitectónica.
+[Contrato](../contracts/hfs021-execution.md), [mapa previo](../audit/hfs021/preparation.md)
+y [pruebas/evidencia](../audit/hfs021/report.md).
+
 ## Actualización HFS-020: distribución y verificación instalada
 
 - `pyproject.toml` posee identidad/versión, requisitos directos de runtime/dev,

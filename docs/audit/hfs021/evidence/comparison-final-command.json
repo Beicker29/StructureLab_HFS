@@ -1,0 +1,15 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+    "-X",
+    "utf8",
+    "scripts/compare_hfs021.py",
+    ".venv/21before",
+    ".venv/21after",
+    ".venv/21-comparison.json"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": "HFS-021: exact results, extracted expressions, protected sources and diagrams verified\n",
+  "stderr": ""
+}

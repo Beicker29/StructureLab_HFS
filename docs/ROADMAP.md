@@ -1,5 +1,18 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**Entrega HFS-021 (2026-10-28), base main `f3a5198`:** ejecución compartida
+en memoria, presentación/exportación separada y geometría maciza canónica.
+F-15/F-16 con cierre funcional acotado para revisión; ecuaciones, guardas,
+catálogo, cobertura y contratos JSON preservados. [Informe](audit/hfs021/report.md)
+y [contrato Python](contracts/hfs021-execution.md). Sin rama/PR/commit/push.
+No se inicia HFS-022, HFS-024, HFS-039 ni web.
+
+**Cierre posterior HFS-020:** aprobado por el usuario; workflow
+[40673575334](https://github.com/Beicker29/StructureLab_HFS/actions/runs/40673575334),
+commit `f3a5198`, Windows y Ubuntu SUCCESS, verificados en GitHub y registrados
+en [preparación HFS-021](audit/hfs021/preparation.md). No certificación AISC.
+Las notas anteriores de ejecución fallida/pendiente se conservan como historia.
+
 **Corrección HFS-020 (2026-10-28), base main `70adc5e`:** el primer run real
 40617061992 terminó Windows SUCCESS/Ubuntu FAILURE por comparar hashes CRLF/LF.
 Corrección local con procedencia verificable y comparación JSON exacta: 1711
@@ -190,8 +203,8 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-015 | 1 | Separar cálculo bruto/visualización, casos límite `DCR ≈ 1` y recomendaciones D1/E2 | 010 | Implementada para revisión: constructor único sin redondeo, trazas originales, no finitos diagnosticados, recomendaciones D1/E2 y migración HFS-014. Diez suites; [informe](audit/hfs015/report.md). |
 | HFS-016 | 1 | Mitigación acotada F-13: identidad ambigua/duplicados de catálogo | 000,001 | Antes de G1, impedir selección silenciosa de geometrías distintas bajo una identidad. Decidir rechazo o identificación explícita con compatibilidad y pruebas de orden/carga; preservar filas/procedencia, no renombrar por suposición ni migrar catálogo completo. Implementación entregada para revisión: [contrato](contracts/hfs016-catalog.md) e [informe](audit/hfs016/report.md). Alcance integral sigue HFS-040; no autoriza avance de fase. |
 | HFS-017 | 1, implementada para revisión | Blindaje LRFD/ASD antes de HFS-020 | 011,013,014,015 | Guardas canónicas en motor/router/reglas/evaluadores; F/I ASD bloqueados, conversores sin fallback desconocido, factores por disposición, F-43 preservado. Once suites sin regresiones; [evidencia](audit/hfs017/report.md). No habilita nuevos dominios ASD. |
-| HFS-020 | 2, implementación para revisión | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Namespace preservado, wheel/sdist e instalaciones externas verificadas; once suites históricas más comparación HFS-020. Primer run Windows SUCCESS/Ubuntu FAILURE por hash CRLF/LF; corrección local sin diferencias estructurales. [Evidencia](audit/hfs020/report.md). Pendiente publicación por el usuario y nuevo run remoto con ambos jobs SUCCESS. |
-| HFS-021 | 2 | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Web y CLI futuros utilizan la misma ejecución; no hay lógica duplicada. |
+| HFS-020 | 2, aprobada por el usuario | Empaquetado Python (`pyproject.toml`), CI, Ruff, pytest | 010-017 | Cierre posterior: workflow 40673575334, commit f3a5198, Windows y Ubuntu SUCCESS. Namespace, wheel/sdist, suites y comparación exacta preservados. [Evidencia histórica](audit/hfs020/report.md), [confirmación posterior](audit/hfs021/preparation.md). No certificación normativa. |
+| HFS-021 | 2, implementada para revisión | Extraer servicios puros del CLI y centralizar geometría custom | 020 | Ejecución individual/lotes invocable sin I/O, contexto con Section única, reporting separado y fachadas compatibles. Regresión instalada y propiedades geométricas independientes. [Informe](audit/hfs021/report.md). No habilita nuevos dominios ni contratos HFS-022. |
 | HFS-022 | 2 | Contratos versionados de entrada, plan normativo, checks y resultado | 021 | JSON round-trip, migración explícita y esquemas generados reproducibles. |
 | HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |
 | HFS-024 | 2 | Trazas de cálculo canónicas y memorias sin inferencia por nombre de cláusula | 022,023 | Variables, unidades, expresiones, fuente y rama normativa recuperables en CLI/JSON/web. |

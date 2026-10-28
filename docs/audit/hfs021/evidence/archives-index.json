@@ -1,0 +1,19 @@
+{
+  "before": {
+    "file": "before.zip",
+    "members": 60,
+    "sha256": "8778d5396aafa7cc467439aed9f51a862dd3fbec4fb2e5d6fe488c2c03145ccf",
+    "original_manifest_verified": true
+  },
+  "after": {
+    "file": "after.zip",
+    "members": 62,
+    "sha256": "62634b0a8f9f76613fa9caa5809fd39f6a2c1a8c9855b6e232e94237aaf4777b",
+    "original_manifest_verified": true
+  },
+  "diagrams": {
+    "file": "diagrams.zip",
+    "members": 12,
+    "sha256": "b815a18905d310fd061f313aec38bdd82df101059b33d75d13b65e092c280f46"
+  }
+}

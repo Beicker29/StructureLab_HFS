@@ -1,0 +1,12 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+  "root": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "external_work": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-666ja8j7",
+  "platform": "win32",
+  "overrides": {
+    "PYTHONNOUSERSITE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONUTF8": "1"
+  }
+}

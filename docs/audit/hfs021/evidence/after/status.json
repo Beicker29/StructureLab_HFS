@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "status",
+    "--short"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": " M scripts/verify_hfs020.py\n M src/steel_design/engine.py\n M src/steel_design/run.py\n?? docs/audit/hfs021/\n?? src/steel_design/execution.py\n?? src/steel_design/reporting.py\n?? src/steel_design/sections/geometry.py\n?? tests/test_hfs021_execution.py\n",
+  "stderr": ""
+}

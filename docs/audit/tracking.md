@@ -49,8 +49,8 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-12 | P1 | Selección ID observada; significado físico pendiente | HFS-033/040 | D/t contrastado con fuente y geometría real |
 | F-13 | **P0** | Sobrescritura corregida en HFS-016, concluida en su alcance y fusionada en main | HFS-016 entregada; calidad integral HFS-040 | get rechaza identidades repetidas con todos los candidatos/procedencia; no se decide qué geometría es correcta. [Evidencia](hfs016/report.md) |
 | F-14 | P1 | Fallback de escala observado; impacto por fuente pendiente | HFS-040 | Unidades de importación inequívocas y pruebas dimensionales |
-| F-15 | P1 | Geometría custom duplicada | HFS-021; DRY-05 | Un constructor consumido por cálculo y reporte, equivalencia probada |
-| F-16 | P1 | CLI con responsabilidades mezcladas | HFS-021/024 | Ejecución/reportes separados con propósito, sin otro motor |
+| F-15 | P1 | HFS-021: cierre funcional para revisión; constructor único `sections.geometry`, Section validada compartida con presentación | HFS-021; DRY-05 | [Oráculos geométricos, regresión exacta y fachadas](hfs021/report.md); sin aproximaciones HSS ni nuevas geometrías |
+| F-16 | P1 | HFS-021: cierre arquitectónico acotado para revisión; ejecución en memoria y reporting separados del transporte CLI | HFS-021; trazas futuras HFS-024 | [Mapa de consumidores y compatibilidad](hfs021/preparation.md); un solo motor, mismas suites/resultados. No acredita contrato canónico de trazas futuro |
 | F-17 | P1 | Reglas compuestas concentran cálculo numérico y reporte | HFS-035/036; extracción posterior justificada | Separación por dominio probado, no por longitud del archivo |
 | F-18 | P1 | Parámetros fijos observados; suficiencia numérica pendiente | HFS-036 | Convergencia/equilibrio y tolerancias documentados |
 | F-19 | P1 | UN F4 PDF124 describe alternativa conservadora F5; fidelidad de código y dominio siguen pendientes | HFS-032 | Fuente, dominio y conservadurismo contrastados, traza de alternativa explícita |

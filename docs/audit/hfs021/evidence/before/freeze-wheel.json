@@ -1,0 +1,13 @@
+{
+  "command": [
+    "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-666ja8j7\\wheel\\Scripts\\python.exe",
+    "-m",
+    "pip",
+    "freeze",
+    "--all"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-666ja8j7\\empty",
+  "returncode": 0,
+  "stdout": "annotated-types==0.8.0\net_xmlfile==2.0.0\nopenpyxl==3.1.5\npip==25.0.1\npydantic==2.14.1\npydantic_core==2.50.1\nstructurelab-hfs @ file:///D:/Users/byomayusa/Documents/GitHub/StructureLab_HFS/.venv/21before/dist/structurelab_hfs-0.1.0-py3-none-any.whl#sha256=da665401413ccb5064054280c694880c1e8f77934b6c8f830de85dd6bc52d468\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\n",
+  "stderr": ""
+}

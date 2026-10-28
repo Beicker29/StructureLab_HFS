@@ -1,6 +1,5 @@
-import math
-
-from .models import CustomSectionType, SteelCase
+from .sections.geometry import build_custom_section as _build_custom_section
+from .models import SteelCase
 from .results_model import EngineResult
 from .sections.models import Section
 from .sections.repository import SectionRepository
@@ -12,60 +11,6 @@ from .domain.coverage_evidence import record_evaluation, record_selection_errors
 from .domain.errors import IncompleteSectionDataError
 
 
-def _build_custom_section(case: SteelCase) -> Section:
-    custom = case.custom_section
-    if custom is None:
-        raise ValidationError("custom_section is required to build a custom section.")
-
-    if custom.type == CustomSectionType.SOLID_CIRCULAR:
-        diameter = custom.diameter or 0.0
-        area = math.pi * (diameter**2) / 4.0
-        inertia = math.pi * (diameter**4) / 64.0
-        radius_of_gyration = diameter / 4.0
-        elastic_modulus = math.pi * (diameter**3) / 32.0
-        plastic_modulus = (diameter**3) / 6.0
-        return Section(
-            name=case.section_name,
-            type=custom.type.value,
-            A=area,
-            OD=diameter,
-            Ix=inertia,
-            Iy=inertia,
-            Sx=elastic_modulus,
-            Sy=elastic_modulus,
-            Zx=plastic_modulus,
-            Zy=plastic_modulus,
-            rx=radius_of_gyration,
-            ry=radius_of_gyration,
-        )
-
-    height = custom.H or 0.0
-    width = custom.B or 0.0
-    area = width * height
-    inertia_x = width * (height**3) / 12.0
-    inertia_y = height * (width**3) / 12.0
-    radius_of_gyration_x = math.sqrt(inertia_x / area) if area > 0.0 else 0.0
-    radius_of_gyration_y = math.sqrt(inertia_y / area) if area > 0.0 else 0.0
-    section_modulus_x = width * (height**2) / 6.0
-    section_modulus_y = height * (width**2) / 6.0
-    plastic_modulus_x = width * (height**2) / 4.0
-    plastic_modulus_y = height * (width**2) / 4.0
-    return Section(
-        name=case.section_name,
-        type=custom.type.value,
-        A=area,
-        h=height,
-        b=width,
-        Ix=inertia_x,
-        Iy=inertia_y,
-        Sx=section_modulus_x,
-        Sy=section_modulus_y,
-        Zx=plastic_modulus_x,
-        Zy=plastic_modulus_y,
-        rx=radius_of_gyration_x,
-        ry=radius_of_gyration_y,
-    )
-
 
 class SteelDesignEngine:
     def __init__(self, repository: SectionRepository):
@@ -73,6 +18,10 @@ class SteelDesignEngine:
         self.router = ProfileRouter()
 
     def run(self, case: SteelCase) -> EngineResult:
+        """Compatibility entry point; the context pipeline owns all validation."""
+        return self.run_with_context(case)[2]
+
+    def run_with_context(self, case: SteelCase) -> tuple[SteelCase, Section, EngineResult]:
         """
         Executes the main pipeline:
         1. Validate
@@ -155,4 +104,4 @@ class SteelDesignEngine:
             checks.append(result)
             record_evaluation(coverage, rule, result, len(checks) - 1, case, section)
 
-        return EngineResult(checks=checks, coverage=coverage)
+        return case, section, EngineResult(checks=checks, coverage=coverage)

@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS",
+  "returncode": 0,
+  "stdout": "f3a5198309d24f772f6cac69ccc483846b81d21a\n",
+  "stderr": ""
+}
