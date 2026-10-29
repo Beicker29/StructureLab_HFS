@@ -1,0 +1,4134 @@
+{
+  "python": "3.12.10",
+  "source": "RULE_DEFINITIONS; read-only snapshot, not executable applicability",
+  "trace_archive": "docs/audit/hfs024/evidence/after.zip",
+  "trace_archive_sha256": "2f154ac8b2178a51dec3f48bed1eb1323feedf258b3c7edb3e5908a5d77e3e7b",
+  "trace_member": "traces-wheel.json",
+  "trace_member_sha256": "3e9f738e563f149cb77487befd014481288ba764466edd829797a7b7c4cb0f94",
+  "entries": 93,
+  "rules": {
+    "D2-1": {
+      "implementation": "steel_design.domain.rules.tension_rule:TensionRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "D",
+          "provision": "D2; D3",
+          "equations": [
+            "D2-1"
+          ],
+          "pdf_pages": "100-103"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.tension_calc",
+        "steel_design.domain.evaluators.tension_evaluator:TensionEvaluator.evaluate"
+      ],
+      "software_tests": [
+        "tests/test_normative_d2_e3_f2.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs010_coverage.py::test_d2_independent_capacities_and_global_pass_fail"
+      ],
+      "independent_scope": "Manual D2 arithmetic LRFD/ASD for stipulated ordinary solid ties; not all connection geometries.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-23",
+        "F-30"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "D2-2": {
+      "implementation": "steel_design.domain.rules.tension_rule:TensionRuptureRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "D",
+          "provision": "D2; D3",
+          "equations": [
+            "D2-2",
+            "D3-1"
+          ],
+          "pdf_pages": "100-103"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.tension_calc",
+        "steel_design.domain.evaluators.tension_evaluator:TensionEvaluator.evaluate"
+      ],
+      "software_tests": [
+        "tests/test_normative_d2_e3_f2.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs010_coverage.py::test_d2_independent_capacities_and_global_pass_fail"
+      ],
+      "independent_scope": "Manual D2 arithmetic LRFD/ASD for stipulated ordinary solid ties; not all connection geometries.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-23",
+        "F-30"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "E3": {
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE3Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E1; E3",
+          "equations": [
+            "E3-1",
+            "E3-2",
+            "E3-3",
+            "E3-4"
+          ],
+          "pdf_pages": "106-117"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.axial_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_e_rules.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs017_design_method.py::test_d2_e3_independent_rule_capacities_and_trace"
+      ],
+      "independent_scope": "E3 stipulated flexural-buckling arithmetic, both methods; not all modes/families.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-23",
+        "F-30"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "channel_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        },
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        },
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        },
+        {
+          "example": "single_angle_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        },
+        {
+          "example": "solid_circular_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        },
+        {
+          "example": "solid_rectangular_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        },
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.axial_rules:AxialE3Rule.check"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "E4": {
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE4Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E4",
+          "equations": [
+            "E4-1 to E4-12"
+          ],
+          "pdf_pages": "106-117"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.axial_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_e_rules.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No complete independent oracle for this domain; method tests are not nominal-strength validation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-23",
+        "F-36"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "channel_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "E5": {
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE5Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E5(a)/(b)",
+          "equations": [
+            "E5-1 to E5-4"
+          ],
+          "pdf_pages": "106-117"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.axial_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_e_rules.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No complete independent oracle for this domain; method tests are not nominal-strength validation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-07",
+        "F-36"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "single_angle_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "E7": {
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE7Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E7; Table E7.1",
+          "equations": [
+            "E7-1 to E7-7"
+          ],
+          "pdf_pages": "106-117"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.axial_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_e_rules.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No complete independent oracle for this domain; method tests are not nominal-strength validation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-35"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F2-1": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F2.1/2",
+          "equations": [
+            "F2-1 to F2-8"
+          ],
+          "pdf_pages": "118-121"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f2",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs012_flexure_selection.py::test_selected_f2_yielding_preserves_independent_lrfd_reference"
+      ],
+      "independent_scope": "F2 yielding LRFD arithmetic only, not LTB.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-03",
+        "F-22",
+        "F-31"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F2-2": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF2LtbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F2.1/2",
+          "equations": [
+            "F2-1 to F2-8"
+          ],
+          "pdf_pages": "118-121"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f2",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs012_flexure_selection.py::test_selected_f2_yielding_preserves_independent_lrfd_reference"
+      ],
+      "independent_scope": "F2 yielding LRFD arithmetic only, not LTB.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-03",
+        "F-22",
+        "F-31"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F3-1": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF3YieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F3.1/2; F2.2",
+          "equations": [
+            "F3-1",
+            "F3-2"
+          ],
+          "pdf_pages": "121-122"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f3",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F3-2": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF3LtbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F3.1/2; F2.2",
+          "equations": [
+            "F3-1",
+            "F3-2"
+          ],
+          "pdf_pages": "121-122"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f3",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F3-3": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F3.1/2; F2.2",
+          "equations": [
+            "F3-1",
+            "F3-2"
+          ],
+          "pdf_pages": "121-122"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f3",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F4-1": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4CompressionYieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F4; F5 alternative",
+          "equations": [],
+          "pdf_pages": "122-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "UN22",
+          "chapter": "F",
+          "provision": "F4 User Note",
+          "equations": [],
+          "pdf_pages": "124"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f4_conservative",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-19",
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F4-2": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4LtbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F4; F5 alternative",
+          "equations": [],
+          "pdf_pages": "122-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "UN22",
+          "chapter": "F",
+          "provision": "F4 User Note",
+          "equations": [],
+          "pdf_pages": "124"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f4_conservative",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-19",
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F4-3": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F4; F5 alternative",
+          "equations": [],
+          "pdf_pages": "122-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "UN22",
+          "chapter": "F",
+          "provision": "F4 User Note",
+          "equations": [],
+          "pdf_pages": "124"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f4_conservative",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-19",
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F4-4": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4TensionYieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F4; F5 alternative",
+          "equations": [],
+          "pdf_pages": "122-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "UN22",
+          "chapter": "F",
+          "provision": "F4 User Note",
+          "equations": [],
+          "pdf_pages": "124"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f4_conservative",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-19",
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F5-1": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5CompressionYieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F5.1-4",
+          "equations": [
+            "F5-1 to F5-10"
+          ],
+          "pdf_pages": "127-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f5",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F5-2": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5LtbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F5.1-4",
+          "equations": [
+            "F5-1 to F5-10"
+          ],
+          "pdf_pages": "127-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f5",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F5-3": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F5.1-4",
+          "equations": [
+            "F5-1 to F5-10"
+          ],
+          "pdf_pages": "127-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f5",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F5-4": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5TensionYieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F5.1-4",
+          "equations": [
+            "F5-1 to F5-10"
+          ],
+          "pdf_pages": "127-129"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f5",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F6-1": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF6YieldRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F6.1/2",
+          "equations": [
+            "F6-1 to F6-4"
+          ],
+          "pdf_pages": "129-130"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f6",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-03",
+        "F-31"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 5,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F6-2": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F6.1/2",
+          "equations": [
+            "F6-1 to F6-4"
+          ],
+          "pdf_pages": "129-130"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f6",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-03",
+        "F-31"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 6,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-1-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7YieldMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-1-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7YieldMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-2-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-2-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 5,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-3-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7WebMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 6,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-3-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7WebMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 7,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-4-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7LtbMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 8,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F7-4-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7LtbMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F7.1-4",
+          "equations": [
+            "F7-1 to F7-7",
+            "F7-10 to F7-13 (local S22)"
+          ],
+          "pdf_pages": "130-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f7",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-28"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 9,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F8-1-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8YieldMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F8.1/2",
+          "equations": [
+            "F8-1 to F8-4"
+          ],
+          "pdf_pages": "132-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f8",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-12",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F8-1-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8YieldMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F8.1/2",
+          "equations": [
+            "F8-1 to F8-4"
+          ],
+          "pdf_pages": "132-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f8",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-12",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F8-2-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F8.1/2",
+          "equations": [
+            "F8-1 to F8-4"
+          ],
+          "pdf_pages": "132-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f8",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-12",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F8-2-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F8.1/2",
+          "equations": [
+            "F8-1 to F8-4"
+          ],
+          "pdf_pages": "132-133"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f8",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-12",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F9": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F9.1-4",
+          "equations": [],
+          "pdf_pages": "133-136"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-23",
+        "F-30"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F10-1-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10YieldMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F10.1-3",
+          "equations": [
+            "F10-1 to F10-8"
+          ],
+          "pdf_pages": "136-139"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H2",
+          "equations": [
+            "H2-1"
+          ],
+          "pdf_pages": "152-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f10",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "single_angle_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F10-1-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10YieldMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F10.1-3",
+          "equations": [
+            "F10-1 to F10-8"
+          ],
+          "pdf_pages": "136-139"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H2",
+          "equations": [
+            "H2-1"
+          ],
+          "pdf_pages": "152-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f10",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F10-2-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LtbMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F10.1-3",
+          "equations": [
+            "F10-1 to F10-8"
+          ],
+          "pdf_pages": "136-139"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H2",
+          "equations": [
+            "H2-1"
+          ],
+          "pdf_pages": "152-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f10",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "single_angle_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F10-2-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LtbMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F10.1-3",
+          "equations": [
+            "F10-1 to F10-8"
+          ],
+          "pdf_pages": "136-139"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H2",
+          "equations": [
+            "H2-1"
+          ],
+          "pdf_pages": "152-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f10",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F10-3-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F10.1-3",
+          "equations": [
+            "F10-1 to F10-8"
+          ],
+          "pdf_pages": "136-139"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H2",
+          "equations": [
+            "H2-1"
+          ],
+          "pdf_pages": "152-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f10",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "single_angle_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F10-3-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F10.1-3",
+          "equations": [
+            "F10-1 to F10-8"
+          ],
+          "pdf_pages": "136-139"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H2",
+          "equations": [
+            "H2-1"
+          ],
+          "pdf_pages": "152-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f10",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F11-1-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11YieldMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F11",
+          "equations": [
+            "F11-1 to F11-5"
+          ],
+          "pdf_pages": "139-140"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f11",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "solid_circular_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        },
+        {
+          "example": "solid_rectangular_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F11-1-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11YieldMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F11",
+          "equations": [
+            "F11-1 to F11-5"
+          ],
+          "pdf_pages": "139-140"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f11",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F11-2-Mx": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11LtbMxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F11",
+          "equations": [
+            "F11-1 to F11-5"
+          ],
+          "pdf_pages": "139-140"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f11",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "solid_circular_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        },
+        {
+          "example": "solid_rectangular_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.flexure_rule:_build_flexure_result_from_mn"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F11-2-My": {
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11LtbMyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F11",
+          "equations": [
+            "F11-1 to F11-5"
+          ],
+          "pdf_pages": "139-140"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.flexure_calc:evaluate_f11",
+        "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength"
+      ],
+      "software_tests": [
+        "tests/test_chapter_f_rules.py",
+        "tests/test_hfs012_flexure_selection.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent nominal-strength oracle credited to this whole provision; F1 conversion evidence is separately linked in H1/H3 tests.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-33"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G2-Vx": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG2VxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G2.1-4",
+          "equations": [
+            "G2-1 to G2-19"
+          ],
+          "pdf_pages": "143-147"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs017_design_method.py::test_g2_independent_exception_not_shared_with_other_chapters"
+      ],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 7,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G3-Vx": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG3VxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G3",
+          "equations": [
+            "G3-1"
+          ],
+          "pdf_pages": "147"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "BLOCKED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-11",
+        "F-42"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G3-Vy": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG3VyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G3",
+          "equations": [
+            "G3-1"
+          ],
+          "pdf_pages": "147"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "BLOCKED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-11",
+        "F-42"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G4-Vx": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG4VxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G4",
+          "equations": [
+            "G4-1"
+          ],
+          "pdf_pages": "148"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs013_directional_h3.py::test_g4_independent_capacity_and_method"
+      ],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-06",
+        "F-08",
+        "F-11"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 10,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.evaluators.hss_shear:evaluate_hss_shear"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G4-Vy": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG4VyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G4",
+          "equations": [
+            "G4-1"
+          ],
+          "pdf_pages": "148"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs013_directional_h3.py::test_g4_independent_capacity_and_method"
+      ],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-06",
+        "F-08",
+        "F-11"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 11,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.evaluators.hss_shear:evaluate_hss_shear"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G5-Vx": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG5VxRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G5",
+          "equations": [
+            "G5-1",
+            "G5-2a",
+            "G5-2b"
+          ],
+          "pdf_pages": "148-149"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs013_directional_h3.py::test_round_numeric_functions_with_independently_given_lengths"
+      ],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-12",
+        "F-41"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G5-Vy": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG5VyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G5",
+          "equations": [
+            "G5-1",
+            "G5-2a",
+            "G5-2b"
+          ],
+          "pdf_pages": "148-149"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs013_directional_h3.py::test_round_numeric_functions_with_independently_given_lengths"
+      ],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-12",
+        "F-41"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "G6-Vy": {
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG6VyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G6",
+          "equations": [
+            "G6-1"
+          ],
+          "pdf_pages": "149"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G1",
+          "equations": [],
+          "pdf_pages": "143"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.shear_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_g_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "Stipulated G2 factor exception / G4 capacities / G5 lengths only where explicitly referenced; no family-wide accreditation.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-11",
+        "F-42"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "w_shape_case.json",
+          "evaluation_index": 8,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "H1": {
+      "implementation": "steel_design.domain.rules.combined_hss_rules:CombinedH1HssRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H1.1/2; H2",
+          "equations": [
+            "H1-1a",
+            "H1-1b",
+            "H2-1"
+          ],
+          "pdf_pages": "150-153"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.combined_hss_calc"
+      ],
+      "software_tests": [
+        "tests/test_chapter_h_rules.py",
+        "tests/test_hfs013_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-20",
+        "F-33",
+        "F-37",
+        "F-43"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.combined_hss_rules:_available_flexural_strength",
+            "steel_design.domain.rules.combined_hss_rules:_compute_h1_interaction"
+          ]
+        },
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 12,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.combined_hss_rules:_available_flexural_strength",
+            "steel_design.domain.rules.combined_hss_rules:_compute_h1_interaction"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "H3-1": {
+      "implementation": "steel_design.domain.rules.combined_hss_rules:HssTorsionH3_1Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H3.1",
+          "equations": [
+            "H3-1 to H3-5"
+          ],
+          "pdf_pages": "153-154"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.combined_hss_calc",
+        "steel_design.domain.evaluators.hss_shear:evaluate_hss_shear"
+      ],
+      "software_tests": [
+        "tests/test_chapter_h_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs013_directional_h3.py::test_rectangular_torsion_regions_independent"
+      ],
+      "independent_scope": "Stipulated torsional stress branches / H3-6 algebra only; axial and flexural capacity validation remains separate.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-06",
+        "F-39",
+        "F-40",
+        "F-41",
+        "F-42",
+        "F-43"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 5,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.combined_hss_calc:calculate_available_torsional_strength",
+            "steel_design.codes.aisc_360_22.combined_hss_calc:calculate_nominal_torsional_strength"
+          ]
+        },
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 13,
+          "outcome": "BLOCKED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "H3-2": {
+      "implementation": "steel_design.domain.rules.combined_hss_rules:HssCombinedH3_2Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H3.2",
+          "equations": [
+            "H3-6"
+          ],
+          "pdf_pages": "153-154"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.combined_hss_calc",
+        "steel_design.domain.evaluators.hss_shear:evaluate_hss_shear"
+      ],
+      "software_tests": [
+        "tests/test_chapter_h_rules.py",
+        "tests/test_hfs013_directional_h3.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [
+        "tests/test_hfs013_directional_h3.py::test_h3_6_normal_term_is_linear"
+      ],
+      "independent_scope": "Stipulated torsional stress branches / H3-6 algebra only; axial and flexural capacity validation remains separate.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-06",
+        "F-39",
+        "F-40",
+        "F-41",
+        "F-42",
+        "F-43"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "circular_hss_case.json",
+          "evaluation_index": 6,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.codes.aisc_360_22.combined_hss_calc:calculate_available_torsional_strength",
+            "steel_design.codes.aisc_360_22.combined_hss_calc:calculate_h3_6_interaction",
+            "steel_design.codes.aisc_360_22.combined_hss_calc:calculate_nominal_torsional_strength",
+            "steel_design.codes.aisc_360_22.flexure_calc:available_flexural_strength",
+            "steel_design.domain.rules.combined_hss_rules:HssCombinedH3_2Rule.check",
+            "steel_design.domain.rules.combined_hss_rules:_available_flexural_strength"
+          ]
+        },
+        {
+          "example": "rectangular_hss_case.json",
+          "evaluation_index": 14,
+          "outcome": "BLOCKED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I2": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I2",
+          "equations": [],
+          "pdf_pages": "163-168"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-26"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I1": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI1Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I1.1-5; Tables I1.1a/b",
+          "equations": [],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_beam_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_circular_hss_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_rectangular_hss_case.json",
+          "evaluation_index": 0,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I2.ENCASED.COMPRESSION": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI2EncasedCompressionRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I2.1b",
+          "equations": [
+            "I2-2 to I2-7"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-18",
+        "F-20",
+        "F-30"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I2.ENCASED.TENSION": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI2EncasedTensionRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I2.1c",
+          "equations": [
+            "I2-8"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I2.FILLED.COMPRESSION": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI2FilledCompressionRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I2.2b",
+          "equations": [
+            "I2-9 to I2-13"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-35"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_filled_circular_hss_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_circular_hss_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_rectangular_hss_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_rectangular_hss_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I2.FILLED.TENSION": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI2FilledTensionRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I2.2c",
+          "equations": [
+            "I2-14"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.TRANSFER.CONCRETE": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI3_1aRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.2d",
+          "equations": [
+            "I3-1a",
+            "I3-1b",
+            "I3-1c"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_beam_case.json",
+          "evaluation_index": 1,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.TRANSFER.STEEL": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI3_1bRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.2d",
+          "equations": [
+            "I3-1a",
+            "I3-1b",
+            "I3-1c"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_beam_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.TRANSFER.ANCHORS": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI3_1cRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.2d",
+          "equations": [
+            "I3-1a",
+            "I3-1b",
+            "I3-1c"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_beam_case.json",
+          "evaluation_index": 3,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.ENCASED.REINFORCEMENT": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI3_3Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.3a",
+          "equations": [
+            "I3-3"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.FILLED.REINFORCEMENT": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI3_4Rule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.4a",
+          "equations": [
+            "I3-4"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_filled_circular_hss_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_rectangular_hss_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I4.ENCASED.STEEL": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI4_1aEncasedRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I4.1(a/b/c)",
+          "equations": [],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 5,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 9,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I4.ENCASED.RC": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI4_1bEncasedRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I4.1(a/b/c)",
+          "equations": [],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 6,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 10,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I4.ENCASED.COMBINED": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI4_1cEncasedRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I4.1(a/b/c)",
+          "equations": [],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 7,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 11,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I4.ENCASED.GOVERNING": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI4_1EncasedGoverningRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I4.1(a/b/c)",
+          "equations": [],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 8,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I4.FILLED": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI4_1FilledRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I4.2",
+          "equations": [
+            "I4-1"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_filled_circular_hss_case.json",
+          "evaluation_index": 5,
+          "outcome": "RETURNED",
+          "step_producers": []
+        },
+        {
+          "example": "composite_filled_rectangular_hss_case.json",
+          "evaluation_index": 5,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I4.BEAM.STEEL": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI4_3BeamDeckSteelOnlyRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I4.3",
+          "equations": [],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-20",
+        "F-38"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_beam_case.json",
+          "evaluation_index": 4,
+          "outcome": "RETURNED",
+          "step_producers": []
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I5": {
+      "implementation": "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule",
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I5(a/b); I1.2; Table I5.1",
+          "equations": [
+            "I5-1a",
+            "I5-1b"
+          ],
+          "pdf_pages": "157-178"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.composite_calc",
+        "steel_design.domain.rules.composite_rules"
+      ],
+      "software_tests": [
+        "tests/test_chapter_i_rules.py",
+        "tests/test_hfs010_coverage.py",
+        "tests/test_hfs017_design_method.py"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "PARTIAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-18",
+        "F-20",
+        "F-33",
+        "F-37"
+      ],
+      "historical_trace_observations": [
+        {
+          "example": "composite_encased_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule.check"
+          ]
+        },
+        {
+          "example": "composite_filled_circular_hss_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule.check"
+          ]
+        },
+        {
+          "example": "composite_filled_rectangular_hss_case.json",
+          "evaluation_index": 2,
+          "outcome": "RETURNED",
+          "step_producers": [
+            "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule.check"
+          ]
+        }
+      ],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N01": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "B",
+          "provision": "B1-B3.3",
+          "equations": [],
+          "pdf_pages": "83-87"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "A",
+          "provision": "A3",
+          "equations": [],
+          "pdf_pages": "Locator pending; see HFS-002 N01"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "EXTERNAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-22"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N02": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "B",
+          "provision": "B4.1-B4.3",
+          "equations": [],
+          "pdf_pages": "87-93"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.codes.aisc_360_22.axial_calc:classify_compression_elements"
+      ],
+      "software_tests": [
+        "tests/test_hfs012_flexure_selection.py::test_unknown_ratio_never_selects_f2_and_keeps_coverage_pending"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "EXTERNAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-03",
+        "F-12",
+        "F-27"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N03": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "C",
+          "provision": "C1-C3",
+          "equations": [],
+          "pdf_pages": "94-99"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E2",
+          "equations": [],
+          "pdf_pages": "106-117"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1",
+          "equations": [],
+          "pdf_pages": "118-120"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "EXTERNAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-22"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N05": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "D",
+          "provision": "D4",
+          "equations": [],
+          "pdf_pages": "103-104"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N09": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E6.1/2",
+          "equations": [],
+          "pdf_pages": "112-114"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N11": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F1(a)-(d)",
+          "equations": [],
+          "pdf_pages": "118-119"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "EXTERNAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-22",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N22": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F13.1-4",
+          "equations": [],
+          "pdf_pages": "140-142"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N28": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "G",
+          "provision": "G7",
+          "equations": [],
+          "pdf_pages": "149"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N31": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H3.3",
+          "equations": [],
+          "pdf_pages": "154-155"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [
+        "tests/test_hfs013_directional_h3.py::test_unsupported_non_hss_torsion_does_not_erase_independent_shear"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N32": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H4",
+          "equations": [
+            "H4-1"
+          ],
+          "pdf_pages": "155-156"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "D",
+          "provision": "D2(b)",
+          "equations": [],
+          "pdf_pages": "100-101"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F13.1",
+          "equations": [],
+          "pdf_pages": "140-142"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N33": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "D",
+          "provision": "D1",
+          "equations": [],
+          "pdf_pages": "100"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "E",
+          "provision": "E2",
+          "equations": [],
+          "pdf_pages": "106-117"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "UN22",
+          "chapter": "D",
+          "provision": "D1 User Note",
+          "equations": [],
+          "pdf_pages": "100"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "UN22",
+          "chapter": "E",
+          "provision": "E2 User Note",
+          "equations": [],
+          "pdf_pages": "108"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.domain.recommendations:slenderness_recommendations"
+      ],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "ADVISORY",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-07",
+        "F-36"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N34": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "D",
+          "provision": "D5/D6",
+          "equations": [],
+          "pdf_pages": "104-105"
+        },
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F12",
+          "equations": [
+            "F12-1 to F12-4"
+          ],
+          "pdf_pages": "140"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N35": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "B",
+          "provision": "B3.4-13; B5-B8 and external referrals",
+          "equations": [],
+          "pdf_pages": "84-93"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "EXTERNAL",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N44": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I2.1d/2d; I6; I8",
+          "equations": [],
+          "pdf_pages": "163-168,177-182"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.domain.rules.composite_rules:_sum_anchor_qn"
+      ],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "scope.N45": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I1.6; I2.3; I3.5; I4.4; I5(c); I7",
+          "equations": [],
+          "pdf_pages": "157-182"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-30",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "F.CHANNEL.MAJOR.OUTSIDE_F2": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "F",
+          "provision": "F2 applicability boundary; F1",
+          "equations": [],
+          "pdf_pages": "118-121"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [
+        "tests/test_hfs012_flexure_selection.py::test_channel_outside_f2_never_uses_i_shape_alternatives"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-31"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "H.INTERACTION.REMAINDER": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "H",
+          "provision": "H1/H2",
+          "equations": [],
+          "pdf_pages": "150-153"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [
+        "tests/test_hfs010_coverage.py::test_f01_f33_interaction_required_independently_of_router"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-01",
+        "F-33",
+        "F-37"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.MOMENT.ENCASED": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.3b",
+          "equations": [],
+          "pdf_pages": "173"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.domain.rules.composite_rules:_encased_steel_only_flexural_capacity_axis"
+      ],
+      "software_tests": [
+        "tests/test_hfs010_coverage.py::test_f34_ratio_or_transfer_is_not_moment_resistance"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.MOMENT.FILLED": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.4b",
+          "equations": [],
+          "pdf_pages": "173-174"
+        }
+      ],
+      "calculation_refs": [
+        "steel_design.domain.rules.composite_rules:_filled_flexural_capacity_i3_axis"
+      ],
+      "software_tests": [
+        "tests/test_hfs010_coverage.py::test_f34_ratio_or_transfer_is_not_moment_resistance"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    },
+    "I3.MOMENT.BEAM": {
+      "implementation": null,
+      "citations": [
+        {
+          "edition": "ANSI/AISC 360-22",
+          "source": "S22",
+          "chapter": "I",
+          "provision": "I3.1/2",
+          "equations": [],
+          "pdf_pages": "168-173"
+        }
+      ],
+      "calculation_refs": [],
+      "software_tests": [
+        "tests/test_hfs010_coverage.py::test_f34_ratio_or_transfer_is_not_moment_resistance"
+      ],
+      "independent_tests": [],
+      "independent_scope": "No independent numerical reference identified for this domain.",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "normative_validation": "NOT_ACCREDITED",
+      "findings": [
+        "F-34",
+        "F-38"
+      ],
+      "historical_trace_observations": [],
+      "review_status": "Inventory link only; consult impact-matrix.md for actual local review"
+    }
+  }
+}

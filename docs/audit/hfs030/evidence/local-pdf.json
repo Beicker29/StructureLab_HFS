@@ -1,0 +1,195 @@
+{
+  "scope": "LOCAL_PDF_ONLY; no external errata comparison",
+  "python": "3.12.10",
+  "pypdf": "6.10.0",
+  "path": "a360-22w.pdf",
+  "sha256": "25c4bf59b4c6fd00589e32a6ddac92cc9fd6be30dd5da07fc7c5f7fd475b2361",
+  "bytes": 16660424,
+  "pages": 780,
+  "metadata": {
+    "/Author": "AISC",
+    "/CreationDate": "D:20230201104206-06'00'",
+    "/Creator": "Adobe InDesign 18.0 (Macintosh)",
+    "/ModDate": "D:20230215172755-06'00'",
+    "/Producer": "Adobe PDF Library 17.0",
+    "/Title": "Specification for Structural Steel Buildings"
+  },
+  "anchors_pdf_1_based": {
+    "A1": [
+      69
+    ],
+    "A3": [
+      74,
+      75,
+      76,
+      77,
+      78,
+      79
+    ],
+    "B4.1/Table B4.1b": [
+      87,
+      88,
+      90,
+      91
+    ],
+    "D2/D3": [
+      100,
+      101,
+      102,
+      103
+    ],
+    "E3/E4": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "E5": [
+      111,
+      112,
+      113
+    ],
+    "E6": [
+      113,
+      114,
+      115,
+      116
+    ],
+    "E7": [
+      116,
+      117
+    ],
+    "F1": [
+      119,
+      120
+    ],
+    "F2": [
+      121,
+      122,
+      123
+    ],
+    "F3": [
+      123,
+      124
+    ],
+    "F4/UN": [
+      124,
+      125,
+      126,
+      127
+    ],
+    "F5/F6": [
+      127,
+      128,
+      129,
+      130
+    ],
+    "F7": [
+      130,
+      131,
+      132,
+      133
+    ],
+    "G4/G5": [
+      148,
+      149
+    ],
+    "H1": [
+      150,
+      151,
+      152
+    ],
+    "H3": [
+      153,
+      154,
+      155
+    ],
+    "I3": [
+      171,
+      172,
+      173,
+      174
+    ],
+    "I5": [
+      176,
+      177,
+      178
+    ],
+    "Commentary front": [
+      355
+    ],
+    "C-I5": [
+      518,
+      519,
+      520,
+      521,
+      522
+    ]
+  },
+  "page_text_sha256_utf8": {
+    "1": "6f91472374e9d7e6f40f938271186c0c0d34310308613e7dc24254ff788192c8",
+    "3": "6f91472374e9d7e6f40f938271186c0c0d34310308613e7dc24254ff788192c8",
+    "69": "2dd6008f8747312d83c26dbf4337da67a10cf0147e2d4d5f52a7a7c988038c9e",
+    "74": "4c43dcf3bed75559ed72cf907db8f4bd01d17bb08dca55a9d774a185ba6b7c3a",
+    "75": "42fbfe966e9ecb37c1af3b2918bb33718c79ffed03416e7da4beac4c71d1d9d3",
+    "76": "38d8adddc9a2c5fe5eb9ad4912f9e3daef4907324ac2d4cd1762694c85309ebd",
+    "77": "6054d451c0ce91b283fe64f2f376717b1776c4813fb20cc22ebfd373c8050e92",
+    "78": "21fa221a4b6e7b46a0f81381968e6685ca3bea4260eb35b67ee71d0afecc2d86",
+    "79": "29ba5d09d73c930fa9982f14e49e0bc9f9197a8f524c5c56acfdcbd178276491",
+    "87": "11a1090e9c32ca9bb100a7357b264f8874b091ea06410a28b6a0e509fae11e6b",
+    "88": "61bb9ad79da875389d938d56bd7c2aaa640cb606e0e3eaa3f1de32af1db395cc",
+    "90": "3afe0f0377c2387be9dd3ef7e549c298dd23b7f6ff2f62472fddbaf62acc5dc6",
+    "91": "cdebf2b8011745c29916b3e8e17adca0b0fd2e840f28c5a28a8a9d9919b927ae",
+    "100": "ed2db2a675ccd223334e3bb5c629814e5deeb82a8e17de05959728759245347c",
+    "101": "bf58e1030dd597aa6fd33cebae0df54dd5d2b9be392dd93fcda293b2d49de454",
+    "102": "955b285874883eb090b1bf96fcbab8fb934b001992c3199c0363d7db7ad1ac44",
+    "103": "8b2e870888dddb3a539cb86d26f97297d2830fad54a67c078b7e0aca3843817a",
+    "108": "1d130d51a83b7b2bf12535dbe27462142abf30b4e1f773ef4b722eb27f003d99",
+    "109": "18dcbab61abd2ab70e5693a9f943993b1c421f27771636777a4a6da0cbdbaeca",
+    "110": "a1607fece5b2650b2c146c581490f262070fe0fffaf3545b1631fca78d2abf28",
+    "111": "b5a291d58ae19b3fdf32f583933af5effe773909122d86d17de488a6541b2e91",
+    "112": "13f193f6765467cd0d159de6a47533132c3d582d5b2f850d2f0c0c95a09092df",
+    "113": "0128afed0ed39db9976b7df7ee211f6deefdbe073ca2a7feea77df1823a6dc25",
+    "114": "6f27085ae02ed38cab6c987dcf30bed5dfab0f660950eeb01b8b594841f3d74c",
+    "115": "05741bf2920ccef99acf34c5a1f5fd179d8ec1ecfa963940d4a221fe8aa4175c",
+    "116": "ed3a8fd7b0791001838e5b545fcd61441d3e2c3868e1c0d8fbba2d8454417505",
+    "117": "04067263c798c8bf76a9a835c9a54b27706935a51a06adbf1c3b48ccb22125d7",
+    "119": "583a26c82a6c4b4edde43b2eb0a9ef05e0d1d3b3c32ecd7e7abfb9ad8986e387",
+    "120": "4c164e2953c26006a5bc318c9a64b5f1a63d66a47662770b5381d9a0a45ef93e",
+    "121": "db3ce391cf89ac6175811b476b27426f0a234d2e8a62ed5926c163ce18ff9a3c",
+    "122": "66367ee3b52f3977f81e23896a17de13820c144da2084ff3b1832c541e9366eb",
+    "123": "99a87fe689ca5da4534e6649009847e9a6fc3577453e87fb072912c04321d4ea",
+    "124": "b7d18495f17fd93b927454c2190e7447401eb93f2e6d91818df3779f22bee4ac",
+    "125": "3283b5542892dd4170074a8def3ff5a263c89eeef053ea0a32d530e173215fcc",
+    "126": "b5ccacab5ad8bb04a772b89b41d29a5f88f03d87b09c8449cd8b1971cf4dfc2d",
+    "127": "5d1cc10cf9baa300133d58e4f94067fb2a07048fb39c3a24c5f765b3a76d8c9c",
+    "128": "47de86e7939785555e67ac1ee17ae1f180e80dd38e76ee4d8d29245178d75ee7",
+    "129": "afc550b435e9f21a4fee1dd4dbde4c9fd0bfacf5441ee534f40a8331a337bf50",
+    "130": "191c7fe86e436c5f52a329c5237c3f1cfc11ca68e303f33c8d00ea3b5405154f",
+    "131": "a62deb4e684610fe6747ab902caf50d4d9903fed38ad403ff6a748df43587350",
+    "132": "49e81d794b1a1f292727f5bdd0e2a146424fd9b6dcc8edeef49d728261c4e122",
+    "133": "e383dbc28f4600c82c7909f838e9ae282a74efa51cba557e058ef2eff6b1cac1",
+    "148": "cf5e9ddc2d8c9e9d384ce322f51b42229260f636ffddcd27f70b0c01476def97",
+    "149": "58fc687e951a382f4f32560a2ea82476c7d5a877df03b1e40af30a3c8b0c1d27",
+    "150": "fc0238573cca0c737c903f12accccbddbda59794b53c67031c0512a5f5f1de58",
+    "151": "0fea17f9925e416650b72c6f38e7c90beed6f3497790f1f951629ae3d444d218",
+    "152": "576cae9ddd94a27d655fd320e90587770f1c44e37460a2e2f52f780075331a92",
+    "153": "ddfe2e3a058e7c278820f7cfce680ac93ea0cba804440e57c18375e5c1f12861",
+    "154": "898986379c5483b9af6d2c46979aa0403b25ea78feee550c9759891ea01a3af2",
+    "155": "b15ce9beca02721e29b77e57d2a20f831dee58fa401a27f23acf6cbf671da99c",
+    "171": "ef1bb772d75531363c04221512e6daa7d96d06a5caa8020af1acf71bd816b6f3",
+    "172": "3904382243595bee4c81ff21a30305943130f5c134c4fc98944281b5f83164dd",
+    "173": "cbab7f4ea57468f31f1c0a378556a1e8a505d28626a8c0f905ae4066ee213197",
+    "174": "b6eebb6a7d04de9ed48a64a3d4c399b680709bc2bce26f7c52768a7dcb0b78ad",
+    "176": "dd81191ae7cc88f59eeb26279ddaef607c5eb80c9d46a7b796296392a20fd26e",
+    "177": "b7750e38bc8218ec243389dfb3339e5821dc5a6aa23018f5ded82053aa86b77c",
+    "178": "9a824628a614aeb98f768a6a832755170350dd897324d2350994ba7d63192d87",
+    "355": "dce321c771e378fb86e371106506b5e36ff7d35932b31e2d381478716b04f99b",
+    "518": "9a32384e1bb6296da34877dc2ee17794bd58b6573adb0b6ea1c526be7ad66842",
+    "519": "a329cb0066d65f1e0693736803a4796248b9825bd1af086226cf029ac84cb259",
+    "520": "9c4e9adc6b5b316963ac9d4b2f4db6411017e021a57e5d868e4978236e9ccf82",
+    "521": "0d8cf996bdaf21751c3f375f639d0a7827320a8f10f217c5b167994fd833265d",
+    "522": "345a985898d8f1dcb05c8c2cbec52d0c4129f0210477284838b605bb6b823bd5"
+  },
+  "warning": "Text hashes prove extraction identity, not equation accuracy; visual review required."
+}

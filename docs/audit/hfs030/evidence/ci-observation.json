@@ -1,0 +1,29 @@
+{
+  "head_sha": "76a908673259211b2d5b2407b046608ca96384ec",
+  "run_id": 40881966196,
+  "url": "https://github.com/Beicker29/StructureLab_HFS/actions/runs/40881966196",
+  "record_type": "Structured transcription of observed GitHub connector response; not a raw API archive",
+  "tool": "mcp__codex_apps__github_fetch_workflow_run_jobs",
+  "observed_date": "2026-10-29",
+  "scope": "Observed before the user restricted document comparison to local PDFs; no subsequent network request",
+  "initial_observation": "start.json: Ubuntu success, Windows in progress",
+  "later_observation": {
+    "jobs": [
+      {
+        "id": 123475542163,
+        "name": "Python 3.12 / ubuntu-24.04",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 123475542580,
+        "name": "Python 3.12 / windows-2022",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "aggregate_run_conclusion_refetched": false,
+    "artifacts_downloaded": false
+  },
+  "interpretation": "Software CI jobs verified, not independent engineering accreditation or closure of all HFS-024 limitations"
+}

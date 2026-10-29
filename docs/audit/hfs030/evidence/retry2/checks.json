@@ -1,0 +1,240 @@
+[
+  {
+    "name": "test_hfs000_characterization",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs000_characterization.py",
+      "--basetemp=.venv/30-retry2/test_hfs000_characterization"
+    ],
+    "started_utc": "2026-10-29T14:35:09.102478+00:00",
+    "exit_code": 1,
+    "log": "test_hfs000_characterization.log"
+  },
+  {
+    "name": "test_hfs011_input_contracts",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs011_input_contracts.py",
+      "--basetemp=.venv/30-retry2/test_hfs011_input_contracts"
+    ],
+    "started_utc": "2026-10-29T14:35:11.897188+00:00",
+    "exit_code": 1,
+    "log": "test_hfs011_input_contracts.log"
+  },
+  {
+    "name": "test_hfs016_catalog_integrity",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs016_catalog_integrity.py",
+      "--basetemp=.venv/30-retry2/test_hfs016_catalog_integrity"
+    ],
+    "started_utc": "2026-10-29T14:35:14.477187+00:00",
+    "exit_code": 1,
+    "log": "test_hfs016_catalog_integrity.log"
+  },
+  {
+    "name": "test_hfs010_coverage",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs010_coverage.py",
+      "--basetemp=.venv/30-retry2/test_hfs010_coverage"
+    ],
+    "started_utc": "2026-10-29T14:35:17.911445+00:00",
+    "exit_code": 1,
+    "log": "test_hfs010_coverage.log"
+  },
+  {
+    "name": "test_hfs014_summary_bundle",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs014_summary_bundle.py",
+      "--basetemp=.venv/30-retry2/test_hfs014_summary_bundle"
+    ],
+    "started_utc": "2026-10-29T14:35:20.882425+00:00",
+    "exit_code": 1,
+    "log": "test_hfs014_summary_bundle.log"
+  },
+  {
+    "name": "test_hfs015_precision_advice",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs015_precision_advice.py",
+      "--basetemp=.venv/30-retry2/test_hfs015_precision_advice"
+    ],
+    "started_utc": "2026-10-29T14:35:25.187614+00:00",
+    "exit_code": 1,
+    "log": "test_hfs015_precision_advice.log"
+  },
+  {
+    "name": "test_hfs017_design_method",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs017_design_method.py",
+      "--basetemp=.venv/30-retry2/test_hfs017_design_method"
+    ],
+    "started_utc": "2026-10-29T14:35:26.633306+00:00",
+    "exit_code": 1,
+    "log": "test_hfs017_design_method.log"
+  },
+  {
+    "name": "test_hfs021_execution",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs021_execution.py",
+      "--basetemp=.venv/30-retry2/test_hfs021_execution"
+    ],
+    "started_utc": "2026-10-29T14:35:28.252871+00:00",
+    "exit_code": 1,
+    "log": "test_hfs021_execution.log"
+  },
+  {
+    "name": "test_hfs021a_public_api",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs021a_public_api.py",
+      "--basetemp=.venv/30-retry2/test_hfs021a_public_api"
+    ],
+    "started_utc": "2026-10-29T14:35:31.530758+00:00",
+    "exit_code": 1,
+    "log": "test_hfs021a_public_api.log"
+  },
+  {
+    "name": "test_hfs021a_svg_comparison",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs021a_svg_comparison.py",
+      "--basetemp=.venv/30-retry2/test_hfs021a_svg_comparison"
+    ],
+    "started_utc": "2026-10-29T14:35:33.365928+00:00",
+    "exit_code": 1,
+    "log": "test_hfs021a_svg_comparison.log"
+  },
+  {
+    "name": "test_hfs022_contracts",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs022_contracts.py",
+      "--basetemp=.venv/30-retry2/test_hfs022_contracts"
+    ],
+    "started_utc": "2026-10-29T14:35:34.075999+00:00",
+    "exit_code": 1,
+    "log": "test_hfs022_contracts.log"
+  },
+  {
+    "name": "test_hfs022r_review",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs022r_review.py",
+      "--basetemp=.venv/30-retry2/test_hfs022r_review"
+    ],
+    "started_utc": "2026-10-29T14:35:36.118388+00:00",
+    "exit_code": 1,
+    "log": "test_hfs022r_review.log"
+  },
+  {
+    "name": "test_hfs022q_independent",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_hfs022q_independent.py",
+      "--basetemp=.venv/30-retry2/test_hfs022q_independent"
+    ],
+    "started_utc": "2026-10-29T14:35:38.616713+00:00",
+    "exit_code": 1,
+    "log": "test_hfs022q_independent.log"
+  },
+  {
+    "name": "ruff",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "src",
+      "tests",
+      "scripts",
+      "docs/audit/hfs030/reproduce.py",
+      "--exclude",
+      "tests/.tmp_tests"
+    ],
+    "started_utc": "2026-10-29T14:35:39.867899+00:00",
+    "exit_code": 0,
+    "log": "ruff.log"
+  },
+  {
+    "name": "freeze",
+    "command": [
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\.venv\\21dev\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "freeze"
+    ],
+    "started_utc": "2026-10-29T14:35:40.069411+00:00",
+    "exit_code": 0,
+    "log": "freeze.log"
+  }
+]

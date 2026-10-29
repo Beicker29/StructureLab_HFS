@@ -1,5 +1,33 @@
 # Seguimiento maestro de hallazgos — HFS-017
 
+## Suplemento HFS-030 — 2026-10-29, cotejo local para revisión
+
+Base `main`/`76a9086`; jobs CI HFS-024 Windows/Ubuntu SUCCESS observados.
+[Informe](hfs030/report.md), [fuentes por hash](hfs030/sources.md) y
+[22 grupos de erratas + contraste documental](hfs030/impact-matrix.md).
+El usuario limitó las fuentes al repositorio y aportó E25/E26 durante la tarea.
+No se modifican cálculos, registro, trazas, selección, cobertura ni estados.
+
+- **F-31 permanece P0 abierto**: E25/E26 no implementan resistencia mayor de
+  canal; B4/F2–F6 conserva condiciones diferenciadas por familia y eje.
+- **F-35/F-36 permanecen P0 propuestos**: E7 Fn·Ae y condiciones/ramas E5
+  cotejadas; ningún cierre por una errata o test. Efecto numérico pendiente.
+- **F-37 permanece P1**: observaciones L30-01/03/06 documentan localizadores
+  F2/F3/F1 incompletos, cita I3.3b incorrecta para resistencia de encamisados,
+  H1-2=Pey y separación Commentary/Specification. E25-02 renumera F7; E26-02
+  solo corrige unidades Lb. La actualización compatible de metadata/trazas
+  queda pendiente, sin alterar identidades ni históricos en HFS-030.
+- **F-28 permanece P2 abierto**: hashes, fuentes locales y diferencias E25/E26
+  registrados; no se afirma autenticación remota, inventario editorial universal
+  ni permiso de redistribución. E25-06 (Fy/Fyb), E26-04 y E26-06/07 tienen
+  prioridad preventiva P1 junto con F-38 antes de implementar esos dominios.
+- F-19/20/22/23/30/34/38 siguen abiertos; usar Fysr en I5-2 y llamar Mn al
+  resultado F5 es concordancia documental acotada, no validación independiente.
+
+La matriz conserva HECHO VERIFICADO / INFERENCIA / HIPÓTESIS / PENDIENTE.
+No se inicia HFS-031/032 ni se cierran hallazgos por esta entrega. Los siguientes
+suplementos son históricos y permanecen intactos.
+
 ## Suplemento HFS-024 — 2026-10-29, para revisión
 
 HFS-023 fue aprobado arquitectónicamente por el usuario; su commit publicado
@@ -89,7 +117,7 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-25 | P1 | Históricos/temporales versionados | Política HFS-001; limpieza posterior separada | Trazabilidad recuperable y justificación antes de retirar |
 | F-26 | P1 | HFS-023: matriz de implementación derivada de RuleDefinition.metadata, referencias e integridad verificadas; cobertura exhaustiva no acreditada | HFS-023 para revisión; HFS-024/030 pendientes | [Registro único y riesgos](hfs023/report.md); no cierre normativo por metadatos |
 | F-27 | P1 | Procedencia de catálogo pendiente; anomalías observadas | HFS-040 | Fuente, conversiones e identidad comprobadas |
-| F-28 | P2 | Permisos/erratas pendientes | HFS-030 y revisión documental | Registro verificable de edición, permisos y erratas |
+| F-28 | P2 | HFS-030 coteja 22 grupos de E25/E26 locales por hash; base S22 conserva texto anterior. Permisos, autenticación remota y exhaustividad editorial pendientes; incertidumbre Fy/Fyb K4.1A explícita | HFS-030 y revisión documental | Registro verificable de edición, permisos y erratas; no cierre por inventario local |
 | F-29 | P1 histórico | Corregido HFS-014 para revisión: aggregate_case_statuses([]) lanza EMPTY_CASE_BUNDLE; CLI stderr/exit 1, sin cumplimiento, ejecución de casos ni memorias. Tabla de estados no vacíos y fallos individuales preservados | HFS-014 | Revisar errores/migración; tests de lista vacía, tipos/elementos inválidos y combinaciones PASS/FAIL/INCOMPLETE. F-32 no cambia |
 | F-30 | P1 | Riesgo de cobertura normativa no auditada | HFS-030–038/041 | Validación independiente; no cierre global por tests verdes |
 | F-31 | **P0** | Mitigado, no cerrado: HFS-010 mantiene Mux pendiente aunque exista F6. HFS-012 añade diagnóstico explícito de selección mayor bloqueada también en biaxial; no añade fórmulas de canal ni valida F6. [Sondas antes/después](hfs012/report.md) | HFS-002/010/012; contraste de flexión HFS-032 | Cobertura por componente, canal real y fronteras; revisar ancho completo en F6 y resistencias de canal antes de acreditar cobertura |
@@ -98,7 +126,7 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-34 | P0 propuesto | HFS-010 exige resistencia M por eje; cuantía/transferencia no la cubren. Tres roles compuestos con flexión pura 1 y 1 000 000 kNm conservan PASS sin check resistente M | HFS-010/035 | No confundir cuantía/transferencia con flexión; evaluar/bloquear M por eje y etapa |
 | F-35 | P0 propuesto | HFS-010 no acredita el dominio E7; fórmula efectiva sigue pendiente. E7 usa QFy/Ag; S22 E7 prescribe Fn·Ae, sin equivalencia demostrada | HFS-010/031/041 | Método por dominio/área efectiva, oráculos y revisión de consumidores H/I |
 | F-36 | P0 propuesto | HFS-010 no acredita condiciones/ramas E5; reparación normativa pendiente. E5 implementa rama única y no acredita condiciones; E4 ángulo sin regla registrada | HFS-010/031/041 | Condiciones de conexión y ramas 75/80/200; flexotorsión/áreas y oráculos |
-| F-37 | P1 | IDs parecen ecuaciones; H1-2 usado para interacción de tracción aunque fuente define Pey | HFS-023/024/034/035 | Separar IDs/citas; contrastar fórmula de tracción y todos consumidores |
+| F-37 | P1 | IDs parecen ecuaciones; H1-2 usado para interacción de tracción aunque fuente define Pey. HFS-030: L30-01/03/06 documentan localizadores y referencia I3.3b incorrectos; E25-02 renumera F7. Traces/metadata preservadas, corrección pendiente | HFS-023/024/030/032/034/035 | Separar IDs/citas; contrastar fórmula de tracción y consumidores, actualizar referencias con revisión explícita de impacto |
 | F-38 | P1 | Verificaciones complementarias/condiciones no acreditadas E6/F13/G7/H4/I1/I6, etapas y conexiones | HFS-010/031–038 | Alcance explícito; no omitir precondiciones ni validar por existencia de cualquier check |
 | F-39 | P0 propuesto | Confirmado y corregido HFS-013 para revisión: H3-6 usaba cuadrado del término normal; Specification 16.1-86 exige término lineal. Oráculo normal=0,4 y corte+torsión=0,9: 0,97→1,21 | HFS-013/034 | Revisión de expresión y dominio; Pc/Mc requieren validación separada |
 | F-40 | P1 propuesto | Confirmado y corregido HFS-013: H3-5 4,58→0,458π²; a h/t=100 Fcr=91,6→90,405576 MPa. Extrapolación h/t>260 bloqueada | HFS-013/034 | Revisión de fronteras y alcance del dato h plano mayor; prioridad P1 por exceso ~1,32% de rama, no significa aceptable |
