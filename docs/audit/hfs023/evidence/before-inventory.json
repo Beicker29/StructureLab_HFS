@@ -1,0 +1,920 @@
+{
+  "rules": {
+    "D2-1": {
+      "rule_id": "D2-1",
+      "implementation": "steel_design.domain.rules.tension_rule:TensionRule",
+      "implemented": true,
+      "fields": [
+        "area"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_has_tension"
+    },
+    "D2-2": {
+      "rule_id": "D2-2",
+      "implementation": "steel_design.domain.rules.tension_rule:TensionRuptureRule",
+      "implemented": true,
+      "fields": [
+        "area"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_has_tension"
+    },
+    "E3": {
+      "rule_id": "E3",
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE3Rule",
+      "implemented": true,
+      "fields": [
+        "area",
+        "rx",
+        "ry"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_has_compression"
+    },
+    "E4": {
+      "rule_id": "E4",
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE4Rule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_has_compression"
+    },
+    "E5": {
+      "rule_id": "E5",
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE5Rule",
+      "implemented": true,
+      "fields": [
+        "area",
+        "rx",
+        "ry",
+        "b_t_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_has_compression"
+    },
+    "E7": {
+      "rule_id": "E7",
+      "implementation": "steel_design.domain.rules.axial_rules:AxialE7Rule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_has_compression"
+    },
+    "F2-1": {
+      "rule_id": "F2-1",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "sx",
+        "iy",
+        "cw",
+        "ry",
+        "j",
+        "ho"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f2_applicable"
+    },
+    "F2-2": {
+      "rule_id": "F2-2",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF2LtbRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "sx",
+        "iy",
+        "cw",
+        "ry",
+        "j",
+        "ho"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f2_applicable"
+    },
+    "F3-1": {
+      "rule_id": "F3-1",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF3YieldRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "sx",
+        "iy",
+        "cw",
+        "ry",
+        "j",
+        "ho",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f3_applicable"
+    },
+    "F3-2": {
+      "rule_id": "F3-2",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF3LtbRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "sx",
+        "iy",
+        "cw",
+        "ry",
+        "j",
+        "ho",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f3_applicable"
+    },
+    "F3-3": {
+      "rule_id": "F3-3",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "sx",
+        "iy",
+        "cw",
+        "ry",
+        "j",
+        "ho",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f3_applicable"
+    },
+    "F4-1": {
+      "rule_id": "F4-1",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4CompressionYieldRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f4_applicable"
+    },
+    "F4-2": {
+      "rule_id": "F4-2",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4LtbRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f4_applicable"
+    },
+    "F4-3": {
+      "rule_id": "F4-3",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f4_applicable"
+    },
+    "F4-4": {
+      "rule_id": "F4-4",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF4TensionYieldRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f4_applicable"
+    },
+    "F5-1": {
+      "rule_id": "F5-1",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5CompressionYieldRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f5_applicable"
+    },
+    "F5-2": {
+      "rule_id": "F5-2",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5LtbRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f5_applicable"
+    },
+    "F5-3": {
+      "rule_id": "F5-3",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f5_applicable"
+    },
+    "F5-4": {
+      "rule_id": "F5-4",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF5TensionYieldRule",
+      "implemented": true,
+      "fields": [
+        "sx",
+        "bf",
+        "tf",
+        "tw",
+        "h",
+        "bf_2tf_ratio",
+        "h_tw_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f5_applicable"
+    },
+    "F6-1": {
+      "rule_id": "F6-1",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF6YieldRule",
+      "implemented": true,
+      "fields": [
+        "zy",
+        "sy",
+        "bf_2tf_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f6_applicable"
+    },
+    "F6-2": {
+      "rule_id": "F6-2",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule",
+      "implemented": true,
+      "fields": [
+        "zy",
+        "sy",
+        "bf_2tf_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f6_applicable"
+    },
+    "F7-1-Mx": {
+      "rule_id": "F7-1-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7YieldMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_mx_applicable"
+    },
+    "F7-1-My": {
+      "rule_id": "F7-1-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7YieldMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_my_applicable"
+    },
+    "F7-2-Mx": {
+      "rule_id": "F7-2-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_mx_applicable"
+    },
+    "F7-2-My": {
+      "rule_id": "F7-2-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_my_applicable"
+    },
+    "F7-3-Mx": {
+      "rule_id": "F7-3-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7WebMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_mx_applicable"
+    },
+    "F7-3-My": {
+      "rule_id": "F7-3-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7WebMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_my_applicable"
+    },
+    "F7-4-Mx": {
+      "rule_id": "F7-4-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7LtbMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_mx_applicable"
+    },
+    "F7-4-My": {
+      "rule_id": "F7-4-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF7LtbMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "b",
+        "h",
+        "tdes",
+        "b_tdes_ratio",
+        "h_tdes_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f7_my_applicable"
+    },
+    "F8-1-Mx": {
+      "rule_id": "F8-1-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8YieldMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "d_t_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f8_mx_applicable"
+    },
+    "F8-1-My": {
+      "rule_id": "F8-1-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8YieldMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "d_t_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f8_my_applicable"
+    },
+    "F8-2-Mx": {
+      "rule_id": "F8-2-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "d_t_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f8_mx_applicable"
+    },
+    "F8-2-My": {
+      "rule_id": "F8-2-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy",
+        "d_t_ratio"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f8_my_applicable"
+    },
+    "F9": {
+      "rule_id": "F9",
+      "implementation": null,
+      "implemented": false,
+      "fields": [
+        "zx"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_has_any_flexure"
+    },
+    "F10-1-Mx": {
+      "rule_id": "F10-1-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10YieldMxRule",
+      "implemented": true,
+      "fields": [
+        "b_t_ratio",
+        "b",
+        "t"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f10_mx_applicable"
+    },
+    "F10-1-My": {
+      "rule_id": "F10-1-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10YieldMyRule",
+      "implemented": true,
+      "fields": [
+        "b_t_ratio",
+        "b",
+        "t"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f10_my_applicable"
+    },
+    "F10-2-Mx": {
+      "rule_id": "F10-2-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LtbMxRule",
+      "implemented": true,
+      "fields": [
+        "b_t_ratio",
+        "b",
+        "t"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f10_mx_applicable"
+    },
+    "F10-2-My": {
+      "rule_id": "F10-2-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LtbMyRule",
+      "implemented": true,
+      "fields": [
+        "b_t_ratio",
+        "b",
+        "t"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f10_my_applicable"
+    },
+    "F10-3-Mx": {
+      "rule_id": "F10-3-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMxRule",
+      "implemented": true,
+      "fields": [
+        "b_t_ratio",
+        "b",
+        "t"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f10_mx_applicable"
+    },
+    "F10-3-My": {
+      "rule_id": "F10-3-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMyRule",
+      "implemented": true,
+      "fields": [
+        "b_t_ratio",
+        "b",
+        "t"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f10_my_applicable"
+    },
+    "F11-1-Mx": {
+      "rule_id": "F11-1-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11YieldMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f11_mx_applicable"
+    },
+    "F11-1-My": {
+      "rule_id": "F11-1-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11YieldMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f11_my_applicable"
+    },
+    "F11-2-Mx": {
+      "rule_id": "F11-2-Mx",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11LtbMxRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f11_mx_applicable"
+    },
+    "F11-2-My": {
+      "rule_id": "F11-2-My",
+      "implementation": "steel_design.domain.rules.flexure_rule:FlexureF11LtbMyRule",
+      "implemented": true,
+      "fields": [
+        "zx",
+        "zy",
+        "sx",
+        "sy"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_f11_my_applicable"
+    },
+    "G2-Vx": {
+      "rule_id": "G2-Vx",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG2VxRule",
+      "implemented": true,
+      "fields": [
+        "tw",
+        "d"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g2_vx_applicable"
+    },
+    "G3-Vx": {
+      "rule_id": "G3-Vx",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG3VxRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g3_vx_applicable"
+    },
+    "G3-Vy": {
+      "rule_id": "G3-Vy",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG3VyRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g3_vy_applicable"
+    },
+    "G4-Vx": {
+      "rule_id": "G4-Vx",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG4VxRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g4_vx_applicable"
+    },
+    "G4-Vy": {
+      "rule_id": "G4-Vy",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG4VyRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g4_vy_applicable"
+    },
+    "G5-Vx": {
+      "rule_id": "G5-Vx",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG5VxRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g5_vx_applicable"
+    },
+    "G5-Vy": {
+      "rule_id": "G5-Vy",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG5VyRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g5_vy_applicable"
+    },
+    "G6-Vy": {
+      "rule_id": "G6-Vy",
+      "implementation": "steel_design.domain.rules.shear_rules:ShearG6VyRule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_g6_vy_applicable"
+    },
+    "H1": {
+      "rule_id": "H1",
+      "implementation": "steel_design.domain.rules.combined_hss_rules:CombinedH1HssRule",
+      "implemented": true,
+      "fields": [
+        "area"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_is_h1_hss_applicable"
+    },
+    "H3-1": {
+      "rule_id": "H3-1",
+      "implementation": "steel_design.domain.rules.combined_hss_rules:HssTorsionH3_1Rule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_h3_1_hss_applicable"
+    },
+    "H3-2": {
+      "rule_id": "H3-2",
+      "implementation": "steel_design.domain.rules.combined_hss_rules:HssCombinedH3_2Rule",
+      "implemented": true,
+      "fields": [],
+      "applicability": "steel_design.domain.routing.profile_router:_is_h3_2_hss_applicable"
+    },
+    "I2": {
+      "rule_id": "I2",
+      "implementation": null,
+      "implemented": false,
+      "fields": [
+        "area"
+      ],
+      "applicability": "steel_design.domain.routing.profile_router:_has_interaction"
+    }
+  },
+  "profiles": {
+    "W": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "E4",
+      "E7",
+      "F2-1",
+      "F2-2",
+      "F3-1",
+      "F3-2",
+      "F3-3",
+      "F4-1",
+      "F4-2",
+      "F4-3",
+      "F4-4",
+      "F5-1",
+      "F5-2",
+      "F5-3",
+      "F5-4",
+      "F6-1",
+      "F6-2",
+      "G2-Vx",
+      "G6-Vy"
+    ],
+    "CHANNEL": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "E4",
+      "E7",
+      "F2-1",
+      "F2-2",
+      "F6-1",
+      "F6-2",
+      "G2-Vx",
+      "G6-Vy"
+    ],
+    "DOUBLE_ANGLE": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "E4",
+      "E7",
+      "F9",
+      "G3-Vx",
+      "G3-Vy"
+    ],
+    "RECTANGULAR_HSS": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "E4",
+      "E7",
+      "F7-1-Mx",
+      "F7-1-My",
+      "F7-2-Mx",
+      "F7-2-My",
+      "F7-3-Mx",
+      "F7-3-My",
+      "F7-4-Mx",
+      "F7-4-My",
+      "G4-Vx",
+      "G4-Vy",
+      "H1",
+      "H3-1",
+      "H3-2"
+    ],
+    "CIRCULAR_HSS": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "E4",
+      "E7",
+      "F8-1-Mx",
+      "F8-1-My",
+      "F8-2-Mx",
+      "F8-2-My",
+      "G5-Vx",
+      "G5-Vy",
+      "H1",
+      "H3-1",
+      "H3-2"
+    ],
+    "SINGLE_ANGLE": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "E5",
+      "E7",
+      "F10-1-Mx",
+      "F10-1-My",
+      "F10-2-Mx",
+      "F10-2-My",
+      "F10-3-Mx",
+      "F10-3-My",
+      "G3-Vx",
+      "G3-Vy"
+    ],
+    "SOLID_RECTANGULAR": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "F11-1-Mx",
+      "F11-1-My",
+      "F11-2-Mx",
+      "F11-2-My"
+    ],
+    "SOLID_CIRCULAR": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "F11-1-Mx",
+      "F11-1-My",
+      "F11-2-Mx",
+      "F11-2-My"
+    ],
+    "FILLED_RECTANGULAR": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "F11-1-Mx",
+      "F11-1-My",
+      "F11-2-Mx",
+      "F11-2-My"
+    ],
+    "FILLED_CIRCULAR": [
+      "D2-1",
+      "D2-2",
+      "E3",
+      "F11-1-Mx",
+      "F11-1-My",
+      "F11-2-Mx",
+      "F11-2-My"
+    ]
+  },
+  "protected_sha256": {
+    "src/steel_design/contracts.py": "e076f8745c00c30dbbfe865856e4fbfbdc39d5bb275daa9bbc4515136391786d",
+    "src/steel_design/design_methods.py": "1429cba447174438bc00e039d1feadcc6248fc3b643201c008c035447e3ca860",
+    "src/steel_design/engine.py": "2b39e0caa24ab49c6a5430abecddcd511f04060f49dedcbce8c003d336e66ef3",
+    "src/steel_design/execution.py": "daf0cf8a06fadac03dac9e9215a617d5e4af3b493e162d040ce269283c5290c1",
+    "src/steel_design/input_contracts.py": "80b930b44405be8d0682b40ae734728030a32327ed6b6ddd4265dde0fe0af87b",
+    "src/steel_design/models.py": "24783fa03e01497810772c57f9e9db127db0c9a7f4084908f73cc49b8511d6d4",
+    "src/steel_design/preparation.py": "252332bccbc1bc3bdcf8ce510e997b410b51d51be1c3277e341f02b9625d0abd",
+    "src/steel_design/reporting.py": "c514128bbeb2a8f8ad5bb4dfa49c667fdf563215bed3eaf0b2a74cb3626005a8",
+    "src/steel_design/results_model.py": "916502d55642f4df5ef24252d3ce97c82b98ab078729340da35d0cedd5405bb1",
+    "src/steel_design/run.py": "45c99f8575388be3bfc880168329f114a1b240e3646e6701a9b6369150d1cac6",
+    "src/steel_design/__init__.py": "1d260a01e3ebb131851adcec2bfdeb5b59b809048ea8a0d685637af78ff9cb00",
+    "src/steel_design/codes/__init__.py": "f63c6c4be3652641dde0e8574cb67adb19d9cb0f15601a6c067a11c4c8d85fdd",
+    "src/steel_design/domain/actions.py": "7c8bcdd8b9e4f1fc43c7194b21b3b07aa0b945c8bdad16620de76ac53f6badab",
+    "src/steel_design/domain/coverage.py": "4f92ab8888bed06413bd5397ba5a27248439ef21c207182b0339268964328d9c",
+    "src/steel_design/domain/coverage_evidence.py": "d951a18fe997b4d14acc5103c2dd3060748fa24f8a5103acf1cc9a9ceeae7aba",
+    "src/steel_design/domain/design_methods.py": "0f747012ea757ce54e094cf74757c590c77eaa31c89b790060f49cc3945d2d3c",
+    "src/steel_design/domain/errors.py": "aad71b4b6dd26a753f6b63dfa782f0bfcc86fcd55aa1509c9a60661146ffb791",
+    "src/steel_design/domain/recommendations.py": "e63dbbce0c4d8da7ffab8c947a3e886a045244b702d984889c4f9650a4c5e201",
+    "src/steel_design/domain/validation.py": "7ae6510d623e736d71f087548754c8901238be91778dc07253ca275572334a29",
+    "src/steel_design/domain/__init__.py": "e07b9376830ba616a3642cdc3ed3ff53b218ada403099b570aebe5078408d28c",
+    "src/steel_design/sections/geometry.py": "17bf78d86203bdbccdbf3f71cd17c554d434d09694d7de6431c4347a378a25d4",
+    "src/steel_design/sections/identity.py": "971f0290496b80af56bf468bb338bd9c9b32ee1000d117ce16469ef51bbe4dfd",
+    "src/steel_design/sections/loader.py": "577c2dddb1854b949f9cf7fa917fe3aba09f70785cd5ed94e8e770f59ab2681f",
+    "src/steel_design/sections/models.py": "7dc54fac04b3b57f5a0b53ae54de41a8dc74f8b931c0a64beac8442c70114d4d",
+    "src/steel_design/sections/repository.py": "ba008d2075c8e8ced370c3f09a06ff869bdc6adf4012795ce97e3be5231107c7",
+    "src/steel_design/sections/__init__.py": "4ac2712d5869891f95a658f3b457c83fd7f7cf6e19b422c1bbb872399715647f",
+    "src/steel_design/codes/aisc_360_22/axial_calc.py": "e43b234fbe661cd8667ba8e4cdef7c6775a9691868d887202c9ec673b136bee7",
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py": "8d908e7d6a4e88cc726ffbf185585aa6e86e30baa49866e6b86f3b8111571385",
+    "src/steel_design/codes/aisc_360_22/composite_calc.py": "ddb1bc525660a8faf4aef5e2a212b202781e330b3f58cf4dc7aacb573189602d",
+    "src/steel_design/codes/aisc_360_22/flexure_calc.py": "e9711631cdd430440e91745aeed226ed4f0ed3b450d9aee25f40ea1adb6ae1c9",
+    "src/steel_design/codes/aisc_360_22/shear_calc.py": "404cebeb4f0ec43bc777188a5f6f51fc3902f6e63425922ac99350ed1062c88c",
+    "src/steel_design/codes/aisc_360_22/tension_calc.py": "6dc9a85d56dd26c773978ed6f7745d4052d7f101807f9044b8445e7bc5d2a6f3",
+    "src/steel_design/codes/aisc_360_22/__init__.py": "d12da3eed0c4b31a99500ed75dea829848df59aefa04a5093ed5974bb481427f",
+    "src/steel_design/domain/evaluators/flexure_evaluator.py": "0221aa1f97ce62e3e6d7754f6ecf7b9bb96fd75682d3c7d2bdef7fdc75bc380a",
+    "src/steel_design/domain/evaluators/hss_shear.py": "0f707afd014b796546638d417a41d9aa9eb8fdc10c7a9d68ed360ff994a16735",
+    "src/steel_design/domain/evaluators/tension_evaluator.py": "8092c1bf74e8cc07347657a49c862232e477b1dd3a9b86a4a3f71cf8544c7da1",
+    "src/steel_design/domain/evaluators/__init__.py": "58e0730d3caa97639980628f7dc7f157869cb34575b04115f6b2cc2c26312c47",
+    "src/steel_design/domain/routing/profile_router.py": "222df31874b2ad5abe71366b3b89ce3717d895667255c35722be6602ed3fabd8",
+    "src/steel_design/domain/routing/__init__.py": "fbcd8b7305ec85642354727f6579d20a80e518f5f17cc243566254f30e8d97c4",
+    "src/steel_design/domain/rules/axial_rules.py": "0449c66fdc0b1b77c4a34930be458c0c32cb7e50c21297589ea26c8aa3843985",
+    "src/steel_design/domain/rules/combined_hss_rules.py": "e2450f881154b019ded05a15c701b38690c9849a15e85d7561241ef40cc6fde0",
+    "src/steel_design/domain/rules/composite_rules.py": "f4b5ac474ca3104cb5ec52cb1ddafd181b50cc5536da097761eddf864b697a0c",
+    "src/steel_design/domain/rules/flexure_rule.py": "43f48f6846ad3af64ec65e16183ca1874d49ba6aea9015a1eb6a193c22cf2987",
+    "src/steel_design/domain/rules/shear_rules.py": "3cec1e991e6ab0c5a34733f4d8768a4aea3f541243ba468a39f04e0d74b525c5",
+    "src/steel_design/domain/rules/tension_rule.py": "1e7d283cd64c1fbcde05fb2709410d8438970978a4549d34403b69b30335183b",
+    "src/steel_design/domain/rules/__init__.py": "dbb61c409b7d8092df8e5ea91365f8db360e9a3baeee3ff9103667fb9a14c5d0",
+    "tests/test_chapter_e_rules.py": "24ad4e8ee2fb386819898119b0d7335491c1adb403a963dd2a0019924a2d827b",
+    "tests/test_chapter_f_rules.py": "f614e17c8bab284ae9eca30990a093559094b3c74351b918594cf0c057a0d463",
+    "tests/test_chapter_g_rules.py": "99f019a0cd3db199cfd8459592d019af8a2060b933741da1f1fc3a5686a30692",
+    "tests/test_chapter_h_rules.py": "622bb4be3cce25fd479e2b3a1a0f40dcdada918a590fffc04db09452ed133900",
+    "tests/test_chapter_i_rules.py": "04837dec46cb4ebd9cc0c69ec700943d2a6213a1fc14d9279256c302cf15dbce",
+    "tests/test_custom_solid_sections.py": "879ef00aafb7279f739875aa62338a367329303b1bcae0582504fc762e989fea",
+    "tests/test_engine_cli_integration.py": "45714fc1c4a5e60a088941162efd50b8f4f22a1f66c5ba2f1eb93c6edbf5b1ef",
+    "tests/test_examples_smoke.py": "8d362b03fac4948156ef7b137bf398c1a7b97e1b94510ec74f3d550c39dadcf2",
+    "tests/test_hfs000_characterization.py": "8948d2682984bbe754e404a0359f287f53cb4edecee54a79e90b3f989bea4372",
+    "tests/test_hfs010_coverage.py": "a4ab1c868df326b6e4aa24b990b9551491fb648b3b384d86083093957d0efb73",
+    "tests/test_hfs011_input_contracts.py": "82ea6cbcd0a1b7da605e2c1061dfbd12f59348de09de1cbaf5ba3231e68e74a9",
+    "tests/test_hfs012_flexure_selection.py": "a19b469aaf8ff54bd525f90057d8b6a74f9d3a250ed88494867d7c7dc5e804c2",
+    "tests/test_hfs013_design_method.py": "b8f4826b3dc3b179f9111405730ada6b6944c348bcdcd00a7102e5995df5a8db",
+    "tests/test_hfs013_directional_h3.py": "8dc43f6e984bd8cc9242dd01be5a24da6fa36e6932a95e3bd8a61746f7a87e7c",
+    "tests/test_hfs014_summary_bundle.py": "59ff096999f04902314e59f96bdffa8b2797cc5b996222946091ec03c9a68861",
+    "tests/test_hfs015_precision_advice.py": "b104ccdcf72a476dcb45da7aebe1254241cd2aedaa57577a3c6775ee58ec3b7a",
+    "tests/test_hfs016_catalog_integrity.py": "363a1fb84f4088dcdcb1d969d34e59be7dfbe086f39b187e5f586c69a43d2ced",
+    "tests/test_hfs017_design_method.py": "7280426455687e287bc944f5df613929409af91429af7da5afd15487307fbc18",
+    "tests/test_hfs020_comparison.py": "7a97851650cc3256b9ebae621a81f9b6b6cf2e91dbeef273e490c8a98277b8b5",
+    "tests/test_hfs021a_public_api.py": "be18ca6b696ed1a86d11414a6c35d9a4a2ab0e5eb2b1b8366299574e0ab89b16",
+    "tests/test_hfs021a_svg_comparison.py": "adfbfd6861863e262b1982663b7032886bf25edcaf5f81e756ad24551ce23f8a",
+    "tests/test_hfs021_execution.py": "672b59a62b8f48494bd8c1099a10bea7b6584dab55c376383cb1f94b3b6cf1ed",
+    "tests/test_hfs022q_independent.py": "bc78e52d761151fd6e1a6647ca46597863623c139f21ac5b5b33e9b69c15aa4e",
+    "tests/test_hfs022r_review.py": "8c03609b4f235263b4e48a0f399350d3285192d643ddfe649e53f9a57f3632be",
+    "tests/test_hfs022_contracts.py": "d0936ad71d62b88165709dc6c5684fd690daeab9bb7c3d69d1cfe87a5b5b39e4",
+    "tests/test_loader_catalog.py": "b93a6416c37088dcb331d9e6adc3ef80f78a30ef3704815ad85d6486a34afc24",
+    "tests/test_normative_d2_e3_f2.py": "ee18779af1213381e2920b2d49c59922e819fcabbf94e1d1b12f30cecdd8f748",
+    "tests/test_profile_router.py": "2b7a714dd401b5736a22953e0e72868149ee54c98e2e6cd4e471a2093891d0e0",
+    "examples/channel_case.json": "d46f938a8f5e66960d9e05898d191e196177e893b6cca8f2f9775c5a9ca29bcd",
+    "examples/circular_hss_case.json": "7c25f19fc779382d708b4f09189481d3d7967d0358618a760585d664723e22df",
+    "examples/composite_beam_case.json": "7284d353ed60d2842d1574d4a0b5429bf41d00048c2af98a9bf18902a7464933",
+    "examples/composite_encased_case.json": "22e1a39b3de08cce6c65a190ac99102dd75ed5900db28d724b6495e1a7a0b60b",
+    "examples/composite_filled_circular_hss_case.json": "21605fc40eb106ba433e819cabbf92391862b01b58bc98ece84019bd227dad42",
+    "examples/composite_filled_rectangular_hss_case.json": "7ca5638590e2cf93a62aac2cb88bca89cdf08abd78dcac22f1d92e4751b34bda",
+    "examples/double_angle_case.json": "ede4d8163d68abe3549f172b34f5c24980227f239dd9bccef528fa3c5085098c",
+    "examples/rectangular_hss_case.json": "c8e4c0cd11eb135a21dd0bac46af7d5bd5afc7e112d10f25461ae35a11c1ef86",
+    "examples/single_angle_case.json": "ad474c9ce47f15cf456c4c152904d2a1444e9664b17315f9d6bbb1d4f0d4342d",
+    "examples/solid_circular_case.json": "11d4cde50ecc093565d3d02c54584f5e42a0b6c331f7f0a61c3decf0c613cadd",
+    "examples/solid_rectangular_case.json": "f32fa241773d00d757f4fb43200d4c7f509ac38db3f9a86e07c8a898ece62102",
+    "examples/w_shape_case.json": "7a148ec1f38a59c70dafe129f4f6d94c3f7df4cfa63c84c4606e2e4796398a06",
+    "docs/schemas/contracts/1.0/case_bundle.serialization.json": "b917dd07dc6337c2d2ee90a114ed26fb3c20921985e55a9251f1bafb1db121eb",
+    "docs/schemas/contracts/1.0/case_bundle.validation.json": "92375b8637b818e617880e1e1484f3af03b16a4c52dea20c9556627dce352c46",
+    "docs/schemas/contracts/1.0/case_input.serialization.json": "95ce47cb66567a3ca1904772f905a5aec81e557ff0dca0c2d2c77b120152299d",
+    "docs/schemas/contracts/1.0/case_input.validation.json": "3a8e9c6f2d053aca480480413c5b8f2e24d5edad192ecd642847a8410624d3f3",
+    "docs/schemas/contracts/1.0/check_result.serialization.json": "bbe6aa1b52bf09f0acbd1366b92e6dfc76c2e1435ea1688db3b8e94a8273cfb6",
+    "docs/schemas/contracts/1.0/check_result.validation.json": "138c07ed1ab130865849c9be6af4266bbd50a1e4ed534ea62ac0c3885bd4d0c2",
+    "docs/schemas/contracts/1.0/coverage_report.serialization.json": "c912a6ddc7d0748bdf53d5eaf770aedfa2d408544ce698d498ae7c53dcf09b4b",
+    "docs/schemas/contracts/1.0/coverage_report.validation.json": "917880681efda2079fe3865f2ae3b7975d3ad7e04adcb6395ba333be482ee709",
+    "docs/schemas/contracts/1.0/engine_result.serialization.json": "64b11091d81ea94d134ca8930ad233acd0125fa66e8ebd7460e1f505720df8cb",
+    "docs/schemas/contracts/1.0/engine_result.validation.json": "fb2605702e95f41f923391aa37c77a95f6d2c961c9271f9e611d5e4f047277eb",
+    "docs/schemas/contracts/1.0/manifest.json": "9e2feb13abc975766377ffe04694b92c2d7cf964dc3f4861b91fa3636c3e61a5",
+    "data/sections.xlsx": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359"
+  }
+}

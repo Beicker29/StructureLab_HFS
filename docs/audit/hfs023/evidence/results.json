@@ -1,0 +1,147 @@
+{
+  "base": "1b170929374bd590292ce3f5a17fca1e65bb79ce",
+  "suites": {
+    "before": {
+      "suites": 18,
+      "junit": {
+        "tests": 2364,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "passed_methods": 2352,
+      "passed_subtests": 12,
+      "xfail": 0,
+      "xpass": 0
+    },
+    "after": {
+      "suites": 19,
+      "junit": {
+        "tests": 2573,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "passed_methods": 2561,
+      "passed_subtests": 12,
+      "xfail": 0,
+      "xpass": 0
+    }
+  },
+  "comparison": {
+    "engine_examples_exact": 12,
+    "cli_memory_scenarios_exact": 24,
+    "diagrams_byte_identical": {
+      "composite_encased_case.json/original/case-0": {
+        "before": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-9bal8rml\\cli\\artifacts\\03o\\COMPOSITE_ENCASED_CASE\\20261029T092607941187Z\\W\\W14X90__20261029T092607942377Z__I5_METHOD2.svg",
+        "after": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-x6nb14xl\\cli\\artifacts\\03o\\COMPOSITE_ENCASED_CASE\\20261029T100101392803Z\\W\\W14X90__20261029T100101395064Z__I5_METHOD2.svg",
+        "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+        "bytes": 4696,
+        "format": ".svg"
+      },
+      "composite_encased_case.json/detailed/case-0": {
+        "before": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-9bal8rml\\cli\\artifacts\\03d\\COMPOSITE_ENCASED_CASE\\20261029T092609063737Z\\W\\W14X90__20261029T092609065925Z__I5_METHOD2.svg",
+        "after": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-x6nb14xl\\cli\\artifacts\\03d\\COMPOSITE_ENCASED_CASE\\20261029T100102483841Z\\W\\W14X90__20261029T100102485345Z__I5_METHOD2.svg",
+        "sha256": "b1891197ec6e8748f87b74e9ca1a06ec50dc2480c52b545d2592c1169ca22d6e",
+        "bytes": 4696,
+        "format": ".svg"
+      },
+      "composite_filled_circular_hss_case.json/original/case-0": {
+        "before": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-9bal8rml\\cli\\artifacts\\04o\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261029T092610170954Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261029T092611200015Z__I5_METHOD2.svg",
+        "after": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-x6nb14xl\\cli\\artifacts\\04o\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261029T100103618309Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261029T100104553237Z__I5_METHOD2.svg",
+        "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+        "bytes": 4754,
+        "format": ".svg"
+      },
+      "composite_filled_circular_hss_case.json/detailed/case-0": {
+        "before": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-9bal8rml\\cli\\artifacts\\04d\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261029T092613112817Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261029T092614119948Z__I5_METHOD2.svg",
+        "after": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-x6nb14xl\\cli\\artifacts\\04d\\COMPOSITE_FILLED_CIRCULAR_HSS_CASE\\20261029T100105660893Z\\CIRCULAR_HSS\\PTER4_X6.00MM__20261029T100106583251Z__I5_METHOD2.svg",
+        "sha256": "9ad1d10077b529cd331b256fe5468979662c54d6886ff38abe3e30ac01ab02ce",
+        "bytes": 4754,
+        "format": ".svg"
+      },
+      "composite_filled_rectangular_hss_case.json/original/case-0": {
+        "before": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-9bal8rml\\cli\\artifacts\\05o\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261029T092616330285Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261029T092617324649Z__I5_METHOD2.svg",
+        "after": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-x6nb14xl\\cli\\artifacts\\05o\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261029T100107737317Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261029T100108676757Z__I5_METHOD2.svg",
+        "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+        "bytes": 4750,
+        "format": ".svg"
+      },
+      "composite_filled_rectangular_hss_case.json/detailed/case-0": {
+        "before": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-9bal8rml\\cli\\artifacts\\05d\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261029T092618611174Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261029T092619806217Z__I5_METHOD2.svg",
+        "after": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\h20-x6nb14xl\\cli\\artifacts\\05d\\COMPOSITE_FILLED_RECTANGULAR_HSS_CASE\\20261029T100109788202Z\\RECTANGULAR_HSS\\PTE50X30X2.5MM__20261029T100110739401Z__I5_METHOD2.svg",
+        "sha256": "61692cf8297faf6ba77c64673623e261d549a0632c5f3b7cf34faf9a9f74de6b",
+        "bytes": 4750,
+        "format": ".svg"
+      }
+    }
+  },
+  "original_tests_preserved": 2352,
+  "new_tests": 209,
+  "all_structural_differences": [],
+  "normal_wheel_editable": true,
+  "schemas": "10 schemas plus manifest unchanged; verified in all three installs",
+  "source_proof": {
+    "base": "1b170929374bd590292ce3f5a17fca1e65bb79ce",
+    "protected_files": 98,
+    "byte_policy": "Git base bytes or exact LF/CRLF text representation; binary files exact; raw historical SHA retained",
+    "only_changed_original": "src/steel_design/domain/routing/profile_router.py",
+    "unchanged_ast": [
+      "ProfileType",
+      "_has_tension",
+      "_has_compression",
+      "_has_major_flexure",
+      "_has_minor_flexure",
+      "_has_any_flexure",
+      "_has_directional_shear",
+      "_has_major_shear",
+      "_has_minor_shear",
+      "_has_shear",
+      "_has_torsion",
+      "_is_h1_hss_applicable",
+      "_is_h3_1_hss_applicable",
+      "_is_h3_2_hss_applicable",
+      "_safe_ratio",
+      "_classify_element",
+      "_flexure_ratio",
+      "_w_or_channel_major_flexure_selection",
+      "_is_f2_applicable",
+      "_is_f3_applicable",
+      "_is_f4_applicable",
+      "_is_f5_applicable",
+      "_is_f6_applicable",
+      "_is_f7_mx_applicable",
+      "_is_f7_my_applicable",
+      "_is_f8_applicable",
+      "_is_f8_mx_applicable",
+      "_is_f8_my_applicable",
+      "_is_f10_mx_applicable",
+      "_is_f10_my_applicable",
+      "_is_f11_mx_applicable",
+      "_is_f11_my_applicable",
+      "_is_g2_vx_applicable",
+      "_is_g3_vx_applicable",
+      "_is_g3_vy_applicable",
+      "_is_g4_vx_applicable",
+      "_is_g4_vy_applicable",
+      "_is_g5_vx_applicable",
+      "_is_g5_vy_applicable",
+      "_is_g6_vy_applicable",
+      "registry/map assignment",
+      "registry/map assignment",
+      "_required_fields_for_e4",
+      "_required_fields_for_e7",
+      "_required_fields_for_h3",
+      "_section_slenderness_values",
+      "ProfileRouter"
+    ],
+    "removed_dead_symbol": "_has_interaction (unused I2 placeholder only, constant False)",
+    "new_production_files": [
+      "src/steel_design/domain/routing/registry_metadata.py"
+    ]
+  },
+  "remote": "Base run 40792213050 SUCCESS both OS; HFS-023 changes local only",
+  "independent_accreditations_added": 0,
+  "F31": "P0 open",
+  "HFS024": "not started"
+}

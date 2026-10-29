@@ -39,6 +39,7 @@ SUITES = [
     "test_hfs022_contracts",
     "test_hfs022r_review",
     "test_hfs022q_independent",
+    "test_hfs023_registry",
 ]
 
 
@@ -132,10 +133,16 @@ def verify(args):
             shutil.copyfile(path, inputs / folder / path.name)
     (inputs / "scripts").mkdir()
     shutil.copytree(ROOT / "tests/fixtures/hfs022q", inputs / "tests/fixtures/hfs022q")
+    shutil.copytree(ROOT / "tests/fixtures/hfs023", inputs / "tests/fixtures/hfs023")
+    for relative in ("docs/normative/hfs002-applicability.md", "docs/normative/hfs002-sources.md",
+                     "docs/audit/tracking.md", "docs/aisc_360_22_traceability.md"):
+        target = inputs / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
     for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py",
                  "hfs021a_invariants.py", "probe_hfs021a_imports.py",
                  "hfs021a_svg_comparison.py", "generate_hfs022_schemas.py",
-                 "probe_hfs022q_consumer.py"):
+                 "probe_hfs022q_consumer.py", "audit_hfs023.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
     for relative in ("docs/schemas/contracts/1.0", "docs/audit/hfs017/evidence/after"):
         target = inputs / relative

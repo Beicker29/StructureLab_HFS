@@ -1,0 +1,20 @@
+{
+  "base_head": "1b170929374bd590292ce3f5a17fca1e65bb79ce",
+  "note": "Raw checkout hashes at delivery; no commit or push",
+  "files": {
+    "CONTRIBUTING.md": "744b6cc4a61c1df1b9c1152f6525dfba6a1aa64f3572695fbfe00c16648333fe",
+    "docs/ROADMAP.md": "ddca35226c10551512cc311445333dcf5bb3eed6a07d218c59d5b52ad38ca5c8",
+    "docs/adr/003-traceability-testing.md": "c6db4dce4c4d959474c5034eba5a77046a729833d0338a51ccdb5a01df3aacdb",
+    "docs/aisc_360_22_traceability.md": "08ca25feb5ea0aea0bb3aaa86208d30e519d0357f3ccd8af4ec2e1a6ff81e302",
+    "docs/architecture/dry-inventory.md": "a6266ddc489afe56fe642fa10810cb3d82ce0286a8df9bdffb37cf0a9d427a33",
+    "docs/audit/hfs023/report.md": "682f58f922d1deba2492ba4d5c5ca7ce291e4c185dc00907b81c4ab5d8fa1637",
+    "docs/audit/tracking.md": "cfe3e1db4e4327c5a993d94d47bac3f428f28381445083aa478b222cd97a57ac",
+    "docs/contracts/hfs023-normative-registry.md": "4dbd7f162df68427baf8f8a9841eda41a19a4a65173488c88f925392a9e54b23",
+    "scripts/audit_hfs023.py": "6c1df371155a68887274b5ef576961d50ffe5fcc961fdaa463c63c76a0740024",
+    "scripts/verify_hfs020.py": "d74ada4e38ad3570dfec4f55bfd88335dbc88049732c548bfbb27bf024f05a9e",
+    "src/steel_design/domain/routing/profile_router.py": "19257a9c87dcf2c47f3761f5babc3590bb0d1ccc06967da02103a3ce7bdacd11",
+    "src/steel_design/domain/routing/registry_metadata.py": "bc18169161f38eac83c681e301babdc60900391bb67b1615de6b8d88d3a64334",
+    "tests/fixtures/hfs023/runtime-registry.json": "bad6a94c4d07a27c18a5ca3885d8cfea230245aecf2f10458edfa4faae85589b",
+    "tests/test_hfs023_registry.py": "f590d3f634bbef748067a19cdee2c713506323b531651cc9a2f56e2f3d977d9c"
+  }
+}

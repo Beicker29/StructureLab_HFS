@@ -1,5 +1,16 @@
 # Seguimiento maestro de hallazgos — HFS-017
 
+## Suplemento HFS-023 — 2026-10-29
+
+F-26 se aborda arquitectónicamente con metadatos canónicos en RuleDefinition
+y un índice derivado verificable; no se cierra la validación exhaustiva ni F-30.
+F-37 queda explícito separando ID, disposición y ecuación, sin cambiar etiquetas
+JSON ni fórmulas. F-31 permanece **P0 abierto**; F-19/20/23/28/33–38 y límites
+normativos restantes no se resuelven por registrar referencias o pasar tests.
+[Informe y riesgos](hfs023/report.md), [contrato](../contracts/hfs023-normative-registry.md).
+No se inicia HFS-024 ni se cambian prioridades/cierres normativos. Las entregas
+anteriores y sus resultados se conservan a continuación como historia.
+
 Fecha: 2026-10-27. Este es el registro vivo; [findings.md](findings.md) conserva el diagnóstico HFS-000 aceptado y no se reescribe. [ROADMAP](../ROADMAP.md) conserva tareas y prioridades resumidas. Actualizar ambos si cambia prioridad o asignación; no mantener una segunda copia completa del diagnóstico. Ningún hallazgo se cierra por aprobar HFS-000 o por redactar estos ADR.
 
 Entrega actual HFS-017 sobre `main`/`7234df8`: F-44/F-45 corregidos
@@ -60,7 +71,7 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-23 | P1 | Pruebas existentes insuficientes para validación exhaustiva | HFS-031–038/041/042 | Referencias independientes por dominio publicitado |
 | F-24 | P1 | Sin empaquetado/CI, requisitos abiertos | HFS-020 | Instalación y tests fuera del checkout reproducibles |
 | F-25 | P1 | Históricos/temporales versionados | Política HFS-001; limpieza posterior separada | Trazabilidad recuperable y justificación antes de retirar |
-| F-26 | P1 | Matriz manual sin prueba de cobertura exhaustiva | HFS-023/024/030 | Registro único trazable a funciones y pruebas |
+| F-26 | P1 | HFS-023: matriz de implementación derivada de RuleDefinition.metadata, referencias e integridad verificadas; cobertura exhaustiva no acreditada | HFS-023 para revisión; HFS-024/030 pendientes | [Registro único y riesgos](hfs023/report.md); no cierre normativo por metadatos |
 | F-27 | P1 | Procedencia de catálogo pendiente; anomalías observadas | HFS-040 | Fuente, conversiones e identidad comprobadas |
 | F-28 | P2 | Permisos/erratas pendientes | HFS-030 y revisión documental | Registro verificable de edición, permisos y erratas |
 | F-29 | P1 histórico | Corregido HFS-014 para revisión: aggregate_case_statuses([]) lanza EMPTY_CASE_BUNDLE; CLI stderr/exit 1, sin cumplimiento, ejecución de casos ni memorias. Tabla de estados no vacíos y fallos individuales preservados | HFS-014 | Revisar errores/migración; tests de lista vacía, tipos/elementos inválidos y combinaciones PASS/FAIL/INCOMPLETE. F-32 no cambia |

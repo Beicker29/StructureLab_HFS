@@ -1,0 +1,1648 @@
+[
+  {
+    "symbol": "steel_design.domain.rules.tension_rule:TensionRule",
+    "check_owner": "steel_design.domain.rules.tension_rule:TensionRule.check",
+    "registry_ids": [
+      "D2-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.tension_rule:TensionRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:13",
+      "src/steel_design/domain/coverage_evidence.py:18",
+      "src/steel_design/domain/coverage_evidence.py:96",
+      "src/steel_design/domain/coverage_evidence.py:100",
+      "src/steel_design/domain/coverage_evidence.py:104",
+      "src/steel_design/domain/routing/profile_router.py:82",
+      "src/steel_design/domain/routing/profile_router.py:363",
+      "tests/test_hfs010_coverage.py:19",
+      "tests/test_hfs010_coverage.py:134",
+      "tests/test_hfs010_coverage.py:156",
+      "tests/test_hfs010_coverage.py:157",
+      "tests/test_hfs015_precision_advice.py:22",
+      "tests/test_hfs015_precision_advice.py:78",
+      "tests/test_hfs017_design_method.py:122",
+      "tests/test_normative_d2_e3_f2.py:6",
+      "tests/test_normative_d2_e3_f2.py:44",
+      "tests/test_profile_router.py:168"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.tension_rule:TensionRuptureRule",
+    "check_owner": "steel_design.domain.rules.tension_rule:TensionRuptureRule.check",
+    "registry_ids": [
+      "D2-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.tension_rule:TensionRuptureRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:13",
+      "src/steel_design/domain/coverage_evidence.py:19",
+      "src/steel_design/domain/coverage_evidence.py:96",
+      "src/steel_design/domain/routing/profile_router.py:82",
+      "src/steel_design/domain/routing/profile_router.py:364",
+      "tests/test_hfs010_coverage.py:19",
+      "tests/test_hfs010_coverage.py:134",
+      "tests/test_hfs010_coverage.py:167",
+      "tests/test_hfs017_design_method.py:122",
+      "tests/test_normative_d2_e3_f2.py:6",
+      "tests/test_normative_d2_e3_f2.py:45",
+      "tests/test_profile_router.py:169"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.axial_rules:AxialE3Rule",
+    "check_owner": "steel_design.domain.rules.axial_rules:AxialE3Rule.check",
+    "registry_ids": [
+      "E3"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.axial_rules:AxialE3Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:20",
+      "src/steel_design/domain/routing/profile_router.py:12",
+      "src/steel_design/domain/routing/profile_router.py:365",
+      "tests/test_chapter_e_rules.py:4",
+      "tests/test_chapter_e_rules.py:107",
+      "tests/test_chapter_e_rules.py:133",
+      "tests/test_hfs017_design_method.py:128",
+      "tests/test_hfs021a_public_api.py:90",
+      "tests/test_hfs021a_public_api.py:95",
+      "tests/test_hfs021a_public_api.py:96",
+      "tests/test_normative_d2_e3_f2.py:4",
+      "tests/test_normative_d2_e3_f2.py:75",
+      "tests/test_profile_router.py:108",
+      "tests/test_profile_router.py:151"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.axial_rules:AxialE4Rule",
+    "check_owner": "steel_design.domain.rules.axial_rules:AxialE4Rule.check",
+    "registry_ids": [
+      "E4"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.axial_rules:AxialE4Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:21",
+      "src/steel_design/domain/routing/profile_router.py:12",
+      "src/steel_design/domain/routing/profile_router.py:366",
+      "tests/test_chapter_e_rules.py:4",
+      "tests/test_chapter_e_rules.py:45",
+      "tests/test_chapter_e_rules.py:134",
+      "tests/test_profile_router.py:109"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.axial_rules:AxialE5Rule",
+    "check_owner": "steel_design.domain.rules.axial_rules:AxialE5Rule.check",
+    "registry_ids": [
+      "E5"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.axial_rules:AxialE5Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:22",
+      "src/steel_design/domain/routing/profile_router.py:12",
+      "src/steel_design/domain/routing/profile_router.py:367",
+      "tests/test_chapter_e_rules.py:4",
+      "tests/test_chapter_e_rules.py:81",
+      "tests/test_chapter_e_rules.py:82"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.axial_rules:AxialE7Rule",
+    "check_owner": "steel_design.domain.rules.axial_rules:AxialE7Rule.check",
+    "registry_ids": [
+      "E7"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.axial_rules:AxialE7Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:23",
+      "src/steel_design/domain/routing/profile_router.py:12",
+      "src/steel_design/domain/routing/profile_router.py:368",
+      "tests/test_chapter_e_rules.py:4",
+      "tests/test_chapter_e_rules.py:108",
+      "tests/test_profile_router.py:110",
+      "tests/test_profile_router.py:134"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingRule.check",
+    "registry_ids": [
+      "F10-3-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:61",
+      "src/steel_design/domain/routing/profile_router.py:449"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingRule.check",
+    "registry_ids": [
+      "F10-3-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:62",
+      "src/steel_design/domain/routing/profile_router.py:450"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10LtbMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LtbRule.check",
+    "registry_ids": [
+      "F10-2-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LtbMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:63",
+      "src/steel_design/domain/routing/profile_router.py:447"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10LtbMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LtbRule.check",
+    "registry_ids": [
+      "F10-2-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LtbMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:64",
+      "src/steel_design/domain/routing/profile_router.py:448"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LtbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LtbMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF10LtbMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10LegBucklingMxRule"
+    ],
+    "textual_references": [
+      "tests/test_chapter_f_rules.py:5",
+      "tests/test_chapter_f_rules.py:102",
+      "tests/test_chapter_f_rules.py:111"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10YieldMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10YieldRule.check",
+    "registry_ids": [
+      "F10-1-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10YieldMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:65",
+      "src/steel_design/domain/routing/profile_router.py:445"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10YieldMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10YieldRule.check",
+    "registry_ids": [
+      "F10-1-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10YieldMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:66",
+      "src/steel_design/domain/routing/profile_router.py:446"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF10YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF10YieldRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF10YieldMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF10YieldMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/rules/flexure_rule.py:645",
+      "src/steel_design/domain/rules/flexure_rule.py:682"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11LtbMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11LtbRule.check",
+    "registry_ids": [
+      "F11-2-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11LtbMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:67",
+      "src/steel_design/domain/routing/profile_router.py:453"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11LtbMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11LtbRule.check",
+    "registry_ids": [
+      "F11-2-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11LtbMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:68",
+      "src/steel_design/domain/routing/profile_router.py:454"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11LtbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11LtbMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF11LtbMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11LtbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11LtbMxRule"
+    ],
+    "textual_references": [
+      "tests/test_chapter_f_rules.py:5",
+      "tests/test_chapter_f_rules.py:131"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11YieldMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11YieldRule.check",
+    "registry_ids": [
+      "F11-1-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11YieldMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:69",
+      "src/steel_design/domain/routing/profile_router.py:451",
+      "scripts/audit_hfs017_probes.py:14",
+      "scripts/audit_hfs017_probes.py:24",
+      "scripts/audit_hfs017_probes.py:25"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11YieldMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11YieldRule.check",
+    "registry_ids": [
+      "F11-1-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11YieldMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:70",
+      "src/steel_design/domain/routing/profile_router.py:452"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF11YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF11YieldRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF11YieldMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF11YieldMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF2LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF2LtbRule.check",
+    "registry_ids": [
+      "F2-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF2LtbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:41",
+      "src/steel_design/domain/routing/profile_router.py:34",
+      "src/steel_design/domain/routing/profile_router.py:370",
+      "tests/test_chapter_f_rules.py:60",
+      "tests/test_hfs012_flexure_selection.py:149",
+      "tests/test_profile_router.py:61",
+      "tests/test_profile_router.py:72"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule.check",
+    "registry_ids": [
+      "F2-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:41",
+      "src/steel_design/domain/routing/profile_router.py:35",
+      "src/steel_design/domain/routing/profile_router.py:369",
+      "tests/test_chapter_f_rules.py:60",
+      "tests/test_hfs012_flexure_selection.py:149",
+      "tests/test_profile_router.py:60",
+      "tests/test_profile_router.py:72"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule.check",
+    "registry_ids": [
+      "F3-3"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:43",
+      "src/steel_design/domain/routing/profile_router.py:36",
+      "src/steel_design/domain/routing/profile_router.py:373",
+      "tests/test_chapter_f_rules.py:65"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF3LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF3LtbRule.check",
+    "registry_ids": [
+      "F3-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF3LtbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:42",
+      "src/steel_design/domain/routing/profile_router.py:37",
+      "src/steel_design/domain/routing/profile_router.py:372",
+      "tests/test_chapter_f_rules.py:65"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF3Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF3FlbRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF3YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF3YieldRule.check",
+    "registry_ids": [
+      "F3-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF3YieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:42",
+      "src/steel_design/domain/routing/profile_router.py:38",
+      "src/steel_design/domain/routing/profile_router.py:371",
+      "tests/test_chapter_f_rules.py:65"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF4CompressionYieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF4CompressionYieldRule.check",
+    "registry_ids": [
+      "F4-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF4CompressionYieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:44",
+      "src/steel_design/domain/routing/profile_router.py:39",
+      "src/steel_design/domain/routing/profile_router.py:374",
+      "tests/test_chapter_f_rules.py:71"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule.check",
+    "registry_ids": [
+      "F4-3"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:45",
+      "src/steel_design/domain/routing/profile_router.py:40",
+      "src/steel_design/domain/routing/profile_router.py:376",
+      "tests/test_chapter_f_rules.py:71"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF4LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF4LtbRule.check",
+    "registry_ids": [
+      "F4-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF4LtbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:45",
+      "src/steel_design/domain/routing/profile_router.py:41",
+      "src/steel_design/domain/routing/profile_router.py:375",
+      "tests/test_chapter_f_rules.py:71"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF4Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF4FlbRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF4TensionYieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF4TensionYieldRule.check",
+    "registry_ids": [
+      "F4-4"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF4TensionYieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:44",
+      "src/steel_design/domain/routing/profile_router.py:42",
+      "src/steel_design/domain/routing/profile_router.py:377",
+      "tests/test_chapter_f_rules.py:71"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF5CompressionYieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF5CompressionYieldRule.check",
+    "registry_ids": [
+      "F5-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF5CompressionYieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:46",
+      "src/steel_design/domain/routing/profile_router.py:43",
+      "src/steel_design/domain/routing/profile_router.py:378",
+      "tests/test_chapter_f_rules.py:77"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule.check",
+    "registry_ids": [
+      "F5-3"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:47",
+      "src/steel_design/domain/routing/profile_router.py:44",
+      "src/steel_design/domain/routing/profile_router.py:380",
+      "tests/test_chapter_f_rules.py:77"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF5LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF5LtbRule.check",
+    "registry_ids": [
+      "F5-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF5LtbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:47",
+      "src/steel_design/domain/routing/profile_router.py:45",
+      "src/steel_design/domain/routing/profile_router.py:379",
+      "tests/test_chapter_f_rules.py:77"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF5Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF5FlbRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF5TensionYieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF5TensionYieldRule.check",
+    "registry_ids": [
+      "F5-4"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF5TensionYieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:46",
+      "src/steel_design/domain/routing/profile_router.py:46",
+      "src/steel_design/domain/routing/profile_router.py:381",
+      "tests/test_chapter_f_rules.py:77"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule.check",
+    "registry_ids": [
+      "F6-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:48",
+      "src/steel_design/domain/routing/profile_router.py:47",
+      "src/steel_design/domain/routing/profile_router.py:383",
+      "tests/test_chapter_f_rules.py:83",
+      "tests/test_profile_router.py:72"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF6Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF6FlbRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF6YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF6YieldRule.check",
+    "registry_ids": [
+      "F6-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF6YieldRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:48",
+      "src/steel_design/domain/routing/profile_router.py:48",
+      "src/steel_design/domain/routing/profile_router.py:382",
+      "tests/test_chapter_f_rules.py:83",
+      "tests/test_profile_router.py:72"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeRule.check",
+    "registry_ids": [
+      "F7-2-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:49",
+      "src/steel_design/domain/routing/profile_router.py:400"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeRule.check",
+    "registry_ids": [
+      "F7-2-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:50",
+      "src/steel_design/domain/routing/profile_router.py:407"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7LtbMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7LtbRule.check",
+    "registry_ids": [
+      "F7-4-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7LtbMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:51",
+      "src/steel_design/domain/routing/profile_router.py:428"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7LtbMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7LtbRule.check",
+    "registry_ids": [
+      "F7-4-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7LtbMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:52",
+      "src/steel_design/domain/routing/profile_router.py:435"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7LtbRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7LtbRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7LtbMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF7LtbMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7FlangeRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7FlangeMxRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7WebMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7WebRule.check",
+    "registry_ids": [
+      "F7-3-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7WebMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:53",
+      "src/steel_design/domain/routing/profile_router.py:414"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7WebMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7WebRule.check",
+    "registry_ids": [
+      "F7-3-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7WebMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:54",
+      "src/steel_design/domain/routing/profile_router.py:421"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7WebRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7WebRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7WebMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF7WebMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7YieldMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7YieldRule.check",
+    "registry_ids": [
+      "F7-1-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7YieldMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:55",
+      "src/steel_design/domain/routing/profile_router.py:386"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7YieldMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7YieldRule.check",
+    "registry_ids": [
+      "F7-1-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7YieldMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:56",
+      "src/steel_design/domain/routing/profile_router.py:393"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF7YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF7YieldRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF7YieldMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF7YieldMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingRule.check",
+    "registry_ids": [
+      "F8-2-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:57",
+      "src/steel_design/domain/routing/profile_router.py:442"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingRule.check",
+    "registry_ids": [
+      "F8-2-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:58",
+      "src/steel_design/domain/routing/profile_router.py:443"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8Rule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8LocalBucklingMxRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8YieldMxRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8YieldRule.check",
+    "registry_ids": [
+      "F8-1-Mx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8YieldMxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:59",
+      "src/steel_design/domain/routing/profile_router.py:440"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8YieldMyRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8YieldRule.check",
+    "registry_ids": [
+      "F8-1-My"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8YieldMyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:60",
+      "src/steel_design/domain/routing/profile_router.py:441"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureF8YieldRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF8YieldRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF8YieldMxRule",
+      "steel_design.domain.rules.flexure_rule:FlexureF8YieldMyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.flexure_rule:FlexureRule",
+    "check_owner": "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.flexure_rule:FlexureF2YieldRule"
+    ],
+    "textual_references": [
+      "tests/test_normative_d2_e3_f2.py:5",
+      "tests/test_normative_d2_e3_f2.py:93"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG2VxRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG2VxRule.check",
+    "registry_ids": [
+      "G2-Vx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG2VxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:60",
+      "src/steel_design/domain/routing/profile_router.py:73",
+      "src/steel_design/domain/routing/profile_router.py:455",
+      "tests/test_chapter_g_rules.py:5",
+      "tests/test_chapter_g_rules.py:34",
+      "tests/test_chapter_g_rules.py:110",
+      "tests/test_hfs013_directional_h3.py:19",
+      "tests/test_hfs013_directional_h3.py:254",
+      "tests/test_hfs017_design_method.py:175"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG3Rule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG3Rule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG3VxRule",
+      "steel_design.domain.rules.shear_rules:ShearG3VyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG3VxRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG3Rule.check",
+    "registry_ids": [
+      "G3-Vx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG3VxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:60",
+      "src/steel_design/domain/routing/profile_router.py:74",
+      "src/steel_design/domain/routing/profile_router.py:456",
+      "tests/test_chapter_g_rules.py:5",
+      "tests/test_chapter_g_rules.py:50"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG3VyRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG3Rule.check",
+    "registry_ids": [
+      "G3-Vy"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG3VyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:62",
+      "src/steel_design/domain/routing/profile_router.py:75",
+      "src/steel_design/domain/routing/profile_router.py:457"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG4Rule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG4Rule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG4VxRule",
+      "steel_design.domain.rules.shear_rules:ShearG4VyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG4VxRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG4Rule.check",
+    "registry_ids": [
+      "G4-Vx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG4VxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:60",
+      "src/steel_design/domain/routing/profile_router.py:76",
+      "src/steel_design/domain/routing/profile_router.py:460",
+      "tests/test_chapter_g_rules.py:65",
+      "tests/test_hfs013_directional_h3.py:19",
+      "tests/test_hfs013_directional_h3.py:96",
+      "tests/test_hfs013_directional_h3.py:118"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG4VyRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG4Rule.check",
+    "registry_ids": [
+      "G4-Vy"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG4VyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:62",
+      "src/steel_design/domain/routing/profile_router.py:77",
+      "src/steel_design/domain/routing/profile_router.py:461",
+      "tests/test_chapter_g_rules.py:66",
+      "tests/test_hfs013_directional_h3.py:19",
+      "tests/test_hfs013_directional_h3.py:97",
+      "tests/test_hfs013_directional_h3.py:118",
+      "tests/test_hfs013_directional_h3.py:294"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG5Rule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG5Rule.check",
+    "registry_ids": [],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG5VxRule",
+      "steel_design.domain.rules.shear_rules:ShearG5VyRule"
+    ],
+    "textual_references": [],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG5VxRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG5Rule.check",
+    "registry_ids": [
+      "G5-Vx"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG5VxRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:60",
+      "src/steel_design/domain/routing/profile_router.py:78",
+      "src/steel_design/domain/routing/profile_router.py:462",
+      "tests/test_chapter_g_rules.py:5",
+      "tests/test_chapter_g_rules.py:78",
+      "tests/test_hfs013_directional_h3.py:19",
+      "tests/test_hfs013_directional_h3.py:211",
+      "tests/test_hfs013_directional_h3.py:232"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG5VyRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG5Rule.check",
+    "registry_ids": [
+      "G5-Vy"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG5VyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:62",
+      "src/steel_design/domain/routing/profile_router.py:79",
+      "src/steel_design/domain/routing/profile_router.py:463"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.shear_rules:ShearG6VyRule",
+    "check_owner": "steel_design.domain.rules.shear_rules:ShearG6VyRule.check",
+    "registry_ids": [
+      "G6-Vy"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.shear_rules:ShearG6VyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:62",
+      "src/steel_design/domain/routing/profile_router.py:80",
+      "src/steel_design/domain/routing/profile_router.py:464",
+      "tests/test_chapter_g_rules.py:5",
+      "tests/test_chapter_g_rules.py:94",
+      "tests/test_chapter_g_rules.py:111",
+      "tests/test_hfs013_directional_h3.py:19",
+      "tests/test_hfs013_directional_h3.py:255",
+      "tests/test_hfs013_directional_h3.py:257",
+      "tests/test_hfs013_directional_h3.py:323"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.combined_hss_rules:CombinedH1HssRule",
+    "check_owner": "steel_design.domain.rules.combined_hss_rules:CombinedH1HssRule.check",
+    "registry_ids": [
+      "H1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.combined_hss_rules:CombinedH1HssRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:24",
+      "src/steel_design/domain/routing/profile_router.py:13",
+      "src/steel_design/domain/routing/profile_router.py:465",
+      "tests/test_chapter_h_rules.py:69",
+      "tests/test_hfs013_design_method.py:24",
+      "tests/test_hfs013_design_method.py:139",
+      "tests/test_hfs013_design_method.py:227",
+      "tests/test_hfs015_precision_advice.py:164"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.combined_hss_rules:HssCombinedH3_2Rule",
+    "check_owner": "steel_design.domain.rules.combined_hss_rules:HssCombinedH3_2Rule.check",
+    "registry_ids": [
+      "H3-2"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.combined_hss_rules:HssCombinedH3_2Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:26",
+      "src/steel_design/domain/routing/profile_router.py:13",
+      "src/steel_design/domain/routing/profile_router.py:467",
+      "tests/test_chapter_h_rules.py:5",
+      "tests/test_chapter_h_rules.py:71",
+      "tests/test_chapter_h_rules.py:85",
+      "tests/test_chapter_h_rules.py:91",
+      "tests/test_hfs013_design_method.py:24",
+      "tests/test_hfs013_design_method.py:106",
+      "tests/test_hfs013_design_method.py:124",
+      "tests/test_hfs013_design_method.py:221",
+      "tests/test_hfs013_directional_h3.py:18",
+      "tests/test_hfs013_directional_h3.py:112",
+      "tests/test_hfs013_directional_h3.py:135",
+      "tests/test_hfs013_directional_h3.py:179",
+      "tests/test_hfs013_directional_h3.py:187",
+      "tests/test_hfs013_directional_h3.py:246",
+      "tests/test_hfs015_precision_advice.py:149",
+      "tests/test_hfs017_design_method.py:191"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.combined_hss_rules:HssTorsionH3_1Rule",
+    "check_owner": "steel_design.domain.rules.combined_hss_rules:HssTorsionH3_1Rule.check",
+    "registry_ids": [
+      "H3-1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.combined_hss_rules:HssTorsionH3_1Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:25",
+      "src/steel_design/domain/routing/profile_router.py:13",
+      "src/steel_design/domain/routing/profile_router.py:466",
+      "tests/test_chapter_h_rules.py:5",
+      "tests/test_chapter_h_rules.py:70",
+      "tests/test_chapter_h_rules.py:75",
+      "tests/test_hfs013_directional_h3.py:18",
+      "tests/test_hfs013_directional_h3.py:169",
+      "tests/test_hfs013_directional_h3.py:193",
+      "tests/test_hfs013_directional_h3.py:220",
+      "tests/test_hfs013_directional_h3.py:223",
+      "tests/test_hfs013_directional_h3.py:234",
+      "tests/test_hfs013_directional_h3.py:297"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI1Rule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI1Rule.check",
+    "registry_ids": [
+      "I1"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI1Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:27",
+      "src/steel_design/domain/routing/profile_router.py:15",
+      "src/steel_design/domain/routing/profile_router.py:475",
+      "src/steel_design/domain/routing/profile_router.py:806",
+      "tests/test_chapter_i_rules.py:131"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI2EncasedCompressionRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI2EncasedCompressionRule.check",
+    "registry_ids": [
+      "I2.ENCASED.COMPRESSION"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI2EncasedCompressionRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:28",
+      "src/steel_design/domain/routing/profile_router.py:16",
+      "src/steel_design/domain/routing/profile_router.py:476",
+      "src/steel_design/domain/routing/profile_router.py:810",
+      "src/steel_design/domain/rules/composite_rules.py:851",
+      "tests/test_chapter_i_rules.py:6",
+      "tests/test_chapter_i_rules.py:132",
+      "tests/test_chapter_i_rules.py:186",
+      "tests/test_hfs015_precision_advice.py:270"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI2EncasedTensionRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI2EncasedTensionRule.check",
+    "registry_ids": [
+      "I2.ENCASED.TENSION"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI2EncasedTensionRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:29",
+      "src/steel_design/domain/routing/profile_router.py:17",
+      "src/steel_design/domain/routing/profile_router.py:477",
+      "src/steel_design/domain/routing/profile_router.py:812",
+      "src/steel_design/domain/rules/composite_rules.py:859",
+      "scripts/audit_hfs017_probes.py:15",
+      "scripts/audit_hfs017_probes.py:26"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI2FilledCompressionRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI2FilledCompressionRule.check",
+    "registry_ids": [
+      "I2.FILLED.COMPRESSION"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI2FilledCompressionRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:30",
+      "src/steel_design/domain/routing/profile_router.py:18",
+      "src/steel_design/domain/routing/profile_router.py:478",
+      "src/steel_design/domain/routing/profile_router.py:829",
+      "src/steel_design/domain/rules/composite_rules.py:853",
+      "tests/test_chapter_i_rules.py:7",
+      "tests/test_chapter_i_rules.py:202"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI2FilledTensionRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI2FilledTensionRule.check",
+    "registry_ids": [
+      "I2.FILLED.TENSION"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI2FilledTensionRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:31",
+      "src/steel_design/domain/routing/profile_router.py:19",
+      "src/steel_design/domain/routing/profile_router.py:479",
+      "src/steel_design/domain/routing/profile_router.py:831",
+      "src/steel_design/domain/rules/composite_rules.py:861"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI3_1aRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI3_1aRule.check",
+    "registry_ids": [
+      "I3.TRANSFER.CONCRETE"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI3_1aRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:34",
+      "src/steel_design/domain/routing/profile_router.py:21",
+      "src/steel_design/domain/routing/profile_router.py:480",
+      "src/steel_design/domain/routing/profile_router.py:847"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI3_1bRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI3_1bRule.check",
+    "registry_ids": [
+      "I3.TRANSFER.STEEL"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI3_1bRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:35",
+      "src/steel_design/domain/routing/profile_router.py:22",
+      "src/steel_design/domain/routing/profile_router.py:481",
+      "src/steel_design/domain/routing/profile_router.py:847"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI3_1cRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI3_1cRule.check",
+    "registry_ids": [
+      "I3.TRANSFER.ANCHORS"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI3_1cRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:36",
+      "src/steel_design/domain/routing/profile_router.py:23",
+      "src/steel_design/domain/routing/profile_router.py:482",
+      "src/steel_design/domain/routing/profile_router.py:847",
+      "tests/test_chapter_i_rules.py:9",
+      "tests/test_chapter_i_rules.py:219"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI3_3Rule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI3_3Rule.check",
+    "registry_ids": [
+      "I3.ENCASED.REINFORCEMENT"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI3_3Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:24",
+      "src/steel_design/domain/routing/profile_router.py:483",
+      "src/steel_design/domain/routing/profile_router.py:815",
+      "tests/test_chapter_i_rules.py:133"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI3_4Rule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI3_4Rule.check",
+    "registry_ids": [
+      "I3.FILLED.REINFORCEMENT"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI3_4Rule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/routing/profile_router.py:25",
+      "src/steel_design/domain/routing/profile_router.py:484",
+      "src/steel_design/domain/routing/profile_router.py:834"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI4_1EncasedGoverningRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI4_1EncasedGoverningRule.check",
+    "registry_ids": [
+      "I4.ENCASED.GOVERNING"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI4_1EncasedGoverningRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:65",
+      "src/steel_design/domain/routing/profile_router.py:26",
+      "src/steel_design/domain/routing/profile_router.py:488",
+      "src/steel_design/domain/routing/profile_router.py:822",
+      "tests/test_chapter_i_rules.py:10",
+      "tests/test_chapter_i_rules.py:134",
+      "tests/test_chapter_i_rules.py:238",
+      "tests/test_hfs015_precision_advice.py:259"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI4_1FilledRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI4_1FilledRule.check",
+    "registry_ids": [
+      "I4.FILLED"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI4_1FilledRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:66",
+      "src/steel_design/domain/routing/profile_router.py:27",
+      "src/steel_design/domain/routing/profile_router.py:489",
+      "src/steel_design/domain/routing/profile_router.py:836",
+      "tests/test_chapter_i_rules.py:11",
+      "tests/test_chapter_i_rules.py:253"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI4_1aEncasedRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI4_1aEncasedRule.check",
+    "registry_ids": [
+      "I4.ENCASED.STEEL"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI4_1aEncasedRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:64",
+      "src/steel_design/domain/routing/profile_router.py:28",
+      "src/steel_design/domain/routing/profile_router.py:485",
+      "src/steel_design/domain/routing/profile_router.py:819",
+      "src/steel_design/domain/rules/composite_rules.py:1788",
+      "tests/test_hfs015_precision_advice.py:252"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI4_1bEncasedRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI4_1bEncasedRule.check",
+    "registry_ids": [
+      "I4.ENCASED.RC"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI4_1bEncasedRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:64",
+      "src/steel_design/domain/routing/profile_router.py:29",
+      "src/steel_design/domain/routing/profile_router.py:486",
+      "src/steel_design/domain/routing/profile_router.py:820",
+      "src/steel_design/domain/rules/composite_rules.py:1789",
+      "tests/test_hfs015_precision_advice.py:252"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI4_1cEncasedRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI4_1cEncasedRule.check",
+    "registry_ids": [
+      "I4.ENCASED.COMBINED"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI4_1cEncasedRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:65",
+      "src/steel_design/domain/routing/profile_router.py:30",
+      "src/steel_design/domain/routing/profile_router.py:487",
+      "src/steel_design/domain/routing/profile_router.py:821",
+      "src/steel_design/domain/rules/composite_rules.py:1790",
+      "tests/test_hfs015_precision_advice.py:253"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI4_3BeamDeckSteelOnlyRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI4_3BeamDeckSteelOnlyRule.check",
+    "registry_ids": [
+      "I4.BEAM.STEEL"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI4_3BeamDeckSteelOnlyRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:66",
+      "src/steel_design/domain/routing/profile_router.py:31",
+      "src/steel_design/domain/routing/profile_router.py:490",
+      "src/steel_design/domain/routing/profile_router.py:849"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  },
+  {
+    "symbol": "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule",
+    "check_owner": "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule.check",
+    "registry_ids": [
+      "I5"
+    ],
+    "related_registered_classes": [
+      "steel_design.domain.rules.composite_rules:CompositeI5CombinedRule"
+    ],
+    "textual_references": [
+      "src/steel_design/domain/coverage_evidence.py:32",
+      "src/steel_design/domain/routing/profile_router.py:20",
+      "src/steel_design/domain/routing/profile_router.py:491",
+      "src/steel_design/domain/routing/profile_router.py:814",
+      "src/steel_design/domain/routing/profile_router.py:833",
+      "tests/test_chapter_i_rules.py:8",
+      "tests/test_chapter_i_rules.py:149",
+      "tests/test_chapter_i_rules.py:269",
+      "tests/test_chapter_i_rules.py:285",
+      "tests/test_chapter_i_rules.py:306",
+      "tests/test_hfs015_precision_advice.py:278"
+    ],
+    "dynamic_consumer": "tests/test_hfs017_design_method.py::rule_classes",
+    "decision": "Preserve: implementation/inheritance or live direct-method-guard consumer; not replaced by metadata"
+  }
+]

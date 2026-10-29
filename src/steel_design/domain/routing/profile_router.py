@@ -2,6 +2,7 @@ import math
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Tuple, Type
 
+from .registry_metadata import RuleMetadata, attach_metadata, pending_groups
 from ...codes.aisc_360_22 import axial_calc
 from ..design_methods import require_case_method, validate_method_scope
 from ...models import SteelCase
@@ -100,7 +101,8 @@ class RuleDefinition:
     rule_class: Optional[Type]
     implemented: bool
     required_section_fields: Tuple[str, ...]
-    applicability: Callable[[SteelCase, Section], bool]
+    applicability: Optional[Callable[[SteelCase, Section], bool]]
+    metadata: Optional[RuleMetadata] = None
 
 
 def _has_tension(case: SteelCase, _: Section) -> bool:
@@ -155,10 +157,6 @@ def _is_h3_2_hss_applicable(case: SteelCase, section: Section) -> bool:
     if section.type.upper() not in {"RECTANGULAR_HSS", "CIRCULAR_HSS"} or not _has_torsion(case, section):
         return False
     return abs(case.loads.Pu) > 0.0 or _has_any_flexure(case, section) or _has_shear(case, section)
-
-
-def _has_interaction(case: SteelCase, section: Section) -> bool:
-    return False
 
 
 def _safe_ratio(value: Optional[float]) -> float:
@@ -467,8 +465,37 @@ RULE_DEFINITIONS: Dict[str, RuleDefinition] = {
     "H1": RuleDefinition("H1", CombinedH1HssRule, True, ("area",), _is_h1_hss_applicable),
     "H3-1": RuleDefinition("H3-1", HssTorsionH3_1Rule, True, tuple(), _is_h3_1_hss_applicable),
     "H3-2": RuleDefinition("H3-2", HssCombinedH3_2Rule, True, tuple(), _is_h3_2_hss_applicable),
-    "I2": RuleDefinition("I2", None, False, ("area",), _has_interaction),
+    "I2": RuleDefinition("I2", None, False, ("area",), None),
 }
+
+
+# HFS-023: descriptive membership only. Chapter I still uses the unchanged
+# procedural selector; these IDs are not added to PROFILE_RULE_MAP.
+RULE_DEFINITIONS.update({
+    "I1": RuleDefinition("I1", CompositeI1Rule, True, (), None),
+    "I2.ENCASED.COMPRESSION": RuleDefinition("I2.ENCASED.COMPRESSION", CompositeI2EncasedCompressionRule, True, (), None),
+    "I2.ENCASED.TENSION": RuleDefinition("I2.ENCASED.TENSION", CompositeI2EncasedTensionRule, True, (), None),
+    "I2.FILLED.COMPRESSION": RuleDefinition("I2.FILLED.COMPRESSION", CompositeI2FilledCompressionRule, True, (), None),
+    "I2.FILLED.TENSION": RuleDefinition("I2.FILLED.TENSION", CompositeI2FilledTensionRule, True, (), None),
+    "I3.TRANSFER.CONCRETE": RuleDefinition("I3.TRANSFER.CONCRETE", CompositeI3_1aRule, True, (), None),
+    "I3.TRANSFER.STEEL": RuleDefinition("I3.TRANSFER.STEEL", CompositeI3_1bRule, True, (), None),
+    "I3.TRANSFER.ANCHORS": RuleDefinition("I3.TRANSFER.ANCHORS", CompositeI3_1cRule, True, (), None),
+    "I3.ENCASED.REINFORCEMENT": RuleDefinition("I3.ENCASED.REINFORCEMENT", CompositeI3_3Rule, True, (), None),
+    "I3.FILLED.REINFORCEMENT": RuleDefinition("I3.FILLED.REINFORCEMENT", CompositeI3_4Rule, True, (), None),
+    "I4.ENCASED.STEEL": RuleDefinition("I4.ENCASED.STEEL", CompositeI4_1aEncasedRule, True, (), None),
+    "I4.ENCASED.RC": RuleDefinition("I4.ENCASED.RC", CompositeI4_1bEncasedRule, True, (), None),
+    "I4.ENCASED.COMBINED": RuleDefinition("I4.ENCASED.COMBINED", CompositeI4_1cEncasedRule, True, (), None),
+    "I4.ENCASED.GOVERNING": RuleDefinition("I4.ENCASED.GOVERNING", CompositeI4_1EncasedGoverningRule, True, (), None),
+    "I4.FILLED": RuleDefinition("I4.FILLED", CompositeI4_1FilledRule, True, (), None),
+    "I4.BEAM.STEEL": RuleDefinition("I4.BEAM.STEEL", CompositeI4_3BeamDeckSteelOnlyRule, True, (), None),
+    "I5": RuleDefinition("I5", CompositeI5CombinedRule, True, (), None),
+})
+for _ids, _metadata in pending_groups():
+    for _id in _ids:
+        if _id not in RULE_DEFINITIONS:
+            RULE_DEFINITIONS[_id] = RuleDefinition(_id, None, False, (), None)
+RULE_DEFINITIONS = attach_metadata(RULE_DEFINITIONS)
+del _ids, _metadata, _id
 
 
 PROFILE_RULE_MAP = {

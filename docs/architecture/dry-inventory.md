@@ -1,5 +1,27 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-023: metadatos declarativos en el registro existente
+
+`profile_router.RULE_DEFINITIONS` / `RuleDefinition.metadata` posee una única
+colección de IDs, fuentes y referencias de evidencia. `registry_metadata.py`
+construye anotaciones inmutables, sin colección paralela, I/O ni predicados.
+El índice de implementación Markdown se deriva mediante `audit_hfs023.py`;
+su tabla manual sustituida queda archivada, no se mantiene otra autoridad editable.
+Consumidores reales: router (campos originales), auditor, índice y pruebas.
+
+`PROFILE_RULE_MAP`, predicados y `_get_composite_rules` conservan selección.
+Los 17 descriptores I no sustituyen su selector procedimental; las entradas
+de vacío/externalidad tampoco participan en routing. HFS-002 conserva requisitos
+independientes, `coverage`/`coverage_evidence` conservan obligaciones y crédito,
+`design_methods` conserva soporte de método. Contratos/reporting no importan
+metadatos; no se duplican modelos ingenieriles o esquemas JSON.
+
+Se retira `_has_interaction`, predicado constante False del placeholder I2
+sin consumidor operativo; se conserva el ID histórico descriptivo. Las clases
+por eje/fachadas siguen teniendo herencia o consumidores de guardas directas
+HFS-017, con inventario por símbolo. No se consolida ninguna fórmula por
+parecido. [Decisión, consumidores y prueba antes/después](../audit/hfs023/report.md).
+
 ## HFS-022Q: contraste independiente de los propietarios vigentes
 
 La auditoría mantiene sin cambios los propietarios HFS-022R. No se identifica

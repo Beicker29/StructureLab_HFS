@@ -45,6 +45,17 @@ Se aprovecha el registro y las trazas existentes y se elimina la reconstrucción
 
 La matriz actual `docs/aisc_360_22_traceability.md` se conserva como inventario manual inicial de implementación; después podrá generarse desde metadatos revisados, sin mantener dos autoridades editables. Esa generación no aplica a la matriz normativa independiente: sus requisitos no provienen del router. Se adopta la [política de evidencia](../audit/evidence-policy.md) para distinguir fixtures mantenidas, capturas de aceptación e información regenerable. PASS se limita al alcance verificable declarado, nunca a certificación AISC global.
 
+### Aplicación HFS-023 — para revisión, 2026-10-29
+
+`RuleDefinition.metadata` materializa esa decisión en la colección existente.
+El índice de implementación se genera; la tabla manual anterior queda archivada.
+HFS-002, selección ejecutable, plan/evidencia HFS-010 y transporte permanecen
+en sus dueños. Los descriptores incluyen reglas compuestas y vacíos, sin convertir
+su registro en permiso de ejecución. Pruebas referenciadas, oráculos acotados
+y acreditación normativa tienen significados distintos. Se conserva F-31 P0
+abierto y F-37 explícito; no se adelanta la traza de HFS-024 ni una auditoría
+normativa. [Contrato y límites](../contracts/hfs023-normative-registry.md).
+
 ## Riesgos y verificación futura
 
 Metadatos desactualizados pueden aparentar trazabilidad; probar correspondencia de IDs, referencias y rutas cuando se implemente el registro. El error de un manual auxiliar o una transcripción también puede propagarse: registrar contraste y revisión. Una expectativa de regresión no debe impedir corregir un defecto. La revisión documental presente no cierra F-30 ni certifica AISC 360-22; AISC 341-22 sigue siendo alcance independiente.
