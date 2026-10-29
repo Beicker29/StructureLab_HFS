@@ -1,5 +1,16 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**HFS-030 (2026-10-29), cotejo documental para revisión:** base `main`
+`76a908673259211b2d5b2407b046608ca96384ec`; jobs CI HFS-024 Windows/Ubuntu
+SUCCESS verificados. Por instrucción del usuario, comparación únicamente de
+PDF locales, incluidas las erratas aportadas de enero de 2025 y septiembre de
+2026: 22 grupos cotejados, hashes y diferencias registrados. F-31 P0 y
+F-35/F-36/F-37 siguen abiertos; ninguna acreditación o cambio de runtime.
+[Informe, fuentes y límites](audit/hfs030/report.md). Autenticación remota de
+bytes/permisos pendientes; no se declara una actualización editorial exhaustiva.
+2675 pruebas +12 subpruebas aprobadas tras resolver limitaciones de ejecución
+sin cambiar permisos ni tests. Sin HFS-031/032, commit ni push.
+
 **HFS-024 (2026-10-29), para revisión:** base main `93e4f8c`, HFS-023 aprobada
 arquitectónicamente por el usuario y CI 40858414332 SUCCESS Windows/Ubuntu.
 Captura optativa de ejecución y pasos desde productores reales, sin reconstrucción
@@ -277,7 +288,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-022 | 2, base aprobada; suplemento 022R para revisión | Contratos versionados de entrada, plan normativo, checks y resultado | 021A | API optativa 1.0; base bae6463 con CI 40777094705 SUCCESS Windows/Ubuntu. [Informe histórico](audit/hfs022/report.md) preservado. [Suplemento HFS-022R](audit/hfs022/architecture-review/report.md): desacoplamiento, interoperabilidad y diagnósticos. Cierre del suplemento pendiente de revisión independiente y CI de su commit final. |
 | HFS-023 | 2, implementado para revisión | Registro normativo declarativo mínimo, sin framework de plugins | 022 | RuleDefinition.metadata, 93 descriptores, referencias y pruebas de integridad; índice de implementación derivado, HFS-002 independiente. Sin cambios de cálculo/cobertura/transporte. [Evidencia](audit/hfs023/report.md). |
 | HFS-024 | 2, implementación progresiva para revisión | Trazas canónicas desde ejecución; exportación auxiliar sin inferencias | 022,023 | 71 clases observadas; pasos numéricos progresivos y pendientes por regla. JSON 1.0/memorias legacy intactos. [Informe](audit/hfs024/report.md); no acredita nuevas disposiciones ni completa todas las subramas. |
-| HFS-030 | 3 | AISC 360-22: base documental y erratas, tabla de trazabilidad | 023 | Comparación de PDF del repo con fuente oficial; versión/erratas registradas. |
+| HFS-030 | 3, cotejo local entregado para revisión | AISC 360-22: base documental y erratas, tabla de trazabilidad | 023 | Comparación de PDF del repo con fuente oficial; versión/erratas registradas. Alcance acotado por usuario a copias locales: 22 grupos E25/E26 contrastados; autenticación remota y permisos pendientes. [Evidencia y límites](audit/hfs030/report.md). |
 | HFS-031 | 3 | Auditoría normativa capítulos D y E (incl. E4/E5/E7) | 030 | Oráculos independientes, casos límite, clases geométricas y condiciones de uso. |
 | HFS-032 | 3 | Auditoría capítulo F (F2–F11, rama F4, Cb, Lb) | 030 | Validación por familia/eje/región de frontera; evitar atajos no probados. |
 | HFS-033 | 3 | Auditoría capítulo G y convenciones de ejes/cortante | 030,013 | Reglas direccionales contrastadas con norma y referencias independientes. |
