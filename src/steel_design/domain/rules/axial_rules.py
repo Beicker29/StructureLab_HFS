@@ -1,5 +1,6 @@
 import math
 
+from ...tracing import traced_rule, emit_step, quantity
 from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import axial_calc
 from ...models import CheckResult, CheckStatus, SteelCase
@@ -197,6 +198,7 @@ def _compression_details(case: SteelCase, section: Section) -> dict:
 class AxialE3Rule:
     """Flexural buckling of members without slender elements (E3)."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         demand = _compression_demand(case)
@@ -208,6 +210,13 @@ class AxialE3Rule:
         fcr = axial_calc.calculate_Fcr(case.material.Fy, fe)
         pn = axial_calc.calculate_Pn(fcr, section.area)
         capacity = axial_calc.calculate_available_compressive_strength(pn, case.design_method)
+        emit_step(producer=__name__+":AxialE3Rule.check", limit_state="flexural_buckling",
+            branch=None, reference="E3", equation=None, expression=None, axis=components["governing_axis"],
+            inputs=(quantity("Fy", case.material.Fy, "MPa", "case.material.Fy"),
+                    quantity("Ag", section.area, "mm2", "section.area")),
+            intermediates=(quantity("Fe", fe, "MPa"), quantity("Fcr", fcr, "MPa"), quantity("Pn", pn, "N")),
+            outputs=(quantity("available", capacity, "kN"),),
+            unknowns=("E3 stress branch/factors are not instrumented here; no branch reconstructed from Fy/Fe.",))
         details = _compression_details(case, section)
         details["memory"] = {
             "clause": "E3",
@@ -251,6 +260,7 @@ class AxialE3Rule:
 class AxialE4Rule:
     """Torsional and flexural-torsional buckling (E4)."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         demand = _compression_demand(case)
@@ -313,6 +323,7 @@ class AxialE4Rule:
 class AxialE5Rule:
     """Single-angle compression members (E5)."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         demand = _compression_demand(case)
@@ -367,6 +378,7 @@ class AxialE5Rule:
 class AxialE7Rule:
     """Members with slender elements (E7)."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         demand = _compression_demand(case)

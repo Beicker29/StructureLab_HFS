@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from ...tracing import traced_rule, emit_step, quantity
 from ..design_methods import require_case_method
 from typing import Dict, Tuple
 
@@ -1136,6 +1137,7 @@ def _i5_method_4_interaction(case: SteelCase, section: Section, axial_cap_kN: fl
 
 
 class CompositeI1Rule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         role = _composite_role(case)
@@ -1182,6 +1184,7 @@ class CompositeI1Rule:
 
 
 class CompositeI2EncasedCompressionRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         demand = max(case.loads.Pu, 0.0)
@@ -1256,6 +1259,7 @@ class CompositeI2EncasedCompressionRule:
 
 
 class CompositeI2EncasedTensionRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         demand = abs(case.loads.Pu) if case.loads.Pu < 0.0 else 0.0
@@ -1290,6 +1294,7 @@ class CompositeI2EncasedTensionRule:
 
 
 class CompositeI2FilledCompressionRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         demand = max(case.loads.Pu, 0.0)
@@ -1405,6 +1410,7 @@ class CompositeI2FilledCompressionRule:
 
 
 class CompositeI2FilledTensionRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         demand = abs(case.loads.Pu) if case.loads.Pu < 0.0 else 0.0
@@ -1439,6 +1445,7 @@ class CompositeI2FilledTensionRule:
 
 
 class CompositeI5CombinedRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         role = _composite_role(case)
@@ -1476,6 +1483,17 @@ class CompositeI5CombinedRule:
             raise ValidationError("Unknown I5 method.", details={"method": str(method)})
 
         ratio = float(method_data["ratio"])
+        emit_step(producer=__name__+":CompositeI5CombinedRule.check", limit_state="composite_axial_biaxial_interaction",
+            branch=method_clause, reference=method_reference, equation=None, expression=None, axis="x+y",
+            inputs=(quantity("Pu", case.loads.Pu, "kN", "case.loads.Pu"),
+                    quantity("Mux", case.loads.Mux, "kN-m", "case.loads.Mux"),
+                    quantity("Muy", case.loads.Muy, "kN-m", "case.loads.Muy")),
+            intermediates=(quantity("Pc", p_available, "kN", "_composite_axial_capacity_i5"),
+                           quantity("Mcx", m_ratios["Mcx_kN_m"], "kN-m"),
+                           quantity("Mcy", m_ratios["Mcy_kN_m"], "kN-m")),
+            outputs=(quantity("interaction", ratio, "ratio"),),
+            assumptions=("Selected I5 method: "+method.value, "Role: "+role),
+            unknowns=("Method 2 is auxiliary/Commentary, not a Specification equation; numerical iteration and branch-equation mapping remain pending.",))
         return _build_result(
             unit="ratio",
             name=f"Combined Flexure and Axial Force I5 ({method.value})",
@@ -1522,6 +1540,7 @@ class CompositeI5CombinedRule:
 
 
 class CompositeI3_1aRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
@@ -1549,6 +1568,7 @@ class CompositeI3_1aRule:
 
 
 class CompositeI3_1bRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
@@ -1573,6 +1593,7 @@ class CompositeI3_1bRule:
 
 
 class CompositeI3_1cRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":
@@ -1604,6 +1625,7 @@ class CompositeI3_1cRule:
 
 
 class CompositeI3_3Rule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
@@ -1630,6 +1652,7 @@ class CompositeI3_3Rule:
 
 
 class CompositeI3_4Rule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "FILLED_MEMBER":
@@ -1676,6 +1699,7 @@ class CompositeI3_4Rule:
 
 
 class CompositeI4_1aEncasedRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
@@ -1703,6 +1727,7 @@ class CompositeI4_1aEncasedRule:
 
 
 class CompositeI4_1bEncasedRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
@@ -1741,6 +1766,7 @@ class CompositeI4_1bEncasedRule:
 
 
 class CompositeI4_1cEncasedRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
@@ -1778,6 +1804,7 @@ class CompositeI4_1cEncasedRule:
 
 
 class CompositeI4_1EncasedGoverningRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "ENCASED_MEMBER":
@@ -1810,6 +1837,7 @@ class CompositeI4_1EncasedGoverningRule:
 
 
 class CompositeI4_1FilledRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "FILLED_MEMBER":
@@ -1888,6 +1916,7 @@ class CompositeI4_1FilledRule:
 
 
 class CompositeI4_3BeamDeckSteelOnlyRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="I")
         if _composite_role(case) != "COMPOSITE_BEAM":

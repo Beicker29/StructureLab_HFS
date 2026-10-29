@@ -11,6 +11,15 @@ from .domain.recommendations import slenderness_recommendations
 from .execution import CaseExecution
 
 
+def calculation_trace_document(trace) -> dict:
+    """Export only producer observations; never infer equations or rerun checks.
+
+    This opt-in sidecar is HFS-024-v1, not a new payload in JSON contract 1.0.
+    Raw values remain raw. Consumers may format separate display values.
+    """
+    return trace.model_dump(mode="json")
+
+
 def _sanitize_filename(text: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]", "_", text)
 

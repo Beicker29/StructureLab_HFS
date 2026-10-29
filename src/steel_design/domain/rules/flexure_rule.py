@@ -1,3 +1,4 @@
+from ...tracing import traced_rule, emit_step, quantity
 from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import flexure_calc
 from ...models import CheckResult, CheckStatus, SteelCase
@@ -71,6 +72,10 @@ def _build_flexure_result_from_mn(
     inputs: dict,
     limit_state_label: str,
 ) -> CheckResult:
+    emit_step(producer=__name__+":_build_flexure_result_from_mn", limit_state=limit_state_label,
+        branch="reported_limit_state", reference="Chapter F; see canonical rule metadata", equation=None,
+        expression=None, outputs=(quantity("selected_Mn", mn_nmm, "N-mm", "calling rule's selected limit-state value"),),
+        unknowns=("Selected output is observed; nominal equation, subbranch and axis are not inferred from clause text.",))
     evaluation = {
         "Mn_Nmm": mn_nmm,
         "limit_states": base_evaluation["limit_states"],
@@ -94,6 +99,7 @@ def _common_major_inputs(case: SteelCase, section: Section, demand: float) -> di
 class FlexureF2YieldRule:
     """F2-1: yielding for compact I-shapes/channels in major-axis flexure."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -115,6 +121,7 @@ class FlexureF2YieldRule:
 class FlexureF2LtbRule:
     """F2-2: lateral-torsional buckling for compact I-shapes/channels in major-axis flexure."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -134,6 +141,7 @@ class FlexureF2LtbRule:
 
 
 class FlexureF3YieldRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -153,6 +161,7 @@ class FlexureF3YieldRule:
 
 
 class FlexureF3LtbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -172,6 +181,7 @@ class FlexureF3LtbRule:
 
 
 class FlexureF3FlbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -195,6 +205,7 @@ class FlexureF3FlbRule:
 
 
 class FlexureF4CompressionYieldRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -214,6 +225,7 @@ class FlexureF4CompressionYieldRule:
 
 
 class FlexureF4LtbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -233,6 +245,7 @@ class FlexureF4LtbRule:
 
 
 class FlexureF4FlbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -252,6 +265,7 @@ class FlexureF4FlbRule:
 
 
 class FlexureF4TensionYieldRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -273,6 +287,7 @@ class FlexureF4TensionYieldRule:
 
 
 class FlexureF5CompressionYieldRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -292,6 +307,7 @@ class FlexureF5CompressionYieldRule:
 
 
 class FlexureF5LtbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -311,6 +327,7 @@ class FlexureF5LtbRule:
 
 
 class FlexureF5FlbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -330,6 +347,7 @@ class FlexureF5FlbRule:
 
 
 class FlexureF5TensionYieldRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _major_demand(case)
@@ -350,6 +368,7 @@ class FlexureF5TensionYieldRule:
 
 
 class FlexureF6YieldRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _minor_demand(case)
@@ -375,6 +394,7 @@ class FlexureF6YieldRule:
 
 
 class FlexureF6FlbRule:
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand = _minor_demand(case)
@@ -401,6 +421,7 @@ class FlexureF6FlbRule:
 class FlexureF7YieldRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -431,6 +452,7 @@ class FlexureF7YieldMyRule(FlexureF7YieldRule):
 class FlexureF7FlangeRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -461,6 +483,7 @@ class FlexureF7FlangeMyRule(FlexureF7FlangeRule):
 class FlexureF7WebRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -491,6 +514,7 @@ class FlexureF7WebMyRule(FlexureF7WebRule):
 class FlexureF7LtbRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -521,6 +545,7 @@ class FlexureF7LtbMyRule(FlexureF7LtbRule):
 class FlexureF8YieldRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -551,6 +576,7 @@ class FlexureF8YieldMyRule(FlexureF8YieldRule):
 class FlexureF8LocalBucklingRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -602,6 +628,7 @@ class FlexureF10YieldRule:
             )
         return axis, restraint
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand_axis = self.axis
@@ -633,6 +660,7 @@ class FlexureF10YieldMyRule(FlexureF10YieldRule):
 class FlexureF10LtbRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand_axis = self.axis
@@ -673,6 +701,7 @@ class FlexureF10LtbMyRule(FlexureF10LtbRule):
 class FlexureF10LegBucklingRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         demand_axis = self.axis
@@ -704,6 +733,7 @@ class FlexureF10LegBucklingMyRule(FlexureF10LegBucklingRule):
 class FlexureF11YieldRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis
@@ -734,6 +764,7 @@ class FlexureF11YieldMyRule(FlexureF11YieldRule):
 class FlexureF11LtbRule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case, chapter="F")
         axis = self.axis

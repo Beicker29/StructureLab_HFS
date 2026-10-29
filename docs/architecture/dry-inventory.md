@@ -1,5 +1,25 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-024: observación de operaciones y exportación sin recálculo
+
+| Responsabilidad / duplicación | Decisión y propietario | Consumidores / límites |
+|---|---|---|
+| Identidad, edición, citas, pruebas y F-ID | **Conservar** `RuleDefinition.metadata` HFS-023; captura consulta por identidad real de clase | No hay mapa paralelo de reglas ni predicados en tracing; metadata se copia en el documento para su lectura reproducible |
+| Contexto, valores brutos y pasos | **Consolidar** formato en `steel_design.tracing`, con pasos emitidos por sus productores | Decorador compartido para 57 métodos/71 clases; evita 57 capturadores/copias de serialización. No calcula ni infiere ecuaciones |
+| Factores D2/F1/H3 | **Conservar** conversores canónicos y observar sus valores usados | No factor nuevo en exportadores. F1 sigue siendo una sola operación compartida H1/H3/F; no se fusiona con capítulos de constante semejante |
+| Memorias nuevas vs interpretación de etiquetas | **Consolidar** nuevas exportaciones en `reporting.calculation_trace_document` | Consume snapshot, sin regex, inferencias ni nueva ejecución. CLI/memorias/SVG legacy siguen por contrato vigente; no se reemplazó ni retiró ningún productor |
+| Nominales duplicadas entre reglas e interacciones | **Conservar provisionalmente** las llamadas actuales | Contadores verifican idéntica secuencia de funciones normativas con/sin captura en los 12 ejemplos. D2 sigue evaluando ambas nominales por check; no presentar la observación como consolidación de capacidades |
+| Copias de contexto por intento | **Conservar justificadamente** como evidencia optativa | Memoria adicional deliberada; buffer por ejecución y snapshots independientes. No crear cache de capacidades para ahorrar tamaño sin validar su dominio |
+
+No se añade un motor de fórmulas, repositorio de trazas, servicio o API web.
+El contexto evita propagar argumentos nuevos por toda la API, pero es una
+dependencia implícita: aislamiento probado y límites de concurrencia documentados.
+La traza declara ramas/intermedios pendientes; no se completa desde textos legacy.
+Al no sustituir código operativo ni firmas, no se añaden fachadas ni quedan copias
+de una implementación retirada. La transición futura de memorias deberá demostrar
+consumidores y retirar lo sustituido en su tarea autorizada.
+[Contrato](../contracts/hfs024-calculation-traces.md) y [evaluación crítica](../audit/hfs024/report.md).
+
 ## HFS-023: metadatos declarativos en el registro existente
 
 `profile_router.RULE_DEFINITIONS` / `RuleDefinition.metadata` posee una única

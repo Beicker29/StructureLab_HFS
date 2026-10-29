@@ -77,6 +77,16 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-024 añade `tests/test_hfs024_tracing.py`, separada de las 2561 pruebas y
+12 subpruebas de la base HFS-023. El verificador ejecuta la nueva suite con wheel
+y editable y una sonda de trazas de los 12 ejemplos en las tres instalaciones.
+`scripts/audit_hfs024.py --probe . --out NUEVO.json` compara ejecución con/sin
+captura y conserva los documentos auxiliares. `--source-proof --out NUEVO.json`
+comprueba AST de los fuentes previos contra el SHA HFS-023, descontando solo
+instrumentación declarada; no equivale a validación normativa. La suite comprueba
+también llamadas numéricas y exportación sin recálculo. Ningún JSON Schema 1.0
+se amplía para incluir la traza. [Contrato y límites](docs/contracts/hfs024-calculation-traces.md).
+
 HFS-023 agrega `tests/test_hfs023_registry.py`: integridad de metadatos y
 referencias, propietarios, caracterización de bindings y mutaciones. Conserva
 las 2352 pruebas y 12 subpruebas HFS-022Q. El verificador común ejecuta la suite

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from ...tracing import traced_rule, emit_step, quantity
 from ..design_methods import require_case_method
 from typing import Dict, Optional
 
@@ -227,6 +228,12 @@ def _available_flexural_strength(case: SteelCase, section: Section, axis: str) -
         raise ValidationError("H1/H3 flexural interaction is scoped to HSS profiles only.", details={"profile_type": profile})
 
     available = flexure_calc.available_flexural_strength(evaluation["Mn_Nmm"], case.design_method.value)
+    emit_step(producer=__name__+":_available_flexural_strength", limit_state="interaction_flexural_capacity",
+        branch=profile, reference="F7/F8; F1(a)", equation=None, expression=None, axis=axis,
+        inputs=(quantity("moment_magnitude", demand, "kN-m", "abs(case.loads.Mux or Muy), selected by axis"),),
+        intermediates=(quantity("Mn", evaluation["Mn_Nmm"], "N-mm", "actual F7/F8 evaluation"),),
+        outputs=(quantity("Mc", available, "kN-m", "available_flexural_strength"),),
+        unknowns=("Nominal F7/F8 subbranch mapping remains pending; axis is supplied by caller, not inferred.",))
     return {"available_kN_m": available, "evaluation": evaluation}
 
 
@@ -243,6 +250,11 @@ def _available_shear_strength(case: SteelCase, section: Section) -> Dict[str, ob
         evaluations[axis] = evaluation
         capacities[axis] = evaluation["capacity_kN"]
         ratios[axis] = _safe_ratio(demand=demands[axis], capacity=capacities[axis], ratio_name=f"Vr{axis}/Vc{axis}")
+        emit_step(producer=__name__+":_available_shear_strength", limit_state="directional_shear_ratio",
+            branch="active_direction", reference="H3.2", equation="H3-6", expression="abs(demand) / capacity", axis=axis,
+            inputs=(quantity("demand", demands[axis], "kN", "shear_demand"),
+                    quantity("capacity", capacities[axis], "kN", "evaluate_hss_shear")),
+            outputs=(quantity("ratio", ratios[axis], "ratio"),))
     governing = max(ratios, key=ratios.get) if any(demands.values()) else None
     return {"required_kN": demands[governing] if governing else 0.0,
             "available_kN": capacities[governing] if governing else None,
@@ -270,14 +282,23 @@ def _compute_h1_interaction(case: SteelCase, section: Section) -> Dict[str, obje
             interaction = pu_ratio + ((8.0 / 9.0) * (mx_ratio + my_ratio))
             clause = "H1-1a"
             branch = "compression_high_axial"
+            equation, expression = "H1-1a", "pu_ratio + (8/9) * (mx_ratio + my_ratio)"
         else:
             interaction = (pu_ratio / 2.0) + (mx_ratio + my_ratio)
             clause = "H1-1b"
             branch = "compression_low_axial"
+            equation, expression = "H1-1b", "pu_ratio / 2 + mx_ratio + my_ratio"
     else:
         interaction = pu_ratio + mx_ratio + my_ratio
         clause = "H1-2"
         branch = "tension"
+        equation, expression = None, "pu_ratio + mx_ratio + my_ratio"
+
+    emit_step(producer=__name__+":_compute_h1_interaction", limit_state="axial_biaxial_interaction",
+        branch=branch, reference="H1", equation=equation, expression=expression, axis="x+y",
+        inputs=(quantity("pu_ratio", pu_ratio, "ratio"), quantity("mx_ratio", mx_ratio, "ratio"),
+                quantity("my_ratio", my_ratio, "ratio")), outputs=(quantity("interaction", interaction, "ratio"),),
+        unknowns=("F-37: legacy H1-2 label is not the tension interaction equation; tension mapping remains unaccredited.",))
 
     return {
         "interaction_ratio": interaction,
@@ -304,6 +325,7 @@ def _compute_h1_interaction(case: SteelCase, section: Section) -> Dict[str, obje
 class CombinedH1HssRule:
     """H1 interaction for HSS members with combined axial force and flexure."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         if case.loads.Pu == 0.0 or (abs(case.loads.Mux) <= 0.0 and abs(case.loads.Muy) <= 0.0):
@@ -344,6 +366,7 @@ class CombinedH1HssRule:
 class HssTorsionH3_1Rule:
     """H3-1: round and rectangular HSS subjected to torsion."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         tr = abs(case.loads.Tu)
@@ -386,6 +409,7 @@ class HssTorsionH3_1Rule:
 class HssCombinedH3_2Rule:
     """H3-2: HSS subjected to combined torsion, shear, flexure, and axial force."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         tr = abs(case.loads.Tu)
@@ -405,6 +429,11 @@ class HssCombinedH3_2Rule:
         torsion_threshold = 0.2 * tc
 
         if tr <= torsion_threshold:
+            emit_step(producer=__name__+":HssCombinedH3_2Rule.check", limit_state="torsion_interaction_permission",
+                branch="Tr_at_or_below_0.2Tc_BLOCKED", reference="H3.2", equation=None,
+                expression="Tr <= 0.2 * Tc", inputs=(quantity("Tr", tr, "kN-m"), quantity("Tc", tc, "kN-m")),
+                intermediates=(quantity("threshold", torsion_threshold, "kN-m"),),
+                unknowns=("Qualified H1/G alternative not established; this threshold is not resistance.",))
             raise RuleNotImplementedError(
                 "H3.2 permits neglecting torsional interaction at Tr/Tc <= 0.20, but a qualified H1/G alternative is not established; threshold is not a resistance check.",
                 details={"reference": "H3.2", "Tr_kN_m": tr, "Tc_kN_m": tc,
@@ -424,6 +453,15 @@ class HssCombinedH3_2Rule:
 
         normal_ratio = pu_ratio + mx_ratio + my_ratio
         shear_torsion_ratio = vr_ratio + tr_ratio
+        emit_step(producer=__name__+":HssCombinedH3_2Rule.check", limit_state="HSS_combined_actions",
+            branch="Tr_above_0.2Tc", reference="H3.2", equation="H3-6",
+            expression="normal=pu_ratio+mx_ratio+my_ratio; shear_torsion=vr_ratio+tr_ratio", axis="x+y",
+            inputs=(quantity("pu_ratio", pu_ratio, "ratio"), quantity("mx_ratio", mx_ratio, "ratio"),
+                    quantity("my_ratio", my_ratio, "ratio"), quantity("vr_ratio", vr_ratio, "ratio"),
+                    quantity("tr_ratio", tr_ratio, "ratio")),
+            outputs=(quantity("normal_ratio", normal_ratio, "ratio"),
+                     quantity("shear_torsion_ratio", shear_torsion_ratio, "ratio")),
+            assumptions=("Shear uses paired directional demand/capacity ratios; HFS-013 convention.",))
         interaction = combined_hss_calc.calculate_h3_6_interaction(
             normal_ratio=normal_ratio,
             shear_torsion_ratio=shear_torsion_ratio,

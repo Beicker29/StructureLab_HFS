@@ -1,3 +1,4 @@
+from ...tracing import traced_rule
 from ..design_methods import require_case_method
 from ...codes.aisc_360_22.tension_calc import tension_design_factor
 from ...models import CheckResult, CheckStatus, SteelCase
@@ -22,6 +23,7 @@ class TensionRule:
     def __init__(self):
         self.evaluator = TensionEvaluator()
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         if case.loads.Pu >= 0.0:
@@ -62,6 +64,7 @@ class TensionRuptureRule:
     def __init__(self):
         self.evaluator = TensionEvaluator()
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         if case.loads.Pu >= 0.0:

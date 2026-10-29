@@ -1,5 +1,6 @@
 import math
 
+from ...tracing import traced_rule
 from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import shear_calc
 from ...models import CheckResult, CheckStatus, SteelCase
@@ -99,6 +100,7 @@ def _g2_design_factors(case: SteelCase, profile: str, h_over_tw: float) -> dict:
 class ShearG2VxRule:
     """G2: I-shaped members and channels (major-axis web shear)."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         demand = _shear_demand(case, "x")
@@ -163,6 +165,7 @@ class ShearG2VxRule:
 class ShearG3Rule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         if _shear_demand(case, self.axis) <= 0:
@@ -201,6 +204,7 @@ def _hss_shear_check(case, section, axis, profile):
 class ShearG4Rule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         return _hss_shear_check(case, section, self.axis, "RECTANGULAR_HSS")
@@ -217,6 +221,7 @@ class ShearG4VyRule(ShearG4Rule):
 class ShearG5Rule:
     axis = "x"
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         return _hss_shear_check(case, section, self.axis, "CIRCULAR_HSS")
@@ -233,6 +238,7 @@ class ShearG5VyRule(ShearG5Rule):
 class ShearG6VyRule:
     """G6: W minor bending-plane shear (Vuy is a local-x force)."""
 
+    @traced_rule
     def check(self, case: SteelCase, section: Section) -> CheckResult:
         require_case_method(case)
         demand = _shear_demand(case, "y")

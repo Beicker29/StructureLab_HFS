@@ -2,6 +2,7 @@ from ..design_methods import require_case_method
 from ...models import SteelCase
 from ...sections.models import Section
 from ...codes.aisc_360_22 import tension_calc
+from ...tracing import emit_step, quantity
 
 class TensionEvaluator:
     def evaluate(self, case: SteelCase, section: Section) -> dict:
@@ -14,6 +15,12 @@ class TensionEvaluator:
         an = case.connection.An or 0.0
         u_factor = case.connection.U or 0.0
         ae = u_factor * an
+        emit_step(producer=__name__+":TensionEvaluator.evaluate", limit_state="effective_net_area",
+            branch="declared_connection", reference="D3", equation="D3-1", expression="U * An",
+            inputs=(quantity("U", u_factor, "ratio", "case.connection.U or existing zero fallback"),
+                    quantity("An", an, "mm2", "case.connection.An or existing zero fallback")),
+            outputs=(quantity("Ae", ae, "mm2"),),
+            assumptions=("Connection provenance is supplied externally, not verified by this trace.",))
         
         # 1. Tensile Yielding
         Pn_y = tension_calc.calculate_Pn_yielding(case.material.Fy, Ag)
