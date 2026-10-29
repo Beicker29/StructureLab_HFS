@@ -1,5 +1,15 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**HFS-031 (2026-10-29), auditoría D/E para revisión:** base `main`
+`05198f06a63f8405bd96ffbe494be796cdb165e4`, CI40961316786 SUCCESS Windows/Ubuntu.
+Matriz independiente S22+E25+E26,95 hojas numéricas y confrontación por dominio.
+F-35/F-36 demostrados incorrectos; F-46/47/48 nuevos, F-12 reproducido.
+No se modifican capacidades ni se acredita cobertura: se entrega
+[dictamen y plan verificable](audit/hfs031/report.md). 2675 pruebas previas
++12 subpruebas conservadas; suite nueva72 aprobadas/60xfail estrictos;
+12 ejemplos/24CLI/6SVG sin diferencias. Autenticación remota de fuentes y
+revisión ingenieril pendientes. F-31 P0 abierto; sin HFS-032, commit/push.
+
 **HFS-030 (2026-10-29), cotejo documental para revisión:** base `main`
 `76a908673259211b2d5b2407b046608ca96384ec`; jobs CI HFS-024 Windows/Ubuntu
 SUCCESS verificados. Por instrucción del usuario, comparación únicamente de
@@ -289,7 +299,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-023 | 2, implementado para revisión | Registro normativo declarativo mínimo, sin framework de plugins | 022 | RuleDefinition.metadata, 93 descriptores, referencias y pruebas de integridad; índice de implementación derivado, HFS-002 independiente. Sin cambios de cálculo/cobertura/transporte. [Evidencia](audit/hfs023/report.md). |
 | HFS-024 | 2, implementación progresiva para revisión | Trazas canónicas desde ejecución; exportación auxiliar sin inferencias | 022,023 | 71 clases observadas; pasos numéricos progresivos y pendientes por regla. JSON 1.0/memorias legacy intactos. [Informe](audit/hfs024/report.md); no acredita nuevas disposiciones ni completa todas las subramas. |
 | HFS-030 | 3, cotejo local entregado para revisión | AISC 360-22: base documental y erratas, tabla de trazabilidad | 023 | Comparación de PDF del repo con fuente oficial; versión/erratas registradas. Alcance acotado por usuario a copias locales: 22 grupos E25/E26 contrastados; autenticación remota y permisos pendientes. [Evidencia y límites](audit/hfs030/report.md). |
-| HFS-031 | 3 | Auditoría normativa capítulos D y E (incl. E4/E5/E7) | 030 | Oráculos independientes, casos límite, clases geométricas y condiciones de uso. |
+| HFS-031 | 3, auditada para revisión | Auditoría normativa capítulos D y E (incl. E4/E5/E7) | 030 | [Matriz,95 hojas, hallazgos y dictamen acotado](audit/hfs031/report.md); F-35/F-36/F-46–48 abiertos; sin acreditación global ni correcciones silenciosas. |
 | HFS-032 | 3 | Auditoría capítulo F (F2–F11, rama F4, Cb, Lb) | 030 | Validación por familia/eje/región de frontera; evitar atajos no probados. |
 | HFS-033 | 3 | Auditoría capítulo G y convenciones de ejes/cortante | 030,013 | Reglas direccionales contrastadas con norma y referencias independientes. |
 | HFS-034 | 3 | Capítulo H: H1 para W y demás miembros elegibles; H2/H3 según alcance | 031-033 | Combinación Pu+Mx/My no queda sin evaluar silenciosamente; casos de verificación independientes. |

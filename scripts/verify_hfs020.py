@@ -41,6 +41,7 @@ SUITES = [
     "test_hfs022q_independent",
     "test_hfs023_registry",
     "test_hfs024_tracing",
+    "test_hfs031_de_audit",
 ]
 
 
@@ -135,6 +136,7 @@ def verify(args):
     (inputs / "scripts").mkdir()
     shutil.copytree(ROOT / "tests/fixtures/hfs022q", inputs / "tests/fixtures/hfs022q")
     shutil.copytree(ROOT / "tests/fixtures/hfs023", inputs / "tests/fixtures/hfs023")
+    shutil.copytree(ROOT / "tests/fixtures/hfs031", inputs / "tests/fixtures/hfs031")
     for relative in ("docs/normative/hfs002-applicability.md", "docs/normative/hfs002-sources.md",
                      "docs/audit/tracking.md", "docs/aisc_360_22_traceability.md"):
         target = inputs / relative
