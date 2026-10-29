@@ -1,0 +1,234 @@
+{
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "05198f06a63f8405bd96ffbe494be796cdb165e4\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit": 0,
+      "stdout": "main\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit": 0,
+      "stdout": " M CONTRIBUTING.md\n M docs/ROADMAP.md\n M docs/architecture/dry-inventory.md\n M docs/audit/tracking.md\n M scripts/verify_hfs020.py\n?? docs/audit/hfs031/\n?? tests/fixtures/hfs031/\n?? tests/test_hfs031_de_audit.py\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "HEAD",
+        "--",
+        "src",
+        "examples",
+        "schemas",
+        "data",
+        "docs/contracts",
+        "docs/audit/hfs030",
+        "pyproject.toml"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\.venv\\31dev\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts",
+        "docs/audit/hfs031/oracles.py",
+        "docs/audit/hfs031/probe.py",
+        "docs/audit/hfs031/checks.py",
+        "--exclude",
+        "tests/.tmp_tests"
+      ],
+      "exit": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    }
+  ],
+  "links_checked": [
+    {
+      "source": "docs/audit/hfs031/calculations.md",
+      "target": "requirements.md"
+    },
+    {
+      "source": "docs/audit/hfs031/calculations.md",
+      "target": "oracles.py"
+    },
+    {
+      "source": "docs/audit/hfs031/calculations.md",
+      "target": "../../../tests/fixtures/hfs031/oracles.json"
+    },
+    {
+      "source": "docs/audit/hfs031/calculations.md",
+      "target": "probe.py"
+    },
+    {
+      "source": "docs/audit/hfs031/findings.md",
+      "target": "requirements.md"
+    },
+    {
+      "source": "docs/audit/hfs031/findings.md",
+      "target": "calculations.md"
+    },
+    {
+      "source": "docs/audit/hfs031/findings.md",
+      "target": "evidence/probes.json"
+    },
+    {
+      "source": "docs/audit/hfs031/findings.md",
+      "target": "../../../tests/test_hfs031_de_audit.py"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "software-audit.md"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "calculations.md"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/start.json"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/sources.json"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "requirements.md"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/probes.json"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/ci.json"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "findings.md"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/verification.zip"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/final-checks.zip"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/archives.json"
+    },
+    {
+      "source": "docs/audit/hfs031/report.md",
+      "target": "evidence/archive-incident.json"
+    },
+    {
+      "source": "docs/audit/hfs031/requirements.md",
+      "target": "software-audit.md"
+    },
+    {
+      "source": "docs/audit/hfs031/software-audit.md",
+      "target": "requirements.md"
+    },
+    {
+      "source": "docs/audit/hfs031/software-audit.md",
+      "target": "calculations.md"
+    },
+    {
+      "source": "docs/audit/hfs031/software-audit.md",
+      "target": "evidence/probes.json"
+    },
+    {
+      "source": "docs/ROADMAP.md",
+      "target": "audit/hfs031/report.md"
+    },
+    {
+      "source": "docs/ROADMAP.md",
+      "target": "audit/hfs031/report.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/report.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/requirements.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/calculations.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/findings.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/calculations.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/findings.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/findings.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/calculations.md"
+    },
+    {
+      "source": "docs/audit/tracking.md",
+      "target": "hfs031/findings.md"
+    },
+    {
+      "source": "docs/architecture/dry-inventory.md",
+      "target": "../audit/hfs031/findings.md"
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "target": "docs/audit/hfs031/report.md"
+    }
+  ],
+  "archives_readback_verified": true,
+  "xfail_distinguished_from_skip": true
+}

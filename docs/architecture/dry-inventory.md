@@ -1,5 +1,26 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-031: auditoría D/E sin sustitución productiva
+
+DRY-03/09/18/19: se demuestra que compartir QFy/Ag propagaría F-35; E5 exige
+datos de conexión/ejes que no representa el contrato. Se conservan propietarios
+de cálculo, selección, preparación y cobertura, sin nuevo motor/clasificador.
+`axial_calc` sigue como propietario de fórmulas; `axial_rules` de evaluaciones;
+el registro HFS-023 no se altera ni recibe acreditación por pruebas.
+
+Mapa de consumidores de Q/Fcr_slender: AxialE7Rule y capacidades axiales
+internas de `combined_hss_rules`/`composite_rules`. Solo se registra dependencia;
+no se auditan H/I. `_e3_components/_e4_components` y helpers `_governing_fe_*`
+conservan duplicación existente, sin sustitución ni eliminación en este hito.
+Una corrección compartida exige medir impacto explícito en consumidores.
+
+Los cálculos independientes en `docs/audit/hfs031/oracles.py` usan Decimal/std-
+lib y no importan producción. Esta repetición matemática es deliberada: contrasta
+el programa con S22 y no sirve a CLI/API. No se deduplican los oráculos con
+fórmulas productivas. `probe.py` compara después, sin generar esperados.
+No se crean fachadas, clases, dependencias del paquete ni abstracciones nuevas.
+[Hallazgos, consumidores y plan de reparación](../audit/hfs031/findings.md).
+
 ## HFS-024: observación de operaciones y exportación sin recálculo
 
 | Responsabilidad / duplicación | Decisión y propietario | Consumidores / límites |

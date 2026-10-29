@@ -1,0 +1,1391 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="50" skipped="45" tests="123" time="3.663" timestamp="2026-10-29T18:04:08.913206-05:00" hostname="DESKTOP-NDHHPHC"><testcase classname="tests.test_hfs031_de_audit" name="test_d2_d3_declared_area_and_factors[LRFD-D2-800]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">key = 'D2-800', method = 'LRFD'
+
+    @pytest.mark.parametrize('key', ['D2-800','D2-1000'])
+    @pytest.mark.parametrize('method', METHODS)
+    def test_d2_d3_declared_area_and_factors(key, method):
+        o = BANK[key]
+&gt;       c = case(method, -1, connection=dict(An=o['An'], U=float(o['U'])))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = -1, extra = {'connection': {'An': 800, 'U': 0.8}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_d2_d3_declared_area_and_factors[LRFD-D2-1000]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">key = 'D2-1000', method = 'LRFD'
+
+    @pytest.mark.parametrize('key', ['D2-800','D2-1000'])
+    @pytest.mark.parametrize('method', METHODS)
+    def test_d2_d3_declared_area_and_factors(key, method):
+        o = BANK[key]
+&gt;       c = case(method, -1, connection=dict(An=o['An'], U=float(o['U'])))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = -1, extra = {'connection': {'An': 1000, 'U': 1.0}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_d2_d3_declared_area_and_factors[ASD-D2-800]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">key = 'D2-800', method = 'ASD'
+
+    @pytest.mark.parametrize('key', ['D2-800','D2-1000'])
+    @pytest.mark.parametrize('method', METHODS)
+    def test_d2_d3_declared_area_and_factors(key, method):
+        o = BANK[key]
+&gt;       c = case(method, -1, connection=dict(An=o['An'], U=float(o['U'])))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = -1, extra = {'connection': {'An': 800, 'U': 0.8}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_d2_d3_declared_area_and_factors[ASD-D2-1000]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">key = 'D2-1000', method = 'ASD'
+
+    @pytest.mark.parametrize('key', ['D2-800','D2-1000'])
+    @pytest.mark.parametrize('method', METHODS)
+    def test_d2_d3_declared_area_and_factors(key, method):
+        o = BANK[key]
+&gt;       c = case(method, -1, connection=dict(An=o['An'], U=float(o['U'])))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = -1, extra = {'connection': {'An': 1000, 'U': 1.0}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[LRFD-E3-.1]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[LRFD-E3-1]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[LRFD-E3-2.249999]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[LRFD-E3-2.25]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[LRFD-E3-2.250001]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[LRFD-E3-4.3125]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[ASD-E3-.1]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[ASD-E3-1]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[ASD-E3-2.249999]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[ASD-E3-2.25]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[ASD-E3-2.250001]" time="0.003" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_both_stress_branches_independent[ASD-E3-4.3125]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e3_rule_principal_axis_and_units[x-LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 3782.0331165039265...66233007852, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD', axis = 'x'
+
+    @pytest.mark.parametrize('method', METHODS)
+    @pytest.mark.parametrize('axis', ['x','y'])
+    def test_e3_rule_principal_axis_and_units(method,axis):
+        o = BANK['E3-1']
+        lengths = dict(Lx=float(o['s'])*50, Ly=float(o['s'])*20,Lz=1000)
+        lengths['Ly' if axis=='x' else 'Lx'] /= 2
+&gt;       c = case(method,lengths=lengths)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 3782.0331165039265, 'Ly': 756.4066233007852, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 3782.0331165039265...66233007852, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e3_rule_principal_axis_and_units[x-ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 3782.0331165039265...66233007852, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD', axis = 'x'
+
+    @pytest.mark.parametrize('method', METHODS)
+    @pytest.mark.parametrize('axis', ['x','y'])
+    def test_e3_rule_principal_axis_and_units(method,axis):
+        o = BANK['E3-1']
+        lengths = dict(Lx=float(o['s'])*50, Ly=float(o['s'])*20,Lz=1000)
+        lengths['Ly' if axis=='x' else 'Lx'] /= 2
+&gt;       c = case(method,lengths=lengths)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 3782.0331165039265, 'Ly': 756.4066233007852, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 3782.0331165039265...66233007852, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e3_rule_principal_axis_and_units[y-LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1891.0165582519633...32466015704, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD', axis = 'y'
+
+    @pytest.mark.parametrize('method', METHODS)
+    @pytest.mark.parametrize('axis', ['x','y'])
+    def test_e3_rule_principal_axis_and_units(method,axis):
+        o = BANK['E3-1']
+        lengths = dict(Lx=float(o['s'])*50, Ly=float(o['s'])*20,Lz=1000)
+        lengths['Ly' if axis=='x' else 'Lx'] /= 2
+&gt;       c = case(method,lengths=lengths)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 1891.0165582519633, 'Ly': 1512.8132466015704, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1891.0165582519633...32466015704, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e3_rule_principal_axis_and_units[y-ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1891.0165582519633...32466015704, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD', axis = 'y'
+
+    @pytest.mark.parametrize('method', METHODS)
+    @pytest.mark.parametrize('axis', ['x','y'])
+    def test_e3_rule_principal_axis_and_units(method,axis):
+        o = BANK['E3-1']
+        lengths = dict(Lx=float(o['s'])*50, Ly=float(o['s'])*20,Lz=1000)
+        lengths['Ly' if axis=='x' else 'Lx'] /= 2
+&gt;       c = case(method,lengths=lengths)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 1891.0165582519633, 'Ly': 1512.8132466015704, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1891.0165582519633...32466015704, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_double_symmetry_and_units[LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method', METHODS)
+    def test_e4_double_symmetry_and_units(method):
+&gt;       c,s = symmetric(method)
+              ^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:94: in symmetric
+    c = case(method, lengths=dict(Lx=1000,Ly=1000,Lz=float(o['Lz'])), factors=offsets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, 'factors': {}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_double_symmetry_and_units[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method', METHODS)
+    def test_e4_double_symmetry_and_units(method):
+&gt;       c,s = symmetric(method)
+              ^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:94: in symmetric
+    c = case(method, lengths=dict(Lx=1000,Ly=1000,Lz=float(o['Lz'])), factors=offsets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, 'factors': {}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_channel_normative_symmetry_axis[LRFD]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-46: channel E4 uses Fey instead of symmetry-axis Fex')
+    def test_e4_channel_normative_symmetry_axis(method):
+&gt;       c,s=channel(method)
+            ^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:113: in channel
+    c=case(method,lengths=dict(Lx=math.pi*math.sqrt(200000/o['Fex'])*s.rx,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 19869.1765315922, 'Ly': 4442.8829381583655, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_channel_normative_symmetry_axis[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-46: channel E4 uses Fey instead of symmetry-axis Fex')
+    def test_e4_channel_normative_symmetry_axis(method):
+&gt;       c,s=channel(method)
+            ^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:113: in channel
+    c=case(method,lengths=dict(Lx=math.pi*math.sqrt(200000/o['Fex'])*s.rx,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 19869.1765315922, 'Ly': 4442.8829381583655, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_offset_normative_capacity[x-LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD', axis = 'x'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.parametrize('axis',['x','y'])
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-47: xa/ya are recorded but absent from E4 capacity')
+    def test_e4_offset_normative_capacity(method,axis):
+        o=BANK[f'E4-offset-{axis}']
+&gt;       c,s=symmetric(method, **{axis+'a':float(o['offset'])})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:94: in symmetric
+    c = case(method, lengths=dict(Lx=1000,Ly=1000,Lz=float(o['Lz'])), factors=offsets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, 'factors': {'xa': 100.0}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_offset_normative_capacity[x-ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD', axis = 'x'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.parametrize('axis',['x','y'])
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-47: xa/ya are recorded but absent from E4 capacity')
+    def test_e4_offset_normative_capacity(method,axis):
+        o=BANK[f'E4-offset-{axis}']
+&gt;       c,s=symmetric(method, **{axis+'a':float(o['offset'])})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:94: in symmetric
+    c = case(method, lengths=dict(Lx=1000,Ly=1000,Lz=float(o['Lz'])), factors=offsets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, 'factors': {'xa': 100.0}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_offset_normative_capacity[y-LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD', axis = 'y'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.parametrize('axis',['x','y'])
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-47: xa/ya are recorded but absent from E4 capacity')
+    def test_e4_offset_normative_capacity(method,axis):
+        o=BANK[f'E4-offset-{axis}']
+&gt;       c,s=symmetric(method, **{axis+'a':float(o['offset'])})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:94: in symmetric
+    c = case(method, lengths=dict(Lx=1000,Ly=1000,Lz=float(o['Lz'])), factors=offsets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, 'factors': {'ya': 200.0}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e4_offset_normative_capacity[y-ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD', axis = 'y'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.parametrize('axis',['x','y'])
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-47: xa/ya are recorded but absent from E4 capacity')
+    def test_e4_offset_normative_capacity(method,axis):
+        o=BANK[f'E4-offset-{axis}']
+&gt;       c,s=symmetric(method, **{axis+'a':float(o['offset'])})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:94: in symmetric
+    c = case(method, lengths=dict(Lx=1000,Ly=1000,Lz=float(o['Lz'])), factors=offsets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, 'factors': {'ya': 200.0}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 6000.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-60]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-74.999]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-75]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-75.001]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-79.999]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-80]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-80.001]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-120]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-134.4]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-155]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-a-180]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-60]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-74.999]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-75]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-75.001]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-79.999]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-80]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-80.001]" time="0.001"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-120]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-134.4]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-155]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_all_long_leg_slenderness_branches[E5-b-180]" time="0.002"><skipped type="pytest.xfail" message="F-36: E5-2/3/4 absent from one_leg helper" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_short_leg_and_principal_radius_floor[E5-short-a-140]" time="0.002"><skipped type="pytest.xfail" message="F-36: no short-leg correction or principal-radius floor" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_short_leg_and_principal_radius_floor[E5-short-a-200]" time="0.002"><skipped type="pytest.xfail" message="F-36: no short-leg correction or principal-radius floor" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_short_leg_and_principal_radius_floor[E5-short-b-140]" time="0.002"><skipped type="pytest.xfail" message="F-36: no short-leg correction or principal-radius floor" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_short_leg_and_principal_radius_floor[E5-short-b-200]" time="0.002"><skipped type="pytest.xfail" message="F-36: no short-leg correction or principal-radius floor" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_rule_capacity_above_branch[LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 3600, 'Ly': 3600, 'Lz': 3600}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-36: E5-2 capacity wrong at L/ra=120')
+    def test_e5_rule_capacity_above_branch(method):
+&gt;       c=case(method,lengths=dict(Lx=3600,Ly=3600,Lz=3600))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 3600, 'Ly': 3600, 'Lz': 3600}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 3600, 'Ly': 3600, 'Lz': 3600}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e5_rule_capacity_above_branch[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 3600, 'Ly': 3600, 'Lz': 3600}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-36: E5-2 capacity wrong at L/ra=120')
+    def test_e5_rule_capacity_above_branch(method):
+&gt;       c=case(method,lengths=dict(Lx=3600,Ly=3600,Lz=3600))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 3600, 'Ly': 3600, 'Lz': 3600}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 3600, 'Ly': 3600, 'Lz': 3600}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-100-80]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-250-80]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-100-150]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-250-150]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-100-500]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-250-500]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-100-5000]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[LRFD-E7-round-250-5000]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-100-80]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-250-80]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-100-150]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-250-150]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-100-500]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-250-500]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-100-5000]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_independent_effective_area[ASD-E7-round-250-5000]" time="0.002"><skipped type="pytest.xfail" message="F-35: QFy/Ag is not E7-1 Fn*Ae" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[LRFD-E7-round-50-80]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[LRFD-E7-round-50-150]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[LRFD-E7-round-50-500]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[LRFD-E7-round-50-5000]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[ASD-E7-round-50-80]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[ASD-E7-round-50-150]" time="0.002" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[ASD-E7-round-50-500]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_nonslender_equivalence_is_bounded[ASD-E7-round-50-5000]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[LRFD-W]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[LRFD-CHANNEL]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[LRFD-RECTANGULAR_HSS]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[LRFD-SINGLE_ANGLE]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[ASD-W]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[ASD-CHANNEL]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[ASD-RECTANGULAR_HSS]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_nonround_widths[ASD-SINGLE_ANGLE]" time="0.002"><skipped type="pytest.xfail" message="F-35: no per-element E7-2..5 widths" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_f35_direct_false_pass_but_public_engine_incomplete[LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 22045.741013165287...Lz': 22045.741013165287}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_f35_direct_false_pass_but_public_engine_incomplete(method):
+&gt;       c,s=round_e7(method)
+            ^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:208: in round_e7
+    return case(method,lengths=dict(Lx=length,Ly=length,Lz=length)),s
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 22045.741013165287, 'Ly': 22045.741013165287, 'Lz': 22045.741013165287}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 22045.741013165287...Lz': 22045.741013165287}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_f35_direct_false_pass_but_public_engine_incomplete[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 22045.741013165287...Lz': 22045.741013165287}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_f35_direct_false_pass_but_public_engine_incomplete(method):
+&gt;       c,s=round_e7(method)
+            ^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:208: in round_e7
+    return case(method,lengths=dict(Lx=length,Ly=length,Lz=length)),s
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 22045.741013165287, 'Ly': 22045.741013165287, 'Lz': 22045.741013165287}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 22045.741013165287...Lz': 22045.741013165287}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_f46_channel_false_pass_is_not_global_compliance[LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_f46_channel_false_pass_is_not_global_compliance(method):
+&gt;       c,s=channel(method)
+            ^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:113: in channel
+    c=case(method,lengths=dict(Lx=math.pi*math.sqrt(200000/o['Fex'])*s.rx,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 19869.1765315922, 'Ly': 4442.8829381583655, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_f46_channel_false_pass_is_not_global_compliance[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_f46_channel_false_pass_is_not_global_compliance(method):
+&gt;       c,s=channel(method)
+            ^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:113: in channel
+    c=case(method,lengths=dict(Lx=math.pi*math.sqrt(200000/o['Fex'])*s.rx,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 19869.1765315922, 'Ly': 4442.8829381583655, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_f36_effective_slenderness_exceeds_200_stays_pending[LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 5400, 'Ly': 5400, 'Lz': 5400}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_f36_effective_slenderness_exceeds_200_stays_pending(method):
+&gt;       c=case(method,lengths=dict(Lx=5400,Ly=5400,Lz=5400))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 5400, 'Ly': 5400, 'Lz': 5400}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 5400, 'Ly': 5400, 'Lz': 5400}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_f36_effective_slenderness_exceeds_200_stays_pending[ASD]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 5400, 'Ly': 5400, 'Lz': 5400}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_f36_effective_slenderness_exceeds_200_stays_pending(method):
+&gt;       c=case(method,lengths=dict(Lx=5400,Ly=5400,Lz=5400))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 5400, 'Ly': 5400, 'Lz': 5400}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 5400, 'Ly': 5400, 'Lz': 5400}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_outside_upper_bound_not_accredited[LRFD]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 35716.2516862941, ... 'Lz': 35716.2516862941}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_e7_round_outside_upper_bound_not_accredited(method):
+        for ratio in [float(.45*200000/345),300]:
+&gt;           c,s=round_e7(method,ratio)
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:208: in round_e7
+    return case(method,lengths=dict(Lx=length,Ly=length,Lz=length)),s
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 35716.2516862941, 'Ly': 35716.2516862941, 'Lz': 35716.2516862941}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 35716.2516862941, ... 'Lz': 35716.2516862941}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_e7_round_outside_upper_bound_not_accredited[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 35716.2516862941, ... 'Lz': 35716.2516862941}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_e7_round_outside_upper_bound_not_accredited(method):
+        for ratio in [float(.45*200000/345),300]:
+&gt;           c,s=round_e7(method,ratio)
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:208: in round_e7
+    return case(method,lengths=dict(Lx=length,Ly=length,Lz=length)),s
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1
+extra = {'lengths': {'Lx': 35716.2516862941, 'Ly': 35716.2516862941, 'Lz': 35716.2516862941}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 35716.2516862941, ... 'Lz': 35716.2516862941}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-W]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'W', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-CHANNEL]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'CHANNEL', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-DOUBLE_ANGLE]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'DOUBLE_ANGLE', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-RECTANGULAR_HSS]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'RECTANGULAR_HSS', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-CIRCULAR_HSS]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'CIRCULAR_HSS', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-SINGLE_ANGLE]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'SINGLE_ANGLE', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-SOLID_RECTANGULAR]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'SOLID_RECTANGULAR', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[LRFD-SOLID_CIRCULAR]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'SOLID_CIRCULAR', method = 'LRFD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-W]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'W', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-CHANNEL]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'CHANNEL', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-DOUBLE_ANGLE]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'DOUBLE_ANGLE', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-RECTANGULAR_HSS]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'RECTANGULAR_HSS', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-CIRCULAR_HSS]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'CIRCULAR_HSS', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-SINGLE_ANGLE]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'SINGLE_ANGLE', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-SOLID_RECTANGULAR]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'SOLID_RECTANGULAR', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_all_compression_families_cannot_discharge_coverage[ASD-SOLID_CIRCULAR]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'SOLID_CIRCULAR', method = 'ASD'
+
+    @pytest.mark.parametrize('family',['W','CHANNEL','DOUBLE_ANGLE','RECTANGULAR_HSS','CIRCULAR_HSS','SINGLE_ANGLE','SOLID_RECTANGULAR','SOLID_CIRCULAR'])
+    @pytest.mark.parametrize('method',METHODS)
+    def test_all_compression_families_cannot_discharge_coverage(family,method):
+        s=Section(name='audit',type=family,A=5000,Ix=50000000,Iy=10000000,
+                  rx=100,ry=math.sqrt(2000),ro=math.sqrt(12000),H=.8,J=100000,Cw=1000000,
+                  bf_2tf_ratio=5,b_t_ratio=5,h_tw_ratio=10,b_tdes_ratio=10,h_tdes_ratio=10,d_t_ratio=20)
+&gt;       result=run(case(method),s)
+                   ^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_unrepresented_families_explicitly_rejected[TEE]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'TEE'
+
+    @pytest.mark.parametrize('family',['TEE','UNSYMMETRIC','EYEBAR','PIN_CONNECTED'])
+    def test_unrepresented_families_explicitly_rejected(family):
+        s=Section(name='audit',type=family,A=5000,rx=100,ry=50)
+        with pytest.raises(RuleNotImplementedError):
+&gt;           run(case(),s)
+                ^^^^^^
+
+tests\test_hfs031_de_audit.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_unrepresented_families_explicitly_rejected[UNSYMMETRIC]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'UNSYMMETRIC'
+
+    @pytest.mark.parametrize('family',['TEE','UNSYMMETRIC','EYEBAR','PIN_CONNECTED'])
+    def test_unrepresented_families_explicitly_rejected(family):
+        s=Section(name='audit',type=family,A=5000,rx=100,ry=50)
+        with pytest.raises(RuleNotImplementedError):
+&gt;           run(case(),s)
+                ^^^^^^
+
+tests\test_hfs031_de_audit.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_unrepresented_families_explicitly_rejected[EYEBAR]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'EYEBAR'
+
+    @pytest.mark.parametrize('family',['TEE','UNSYMMETRIC','EYEBAR','PIN_CONNECTED'])
+    def test_unrepresented_families_explicitly_rejected(family):
+        s=Section(name='audit',type=family,A=5000,rx=100,ry=50)
+        with pytest.raises(RuleNotImplementedError):
+&gt;           run(case(),s)
+                ^^^^^^
+
+tests\test_hfs031_de_audit.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_unrepresented_families_explicitly_rejected[PIN_CONNECTED]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">family = 'PIN_CONNECTED'
+
+    @pytest.mark.parametrize('family',['TEE','UNSYMMETRIC','EYEBAR','PIN_CONNECTED'])
+    def test_unrepresented_families_explicitly_rejected(family):
+        s=Section(name='audit',type=family,A=5000,rx=100,ry=50)
+        with pytest.raises(RuleNotImplementedError):
+&gt;           run(case(),s)
+                ^^^^^^
+
+tests\test_hfs031_de_audit.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_missing_e4_H_is_silently_replaced_but_coverage_pending" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">def test_missing_e4_H_is_silently_replaced_but_coverage_pending():
+&gt;       c,s=channel(omit_h=True)
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_hfs031_de_audit.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_hfs031_de_audit.py:113: in channel
+    c=case(method,lengths=dict(Lx=math.pi*math.sqrt(200000/o['Fex'])*s.rx,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1
+extra = {'lengths': {'Lx': 19869.1765315922, 'Ly': 4442.8829381583655, 'Lz': 1000}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 19869.1765315922, ...29381583655, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_partial_classification_cannot_be_nonslender" time="0.002"><skipped type="pytest.xfail" message="F-48: unknown flange combined with known web is labelled non_slender" /></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_public_router_rejects_missing_compression_classification" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">def test_public_router_rejects_missing_compression_classification():
+        s=Section(name='audit',type='W',A=5000,rx=100,ry=50,h_tw_ratio=20)
+        with pytest.raises(IncompleteSectionDataError):
+&gt;           ProfileRouter.get_rules(case(),s)
+                                    ^^^^^^
+
+tests\test_hfs031_de_audit.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = 1, extra = {}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_d2_external_area_provenance_not_inferred[LRFD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'LRFD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_d2_external_area_provenance_not_inferred(method):
+&gt;       c=case(method,-1,connection=dict(An=800,U=.8),
+               custom_section=dict(type='SOLID_RECTANGULAR',B=10,H=100))
+
+tests\test_hfs031_de_audit.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'LRFD', pu = -1
+extra = {'connection': {'An': 800, 'U': 0.8}, 'custom_section': {'type': 'SOLID_RECTANGULAR', 'B': 10, 'H': 100}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_d2_external_area_provenance_not_inferred[ASD]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase&#10;lengths.Lb&#10;  Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/missing">method = 'ASD'
+
+    @pytest.mark.parametrize('method',METHODS)
+    def test_d2_external_area_provenance_not_inferred(method):
+&gt;       c=case(method,-1,connection=dict(An=800,U=.8),
+               custom_section=dict(type='SOLID_RECTANGULAR',B=10,H=100))
+
+tests\test_hfs031_de_audit.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+method = 'ASD', pu = -1
+extra = {'connection': {'An': 800, 'U': 0.8}, 'custom_section': {'type': 'SOLID_RECTANGULAR', 'B': 10, 'H': 100}}
+
+    def case(method='LRFD', pu=1, **extra):
+        data = dict(section_name='audit', design_method=method, material=dict(Fy=345, Fu=450),
+                    loads=dict(Pu=pu), lengths=dict(Lx=1000, Ly=1000, Lz=1000),
+                    connection=dict(angle_compression_mode='one_leg'))
+        data.update(extra)
+&gt;       return SteelCase(**data)
+               ^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SteelCase
+E       lengths.Lb
+E         Field required [type=missing, input_value={'Lx': 1000, 'Ly': 1000, 'Lz': 1000}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+tests\test_hfs031_de_audit.py:40: ValidationError</failure></testcase><testcase classname="tests.test_hfs031_de_audit" name="test_d2_nominal_conversion_preserves_force_units[yielding-0.9]" time="0.001" /><testcase classname="tests.test_hfs031_de_audit" name="test_d2_nominal_conversion_preserves_force_units[rupture-0.75]" time="0.001" /></testsuite></testsuites>

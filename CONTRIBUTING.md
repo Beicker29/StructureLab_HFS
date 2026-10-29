@@ -77,6 +77,15 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-031 añade `tests/test_hfs031_de_audit.py`, separada de la base2675 pruebas
++12 subpruebas. Los esperados de `tests/fixtures/hfs031/oracles.json` proceden
+de S22+E25+E26 por hash y desarrollos independientes en
+`docs/audit/hfs031/calculations.md`; `oracles.py` no importa el producto.
+La suite incluye defectos abiertos con `xfail(strict=True, raises=AssertionError)`:
+no contarlos como aprobados ni cambiarlos para obtener una validación favorable.
+El verificador común copia el fixture al consumidor externo. Reproducción y
+dictamen por dominio en [informe HFS-031](docs/audit/hfs031/report.md).
+
 HFS-024 añade `tests/test_hfs024_tracing.py`, separada de las 2561 pruebas y
 12 subpruebas de la base HFS-023. El verificador ejecuta la nueva suite con wheel
 y editable y una sonda de trazas de los 12 ejemplos en las tres instalaciones.

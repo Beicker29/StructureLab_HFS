@@ -1,0 +1,320 @@
+{
+  "W": {
+    "count": 319,
+    "sample": [
+      {
+        "name": "W44X408",
+        "type": "W",
+        "area": 77400.0,
+        "rx": 457.0,
+        "ry": 90.4,
+        "rz": null,
+        "ro": null,
+        "H": null,
+        "od": null,
+        "id": null,
+        "t": null,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": null,
+        "bf_2tf_ratio": 3.71,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "W_IPE_HEA_HEB",
+          "row": 2,
+          "original_name": "W44X408"
+        }
+      },
+      {
+        "name": "W44X368",
+        "type": "W",
+        "area": 69700.0,
+        "rx": 455.0,
+        "ry": 89.9,
+        "rz": null,
+        "ro": null,
+        "H": null,
+        "od": null,
+        "id": null,
+        "t": null,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": null,
+        "bf_2tf_ratio": 4.06,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "W_IPE_HEA_HEB",
+          "row": 3,
+          "original_name": "W44X368"
+        }
+      }
+    ]
+  },
+  "CHANNEL": {
+    "count": 32,
+    "sample": [
+      {
+        "name": "C15X50",
+        "type": "CHANNEL",
+        "area": 9480.0,
+        "rx": 133.0,
+        "ry": 22.0,
+        "rz": null,
+        "ro": 139.0,
+        "H": 0.937,
+        "od": null,
+        "id": null,
+        "t": null,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": 5.72,
+        "bf_2tf_ratio": 2.8636363636363638,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "C",
+          "row": 2,
+          "original_name": "C15X50"
+        }
+      },
+      {
+        "name": "C15X40",
+        "type": "CHANNEL",
+        "area": 7610.0,
+        "rx": 138.0,
+        "ry": 22.4,
+        "rz": null,
+        "ro": 145.0,
+        "H": 0.927,
+        "od": null,
+        "id": null,
+        "t": null,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": 5.42,
+        "bf_2tf_ratio": 2.7090909090909094,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "C",
+          "row": 3,
+          "original_name": "C15X40"
+        }
+      }
+    ]
+  },
+  "DOUBLE_ANGLE": {
+    "count": 639,
+    "sample": [
+      {
+        "name": "2L12X12X1-3/8",
+        "type": "DOUBLE_ANGLE",
+        "area": 40100.0,
+        "rx": 92.5,
+        "ry": 129.0,
+        "rz": null,
+        "ro": 174.0,
+        "H": 0.831,
+        "od": null,
+        "id": null,
+        "t": 35.1,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": 8.7,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "2L",
+          "row": 2,
+          "original_name": "2L12X12X1-3/8"
+        }
+      },
+      {
+        "name": "2L12X12X1-3/8X3/4",
+        "type": "DOUBLE_ANGLE",
+        "area": 40100.0,
+        "rx": 92.5,
+        "ry": 135.0,
+        "rz": null,
+        "ro": 179.0,
+        "H": 0.84,
+        "od": null,
+        "id": null,
+        "t": 35.1,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": 8.7,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "2L",
+          "row": 3,
+          "original_name": "2L12X12X1-3/8X3/4"
+        }
+      }
+    ]
+  },
+  "SINGLE_ANGLE": {
+    "count": 137,
+    "sample": [
+      {
+        "name": "L12X12X1-3/8",
+        "type": "SINGLE_ANGLE",
+        "area": 20100.0,
+        "rx": 92.5,
+        "ry": 92.5,
+        "rz": 58.4,
+        "ro": 165.0,
+        "H": 0.627,
+        "od": null,
+        "id": null,
+        "t": 35.1,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": 8.7,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "L",
+          "row": 2,
+          "original_name": "L12X12X1-3/8"
+        }
+      },
+      {
+        "name": "L12X12X1-1/4",
+        "type": "SINGLE_ANGLE",
+        "area": 18300.0,
+        "rx": 93.0,
+        "ry": 93.0,
+        "rz": 58.7,
+        "ro": 166.0,
+        "H": 0.627,
+        "od": null,
+        "id": null,
+        "t": 31.8,
+        "tdes": null,
+        "d_t_ratio": null,
+        "b_t_ratio": 9.6,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "L",
+          "row": 3,
+          "original_name": "L12X12X1-1/4"
+        }
+      }
+    ]
+  },
+  "RECTANGULAR_HSS": {
+    "count": 80,
+    "sample": [
+      {
+        "name": "PTE50X13X1.5MM",
+        "type": "RECTANGULAR_HSS",
+        "area": 162.97445353110612,
+        "rx": 16.210274727884276,
+        "ry": 5.411615267829667,
+        "rz": null,
+        "ro": null,
+        "H": null,
+        "od": null,
+        "id": null,
+        "t": null,
+        "tdes": 1.395,
+        "d_t_ratio": null,
+        "b_t_ratio": null,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "PTE_RECT",
+          "row": 2,
+          "original_name": "PTE50X13X1.5mm"
+        }
+      },
+      {
+        "name": "PTE50X30X1.5MM",
+        "type": "RECTANGULAR_HSS",
+        "area": 210.40445353110636,
+        "rx": 18.349711074423684,
+        "ry": 12.362275915854942,
+        "rz": null,
+        "ro": null,
+        "H": null,
+        "od": null,
+        "id": null,
+        "t": null,
+        "tdes": 1.395,
+        "d_t_ratio": null,
+        "b_t_ratio": null,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "PTE_RECT",
+          "row": 3,
+          "original_name": "PTE50X30X1.5mm"
+        }
+      }
+    ]
+  },
+  "CIRCULAR_HSS": {
+    "count": 21,
+    "sample": [
+      {
+        "name": "PTER1-1/2\"X2.50MM",
+        "type": "CIRCULAR_HSS",
+        "area": 335.51856111165466,
+        "rx": 16.26126474939757,
+        "ry": 16.26126474939757,
+        "rz": null,
+        "ro": null,
+        "H": null,
+        "od": 48.26,
+        "id": 43.61,
+        "t": null,
+        "tdes": 2.325,
+        "d_t_ratio": 18.756989247311825,
+        "b_t_ratio": null,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "PTE_RED",
+          "row": 2,
+          "original_name": "PTER1-1/2\"X2.50mm"
+        }
+      },
+      {
+        "name": "PTER1-1/2\"X3.00MM",
+        "type": "CIRCULAR_HSS",
+        "area": 398.5465281048507,
+        "rx": 16.106306994466483,
+        "ry": 16.106306994466483,
+        "rz": null,
+        "ro": null,
+        "H": null,
+        "od": 48.26,
+        "id": 42.68,
+        "t": null,
+        "tdes": 2.79,
+        "d_t_ratio": 15.297491039426523,
+        "b_t_ratio": null,
+        "bf_2tf_ratio": null,
+        "source": {
+          "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+          "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+          "sheet": "PTE_RED",
+          "row": 3,
+          "original_name": "PTER1-1/2\"X3.00mm"
+        }
+      }
+    ]
+  }
+}

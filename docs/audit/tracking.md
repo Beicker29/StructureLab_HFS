@@ -1,5 +1,26 @@
 # Seguimiento maestro de hallazgos — HFS-017
 
+## Suplemento HFS-031 — 2026-10-29, auditoría D/E para revisión
+
+Base `main`/`05198f0`, árbol inicial limpio; CI de la base Windows/Ubuntu SUCCESS.
+[Informe](hfs031/report.md), [matriz independiente](hfs031/requirements.md),
+[cálculos](hfs031/calculations.md) y [plan de correcciones](hfs031/findings.md).
+S22+E25+E26 por hash; autenticación remota pendiente (AISC403).
+
+F-35/F-36 tienen discrepancias numéricas demostradas: E7 circular +12,7451%;
+E5(a) s120 +26,2155%; ángulo concéntrico con radios geométricos +135,0841%
+en los casos analíticos descritos. Se añaden F-46/F-47/F-48 y se reproduce
+F-12. Permanecen abiertos. Hay PASS locales falsos; los escenarios públicos
+ensayados conservan INCOMPLETE. No cambian ecuaciones, selección, cobertura,
+IDs, contratos ni históricos. 95 hojas independientes; nueva suite72 aprobadas/
+60 xfail estrictos, sin XPASS; 2675 pruebas previas +12 subpruebas preservadas,
+12 ejemplos/24CLI/6SVG sin diferencias. Un xfail no es validación.
+
+**F-31 continúa P0 abierto, reservado prioritariamente para HFS-032.**
+No se inicia ese hito ni F/G/H/I, no se hace commit/push, no se declara
+aptitud global. Dictámenes acotados VERIFICADO/INCORRECTO/NO IMPLEMENTADO/
+INDETERMINADO y revisión ingenieril pendiente. Suplementos anteriores históricos.
+
 ## Suplemento HFS-030 — 2026-10-29, cotejo local para revisión
 
 Base `main`/`76a9086`; jobs CI HFS-024 Windows/Ubuntu SUCCESS observados.
@@ -124,8 +145,8 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-32 | **P1** | Confirmado: FAIL con exit 0; riesgo para consumidores, no regresión | HFS-022 y documentación CLI al adaptar HFS-021 | Semántica ejecución/diseño documentada y consumidores probados; transición si cambia |
 | F-33 | P0 propuesto | HFS-010 exige interacción incluso Pu=0; rutas H/I completas pendientes. Biaxial sin axial omitida: sonda W y gating H/I; N29/N42 | HFS-010/034/035 | Obligaciones por combinación, incluso Pu=0; ruta por familia validada |
 | F-34 | P0 propuesto | HFS-010 exige resistencia M por eje; cuantía/transferencia no la cubren. Tres roles compuestos con flexión pura 1 y 1 000 000 kNm conservan PASS sin check resistente M | HFS-010/035 | No confundir cuantía/transferencia con flexión; evaluar/bloquear M por eje y etapa |
-| F-35 | P0 propuesto | HFS-010 no acredita el dominio E7; fórmula efectiva sigue pendiente. E7 usa QFy/Ag; S22 E7 prescribe Fn·Ae, sin equivalencia demostrada | HFS-010/031/041 | Método por dominio/área efectiva, oráculos y revisión de consumidores H/I |
-| F-36 | P0 propuesto | HFS-010 no acredita condiciones/ramas E5; reparación normativa pendiente. E5 implementa rama única y no acredita condiciones; E4 ángulo sin regla registrada | HFS-010/031/041 | Condiciones de conexión y ramas 75/80/200; flexotorsión/áreas y oráculos |
+| F-35 | P0 propuesto, abierto | HFS-031 demuestra no equivalencia QFy/Ag frente Fn·Ae; errores de ambos signos, circular +12,7451% y PASS local falso. Cobertura pública pendiente | HFS-010/031/041 | [Prueba algebraica, banco y reparación por dominio](hfs031/calculations.md); revisar consumidores H/I antes de sustituir |
+| F-36 | P0 propuesto, abierto | HFS-031 demuestra E5-2 incorrecta, otras ramas/condiciones ausentes y omisión de radio principal: +26,2155%/+135,0841% en casos definidos; sin cierre | HFS-010/031/041 | [Condiciones, ramas75/80/200 y plan](hfs031/findings.md); contrato de datos y modos antes de corregir |
 | F-37 | P1 | IDs parecen ecuaciones; H1-2 usado para interacción de tracción aunque fuente define Pey. HFS-030: L30-01/03/06 documentan localizadores y referencia I3.3b incorrectos; E25-02 renumera F7. Traces/metadata preservadas, corrección pendiente | HFS-023/024/030/032/034/035 | Separar IDs/citas; contrastar fórmula de tracción y consumidores, actualizar referencias con revisión explícita de impacto |
 | F-38 | P1 | Verificaciones complementarias/condiciones no acreditadas E6/F13/G7/H4/I1/I6, etapas y conexiones | HFS-010/031–038 | Alcance explícito; no omitir precondiciones ni validar por existencia de cualquier check |
 | F-39 | P0 propuesto | Confirmado y corregido HFS-013 para revisión: H3-6 usaba cuadrado del término normal; Specification 16.1-86 exige término lineal. Oráculo normal=0,4 y corte+torsión=0,9: 0,97→1,21 | HFS-013/034 | Revisión de expresión y dominio; Pc/Mc requieren validación separada |
@@ -135,6 +156,9 @@ Estado actual: HFS-000/001/002/011/016 concluidas dentro de sus alcances por dec
 | F-43 | P0 propuesto; corregido | Revisión independiente confirma Mc=0,90Mn también en ASD dentro de H3/H1. Cierre funcional HFS-013: conversión canónica F1(a), ASD=Mn/1,67, nominales y LRFD preservados. Antes 18 fallos ASD dirigidos; después 73 pruebas nuevas aprobadas. Ocho checks de sondas ASD pasan de PASS a FAIL | Corrección final HFS-013; aprobación técnica pendiente | Revisar cierre acotado al factor F1. El rechazo público de flexión ASD limita exposición, pero no legitima capacidades internas 50,3% excesivas. No habilitar ASD integral ni cerrar F-37/F-31 |
 | F-44 | P0 propuesto; corregido para revisión | HFS-017 reproduce F directo ASD calculando LRFD y helpers/reglas I sin guarda de método. Ahora rechazo estructurado antes de nominales y retornos inactivos; motor/router/evaluadores comparten política | HFS-017 | [Sondas antes/después y 468 pruebas](hfs017/report.md); revisar cobertura de entradas directas. No habilitar ASD F/I ni declarar acreditadas capacidades I |
 | F-45 | P1; corregido para revisión | HFS-017 reproduce métodos desconocidos tratados como ASD en conversores D/E/G/H, o cero previo a validar. Ahora ValueError explícito incluso nominal cero; casos corruptos directos dan ValidationError estructurado | HFS-017 | [Contrato y migración](../contracts/hfs017-design-method.md); verificar consumidores directos y conservar factores/aritmética válidos |
+| F-46 | P0 propuesto, abierto | HFS-031: E4 canal usa Fey en vez de Fex del eje de simetría; H ausente se toma1. Caso E4 +100%, mínimo con E3 aún excesivo | HFS-031 | [Ejes, datos y oráculo](hfs031/findings.md); no cambio global de Fey→Fex para todas las familias |
+| F-47 | P0 propuesto, abierto | HFS-031: xa/ya se aceptan/reportan pero no intervienen en resistencia E4; caso ya200 +58,7499% | HFS-031 | E4-10/11/12 por dominio o rechazo; análisis general E4(f) separado; [evidencia](hfs031/calculations.md) |
+| F-48 | P0 propuesto, abierto | HFS-031: clasificación parcialmente desconocida favorable, 2L continuo tratado como separado y E3 directo con eje ausente puede emitir PASS | HFS-031 | [Reproducciones y plan](hfs031/findings.md); clasificación completa, geometría/contacto y guardas directas; no acreditación desde tests |
 
 Las reproducciones, archivos/símbolos y salidas de F-01 a F-32 están en [findings](findings.md). F-31 tiene `test_channel_both_axes_must_block_if_major_axis_is_unsupported`; F-32 se acredita en [examples.json](evidence-clean/examples.json) y `run.py::main`. No se inventa un xfail para F-32: el exit actual es un contrato observable cuyo cambio exige decisión explícita.
 

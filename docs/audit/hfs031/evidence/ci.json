@@ -1,0 +1,28 @@
+{
+  "url": "https://api.github.com/repos/Beicker29/StructureLab_HFS/actions/runs?head_sha=05198f06a63f8405bd96ffbe494be796cdb165e4",
+  "runs": [
+    {
+      "id": 40961316786,
+      "html_url": "https://github.com/Beicker29/StructureLab_HFS/actions/runs/40961316786",
+      "head_sha": "05198f06a63f8405bd96ffbe494be796cdb165e4",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "jobs": [
+    {
+      "id": 123754505596,
+      "name": "Python 3.12 / ubuntu-24.04",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Beicker29/StructureLab_HFS/actions/runs/40961316786/job/123754505596"
+    },
+    {
+      "id": 123754505909,
+      "name": "Python 3.12 / windows-2022",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Beicker29/StructureLab_HFS/actions/runs/40961316786/job/123754505909"
+    }
+  ]
+}
