@@ -77,6 +77,15 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-023 agrega `tests/test_hfs023_registry.py`: integridad de metadatos y
+referencias, propietarios, caracterización de bindings y mutaciones. Conserva
+las 2352 pruebas y 12 subpruebas HFS-022Q. El verificador común ejecuta la suite
+nueva por separado con el wheel instalado, sin cambiar oráculos históricos.
+Comprobar el índice derivado con `python scripts/audit_hfs023.py --check`;
+regenerarlo sin `--check` solo cuando cambien metadatos revisados. HFS-002 nunca
+se genera desde el registro. [Contrato](docs/contracts/hfs023-normative-registry.md)
+y [resultados](docs/audit/hfs023/report.md). No confundir integridad con acreditación.
+
 HFS-022Q incorpora `tests/test_hfs022q_independent.py`: 20 documentos manuales
 contra los dos modos de schema/Python y dos procesos consumidores, 42 pruebas
 nuevas; total 2352 +12 subpruebas en 18 suites. Los esperados viven en

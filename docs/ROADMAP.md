@@ -1,5 +1,13 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**HFS-023 (2026-10-29), para revisión:** base main `1b170929`, árbol inicial
+limpio, [CI 40792213050](https://github.com/Beicker29/StructureLab_HFS/actions/runs/40792213050)
+SUCCESS Windows/Ubuntu verificada. HFS-022Q aprobado por declaración del usuario.
+Registro único ampliado con 93 descriptores, fuentes/condiciones/implementaciones
+y evidencia separadas; ninguna acreditación normativa nueva. F-31 P0 abierto.
+[Contrato](contracts/hfs023-normative-registry.md) e [informe](audit/hfs023/report.md).
+Sin commit/push ni inicio de HFS-024; la CI de la base no acredita cambios locales.
+
 **HFS-022Q (2026-10-28), auditoría final para revisión:** base `449549d9`,
 [CI 40788962500](https://github.com/Beicker29/StructureLab_HFS/actions/runs/40788962500)
 SUCCESS Windows/Ubuntu verificado. Se amplía evidencia con consumidor externo,
@@ -258,7 +266,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-021A | 2, aprobada y cerrada | Paquete convencional steel_design y API pública mínima | 021 | Distribución 0.2.0; commit final 35dd7b8; CI 40736064324 SUCCESS Windows 2022/Ubuntu 24.04; corrección SVG aceptada y referencia local 1819 +12 subpruebas. [Cierre verificado](audit/hfs021b/report.md). Se preservan el [informe histórico](audit/hfs021a/report.md), el run fallido 40694129771 y su [corrección](audit/hfs021a/ci-fix/report.md). F-31 P0 y restantes defectos normativos siguen abiertos. |
 | HFS-021B | 2, para revisión | Cierre documental y limpieza incremental controlada | 021A | Política permanente, inventario por símbolo/consumidor y retiro exclusivo de bindings sin contrato ni uso. Fachadas comprometidas conservadas, regresión exacta antes/después, sin cambios normativos ni versión nueva. [Informe](audit/hfs021b/report.md), [inventario](audit/hfs021b/cleanup-inventory.md). |
 | HFS-022 | 2, base aprobada; suplemento 022R para revisión | Contratos versionados de entrada, plan normativo, checks y resultado | 021A | API optativa 1.0; base bae6463 con CI 40777094705 SUCCESS Windows/Ubuntu. [Informe histórico](audit/hfs022/report.md) preservado. [Suplemento HFS-022R](audit/hfs022/architecture-review/report.md): desacoplamiento, interoperabilidad y diagnósticos. Cierre del suplemento pendiente de revisión independiente y CI de su commit final. |
-| HFS-023 | 2 | Registro normativo declarativo mínimo, sin framework de plugins | 022 | Cada regla tiene ID, aplicabilidad, cita, implementación, conjunto de tests y estado de verificación. |
+| HFS-023 | 2, implementado para revisión | Registro normativo declarativo mínimo, sin framework de plugins | 022 | RuleDefinition.metadata, 93 descriptores, referencias y pruebas de integridad; índice de implementación derivado, HFS-002 independiente. Sin cambios de cálculo/cobertura/transporte. [Evidencia](audit/hfs023/report.md). |
 | HFS-024 | 2 | Trazas de cálculo canónicas y memorias sin inferencia por nombre de cláusula | 022,023 | Variables, unidades, expresiones, fuente y rama normativa recuperables en CLI/JSON/web. |
 | HFS-030 | 3 | AISC 360-22: base documental y erratas, tabla de trazabilidad | 023 | Comparación de PDF del repo con fuente oficial; versión/erratas registradas. |
 | HFS-031 | 3 | Auditoría normativa capítulos D y E (incl. E4/E5/E7) | 030 | Oráculos independientes, casos límite, clases geométricas y condiciones de uso. |
