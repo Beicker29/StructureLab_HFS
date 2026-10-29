@@ -1,5 +1,6 @@
 import math
 from typing import Dict, Optional
+from ...tracing import observed_value, emit_step, quantity
 
 
 NORMATIVE_E_MPA = 200000.0
@@ -112,9 +113,17 @@ def available_flexural_strength(Mn_Nmm: float, design_method: str) -> float:
     Preserve the original LRFD operation order for exact regression stability.
     """
     if design_method == "LRFD":
-        return PHI_B_LRFD * Mn_Nmm / 1_000_000.0
+        return observed_value(PHI_B_LRFD * Mn_Nmm / 1_000_000.0, name="Mc", unit="kN-m",
+            producer=__name__+":available_flexural_strength", limit_state="available_flexural_strength",
+            branch="LRFD", reference="F1(a)", equation=None, expression="phi_b * Mn / 1000000",
+            inputs=(quantity("Mn", Mn_Nmm, "N-mm"),), factors=(quantity("phi_b", PHI_B_LRFD, "ratio"),),
+            unknowns=("F1 conversion only; nominal branch and axis belong to the calling evaluator.",))
     if design_method == "ASD":
-        return Mn_Nmm / OMEGA_B_ASD / 1_000_000.0
+        return observed_value(Mn_Nmm / OMEGA_B_ASD / 1_000_000.0, name="Mc", unit="kN-m",
+            producer=__name__+":available_flexural_strength", limit_state="available_flexural_strength",
+            branch="ASD", reference="F1(a)", equation=None, expression="Mn / omega_b / 1000000",
+            inputs=(quantity("Mn", Mn_Nmm, "N-mm"),), factors=(quantity("omega_b", OMEGA_B_ASD, "ratio"),),
+            unknowns=("Internal F1 conversion does not enable public ASD flexure.",))
     raise ValueError(f"Unsupported flexural design method: {design_method!r}")
 
 
@@ -293,6 +302,10 @@ def evaluate_f5(case, section) -> Dict[str, object]:
 
 def evaluate_f4_conservative(case, section) -> Dict[str, object]:
     base = evaluate_f5(case, section)
+    emit_step(producer=__name__+":evaluate_f4_conservative", limit_state="F4 alternative",
+        branch="delegate_to_evaluate_f5", reference="F4 User Note (UN22, informative)", equation=None,
+        expression=None, axis="x", outputs=(quantity("Mn", base["Mn_Nmm"], "N-mm"),),
+        unknowns=("F-19: equivalence/conservatism and branch equation mapping are not accredited.",))
     base["intermediate"]["implementation_note"] = (
         "Conservative implementation using F5 per User Note in F4."
     )

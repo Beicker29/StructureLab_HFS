@@ -9,6 +9,7 @@ from ..design_methods import require_case_method
 from ...codes.aisc_360_22 import shear_calc
 from ..actions import shear_trace
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ...tracing import emit_step, quantity
 
 
 def require_section_values(section, fields, reference):
@@ -62,6 +63,14 @@ def evaluate_hss_shear(case, section, axis):
         raise RuleNotImplementedError("Shared HSS shear evaluation is limited to rectangular/round HSS.")
     available = shear_calc.calculate_available_shear_strength(vn_n=nominal,
         design_method=case.design_method.value, phi_v=.90, omega_v=1.67)
+    emit_step(producer=__name__+":evaluate_hss_shear", limit_state="HSS_directional_shear",
+        branch=intermediate["branch"], reference=clause, equation=None, expression=None, axis=axis,
+        inputs=(quantity("signed_demand", trace["signed_demand_kN"], "kN", "case.loads."+trace["input_component"]),
+                quantity("Fy", fy, "MPa", "case.material.Fy"), quantity("E", e, "MPa", "case.material.E")),
+        intermediates=(quantity("Vn", nominal, "N"),), outputs=(quantity("Vc", available, "kN"),),
+        assumptions=(trace["axis_convention"], "Force direction: "+trace["force_direction"],
+                     "Vu is a scalar alias in the x bending plane, never a vector resultant."),
+        unknowns=("Branch label is emitted by coefficient evaluator; equation mapping and geometry derivation are not expanded here.",))
     return {"clause": clause, "capacity_kN": available, "inputs": inputs,
             "intermediate": intermediate, "design_factor": {"design_method": case.design_method.value,
                 "phi_v": .90, "omega_v": 1.67, "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)"}}

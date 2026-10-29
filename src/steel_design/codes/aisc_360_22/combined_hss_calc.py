@@ -1,4 +1,5 @@
 from ...design_methods import require_design_method
+from ...tracing import observed_value, quantity
 import math
 from typing import Dict, Optional
 
@@ -154,7 +155,9 @@ def calculate_nominal_torsional_strength(*, fcr_mpa: float, c_mm3: float) -> flo
     c_value = _positive(c_mm3)
     if min(fcr, c_value) <= 0.0:
         return 0.0
-    return fcr * c_value
+    return observed_value(fcr * c_value, name="Tn", unit="N-mm", producer=__name__+":calculate_nominal_torsional_strength",
+        limit_state="HSS_torsion", branch="positive_inputs", reference="H3.1", equation="H3-1",
+        expression="Fcr * C", inputs=(quantity("Fcr", fcr, "MPa"), quantity("C", c_value, "mm3")))
 
 
 def calculate_available_torsional_strength(*, tn_nmm: float, design_method: str, phi_t: float = 0.90, omega_t: float = 1.67) -> float:
@@ -166,9 +169,17 @@ def calculate_available_torsional_strength(*, tn_nmm: float, design_method: str,
     if tn <= 0.0:
         return 0.0
     if method == "LRFD":
-        return _positive(phi_t) * tn / 1_000_000.0
+        return observed_value(_positive(phi_t) * tn / 1_000_000.0, name="Tc", unit="kN-m",
+            producer=__name__+":calculate_available_torsional_strength", limit_state="HSS_torsion",
+            branch="LRFD", reference="H3.1", equation=None, expression="positive(phi_t) * Tn / 1000000",
+            inputs=(quantity("Tn", tn, "N-mm"),), factors=(quantity("phi_t", phi_t, "ratio", "function argument"),),
+            unknowns=("Conversion; critical stress branch is not expanded here.",))
     omega = _positive(omega_t)
-    return (tn / omega) / 1_000_000.0 if omega > 0.0 else 0.0
+    return observed_value((tn / omega) / 1_000_000.0 if omega > 0.0 else 0.0, name="Tc", unit="kN-m",
+        producer=__name__+":calculate_available_torsional_strength", limit_state="HSS_torsion",
+        branch="ASD", reference="H3.1", equation=None, expression="(Tn / omega) / 1000000 if omega > 0 else 0",
+        inputs=(quantity("Tn", tn, "N-mm"),), factors=(quantity("omega", omega, "ratio", "positive(omega_t)"),),
+        unknowns=("Conversion; existing invalid-factor fallback preserved, not accredited.",))
 
 
 def calculate_h3_6_interaction(*, normal_ratio: float, shear_torsion_ratio: float) -> float:
@@ -178,4 +189,8 @@ def calculate_h3_6_interaction(*, normal_ratio: float, shear_torsion_ratio: floa
     """
     normal = max(0.0, float(normal_ratio))
     shear_torsion = max(0.0, float(shear_torsion_ratio))
-    return normal + (shear_torsion**2)
+    return observed_value(normal + (shear_torsion**2), name="interaction", unit="ratio",
+        producer=__name__+":calculate_h3_6_interaction", limit_state="HSS_combined_actions",
+        branch="nonnegative_terms", reference="H3.2", equation="H3-6",
+        expression="normal + shear_torsion**2",
+        inputs=(quantity("normal", normal, "ratio"), quantity("shear_torsion", shear_torsion, "ratio")))

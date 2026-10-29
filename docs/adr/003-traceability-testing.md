@@ -58,4 +58,23 @@ normativa. [Contrato y límites](../contracts/hfs023-normative-registry.md).
 
 ## Riesgos y verificación futura
 
+### Aplicación HFS-024 — para revisión, 2026-10-29
+
+Se instrumentan los productores mediante observación optativa, en contexto de
+ejecución, y pasos explícitos con valores locales. Identidad/citas/evidencia se
+obtienen del registro HFS-023; las decisiones de cobertura se copian del resultado
+canónico. La traza es un documento auxiliar y no modifica los diez esquemas JSON
+1.0. Se descarta reconstruir fórmulas a partir de memorias legacy y añadir campos
+silenciosamente al contrato congelado. También se descarta propagar un argumento
+nuevo por todos los cálculos: el contexto optativo preserva firmas y limita el
+cambio, a costa de una dependencia contextual que requiere aislamiento probado.
+
+La frontera observada de una regla no prueba instrumentación aritmética completa.
+Campos desconocidos y ramas pendientes se conservan explícitos, especialmente
+F3/F4/H1/I. Las memorias existentes permanecen como formato de compatibilidad;
+el exportador optativo solo consume el snapshot. No se duplican operaciones,
+factores, selección ni registro. Contrato, alternativas y riesgos en
+[HFS-024](../contracts/hfs024-calculation-traces.md) y su
+[informe](../audit/hfs024/report.md). F-31 y acreditaciones pendientes siguen abiertos.
+
 Metadatos desactualizados pueden aparentar trazabilidad; probar correspondencia de IDs, referencias y rutas cuando se implemente el registro. El error de un manual auxiliar o una transcripción también puede propagarse: registrar contraste y revisión. Una expectativa de regresión no debe impedir corregir un defecto. La revisión documental presente no cierra F-30 ni certifica AISC 360-22; AISC 341-22 sigue siendo alcance independiente.

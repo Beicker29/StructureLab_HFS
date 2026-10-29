@@ -40,6 +40,7 @@ SUITES = [
     "test_hfs022r_review",
     "test_hfs022q_independent",
     "test_hfs023_registry",
+    "test_hfs024_tracing",
 ]
 
 
@@ -142,7 +143,7 @@ def verify(args):
     for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py",
                  "hfs021a_invariants.py", "probe_hfs021a_imports.py",
                  "hfs021a_svg_comparison.py", "generate_hfs022_schemas.py",
-                 "probe_hfs022q_consumer.py", "audit_hfs023.py"):
+                 "probe_hfs022q_consumer.py", "audit_hfs023.py", "audit_hfs024.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
     for relative in ("docs/schemas/contracts/1.0", "docs/audit/hfs017/evidence/after"):
         target = inputs / relative
@@ -220,6 +221,8 @@ def verify(args):
         missing = run(f"missing-default-{mode}", [cli, inputs / "examples/w_shape_case.json"], empty, expected=1)
         assert json.loads(missing.stderr)["error"]["stage"] == "load_sections"
         assert not (empty / "data").exists()
+        run(f"trace-probe-{mode}", [executable, inputs / "scripts/audit_hfs024.py",
+            "--probe", inputs, "--out", out / f"traces-{mode}.json"], empty)
 
     executable = interpreters["wheel"]
     # Test tools remain development-only; pyproject owns their direct pins.
@@ -234,6 +237,8 @@ def verify(args):
         "tests/test_hfs021a_public_api.py", f"--basetemp={work / 'tmp' / 'editable-api'}"], inputs)
     run("editable-contract-review-tests", [interpreters["editable"], "-m", "pytest", "-q", "-p", "no:cacheprovider",
         "tests/test_hfs022r_review.py", f"--basetemp={work / 'tmp' / 'editable-contract-review'}"], inputs)
+    run("editable-tracing-tests", [interpreters["editable"], "-m", "pytest", "-q", "-p", "no:cacheprovider",
+        "tests/test_hfs024_tracing.py", f"--basetemp={work / 'tmp' / 'editable-tracing'}"], inputs)
     summary = {}
     selections = [("original", [f"--ignore=tests/{name}.py" for name in SUITES])]
     selections += [(name, [f"tests/{name}.py"]) for name in SUITES]

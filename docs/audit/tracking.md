@@ -1,5 +1,21 @@
 # Seguimiento maestro de hallazgos — HFS-017
 
+## Suplemento HFS-024 — 2026-10-29, para revisión
+
+HFS-023 fue aprobado arquitectónicamente por el usuario; su commit publicado
+`93e4f8c` tiene CI SUCCESS Windows/Ubuntu. HFS-024 añade observaciones reales y
+pasos progresivos, con [contrato](../contracts/hfs024-calculation-traces.md),
+[matriz](hfs024/rule-matrix.md) e [informe](hfs024/report.md).
+
+F-21/F-26: fuente estructurada optativa de valores/unidades/procedencia, enlazada
+al registro único y a checks por identidad; expansión completa y transición de
+memorias pendientes. F-37: F3 no se trata como ecuación, F4 declara delegación F5,
+H1 tracción no atribuye su fórmula a H1-2, I5 conserva método y tipo de fuente.
+No cambia la etiqueta legacy ni se acredita su expresión normativa. F-19/20/23/28/30
+permanecen abiertos; observar no valida. **F-31 permanece P0 abierto**: trazar
+F6 no acredita la flexión mayor de un canal. F-33–38 y restantes límites siguen
+vigentes. No cambia prioridad ni se cierra una auditoría normativa por esta entrega.
+
 ## Suplemento HFS-023 — 2026-10-29
 
 F-26 se aborda arquitectónicamente con metadatos canónicos en RuleDefinition

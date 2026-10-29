@@ -1,0 +1,241 @@
+{
+  "base": "93e4f8cd523148c8cb3ccff1d94caafb4cfa8af1",
+  "method": "AST minus explicitly enumerated observation-only nodes; not numeric validation",
+  "files": {
+    "src/steel_design/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b598de9f0a5f356f0eca3d533eff9d985f977cafb0b2d2e96ac5cf7fbd57d403",
+      "working_lf_sha256": "b598de9f0a5f356f0eca3d533eff9d985f977cafb0b2d2e96ac5cf7fbd57d403"
+    },
+    "src/steel_design/codes/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "a26d50c00e6e1b1d4dd475308311b19c59dd94d096a6487f4db7082f5711d334",
+      "working_lf_sha256": "a26d50c00e6e1b1d4dd475308311b19c59dd94d096a6487f4db7082f5711d334"
+    },
+    "src/steel_design/codes/aisc_360_22/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "d7eb95aaeddc2ebdfae5818274d32ae35e9498fe53ca9a78d372ac8cccca162f",
+      "working_lf_sha256": "d7eb95aaeddc2ebdfae5818274d32ae35e9498fe53ca9a78d372ac8cccca162f"
+    },
+    "src/steel_design/codes/aisc_360_22/axial_calc.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "e59822fc45dcd160768cfdd8935a6dd6e3e65aed74fc507cf24c7ec728702b01",
+      "working_lf_sha256": "e59822fc45dcd160768cfdd8935a6dd6e3e65aed74fc507cf24c7ec728702b01"
+    },
+    "src/steel_design/codes/aisc_360_22/combined_hss_calc.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b837c40030793038f2ec64680f31487ff3de09bd85b496a38a3c85408f99ab27",
+      "working_lf_sha256": "2d1a18549783a78e4578e27d505e143dbf5dfb15e98a8def9902af216fb035f1"
+    },
+    "src/steel_design/codes/aisc_360_22/composite_calc.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "56124cd0c876b672b2f2f52b3f9891058e4e6374cec67c8c29d1e7d3ab49beda",
+      "working_lf_sha256": "56124cd0c876b672b2f2f52b3f9891058e4e6374cec67c8c29d1e7d3ab49beda"
+    },
+    "src/steel_design/codes/aisc_360_22/flexure_calc.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "6b1d48f63cda2bd2e51264f26930cef0701b2ca9b57547ecac1b602756ec23f5",
+      "working_lf_sha256": "e40aeb9687353fcc5f08aae9829bf6d6d49ffe754e95b4ecbde86833a070609a"
+    },
+    "src/steel_design/codes/aisc_360_22/shear_calc.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "531556057823c5353c703bdb759c0b182b5f7c615489f7a1532b23acc0a5247c",
+      "working_lf_sha256": "531556057823c5353c703bdb759c0b182b5f7c615489f7a1532b23acc0a5247c"
+    },
+    "src/steel_design/codes/aisc_360_22/tension_calc.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "c286fb79d528e0073951357c289cf196635cdbf9ca3b6a3b8d5170e1285a0f7c",
+      "working_lf_sha256": "9a23da58fc645799ee870384db45a0d78186137532a1ac4cf78b4fd675180d84"
+    },
+    "src/steel_design/contracts.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "18deec2137a8a555cd0fce019c5398eb64ea5d7efc8a942b9417f1902b162270",
+      "working_lf_sha256": "18deec2137a8a555cd0fce019c5398eb64ea5d7efc8a942b9417f1902b162270"
+    },
+    "src/steel_design/design_methods.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "1429cba447174438bc00e039d1feadcc6248fc3b643201c008c035447e3ca860",
+      "working_lf_sha256": "1429cba447174438bc00e039d1feadcc6248fc3b643201c008c035447e3ca860"
+    },
+    "src/steel_design/domain/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "fd1d29dd2c20be7537bb1b99f013b22bc1029d19f533ec2734db4479f07a05e0",
+      "working_lf_sha256": "fd1d29dd2c20be7537bb1b99f013b22bc1029d19f533ec2734db4479f07a05e0"
+    },
+    "src/steel_design/domain/actions.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b11c6ca6d02360dc22327d3728ea0dd9a5d2e15d03c72e781cb25b191685d951",
+      "working_lf_sha256": "b11c6ca6d02360dc22327d3728ea0dd9a5d2e15d03c72e781cb25b191685d951"
+    },
+    "src/steel_design/domain/coverage.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "285d1fd2bd9cec1420e1677be703e76e7fe9ad2fbcd0dd616dead0837f5baae4",
+      "working_lf_sha256": "285d1fd2bd9cec1420e1677be703e76e7fe9ad2fbcd0dd616dead0837f5baae4"
+    },
+    "src/steel_design/domain/coverage_evidence.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "2f2f6cb724efd3aaa384c08e6785f4f2ed7634333ac0de05b36785d289dc87a8",
+      "working_lf_sha256": "2f2f6cb724efd3aaa384c08e6785f4f2ed7634333ac0de05b36785d289dc87a8"
+    },
+    "src/steel_design/domain/design_methods.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "0f747012ea757ce54e094cf74757c590c77eaa31c89b790060f49cc3945d2d3c",
+      "working_lf_sha256": "0f747012ea757ce54e094cf74757c590c77eaa31c89b790060f49cc3945d2d3c"
+    },
+    "src/steel_design/domain/errors.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "9d564e155a4b7437ce8c9d3719b02b0901fc6c0f18b0d5d106de87b15ca07ee1",
+      "working_lf_sha256": "9d564e155a4b7437ce8c9d3719b02b0901fc6c0f18b0d5d106de87b15ca07ee1"
+    },
+    "src/steel_design/domain/evaluators/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "ba4b2c5f7fbd26abbafe0497f91c4517d253fc32fbd850da6cf10869969c96de",
+      "working_lf_sha256": "ba4b2c5f7fbd26abbafe0497f91c4517d253fc32fbd850da6cf10869969c96de"
+    },
+    "src/steel_design/domain/evaluators/flexure_evaluator.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "c97637d1ea700727142f1142e78834915ca92b0a1a20be262748cd0ff739ea5e",
+      "working_lf_sha256": "c97637d1ea700727142f1142e78834915ca92b0a1a20be262748cd0ff739ea5e"
+    },
+    "src/steel_design/domain/evaluators/hss_shear.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "84ec9ae5cdb5c68437f8bc02c33b3e169c61f2688d0dbc22910500df7c7cabad",
+      "working_lf_sha256": "cc305a41189f0ac2428029dc5dcf56ad9792bf61599d7830bc44b45f8934ff37"
+    },
+    "src/steel_design/domain/evaluators/tension_evaluator.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "fe84bf0fd06ee7a624b6383a48aef2eb139937988c4a2412893f6bd8bab006d2",
+      "working_lf_sha256": "43f279ef28c1cfb3daf8a2e9b2495f06e7cefe6911a5f9953df59f91ea4b666a"
+    },
+    "src/steel_design/domain/recommendations.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "0fd88459ef695c004e6546d4ae579b8359859d563211e55c1b11446fb8acf9bf",
+      "working_lf_sha256": "0fd88459ef695c004e6546d4ae579b8359859d563211e55c1b11446fb8acf9bf"
+    },
+    "src/steel_design/domain/routing/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "f511eab17d38de9f1f2ce339bedbe1a9680cfdd5356e743c3dfe43c58c3c1978",
+      "working_lf_sha256": "f511eab17d38de9f1f2ce339bedbe1a9680cfdd5356e743c3dfe43c58c3c1978"
+    },
+    "src/steel_design/domain/routing/profile_router.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "dcf10fe11e07f9cc3e6cf7e7b1eb774ba2af216d54c16d9b17377c8c0eddc21d",
+      "working_lf_sha256": "dcf10fe11e07f9cc3e6cf7e7b1eb774ba2af216d54c16d9b17377c8c0eddc21d"
+    },
+    "src/steel_design/domain/routing/registry_metadata.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "bc18169161f38eac83c681e301babdc60900391bb67b1615de6b8d88d3a64334",
+      "working_lf_sha256": "bc18169161f38eac83c681e301babdc60900391bb67b1615de6b8d88d3a64334"
+    },
+    "src/steel_design/domain/rules/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "3dedbda99a3c0c20fa180ce979c56cd7d836c3bcae9702ac3aac1f7d3d3e803d",
+      "working_lf_sha256": "3dedbda99a3c0c20fa180ce979c56cd7d836c3bcae9702ac3aac1f7d3d3e803d"
+    },
+    "src/steel_design/domain/rules/axial_rules.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "7e04d7d95409c7bf730aa29ce39cedaa2b448f6455a6359d5e8e85e67c0179ac",
+      "working_lf_sha256": "19ecf93569498f1d087dc9ce8dc0e8cf2bb5451c2e32075cebfb47980be991e1"
+    },
+    "src/steel_design/domain/rules/combined_hss_rules.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "6f733dd268ab2030c73fb9d08a3a3fa4d38db490dd87e5609c35417607f6a57d",
+      "working_lf_sha256": "fb8998a1ce3bc1d1c2736476cb15b5da966c3881ef235df8dee4d0efc85bf713"
+    },
+    "src/steel_design/domain/rules/composite_rules.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "264253a04e78e579fe360f352f0ecd56aef564ad1b841e15dc988366580a49bc",
+      "working_lf_sha256": "27280ee4417c896de452a5eb716ce5c872d2f4c8047443aa75e4818e77b0afa8"
+    },
+    "src/steel_design/domain/rules/flexure_rule.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "23a1c4bc2c01e368f997d61c80925cf001b41680b993d3b24e6149a002b6e020",
+      "working_lf_sha256": "db573b58146272422e12789c582e7260211a55e016ad70b955e9a657e782d306"
+    },
+    "src/steel_design/domain/rules/shear_rules.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "f6d36f110eff290d7a72423e45e6f05aeca5aead554462a4ad1c92af7a8281c3",
+      "working_lf_sha256": "13d58e0eb1c363f26e68be038c7bfd5bbf6824bfb046fc03ccfec0499fe9fcab"
+    },
+    "src/steel_design/domain/rules/tension_rule.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "d44d1149db4b5ebdfa572918469ed00b8ff3a3472c781bddfa614a665ba5bdce",
+      "working_lf_sha256": "91949232a09a33991f94cdf22999633dd43eeba8a26e97b31dd369e9f4bcdc7d"
+    },
+    "src/steel_design/domain/validation.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "2ff3f742b6765f99ec040abb556162f6127a25d05cda14f4b5f327ee81ca940d",
+      "working_lf_sha256": "2ff3f742b6765f99ec040abb556162f6127a25d05cda14f4b5f327ee81ca940d"
+    },
+    "src/steel_design/engine.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b2bc447fa428817f810fc9e7d4f1390eb50355acabe8dac8e39bcd358ed4ac1a",
+      "working_lf_sha256": "5547532635ec26fd90305df57399e4b735355402b7ef60e0779861ae83be55a0"
+    },
+    "src/steel_design/execution.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b489cc27dc2117d2c9f00b6c01ce9e2d04d56f1274dfb73dacf4508e0cf3cb2e",
+      "working_lf_sha256": "b489cc27dc2117d2c9f00b6c01ce9e2d04d56f1274dfb73dacf4508e0cf3cb2e"
+    },
+    "src/steel_design/input_contracts.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "61bee110254f386b5df6598753659ecd404659bb8546c3310a2212abb838d329",
+      "working_lf_sha256": "61bee110254f386b5df6598753659ecd404659bb8546c3310a2212abb838d329"
+    },
+    "src/steel_design/models.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "262663585a3e6da1770d77c6972658030de138e3b41ac0745c3122314b536d7d",
+      "working_lf_sha256": "262663585a3e6da1770d77c6972658030de138e3b41ac0745c3122314b536d7d"
+    },
+    "src/steel_design/preparation.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "421c92b3efa47d98d5bc0166871bb8c397aef774a5b3ac607433bbb804d664d4",
+      "working_lf_sha256": "421c92b3efa47d98d5bc0166871bb8c397aef774a5b3ac607433bbb804d664d4"
+    },
+    "src/steel_design/reporting.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b809849ddcf8d5c0fed02ea58ec7d7bf2731597328eb22bb97ff6c8ba1e6f25b",
+      "working_lf_sha256": "31a926ed50e25bbbca0b4cade75bd06d3275a7ca1de4a7b982665f6c65a6d8d6"
+    },
+    "src/steel_design/results_model.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "25a0eecba59479009ae4be308bf537487a9ef5880a15fb9f81167632843428cc",
+      "working_lf_sha256": "25a0eecba59479009ae4be308bf537487a9ef5880a15fb9f81167632843428cc"
+    },
+    "src/steel_design/run.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "d7c15d39f6cf6fe6f2aec75da046ec4405c665b7d97d84c8f4e6e11de7e464b9",
+      "working_lf_sha256": "d7c15d39f6cf6fe6f2aec75da046ec4405c665b7d97d84c8f4e6e11de7e464b9"
+    },
+    "src/steel_design/sections/__init__.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "ef8a281fb22c6b3dae4360e404e72ae05c3f554e3f4573fd48496e2e8c422478",
+      "working_lf_sha256": "ef8a281fb22c6b3dae4360e404e72ae05c3f554e3f4573fd48496e2e8c422478"
+    },
+    "src/steel_design/sections/geometry.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "333dc812a86fabf5ac418cad30323a5d806f982aaf5c411db4e7bfc04c5b0103",
+      "working_lf_sha256": "333dc812a86fabf5ac418cad30323a5d806f982aaf5c411db4e7bfc04c5b0103"
+    },
+    "src/steel_design/sections/identity.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "971f0290496b80af56bf468bb338bd9c9b32ee1000d117ce16469ef51bbe4dfd",
+      "working_lf_sha256": "971f0290496b80af56bf468bb338bd9c9b32ee1000d117ce16469ef51bbe4dfd"
+    },
+    "src/steel_design/sections/loader.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "933719f02bb1efe08404f8e4a5eb3733934cf74fcbca0396915d08e856dbe8ed",
+      "working_lf_sha256": "933719f02bb1efe08404f8e4a5eb3733934cf74fcbca0396915d08e856dbe8ed"
+    },
+    "src/steel_design/sections/models.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "b66287be0f0cf0e535a40210d9d11d542230e880aee2461cd692ce6acb25234d",
+      "working_lf_sha256": "b66287be0f0cf0e535a40210d9d11d542230e880aee2461cd692ce6acb25234d"
+    },
+    "src/steel_design/sections/repository.py": {
+      "arithmetic_control_flow_preserved": true,
+      "base_sha256": "37109c604555a6279e0c5505f1036ba7e6a99580b2867382263aa047f5150212",
+      "working_lf_sha256": "37109c604555a6279e0c5505f1036ba7e6a99580b2867382263aa047f5150212"
+    }
+  }
+}

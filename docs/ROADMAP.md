@@ -1,5 +1,14 @@
 # StructureLab_HFS — Roadmap de auditoría crítica, modernización y aplicación web
 
+**HFS-024 (2026-10-29), para revisión:** base main `93e4f8c`, HFS-023 aprobada
+arquitectónicamente por el usuario y CI 40858414332 SUCCESS Windows/Ubuntu.
+Captura optativa de ejecución y pasos desde productores reales, sin reconstrucción
+de ecuaciones desde etiquetas. Instrumentación progresiva con pendientes explícitos;
+JSON 1.0, cálculos, cobertura y salidas legacy preservados. F-31 P0 abierto.
+[Contrato](contracts/hfs024-calculation-traces.md), [matriz](audit/hfs024/rule-matrix.md)
+y [evidencia de revisión](audit/hfs024/report.md). No inicia HFS-030 ni web;
+sin commit/push. Las notas anteriores de entrega se conservan a continuación.
+
 **HFS-023 (2026-10-29), para revisión:** base main `1b170929`, árbol inicial
 limpio, [CI 40792213050](https://github.com/Beicker29/StructureLab_HFS/actions/runs/40792213050)
 SUCCESS Windows/Ubuntu verificada. HFS-022Q aprobado por declaración del usuario.
@@ -267,7 +276,7 @@ Las tareas siguientes se implementan con una rama y PR independientes cuando sea
 | HFS-021B | 2, para revisión | Cierre documental y limpieza incremental controlada | 021A | Política permanente, inventario por símbolo/consumidor y retiro exclusivo de bindings sin contrato ni uso. Fachadas comprometidas conservadas, regresión exacta antes/después, sin cambios normativos ni versión nueva. [Informe](audit/hfs021b/report.md), [inventario](audit/hfs021b/cleanup-inventory.md). |
 | HFS-022 | 2, base aprobada; suplemento 022R para revisión | Contratos versionados de entrada, plan normativo, checks y resultado | 021A | API optativa 1.0; base bae6463 con CI 40777094705 SUCCESS Windows/Ubuntu. [Informe histórico](audit/hfs022/report.md) preservado. [Suplemento HFS-022R](audit/hfs022/architecture-review/report.md): desacoplamiento, interoperabilidad y diagnósticos. Cierre del suplemento pendiente de revisión independiente y CI de su commit final. |
 | HFS-023 | 2, implementado para revisión | Registro normativo declarativo mínimo, sin framework de plugins | 022 | RuleDefinition.metadata, 93 descriptores, referencias y pruebas de integridad; índice de implementación derivado, HFS-002 independiente. Sin cambios de cálculo/cobertura/transporte. [Evidencia](audit/hfs023/report.md). |
-| HFS-024 | 2 | Trazas de cálculo canónicas y memorias sin inferencia por nombre de cláusula | 022,023 | Variables, unidades, expresiones, fuente y rama normativa recuperables en CLI/JSON/web. |
+| HFS-024 | 2, implementación progresiva para revisión | Trazas canónicas desde ejecución; exportación auxiliar sin inferencias | 022,023 | 71 clases observadas; pasos numéricos progresivos y pendientes por regla. JSON 1.0/memorias legacy intactos. [Informe](audit/hfs024/report.md); no acredita nuevas disposiciones ni completa todas las subramas. |
 | HFS-030 | 3 | AISC 360-22: base documental y erratas, tabla de trazabilidad | 023 | Comparación de PDF del repo con fuente oficial; versión/erratas registradas. |
 | HFS-031 | 3 | Auditoría normativa capítulos D y E (incl. E4/E5/E7) | 030 | Oráculos independientes, casos límite, clases geométricas y condiciones de uso. |
 | HFS-032 | 3 | Auditoría capítulo F (F2–F11, rama F4, Cb, Lb) | 030 | Validación por familia/eje/región de frontera; evitar atajos no probados. |

@@ -9,6 +9,7 @@ from .domain.routing.profile_router import ProfileRouter
 from .domain.coverage import build_coverage_plan
 from .domain.coverage_evidence import record_evaluation, record_selection_errors
 from .domain.errors import IncompleteSectionDataError
+from .tracing import record_analysis
 
 
 
@@ -104,4 +105,6 @@ class SteelDesignEngine:
             checks.append(result)
             record_evaluation(coverage, rule, result, len(checks) - 1, case, section)
 
-        return case, section, EngineResult(checks=checks, coverage=coverage)
+        result = EngineResult(checks=checks, coverage=coverage)
+        record_analysis(result)
+        return case, section, result
