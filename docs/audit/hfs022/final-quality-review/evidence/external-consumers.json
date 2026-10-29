@@ -1,0 +1,300 @@
+{
+  "project": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Scripts\\python.exe",
+      "-I",
+      "-B",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\inputs\\scripts\\probe_hfs022q_consumer.py",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\inputs\\tests\\fixtures\\hfs022q\\manual.json",
+      "--aliases"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\empty",
+    "guarded_contract_phase": true,
+    "contract_modules": [
+      "steel_design",
+      "steel_design.codes",
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.contracts",
+      "steel_design.design_methods",
+      "steel_design.domain",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.domain.validation",
+      "steel_design.input_contracts",
+      "steel_design.models",
+      "steel_design.preparation",
+      "steel_design.results_model",
+      "steel_design.sections",
+      "steel_design.sections.models"
+    ],
+    "module_files": {
+      "steel_design": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\__init__.py",
+      "steel_design.codes": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\codes\\__init__.py",
+      "steel_design.codes.aisc_360_22": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\codes\\aisc_360_22\\__init__.py",
+      "steel_design.codes.aisc_360_22.axial_calc": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\codes\\aisc_360_22\\axial_calc.py",
+      "steel_design.contracts": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\contracts.py",
+      "steel_design.design_methods": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\design_methods.py",
+      "steel_design.domain": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\domain\\__init__.py",
+      "steel_design.domain.design_methods": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\domain\\design_methods.py",
+      "steel_design.domain.errors": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\domain\\errors.py",
+      "steel_design.domain.validation": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\domain\\validation.py",
+      "steel_design.input_contracts": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\input_contracts.py",
+      "steel_design.models": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\models.py",
+      "steel_design.preparation": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\preparation.py",
+      "steel_design.results_model": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\results_model.py",
+      "steel_design.sections": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\sections\\__init__.py",
+      "steel_design.sections.models": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages\\steel_design\\sections\\models.py"
+    },
+    "sys_path": [
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\python312.zip",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\DLLs",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\project\\Lib\\site-packages"
+    ],
+    "fixture_sha256": "de64b464e7ad2ef5feabeb104e7087eaf22deddd9ea8dc7f22d5dec16fa840d9",
+    "fixture_count": 20,
+    "public_aliases": {
+      "OutputOptions": {
+        "owner": "steel_design.preparation",
+        "signature": "(*, write_results_json: Annotated[bool, Strict(strict=True)] = True) -> None"
+      },
+      "extract_output_options": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> tuple[dict, dict]"
+      },
+      "merge_case_payload": {
+        "owner": "steel_design.preparation",
+        "signature": "(base_payload: dict, override_payload: dict) -> dict"
+      },
+      "prepare_cases": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> Iterator[tuple[steel_design.models.SteelCase, dict, dict, str | None]]"
+      },
+      "validate_bundle_shape": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> bool"
+      }
+    },
+    "prepared_bundle": [
+      {
+        "Pu": 20.0,
+        "Fy": 250.0,
+        "Fu": 400.0,
+        "Kx": 1.5,
+        "tag": "first",
+        "write_results_json": false
+      },
+      {
+        "Pu": 10.0,
+        "Fy": 250.0,
+        "Fu": 450.0,
+        "Kx": 1.5,
+        "tag": "second",
+        "write_results_json": true
+      }
+    ],
+    "jsonschema_absent_from_runtime_install": true
+  },
+  "wheel": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Scripts\\python.exe",
+      "-I",
+      "-B",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\inputs\\scripts\\probe_hfs022q_consumer.py",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\inputs\\tests\\fixtures\\hfs022q\\manual.json",
+      "--aliases"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\empty",
+    "guarded_contract_phase": true,
+    "contract_modules": [
+      "steel_design",
+      "steel_design.codes",
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.contracts",
+      "steel_design.design_methods",
+      "steel_design.domain",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.domain.validation",
+      "steel_design.input_contracts",
+      "steel_design.models",
+      "steel_design.preparation",
+      "steel_design.results_model",
+      "steel_design.sections",
+      "steel_design.sections.models"
+    ],
+    "module_files": {
+      "steel_design": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\__init__.py",
+      "steel_design.codes": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\codes\\__init__.py",
+      "steel_design.codes.aisc_360_22": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\codes\\aisc_360_22\\__init__.py",
+      "steel_design.codes.aisc_360_22.axial_calc": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\codes\\aisc_360_22\\axial_calc.py",
+      "steel_design.contracts": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\contracts.py",
+      "steel_design.design_methods": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\design_methods.py",
+      "steel_design.domain": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\domain\\__init__.py",
+      "steel_design.domain.design_methods": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\domain\\design_methods.py",
+      "steel_design.domain.errors": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\domain\\errors.py",
+      "steel_design.domain.validation": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\domain\\validation.py",
+      "steel_design.input_contracts": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\input_contracts.py",
+      "steel_design.models": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\models.py",
+      "steel_design.preparation": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\preparation.py",
+      "steel_design.results_model": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\results_model.py",
+      "steel_design.sections": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\sections\\__init__.py",
+      "steel_design.sections.models": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages\\steel_design\\sections\\models.py"
+    },
+    "sys_path": [
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\python312.zip",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\DLLs",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\wheel\\Lib\\site-packages"
+    ],
+    "fixture_sha256": "de64b464e7ad2ef5feabeb104e7087eaf22deddd9ea8dc7f22d5dec16fa840d9",
+    "fixture_count": 20,
+    "public_aliases": {
+      "OutputOptions": {
+        "owner": "steel_design.preparation",
+        "signature": "(*, write_results_json: Annotated[bool, Strict(strict=True)] = True) -> None"
+      },
+      "extract_output_options": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> tuple[dict, dict]"
+      },
+      "merge_case_payload": {
+        "owner": "steel_design.preparation",
+        "signature": "(base_payload: dict, override_payload: dict) -> dict"
+      },
+      "prepare_cases": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> Iterator[tuple[steel_design.models.SteelCase, dict, dict, str | None]]"
+      },
+      "validate_bundle_shape": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> bool"
+      }
+    },
+    "prepared_bundle": [
+      {
+        "Pu": 20.0,
+        "Fy": 250.0,
+        "Fu": 400.0,
+        "Kx": 1.5,
+        "tag": "first",
+        "write_results_json": false
+      },
+      {
+        "Pu": 10.0,
+        "Fy": 250.0,
+        "Fu": 450.0,
+        "Kx": 1.5,
+        "tag": "second",
+        "write_results_json": true
+      }
+    ],
+    "jsonschema_absent_from_runtime_install": true
+  },
+  "editable": {
+    "command": [
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\editable\\Scripts\\python.exe",
+      "-I",
+      "-B",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\inputs\\scripts\\probe_hfs022q_consumer.py",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\inputs\\tests\\fixtures\\hfs022q\\manual.json",
+      "--aliases"
+    ],
+    "cwd": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\empty",
+    "guarded_contract_phase": true,
+    "contract_modules": [
+      "steel_design",
+      "steel_design.codes",
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.contracts",
+      "steel_design.design_methods",
+      "steel_design.domain",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.domain.validation",
+      "steel_design.input_contracts",
+      "steel_design.models",
+      "steel_design.preparation",
+      "steel_design.results_model",
+      "steel_design.sections",
+      "steel_design.sections.models"
+    ],
+    "module_files": {
+      "steel_design": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\__init__.py",
+      "steel_design.codes": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\codes\\__init__.py",
+      "steel_design.codes.aisc_360_22": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\codes\\aisc_360_22\\__init__.py",
+      "steel_design.codes.aisc_360_22.axial_calc": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\codes\\aisc_360_22\\axial_calc.py",
+      "steel_design.contracts": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\contracts.py",
+      "steel_design.design_methods": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\design_methods.py",
+      "steel_design.domain": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\domain\\__init__.py",
+      "steel_design.domain.design_methods": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\domain\\design_methods.py",
+      "steel_design.domain.errors": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\domain\\errors.py",
+      "steel_design.domain.validation": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\domain\\validation.py",
+      "steel_design.input_contracts": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\input_contracts.py",
+      "steel_design.models": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\models.py",
+      "steel_design.preparation": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\preparation.py",
+      "steel_design.results_model": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\results_model.py",
+      "steel_design.sections": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\sections\\__init__.py",
+      "steel_design.sections.models": "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src\\steel_design\\sections\\models.py"
+    },
+    "sys_path": [
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\python312.zip",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\DLLs",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\Lib",
+      "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\editable",
+      "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e\\editable\\Lib\\site-packages",
+      "D:\\Users\\byomayusa\\Documents\\GitHub\\StructureLab_HFS\\src"
+    ],
+    "fixture_sha256": "de64b464e7ad2ef5feabeb104e7087eaf22deddd9ea8dc7f22d5dec16fa840d9",
+    "fixture_count": 20,
+    "public_aliases": {
+      "OutputOptions": {
+        "owner": "steel_design.preparation",
+        "signature": "(*, write_results_json: Annotated[bool, Strict(strict=True)] = True) -> None"
+      },
+      "extract_output_options": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> tuple[dict, dict]"
+      },
+      "merge_case_payload": {
+        "owner": "steel_design.preparation",
+        "signature": "(base_payload: dict, override_payload: dict) -> dict"
+      },
+      "prepare_cases": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> Iterator[tuple[steel_design.models.SteelCase, dict, dict, str | None]]"
+      },
+      "validate_bundle_shape": {
+        "owner": "steel_design.preparation",
+        "signature": "(payload: dict) -> bool"
+      }
+    },
+    "prepared_bundle": [
+      {
+        "Pu": 20.0,
+        "Fy": 250.0,
+        "Fu": 400.0,
+        "Kx": 1.5,
+        "tag": "first",
+        "write_results_json": false
+      },
+      {
+        "Pu": 10.0,
+        "Fy": 250.0,
+        "Fu": 450.0,
+        "Kx": 1.5,
+        "tag": "second",
+        "write_results_json": true
+      }
+    ],
+    "jsonschema_absent_from_runtime_install": true
+  }
+}

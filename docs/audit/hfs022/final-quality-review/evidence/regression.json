@@ -1,0 +1,229 @@
+{
+  "accepted": true,
+  "suites": {
+    "original": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "80",
+        "time": "37.319",
+        "timestamp": "2026-10-28T18:54:15.057169-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs000_characterization": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "12",
+        "time": "4.350",
+        "timestamp": "2026-10-28T18:54:52.877196-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs011_input_contracts": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "665",
+        "time": "12.427",
+        "timestamp": "2026-10-28T18:54:57.829873-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs016_catalog_integrity": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "44",
+        "time": "11.231",
+        "timestamp": "2026-10-28T18:55:10.756949-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs010_coverage": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "57",
+        "time": "6.753",
+        "timestamp": "2026-10-28T18:55:22.466516-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs012_flexure_selection": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "61",
+        "time": "0.284",
+        "timestamp": "2026-10-28T18:55:29.810223-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs013_directional_h3": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "57",
+        "time": "2.026",
+        "timestamp": "2026-10-28T18:55:30.571590-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs013_design_method": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "73",
+        "time": "0.297",
+        "timestamp": "2026-10-28T18:55:33.165887-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs014_summary_bundle": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "72",
+        "time": "24.478",
+        "timestamp": "2026-10-28T18:55:33.934992-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs015_precision_advice": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "84",
+        "time": "5.280",
+        "timestamp": "2026-10-28T18:55:58.959156-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs017_design_method": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "468",
+        "time": "5.326",
+        "timestamp": "2026-10-28T18:56:04.740958-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs020_comparison": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "50",
+        "time": "0.112",
+        "timestamp": "2026-10-28T18:56:10.611252-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs021_execution": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "51",
+        "time": "26.640",
+        "timestamp": "2026-10-28T18:56:11.181318-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs021a_public_api": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "28",
+        "time": "2.949",
+        "timestamp": "2026-10-28T18:56:38.410134-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs021a_svg_comparison": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "29",
+        "time": "0.081",
+        "timestamp": "2026-10-28T18:56:41.822394-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs022_contracts": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "233",
+        "time": "2.878",
+        "timestamp": "2026-10-28T18:56:42.345283-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs022r_review": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "258",
+        "time": "2.303",
+        "timestamp": "2026-10-28T18:56:45.705374-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ],
+    "test_hfs022q_independent": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "42",
+        "time": "1.719",
+        "timestamp": "2026-10-28T18:56:48.510510-05:00",
+        "hostname": "DBCDST1387"
+      }
+    ]
+  },
+  "examples_identical": 12,
+  "cli_memory_scenarios_identical": 24,
+  "external_work": "D:\\Users\\byomayusa\\AppData\\Local\\Temp\\h20-qnqg836e",
+  "production_source_copied": false,
+  "project_and_wheel_installs": true,
+  "editable_install": true,
+  "canonical_package": "steel_design",
+  "external_catalog_explicit": true
+}

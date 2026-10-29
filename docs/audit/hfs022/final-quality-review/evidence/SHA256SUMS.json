@@ -1,0 +1,15 @@
+{
+  "archives.json": "d291d9f7fdc3ebbd5ca83e79161eca5a3c7238801b8e74e25789e55a545b7d75",
+  "base-ci.json": "f54faaa0486292b10241df2f24b2db1539109ed83d93bd869d767dacc30d77aa",
+  "dependency-graph.json": "448af3327769f85fd5ac94c2376c71b99f9691f5feacd5c75865b66f535ab3e5",
+  "development.zip": "61dbed635aa9ddf46b9067fe555122ad7b98d9b552878e8485646d65294933cb",
+  "external-consumers.json": "7143bdb36d11d88d02024937bb92841547f922127b5cb3f51747f40fc64a7d08",
+  "file-inventory.json": "096837c1755bd035c4542ad0b874dab475130010f760cefcf7a3078eb5a8abe8",
+  "interoperability.json": "8ad3854694f90fdcdb6f79388ccba49040f9838acd571a3283ad8f478a7fe3a2",
+  "metrics-calibration.json": "beadfa46b2f933bfaad5bf3deea061bb3078265b2220aee29f66e1fc40cfd711",
+  "metrics.json": "8d61ba63a725914269be4f8957074a18385fa82c3f855c4230b773cb05bf85da",
+  "preparation.json": "c9542b95e68bacddd0ee86385a01f949778d25ae359661b4ba7d07d5314bec8d",
+  "regression.json": "27d6627d7db7caae54e0a0b40826d8f129d905619008266d44a4592b84d06e87",
+  "scope.json": "5fc9aec5b22c506cca7c059a90d539bd1a61dfbc86791b1e79d00aabcb9e051d",
+  "verification.zip": "0caff1be78a29e9ff0d483b9af9f160e2c7a687196ccd75e09a37d7107c598bc"
+}

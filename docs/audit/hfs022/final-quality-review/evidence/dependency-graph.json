@@ -1,0 +1,232 @@
+{
+  "scope": "All local Python imports found by AST, including function-local imports; no claim about arbitrary dynamic imports or third-party package internals.",
+  "modules": {
+    "steel_design.contracts": [
+      "steel_design.domain.errors",
+      "steel_design.domain.validation",
+      "steel_design.input_contracts",
+      "steel_design.models",
+      "steel_design.preparation",
+      "steel_design.results_model"
+    ],
+    "steel_design.design_methods": [],
+    "steel_design.engine": [
+      "steel_design.domain.coverage",
+      "steel_design.domain.coverage_evidence",
+      "steel_design.domain.errors",
+      "steel_design.domain.routing.profile_router",
+      "steel_design.domain.validation",
+      "steel_design.models",
+      "steel_design.results_model",
+      "steel_design.sections.geometry",
+      "steel_design.sections.models",
+      "steel_design.sections.repository"
+    ],
+    "steel_design.execution": [
+      "steel_design.engine",
+      "steel_design.models",
+      "steel_design.preparation",
+      "steel_design.results_model",
+      "steel_design.sections.models"
+    ],
+    "steel_design.input_contracts": [],
+    "steel_design.models": [
+      "steel_design.design_methods",
+      "steel_design.input_contracts"
+    ],
+    "steel_design.preparation": [
+      "steel_design.domain.errors",
+      "steel_design.input_contracts",
+      "steel_design.models",
+      "steel_design.results_model"
+    ],
+    "steel_design.reporting": [
+      "steel_design.domain.recommendations",
+      "steel_design.execution",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.results_model": [
+      "steel_design.domain.errors",
+      "steel_design.models"
+    ],
+    "steel_design.run": [
+      "steel_design",
+      "steel_design.domain.errors",
+      "steel_design.engine",
+      "steel_design.execution",
+      "steel_design.input_contracts",
+      "steel_design.models",
+      "steel_design.reporting",
+      "steel_design.sections.geometry",
+      "steel_design.sections.loader",
+      "steel_design.sections.models",
+      "steel_design.sections.repository"
+    ],
+    "steel_design": [],
+    "steel_design.codes": [],
+    "steel_design.domain.actions": [],
+    "steel_design.domain.coverage": [
+      "steel_design.models",
+      "steel_design.results_model",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.coverage_evidence": [
+      "steel_design.domain.rules",
+      "steel_design.domain.rules.axial_rules",
+      "steel_design.domain.rules.combined_hss_rules",
+      "steel_design.domain.rules.composite_rules",
+      "steel_design.domain.rules.flexure_rule",
+      "steel_design.domain.rules.shear_rules",
+      "steel_design.domain.rules.tension_rule",
+      "steel_design.results_model"
+    ],
+    "steel_design.domain.design_methods": [
+      "steel_design.design_methods",
+      "steel_design.domain.errors"
+    ],
+    "steel_design.domain.errors": [],
+    "steel_design.domain.recommendations": [],
+    "steel_design.domain.validation": [
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain": [],
+    "steel_design.sections.geometry": [
+      "steel_design.domain.errors",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.sections.identity": [
+      "steel_design.domain.errors"
+    ],
+    "steel_design.sections.loader": [
+      "steel_design.domain.errors",
+      "steel_design.input_contracts",
+      "steel_design.sections.identity",
+      "steel_design.sections.models"
+    ],
+    "steel_design.sections.models": [
+      "steel_design.input_contracts"
+    ],
+    "steel_design.sections.repository": [
+      "steel_design.domain.errors",
+      "steel_design.sections.identity",
+      "steel_design.sections.models"
+    ],
+    "steel_design.sections": [],
+    "steel_design.codes.aisc_360_22.axial_calc": [
+      "steel_design.design_methods"
+    ],
+    "steel_design.codes.aisc_360_22.combined_hss_calc": [
+      "steel_design.design_methods"
+    ],
+    "steel_design.codes.aisc_360_22.composite_calc": [],
+    "steel_design.codes.aisc_360_22.flexure_calc": [],
+    "steel_design.codes.aisc_360_22.shear_calc": [
+      "steel_design.design_methods"
+    ],
+    "steel_design.codes.aisc_360_22.tension_calc": [
+      "steel_design.design_methods"
+    ],
+    "steel_design.codes.aisc_360_22": [],
+    "steel_design.domain.evaluators.flexure_evaluator": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.flexure_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.evaluators.hss_shear": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.shear_calc",
+      "steel_design.domain.actions",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors"
+    ],
+    "steel_design.domain.evaluators.tension_evaluator": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.tension_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.evaluators": [],
+    "steel_design.domain.routing.profile_router": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.domain.actions",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.domain.rules.axial_rules",
+      "steel_design.domain.rules.combined_hss_rules",
+      "steel_design.domain.rules.composite_rules",
+      "steel_design.domain.rules.flexure_rule",
+      "steel_design.domain.rules.shear_rules",
+      "steel_design.domain.rules.tension_rule",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.routing": [],
+    "steel_design.domain.rules.axial_rules": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.rules.combined_hss_rules": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.codes.aisc_360_22.combined_hss_calc",
+      "steel_design.codes.aisc_360_22.flexure_calc",
+      "steel_design.domain.actions",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.domain.evaluators.hss_shear",
+      "steel_design.domain.evaluators.tension_evaluator",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.rules.composite_rules": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.axial_calc",
+      "steel_design.codes.aisc_360_22.composite_calc",
+      "steel_design.codes.aisc_360_22.shear_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.rules.flexure_rule": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.flexure_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.rules.shear_rules": [
+      "steel_design.codes.aisc_360_22",
+      "steel_design.codes.aisc_360_22.shear_calc",
+      "steel_design.domain.actions",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.errors",
+      "steel_design.domain.evaluators.hss_shear",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.rules.tension_rule": [
+      "steel_design.codes.aisc_360_22.tension_calc",
+      "steel_design.domain.design_methods",
+      "steel_design.domain.evaluators.tension_evaluator",
+      "steel_design.models",
+      "steel_design.sections.models"
+    ],
+    "steel_design.domain.rules": []
+  },
+  "cycles": []
+}

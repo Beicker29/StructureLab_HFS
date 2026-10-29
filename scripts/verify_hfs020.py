@@ -38,6 +38,7 @@ SUITES = [
     "test_hfs021a_svg_comparison",
     "test_hfs022_contracts",
     "test_hfs022r_review",
+    "test_hfs022q_independent",
 ]
 
 
@@ -130,9 +131,11 @@ def verify(args):
         for path in (ROOT / folder).glob(pattern):
             shutil.copyfile(path, inputs / folder / path.name)
     (inputs / "scripts").mkdir()
+    shutil.copytree(ROOT / "tests/fixtures/hfs022q", inputs / "tests/fixtures/hfs022q")
     for name in ("audit_baseline.py", "audit_hfs014_cli.py", "hfs020_comparison.py",
                  "hfs021a_invariants.py", "probe_hfs021a_imports.py",
-                 "hfs021a_svg_comparison.py", "generate_hfs022_schemas.py"):
+                 "hfs021a_svg_comparison.py", "generate_hfs022_schemas.py",
+                 "probe_hfs022q_consumer.py"):
         shutil.copyfile(ROOT / "scripts" / name, inputs / "scripts" / name)
     for relative in ("docs/schemas/contracts/1.0", "docs/audit/hfs017/evidence/after"):
         target = inputs / relative
@@ -188,6 +191,9 @@ def verify(args):
         run(f"imports-{mode}", [executable, "-I", "-c", probe], empty)
         run(f"schemas-{mode}", [executable, "-I", inputs / "scripts/generate_hfs022_schemas.py",
             "--directory", inputs / "docs/schemas/contracts/1.0", "--check"], empty)
+        run(f"independent-consumer-{mode}", [executable, "-I", "-B",
+            inputs / "scripts/probe_hfs022q_consumer.py", inputs / "tests/fixtures/hfs022q/manual.json",
+            "--aliases"], empty)
         for location, probe_cwd in (("outside", empty), ("checkout", ROOT)):
             for order in ("canonical-first", "legacy-first"):
                 run(f"identity-{mode}-{location}-{order}",

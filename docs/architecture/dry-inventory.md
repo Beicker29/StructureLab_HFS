@@ -1,5 +1,21 @@
 # HFS-001 — Inventario DRY y fuentes canónicas
 
+## HFS-022Q: contraste independiente de los propietarios vigentes
+
+La auditoría mantiene sin cambios los propietarios HFS-022R. No se identifica
+una política duplicada que justifique refactorizar producción. Los documentos
+manuales en `tests/fixtures/hfs022q/manual.json` son oráculos de transporte,
+con expectativas fijadas antes de ejecutar; no son modelos, schemas editables
+ni un segundo motor. Su repetición deliberada permite inspeccionar cada caso
+sin depender de generadores productivos o fixtures previos.
+
+El consumidor independiente importa solo API pública instalada. Las métricas
+AST son evidencia de auditoría, no una nueva dependencia runtime ni una regla
+de partición de módulos por tamaño. El verificador común conserva builds,
+instalaciones, comparadores y suites, incorporando solo los recursos/casos
+independientes nuevos. Se reutiliza el archivador histórico sin copiarlo.
+[Responsabilidades, métricas y riesgos](../audit/hfs022/final-quality-review/report.md).
+
 ## HFS-022R: preparación común, sin dependencia de ejecución
 
 Propietario vigente de `OutputOptions`, `merge_case_payload`,
