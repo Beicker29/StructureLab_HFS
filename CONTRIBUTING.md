@@ -77,6 +77,15 @@ Si Git no está en PATH, pasar su ruta real (HFS-000 registra la usada con GitHu
 
 ## Suites separadas
 
+HFS-022Q incorpora `tests/test_hfs022q_independent.py`: 20 documentos manuales
+contra los dos modos de schema/Python y dos procesos consumidores, 42 pruebas
+nuevas; total 2352 +12 subpruebas en 18 suites. Los esperados viven en
+`tests/fixtures/hfs022q/manual.json` y no se regeneran desde el motor ni desde
+la API bajo prueba. `probe_hfs022q_consumer.py` se copia fuera del checkout y
+se ejecuta con las tres instalaciones, sin imports de tests ni ajustes de
+sys.path/PYTHONPATH. La API contractual permanece intacta. Las cifras de las
+entregas anteriores se conservan a continuación como historia.
+
 HFS-022R añade `tests/test_hfs022r_review.py` (258 pruebas) a las 2052 previas
 y 12 subpruebas históricas: 2310 pruebas +12 subpruebas, en 17 suites separadas.
 El extra `dev` incluye jsonschema 4.26.0 con constraints para verificar los diez
