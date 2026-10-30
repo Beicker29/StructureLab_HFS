@@ -24,11 +24,17 @@ _SECTION_NAMES = {"area": "Ag", "ix": "Ix", "iy": "Iy", "iw": "Iw", "iz": "Iz", 
                   "tan_alpha": "tan α", "od": "D", "bf_2tf_ratio": "bf/2tf", "b_t_ratio": "b/t",
                   "b_tdes_ratio": "b/tdes", "h_tw_ratio": "h/tw", "h_tdes_ratio": "h/tdes", "d_t_ratio": "D/t"}
 _ELEMENTS = {"flange": "ala", "web": "alma", "wall_b": "pared b", "wall_h": "pared h", "wall": "pared",
-             "long_leg": "ala larga", "short_leg": "ala corta"}
+             "long_leg": "ala larga", "short_leg": "ala corta", "flange_legs": "alas horizontales",
+             "web_legs": "alas verticales"}
 _LABELS = {"Lc_over_r_o": "(Lc/r)o", "a_over_ri": "a/ri", "slenderness_equation": "Ec. de esbeltez",
            "Fez_equation": "Ec. Fez", "Fe_torsion_equation": "Ec. Fe torsional", "symmetry_axis": "Eje de simetría",
            "connected_leg": "Ala conectada", "leg_ratio": "bl/bs", "ro_mm": "r̄o (mm)",
-           "ro_from_geometry_mm": "r̄o geométrico (mm)", "ro2_mm2": "r̄o² (mm²)", "H": "H", "Ki": "Ki"}
+           "ro_from_geometry_mm": "r̄o geométrico (mm)", "ro2_mm2": "r̄o² (mm²)", "H": "H", "Ki": "Ki",
+           "be_equation": "Ec. be", "Se": "Se (mm³)", "I_eff": "Ieff (mm⁴)",
+           "neutral_axis_shift_mm": "Desplazamiento del eje neutro (mm)",
+           "c_compression_mm": "Distancia a la fibra comprimida (mm)", "area_removed_mm2": "Área no efectiva (mm²)",
+           "Lb_d_over_t2": "Lb·d/t²", "FuAfn": "Fu·Afn (N)", "YtFyAfg": "Yt·Fy·Afg (N)", "Afg_mm2": "Afg (mm²)",
+           "Afn_mm2": "Afn (mm²)", "rts_mm": "rts (mm)", "Fcr_mpa": "Fcr (MPa)"}
 _UNIT_SUFFIX = {"_mm2": " (mm²)", "_mm4": " (mm⁴)", "_mm6": " (mm⁶)", "_mm": " (mm)", "_mpa": " (MPa)"}
 
 
@@ -54,9 +60,11 @@ def _fmt(value) -> str:
 
 # --- document model ------------------------------------------------------------------------
 
-CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y"}
+CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y",
+                "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z"}
 FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
-                  "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada"}
+                  "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
+                  "LLB": "pandeo local del ala del ángulo"}
 
 
 def _check_title(check) -> str:
@@ -131,7 +139,8 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     f, ln, mat = case.factors, case.lengths, case.material
     material = f"Fy = {_fmt(mat.Fy)} MPa" + (f"; Fu = {_fmt(mat.Fu)} MPa" if mat.Fu else "") + f"; E = {_fmt(mat.E)} MPa"
     demands = [f"Pu = {_fmt(case.Pu)} kN ({'compresión' if case.Pu > 0 else 'tracción'})"] if case.Pu else []
-    demands += [f"Mu{a} = {_fmt(m)} kN·m" for a, m in (("x", case.Mux), ("y", case.Muy)) if m]
+    demands += [f"Mu{a} = {_fmt(m)} kN·m" for a, m in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw),
+                                                         ("z", case.Mz)) if m]
     items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin), ("Material", material),
              ("Demandas (LRFD)", "; ".join(demands))]
     ids = {c.id for c in result.checks}
@@ -152,12 +161,20 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
             b = case.double_angle_e6
             items.append(("Base E6", f"conectores {b.connectors}; a = {_fmt(b.a)} mm; conexión de extremo "
                                      f"soldada o pretensada: {_fmt(b.end_connection_welded_or_pretensioned)}"))
-    if ids & {"flexure_x", "flexure_y"}:
+    if ids & {"flexure_x", "flexure_y", "flexure_w", "flexure_z"}:
         fl = case.flexure
         items.append(("Flexión", f"Lb = {_fmt(fl.Lb) + ' mm' if fl and fl.Lb else 'no indicado'}; "
                                  f"Cb = {_fmt(fl.Cb if fl else 1.0)}; agujeros en el ala traccionada: "
                                  f"{'no declarado' if not fl or fl.tension_flange_holes is None else _fmt(fl.tension_flange_holes)}"
-                                 + (f" (Afn = {_fmt(fl.Afn)} mm²)" if fl and fl.Afn else "")))
+                                 + (f" (Afn = {_fmt(fl.Afn)} mm²)" if fl and fl.Afn else "")
+                                 + (f"; restricción lateral-torsional: {fl.lateral_torsional_restraint}"
+                                    if fl and fl.lateral_torsional_restraint else "")
+                                 + (f"; βw = {_fmt(fl.beta_w)} mm" if fl and fl.beta_w is not None else "")))
+        if case.angle_flexure:
+            af = case.angle_flexure
+            parts = [f"{k} = {v}" for k, v in (("alas verticales", af.web_legs), ("puntera", af.toe),
+                                               ("ala comprimida", af.leg_in_compression)) if v]
+            items.append(("Zona comprimida (dato)", "; ".join(parts)))
     blocks.append({"kind": "kv", "items": items})
     if case.Pu > 0 and ln is not None:
         blocks.append({"kind": "table", "headers": ["Eje", "K", "L (mm)", "Lc = K·L (mm)"], "rows": [
@@ -408,7 +425,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
     width = lambda: pdf.w - pdf.l_margin - pdf.r_margin  # noqa: E731
 
     def heading(text, size, space):
-        if pdf.get_y() > pdf.h - 45:
+        if pdf.get_y() > pdf.h - 60:   # keep a heading with its first lines
             pdf.add_page()
         pdf.ln(space)
         pdf.set_font(FONT, "B", size)

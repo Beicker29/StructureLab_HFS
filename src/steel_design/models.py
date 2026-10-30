@@ -100,6 +100,10 @@ class FlexureBasis(InputModel):
     tension_flange_holes: Optional[StrictBool] = Field(
         None, description="F13.1: bolt holes in the tension flange (I-shapes and channels, major axis); must be declared")
     Afn: Optional[PositiveNumber] = Field(None, description="Net area of the tension flange (mm2), when it has holes")
+    lateral_torsional_restraint: Optional[Literal["none", "at_max_moment", "continuous"]] = Field(
+        None, description="Single angles (F10): lateral-torsional restraint along the length")
+    beta_w: Optional[NonNegativeNumber] = Field(
+        None, description="Single angles (F10-4): |beta_w| (mm) of unequal-leg angles; sign from the leg in compression")
 
     @model_validator(mode="after")
     def holes_need_net_area(self):
@@ -108,6 +112,17 @@ class FlexureBasis(InputModel):
         if self.tension_flange_holes is False and self.Afn is not None:
             raise ValueError("Afn solo corresponde a un ala traccionada con agujeros.")
         return self
+
+
+class AngleFlexure(InputModel):
+    """Which part of an angle is in flexural compression (explicit, per load combination)."""
+    web_legs: Optional[Literal["tension", "compression"]] = Field(
+        None, description="Double angles (F9): legs in the plane of symmetry; 'compression' if compressed anywhere along Lb")
+    toe: Optional[Literal["compression", "tension"]] = Field(
+        None, description="Single angle, geometric axis: toe of the leg perpendicular to the bending axis; "
+                          "principal minor axis (Mz): both toes")
+    leg_in_compression: Optional[Literal["long", "short"]] = Field(
+        None, description="Single angle, major principal axis (Mw): leg whose toe is in compression")
 
 
 class CustomSectionType(str, Enum):
@@ -138,6 +153,9 @@ class SteelCase(InputModel):
                                                "< 0 tension (Chapter D); LRFD load combination")
     Mux: FiniteNumber = Field(0.0, description="Required flexural strength about x (kN*m), Chapter F")
     Muy: FiniteNumber = Field(0.0, description="Required flexural strength about y (kN*m), Chapter F")
+    Mw: FiniteNumber = Field(0.0, description="Single angles: required flexural strength about the major principal axis w (kN*m)")
+    Mz: FiniteNumber = Field(0.0, description="Single angles: required flexural strength about the minor principal axis z (kN*m)")
+    angle_flexure: Optional[AngleFlexure] = None
     lengths: Optional[Lengths] = Field(None, description="Unbraced lengths; required for compression")
     factors: Factors = Field(default_factory=Factors)
     single_angle_e5: Optional[SingleAngleE5Basis] = None
@@ -148,8 +166,8 @@ class SteelCase(InputModel):
 
     @model_validator(mode="after")
     def demand(self):
-        if self.Pu == 0 and self.Mux == 0 and self.Muy == 0:
-            raise ValueError("La combinación debe tener al menos una demanda distinta de cero (Pu, Mux, Muy).")
+        if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz)):
+            raise ValueError("La combinación debe tener al menos una demanda distinta de cero (Pu, Mux, Muy, Mw, Mz).")
         if self.Pu > 0 and self.lengths is None:
             raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
         return self
@@ -171,7 +189,7 @@ class Obligation(BaseModel):
 
 class Check(BaseModel):
     """One required strength of a load combination (axial or flexure about one axis)."""
-    id: Literal["axial", "flexure_x", "flexure_y"]
+    id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z"]
     chapter: Literal["D", "E", "F"]
     demand: float = Field(..., description="|Pu| (kN) or |Mu| (kN*m)")
     unit: Literal["kN", "kN·m"]

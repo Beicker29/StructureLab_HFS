@@ -12,7 +12,7 @@ def validate_case(case: SteelCase) -> SteelCase:
     except PydanticValidationError as exc:
         raise ValidationError("Entrada del caso no válida.", details={"fields": exc.errors(
             include_url=False, include_context=False, include_input=False)}) from exc
-    if (case.Pu > 0 or case.Mux or case.Muy) and abs(case.material.E - 200000.0) > 1e-6:
+    if (case.Pu > 0 or case.Mux or case.Muy or case.Mw or case.Mz) and abs(case.material.E - 200000.0) > 1e-6:
         raise ValidationError("Los Capítulos E y F definen E = 200000 MPa.", details={"E_received": case.material.E})
     return case
 

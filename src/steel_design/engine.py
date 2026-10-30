@@ -1,6 +1,7 @@
 """Design of one member for one LRFD load combination: one check per required strength, then the status.
 
-Pu > 0: compression (Chapter E); Pu < 0: tension (Chapter D); Mux, Muy: flexure (Chapter F).
+Pu > 0: compression (Chapter E); Pu < 0: tension (Chapter D); Mux, Muy (and Mw, Mz for single
+angles about their principal axes): flexure (Chapter F).
 More than one nonzero demand needs the interaction of Chapter H (not yet available).
 """
 from .domain.compression import compression_strength
@@ -63,10 +64,12 @@ class SteelDesignEngine:
                        else (lambda: tension_strength(case, section)))
             checks.append(self._check("axial", chapter, abs(case.Pu), "kN", required_obligations(case, section),
                                       compute, section, inconsistent))
-        for axis, moment in (("x", case.Mux), ("y", case.Muy)):
+        for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
             if moment:
-                checks.append(self._check(f"flexure_{axis}", "F", abs(moment), "kN·m", flexure_obligations(section, axis),
-                                          lambda axis=axis: flexure_strength(case, section, axis), section, inconsistent))
+                checks.append(self._check(
+                    f"flexure_{axis}", "F", abs(moment), "kN·m", flexure_obligations(section, axis),
+                    lambda axis=axis: flexure_strength(case, section, axis, catalog=self._catalog),
+                    section, inconsistent))
         pending = len(checks) > 1
         statuses = {c.status for c in checks}
         if Status.FAIL in statuses:

@@ -19,6 +19,9 @@
     "U": 0.87,
     "fabricated_length": 2000
   },
+  "flexure": {
+    "Lb": 2000
+  },
   "cases": [
     {
       "name": "Combinación 1 — compresión",
@@ -27,6 +30,20 @@
     {
       "name": "Combinación 2 — tracción",
       "Pu": -600
+    },
+    {
+      "name": "Combinación 3 — flexión x (alas verticales en tracción)",
+      "Mux": 10,
+      "angle_flexure": {
+        "web_legs": "tension"
+      }
+    },
+    {
+      "name": "Combinación 4 — flexión x (alas verticales en compresión)",
+      "Mux": 8,
+      "angle_flexure": {
+        "web_legs": "compression"
+      }
     }
   ]
 }

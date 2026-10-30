@@ -16,8 +16,10 @@ getcontext().prec = 50
 ROOT = Path(__file__).resolve().parents[2]
 PI = D("3.14159265358979323846264338327950288419716939937510")
 E = D(200000)
-SHEETS = {"W": "W_IPE_HEA_HEB", "CHANNEL": "C", "RECTANGULAR_HSS": "PTE_RECT", "CIRCULAR_HSS": "PTE_RED"}
-SCALE = {"Ix": 10**6, "Iy": 10**6, "J": 10**3, "Cw": 10**9, "Sx": 10**3, "Sy": 10**3, "Zx": 10**3, "Zy": 10**3}
+SHEETS = {"W": "W_IPE_HEA_HEB", "CHANNEL": "C", "RECTANGULAR_HSS": "PTE_RECT", "CIRCULAR_HSS": "PTE_RED",
+          "SINGLE_ANGLE": "L", "DOUBLE_ANGLE": "2L"}
+SCALE = {"Ix": 10**6, "Iy": 10**6, "Iw": 10**6, "Iz": 10**6, "J": 10**3, "Cw": 10**9, "Sx": 10**3, "Sy": 10**3,
+         "Zx": 10**3, "Zy": 10**3, "SwA": 10**3, "SwB": 10**3, "SwC": 10**3, "SzA": 10**3, "SzB": 10**3, "SzC": 10**3}
 SHEET_SCALE = {"PTE_RED": {"Sx": 1, "Sy": 1}}   # that sheet stores S in mm3 (S = I/c)
 _WB = None
 
@@ -166,6 +168,106 @@ def solid_round(D_, fy):
     return {"Y": min(fy * d**3 / 6, D("1.6") * fy * PI * d**3 / 32)}             # F11-2
 
 
+def f10_ltb(my, mcr):
+    if my / mcr <= 1:
+        return min((D("1.92") - D("1.17") * sqrt(my / mcr)) * my, D("1.5") * my)   # F10-2
+    return (D("0.92") - D("0.17") * mcr / my) * mcr                               # F10-3
+
+
+def leg_buckling(b, t, sc, fy):
+    lam, rt = b / t, sqrt(E / fy)
+    if lam <= D("0.54") * rt:                                                     # B4.1b case 12
+        return None
+    if lam <= D("0.91") * rt:
+        return fy * sc * (D("2.43") - D("1.72") * lam * sqrt(fy / E))            # F10-6
+    return D("0.71") * E / lam**2 * sc                                            # F10-7, F10-8
+
+
+def double_angle(name, fy, Lb, web_legs):
+    import re
+    p, fy, Lb = row("DOUBLE_ANGLE", name), D(fy), D(Lb)
+    m = re.match(r"^2L([^X]+)X([^X]+)X([^X]+?)(?:X([^X]+?))?(LLBB|SLBB)?$", name)
+    comp = row("SINGLE_ANGLE", f"L{m[1]}X{m[2]}X{m[3]}")
+    legs = sorted([p["d"], p["b"]])
+    web = legs[0] if m[5] == "SLBB" else legs[1]          # legs in the plane of symmetry
+    flange = legs[1] if web == legs[0] else legs[0]
+    j, t, my = 2 * comp["J"], p["t"], fy * p["Sx"]       # F9-3
+    sign = 1 if web_legs == "tension" else -1
+    bb = sign * D("2.3") * web / Lb * sqrt(p["Iy"] / j)                           # F9-11 / F9-12
+    mcr = D("1.95") * E / Lb * sqrt(p["Iy"] * j) * (bb + sqrt(1 + bb**2))        # F9-10
+    modes = {}
+    if web_legs == "tension":
+        mp = min(fy * p["Zx"], D("1.6") * my)                                     # F9-2
+        modes["Y"] = mp
+        lp = D("1.76") * p["ry"] * sqrt(E / fy)                                   # F9-8
+        lr = D("1.95") * (E / fy) * sqrt(p["Iy"] * j) / p["Sx"] * sqrt(D("2.36") * (fy / E) * web * p["Sx"] / j + 1)
+        if lp < Lb <= lr:
+            modes["LTB"] = mp - (mp - my) * (Lb - lp) / (lr - lp)                 # F9-6
+        elif Lb > lr:
+            modes["LTB"] = mcr                                                    # F9-7
+        flb = leg_buckling(flange, t, p["Ix"] / p["y"], fy)                       # F9.3(b): Sc to flange legs
+        if flb is not None:
+            modes["FLB"] = flb
+    else:
+        modes["Y"] = D("1.5") * my                                                # F9-5
+        modes["LTB"] = f10_ltb(my, mcr)                                           # F9.2(b)(2)
+        wlb = leg_buckling(web, t, p["Sx"], fy)                                   # F9.4(b)
+        if wlb is not None:
+            modes["WLB"] = wlb
+    return modes
+
+
+def single_angle_geometric(name, fy, axis, restraint, toe, Lb=None, Cb=1):
+    p, fy, Cb = row("SINGLE_ANGLE", name), D(fy), D(Cb)
+    legs = sorted([p["d"], p["b"]])
+    short, long_, t = legs[0], legs[1], p["t"]
+    inertia, perp, par, cen = ((p["Ix"], long_, short, p["y"]) if axis == "x" else (p["Iy"], short, long_, p["x"]))
+    s_toe, s_face = inertia / (perp - cen), inertia / cen
+    k = D("0.80") if restraint == "none" else D(1)                               # F10.2(2)(i): LTB and LLB only
+    my = k * fy * s_toe
+    modes = {"Y": D("1.5") * fy * s_toe}                                          # F10-1, unreduced My
+    if restraint != "continuous":
+        Lb = D(Lb)
+        root = sqrt(1 + D("0.88") * (Lb * t / long_**2) ** 2)
+        mcr = D("0.58") * E * long_**4 * t * Cb / Lb**2 * (root - 1 if toe == "compression" else root + 1)  # F10-5
+        if restraint == "at_max_moment":
+            mcr *= D("1.25")
+        modes["LTB"] = f10_ltb(my, mcr)
+    if toe == "compression":
+        llb = leg_buckling(perp, t, k * s_toe, fy)
+    else:
+        llb = leg_buckling(par, t, k * s_face, fy)
+    if llb is not None:
+        modes["LLB"] = llb
+    return modes
+
+
+def single_angle_principal(name, fy, axis, Lb=None, Cb=1, beta=0, leg=None, toe=None):
+    p, fy = row("SINGLE_ANGLE", name), D(fy)
+    legs = sorted([p["d"], p["b"]])
+    short, long_, t = legs[0], legs[1], p["t"]
+    modes = {}
+    if axis == "w":
+        my = fy * min(v for k, v in p.items() if k in ("SwA", "SwB", "SwC"))
+        modes["Y"] = D("1.5") * my
+        b_w = D(beta) if leg == "short" else -D(beta)                             # + short leg in compression
+        Lb, cb = D(Lb), min(D(Cb), D("1.5"))
+        kk = D("4.4") * b_w * p["rz"] / (Lb * t)
+        mcr = 9 * E * p["A"] * p["rz"] * t * cb / (8 * Lb) * (sqrt(1 + kk**2) + kk)   # F10-4
+        modes["LTB"] = f10_ltb(my, mcr)
+        llb = leg_buckling(long_, t, p["SwC"], fy) if leg == "long" else leg_buckling(short, t, p["SwA"], fy)
+    else:
+        my = fy * min(p["SzA"], p["SzB"], p["SzC"])
+        modes["Y"] = D("1.5") * my
+        llb = None
+        if toe == "compression":
+            options = [v for v in (leg_buckling(long_, t, p["SzC"], fy), leg_buckling(short, t, p["SzA"], fy)) if v]
+            llb = min(options) if options else None
+    if llb is not None:
+        modes["LLB"] = llb
+    return modes
+
+
 def summarize(modes):
     gov = min(modes, key=modes.get)
     return {"modes_kNm": {k: v / 10**6 for k, v in modes.items()}, "governing": gov,
@@ -192,13 +294,31 @@ CASES = {
     "BAR-F11-LTB": dict(kind="bar", H=100, B=20, fy=250, axis="x", Lb=1500),
     "BAR-F11-minor": dict(kind="bar", H=100, B=20, fy=250, axis="y", Lb=1500),
     "ROUND-F11": dict(kind="round", D_=50, fy=250),
+    "2L-F9-web-tension": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=2000, web_legs="tension"),
+    "2L-F9-web-compression": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=2000, web_legs="compression"),
+    "2L-F9-LLBB-tension": dict(kind="2l", name="2L6X4X3/8LLBB", fy=345, Lb=3000, web_legs="tension"),
+    "2L-F9-SLBB-compression": dict(kind="2l", name="2L6X4X3/8SLBB", fy=345, Lb=3000, web_legs="compression"),
+    "2L-F9-elastic-LTB": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=9000, web_legs="tension"),
+    "L-F10-geom-none-toe-comp": dict(kind="lg", name="L4X4X1/4", fy=345, axis="x", restraint="none",
+                                     toe="compression", Lb=2000),
+    "L-F10-geom-none-toe-tens": dict(kind="lg", name="L4X4X1/4", fy=345, axis="x", restraint="none",
+                                     toe="tension", Lb=2000),
+    "L-F10-geom-at-max": dict(kind="lg", name="L4X4X1/4", fy=345, axis="y", restraint="at_max_moment",
+                              toe="compression", Lb=2000, Cb="1.2"),
+    "L-F10-geom-continuous-unequal": dict(kind="lg", name="L6X4X3/8", fy=345, axis="x", restraint="continuous",
+                                          toe="compression"),
+    "L-F10-w-short-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, beta="79.8", leg="short"),
+    "L-F10-w-long-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, beta="79.8", leg="long"),
+    "L-F10-w-equal-Cb-capped": dict(kind="lp", name="L4X4X1/4", fy=345, axis="w", Lb=3000, Cb="1.8", leg="long"),
+    "L-F10-z-toes-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="z", toe="compression"),
 }
 
 
 def build(spec):
     kind = spec["kind"]
     args = {k: v for k, v in spec.items() if k != "kind"}
-    modes = {"w": w_or_channel, "rhss": rect_hss, "chss": round_hss, "bar": solid_rect, "round": solid_round}[kind](**args)
+    modes = {"w": w_or_channel, "rhss": rect_hss, "chss": round_hss, "bar": solid_rect, "round": solid_round,
+             "2l": double_angle, "lg": single_angle_geometric, "lp": single_angle_principal}[kind](**args)
     return {"spec": spec, **summarize(modes)}
 
 
