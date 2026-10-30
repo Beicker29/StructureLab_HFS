@@ -21,8 +21,7 @@ def cli(*args, cwd):
 @pytest.mark.parametrize("example", EXAMPLES, ids=lambda p: p.stem)
 def test_examples_run_in_memory(engine, example):
     results = execute_payload(json.loads(example.read_text(encoding="utf-8")), engine)
-    expected = "INCOMPLETE" if example.stem == "double_angle_case" else "PASS"
-    assert overall_status([r for _, r in results]).value == expected
+    assert overall_status([r for _, r in results]).value == "PASS"
 
 
 def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):

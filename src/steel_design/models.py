@@ -37,6 +37,15 @@ class SingleAngleE5Basis(InputModel):
     no_intermediate_transverse_loads: StrictBool = Field(..., description="E5(3)")
 
 
+class DoubleAngleE6Basis(InputModel):
+    """Built-up double angle data required by S22 E6 (supplied by the user)."""
+    connectors: Literal["snug_tight", "welded", "pretensioned"] = Field(
+        ..., description="Intermediate connectors: snug-tight bolts (E6-1), welded or pretensioned Class A/B bolts (E6-2)")
+    a: PositiveNumber = Field(..., description="Distance between intermediate connectors (mm)")
+    end_connection_welded_or_pretensioned: StrictBool = Field(
+        ..., description="E6.1: end connection welded or with pretensioned bolts, Class A or B faying surfaces")
+
+
 class CustomSectionType(str, Enum):
     SOLID_CIRCULAR = "SOLID_CIRCULAR"
     SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
@@ -66,6 +75,7 @@ class SteelCase(InputModel):
     factors: Factors = Field(default_factory=Factors)
     design_method: DesignMethod = DesignMethod.LRFD
     single_angle_e5: Optional[SingleAngleE5Basis] = None
+    double_angle_e6: Optional[DoubleAngleE6Basis] = None
     custom_section: Optional[CustomSection] = None
 
 
