@@ -60,6 +60,7 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Sección de G por familia y dirección del cortante | `domain/shear.py` |
 | Ecuaciones H1-1a/b, H1-2, H2-1, H4-1 | `codes/aisc_360_22/interaction.py` |
 | Qué chequeos interactúan y con qué resistencias | `domain/interaction.py` |
+| Fórmulas que solo aparecen en una Design Guide (cuando se añadan) | `codes/aisc_dg06/`, `codes/aisc_dg38/` |
 | Ecuaciones I2 a I5, I8.2, φ del Capítulo I, bloques de tensiones | `codes/aisc_360_22/composite.py` |
 | Selección por tipo de miembro compuesto, geometría y requisitos del Capítulo I | `domain/composite.py` |
 | Coherencia de datos del catálogo (r = √(I/A), S = I/c) | `domain/validation.py` |

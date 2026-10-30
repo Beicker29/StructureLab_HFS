@@ -560,13 +560,17 @@ def composite_method2(case: SteelCase, section: Section, checks: list) -> dict:
                 **terms, "Mr_kNm": flexure.demand, "MB_kNm": design[0][1], "MD_kNm": design[1][1],
                 "ratio_design": ratio_design, "ratio_nominal": ratio_nominal,
                 "ratio": max(ratio_design, ratio_nominal), "equation": "Curva A-C-D-B (Fig. C-I5.2)"}
+    notes = ["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3).",
+             "Método 2 del Commentary de I5: no es una ecuación de la Specification, que lo permite por I1.2."]
+    if not simplified:
+        notes.append("AISC Design Guide 6 (2.ª ed., 2.3.2) excluye el punto D por posible error del lado inseguro; "
+                     "considere interaction = M2S.")
     return _result(case, section, modes={"M2": mode}, governing="M2", provisions=[mode["provision"]], ratio=mode["ratio"],
-                   notes=["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3).",
-                          "Método 2 del Commentary de I5: no es una ecuación de la Specification, que lo permite por I1.2."])
+                   notes=notes)
 
 
 def composite_wall_interaction(case: SteelCase, section: Section, checks: list) -> dict:
-    """I5(c): the plastic stress distribution of I1.2a at the required axial force (DI-11)."""
+    """I5(c): the plastic stress distribution of I1.2a at the required axial force (DI-11; Design Guide 38, A.1.2, A.1.3)."""
     by_id = {c.id: c for c in checks}
     missing = [c.id for c in checks if c.capacity is None]
     if missing:
@@ -574,7 +578,7 @@ def composite_wall_interaction(case: SteelCase, section: Section, checks: list) 
                                          code="INTERACTION_COMPONENT_MISSING",
                                          details={"section": section.name, "checks": missing})
     flexure = by_id["flexure_x"]
-    P_N = case.Pu * 1000.0 / eq.PHI_C_WALL                           # phi_c = phi_t = phi_b = 0.90
+    P_N = case.Pu * 1000.0
     out = _wall_moment(case, P_N)
     if out["within_section"]:
         capacity = eq.PHI_B * out["Mp"] / 1e6

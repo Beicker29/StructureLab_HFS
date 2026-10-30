@@ -385,7 +385,7 @@ def wall_shear_oracle(fy, fc, wc, L, tsc, t, tf):
 
 
 def wall_interaction(fy, fc, L, tsc, t, tf, Pu, Mu):
-    mn = wall_moment(fy, fc, L, tsc, t, tf, D(Pu) / D("0.90"))["Mn_kNm"]
+    mn = wall_moment(fy, fc, L, tsc, t, tf, Pu)["Mn_kNm"]                        # Design Guide 38, A.1.2 and A.1.3
     return {"Mc_kNm": D("0.90") * mn, "ratio": D(Mu) / (D("0.90") * mn)}
 
 

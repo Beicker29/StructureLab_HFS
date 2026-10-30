@@ -109,15 +109,15 @@ halla los ejes neutros por bisección. Coincidencia con tolerancia relativa 1e-9
 | wall-T | igual | – | φtPn 22107.60 |
 | wall-M | igual | – | a 942.91; Mn 26971.36 |
 | wall-V | igual | – | φvVn 16240.26 |
-| wall-PM-compression | igual, Pu = 8000, Mu = 20000 | – | Mc 27124.28; 0.737 |
-| wall-PM-tension | igual, Pu = −3000, Mu = 15000 | – | Mc 22377.02; 0.670 |
+| wall-PM-compression | igual, Pu = 8000, Mu = 20000 | – | Mc 26983.87; 0.741 |
+| wall-PM-tension | igual, Pu = −3000, Mu = 15000 | – | Mc 22587.07; 0.664 |
 | stud-shear | d = 19, Fu = 450, Qrv = 50 | – | Qcv 82.93; 0.603 |
 | stud-tension | igual, Qrt = 60 | – | Qct 95.69; 0.627 |
 | stud-interaction | igual, Qrv = 40, Qrt = 60 (I8-5) | – | 0.756 |
 | channel-shear | la = 100, tf = 8, tw = 6, f'c = 35, Qrv = 100 | – | Qc 246.88; 0.405 |
 
-Contraste con los AISC Design Examples I.1, I.4 a I.7, I.9 a I.11 e I.12 en [design-examples.md](design-examples.md). Los
-Design Examples no traen muros de placas: esa parte solo tiene el oráculo.
+Contraste con los AISC Design Examples I.1, I.4 a I.7, I.9 a I.11 e I.12 en [design-examples.md](design-examples.md), y con los
+ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md](design-guides.md).
 
 ## Decisiones
 
@@ -140,12 +140,15 @@ Design Examples no traen muros de placas: esa parte solo tiene el oráculo.
 - **DI-9** Compresión: se toma el mayor entre I2 y el acero solo del Capítulo E, como permiten I2.1b e I2.2b.
 - **DI-10** Los límites usan los valores métricos impresos (75 mm, 19 mm). Por eso, un deck de 3 in (76,2 mm) o un perno
   de 3/4 in (19,05 mm) dan `FAIL` por conversión estricta; use 75 mm y 19 mm al declarar esos productos.
-- **DI-11** Muros, I5(c): I1.2 no da una fórmula de interacción. Se toma Mn de la distribución plástica a P = Pr/0,90 (φc = φt =
-  φb = 0,90) y el valor es Mr/(0,90·Mn); si Pr/0,90 excede la sección, el valor es P/Pmáx. La estabilidad se comprueba
-  en el chequeo axial. Esquinas rectas, como Fig. C-I3.8.
+- **DI-11** Muros, I5(c): I1.2 no da una fórmula de interacción. Se toma Mn de la distribución plástica a P = Pr, como AISC Design
+  Guide 38 (A.1.2, A.1.3 y ejemplos 2.2 y 4.1), y el valor es Mr/(0,90·Mn); si Pr excede la sección, el valor es P/Pmáx. La
+  estabilidad se comprueba en el chequeo axial. Esquinas rectas, como Fig. C-I3.8. Antes se usaba P = Pr/0,90; se corrigió
+  con la guía (2026-10-30).
 - **DI-12** Método 2: se implementan `M2` y `M2S` (indicación del usuario, 2026-10-30, sin distinguirlos). `M2` también compara la
   demanda con la curva nominal sin φ ni λ y gobierna el mayor valor, porque el Commentary y los ejemplos I.6 e I.11 advierten
   que D'' puede salir de esa curva y lo declaran inseguro. No se usa el punto E: el tramo recto A''-C'' queda del lado seguro.
+  AISC Design Guide 6 (2.3.2) excluye el punto D en su método; `M2` lo conserva con ese control y la memoria lo advierte: para
+  diseño conviene `M2S`.
 - **DI-13** I8.1 limita d a 19 mm salvo solo cortante en losa maciza, aunque la Tabla I.12-1 del ejemplo lista 1 in a tracción. Se
   sigue la Specification.
 

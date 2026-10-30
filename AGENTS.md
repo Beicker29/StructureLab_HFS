@@ -4,7 +4,8 @@
 
 - El repositorio implementa los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 y 2) de ANSI/AISC 360-22, solo LRFD (no añadir ASD). Los demás
   se reincorporan en el orden de la [hoja de ruta](docs/ROADMAP.md), uno por vez.
-- Fuente normativa: `a360-22w.pdf` y las erratas del repositorio. Alcance,
+- Fuente normativa: `a360-22w.pdf` y las erratas del repositorio. Las Design Guides y los Design Examples sirven para
+  contrastar e interpretar, no son norma ([guías](docs/design-guides.md)). Alcance,
   decisiones y consultas abiertas: [D](docs/chapter-d.md), [E](docs/chapter-e.md), [F](docs/chapter-f.md),
   [G](docs/chapter-g.md), [H](docs/chapter-h.md) e [I](docs/chapter-i.md).
 - Antes de trabajar, registrar rama/SHA y cambios locales. No borrar trabajo del
@@ -16,6 +17,8 @@
 - Una fuente de verdad por concepto ([arquitectura](docs/architecture.md)):
   fórmulas en `codes/aisc_360_22/<capítulo>.py`; selección y cálculo en
   `domain/<capítulo>.py`; obligaciones independientes en `domain/coverage.py`.
+- Las fórmulas que solo aparecen en otro documento (p. ej. una Design Guide) van en su propia carpeta dentro
+  de `codes/` (`codes/aisc_dg06/`, `codes/aisc_dg38/`), nunca en `codes/aisc_360_22/`; la memoria indica que no son norma.
 - Las interfaces (CLI, web) llaman a `engine`/`execution`; nunca calculan capacidades.
 - No fusionar ecuaciones por parecido algebraico; exigir equivalencia de norma,
   dominio, unidades y estado límite.
