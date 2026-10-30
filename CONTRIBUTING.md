@@ -16,6 +16,7 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 | `tests/test_compression.py` | Perfiles reales contra cálculos independientes (todas las familias soportadas); selección; bloqueos; propiedades de fórmulas (continuidad E3/E5, c2, E4-4 → E4-3, E6, E7-7) |
 | `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes, modo gobernante por resistencia de diseño φt·Pn, datos faltantes, nota D1, memoria |
 | `tests/test_flexure.py` | Capítulo F: perfiles reales contra cálculos independientes (F2, F3, F6, F7 incl. Se, F8, F11, F13.1), estados límite reportados, datos faltantes, bloqueos, interacción pendiente, memoria |
+| `tests/test_composite.py` | Capítulo I: rellenos, embebidos y vigas contra cálculos independientes; requisitos, bloqueos y memoria |
 | `tests/test_engine.py` | Obligaciones independientes; frontera PASS/FAIL; INCOMPLETE ante dominios bloqueados; barra maciza a mano |
 | `tests/test_inputs.py` | Rechazo de entradas inválidas o incompletas |
 | `tests/test_catalog.py` | Importación del Excel: familias, unidades, relaciones B4 |
@@ -24,8 +25,8 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 
 ## Oráculo independiente
 
-`tests/oracles/chapter_d.py`, `chapter_e.py`, `chapter_f.py`, `chapter_g.py` y `chapter_h.py` (este último
-reutiliza los oráculos D, E y F para las resistencias) se escriben directamente desde la Specification, en
+`tests/oracles/chapter_d.py`, `chapter_e.py`, `chapter_f.py`, `chapter_g.py`, `chapter_h.py` (este
+reutiliza los oráculos D, E y F para las resistencias) y `chapter_i.py` se escriben directamente desde la Specification, en
 Decimal, leyendo `data/sections.xlsx` con sus propias escalas de unidades y **sin
 importar `steel_design`**. Las pruebas consumen el resultado congelado
 `tests/fixtures/chapter_<x>/reference.json`. Para añadir un caso:
@@ -36,6 +37,7 @@ python tests/oracles/chapter_d.py   # regenera la referencia del capítulo D
 python tests/oracles/chapter_f.py   # regenera la referencia del capítulo F
 python tests/oracles/chapter_g.py   # regenera la referencia del capítulo G
 python tests/oracles/chapter_h.py   # regenera la referencia del capítulo H
+python tests/oracles/chapter_i.py   # regenera la referencia del capítulo I
 ```
 
 Revisar el diff de la referencia: un valor de referencia solo cambia por una

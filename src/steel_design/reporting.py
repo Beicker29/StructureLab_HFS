@@ -70,16 +70,20 @@ FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-to
 
 
 def _check_title(check) -> str:
+    if check.id == "axial" and check.chapter == "I":
+        return f"{'Tracción' if check.obligations[0].id == 'TY' else 'Compresión'} (Capítulo I)"
     if check.id == "axial":
         return "Compresión (Capítulo E)" if check.chapter == "E" else "Tracción (Capítulo D)"
     return f"{CHECK_TITLES[check.id]} (Capítulo {check.chapter})"
 
 
 def _capacity_label(check) -> str:
+    if check.chapter == "I":
+        return {"kN": "φ·Rn", "kN·m": "φb·Mn"}[check.unit]
     return {"E": "φc·Pn", "D": "φt·Pn", "F": "φb·Mn", "G": "φv·Vn", "H": "1.0"}[check.chapter]
 
 
-_DEMAND_SYMBOL = {"D": "|Pu|", "E": "Pu", "F": "Mu", "G": "Vu", "H": "H"}
+_DEMAND_SYMBOL = {"D": "|Pu|", "E": "Pu", "F": "Mu", "G": "Vu", "H": "H", "I": "Demanda"}
 
 
 def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = None) -> list[dict]:
@@ -94,8 +98,8 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
                "ratio": result.ratio}]
     cards = []
     for c in result.checks:
-        if c.chapter == "H":
-            label = f"Interacción ({c.result['governing_equation'] if c.result else 'H'}): razón"
+        if c.id == "interaction":
+            label = f"Interacción ({c.result['governing_equation'] if c.result else c.chapter}): razón"
             value = f"{c.ratio:.3f}" if c.ratio is not None else "no calculada"
         else:
             label = f"{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · {_DEMAND_SYMBOL[c.chapter]}/cap."
@@ -122,6 +126,8 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
             blocks += _shear_blocks(case, check, r)
         elif check.chapter == "H":
             blocks += _interaction_blocks(case, check, r)
+        elif check.chapter == "I":
+            blocks += _composite_blocks(check, r)
         else:
             blocks += _flexure_blocks(case, check, r)
         blocks.append({"kind": "h2", "text": f"Obligaciones del Capítulo {check.chapter} (comprobación independiente)"})
@@ -152,6 +158,10 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     demands += [f"Vu{a} = {_fmt(v)} kN" for a, v in (("x", case.Vux), ("y", case.Vuy)) if v]
     items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin), ("Material", material),
              ("Demandas (LRFD)", "; ".join(demands))]
+    if case.composite:
+        concrete = case.composite.concrete
+        items.append(("Miembro compuesto", f"{case.composite.kind}; f'c = {_fmt(concrete.fc)} MPa; "
+                                           f"wc = {_fmt(concrete.wc)} kg/m³"))
     ids = {c.id for c in result.checks}
     if case.Pu < 0 and case.tension:
         t = case.tension
@@ -343,6 +353,29 @@ def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
               ("Resistencia de diseño", f"φv·Vn = {m['phi_v']:.2f} · Vn = {_fmt(c['available_kN'])} kN"),
               _verification(check)]
     blocks += [{"kind": "h2", "text": "Resistencia"}, {"kind": "kv", "items": items}]
+    return blocks
+
+
+_COMPOSITE_KEYS = {"limit_state", "provision", "applies"}
+
+
+def _composite_blocks(check, c: dict) -> list[dict]:
+    blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    rows = [[_ELEMENTS.get(r["element"], r["element"]), r["ratio"], r["lambda_p"], r["lambda_r"], r["class"]]
+            for r in c["classification"]["elements"]]
+    if rows:
+        blocks += [{"kind": "h2", "text": f"Clasificación ({c['classification']['reference']})"},
+                   {"kind": "table", "headers": ["Elemento", "λ", "λp", "λr", "Clase"], "rows": rows}]
+    m = c["modes"][c["governing_mode"]]
+    items = [(_label(k), _fmt(v)) for k, v in m.items()
+             if k not in _COMPOSITE_KEYS and isinstance(v, (int, float, str)) and not isinstance(v, bool)]
+    if check.ratio is not None:
+        items.append(("Verificación", f"{_fmt(check.demand)} / {_fmt(check.capacity)} = {_fmt(check.ratio)}"))
+    blocks += [{"kind": "h2", "text": f"Resistencia: modo {c['governing_mode']}"}, {"kind": "kv", "items": items}]
+    if c["requirements"]:
+        blocks += [{"kind": "h2", "text": "Limitaciones del Capítulo I"},
+                   {"kind": "table", "headers": ["Requisito", "Disposición", "Cumple"],
+                    "rows": [[r["message"], r["provision"], "sí" if r["satisfied"] else "NO"] for r in c["requirements"]]}]
     return blocks
 
 

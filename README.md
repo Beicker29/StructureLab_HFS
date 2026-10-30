@@ -1,8 +1,8 @@
 # StructureLab_HFS
 
 Motor de cálculo de la **resistencia de miembros de acero** según ANSI/AISC 360-22,
-solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante) y H
-(interacción de fuerza axial y flexión)
+solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante), H
+(interacción de fuerza axial y flexión) e I (miembros compuestos: PTE rellenos, W embebidos y vigas)
 (`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026 del repositorio). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
@@ -89,6 +89,7 @@ símbolos escritos en letras.
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
+| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`), `concrete` (`fc`, `wc`, `lightweight`), `interaction` (`H1`, `I5`), y `encased` o `beam` según el tipo ([detalle](docs/chapter-i.md)) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
 material, longitudes, `tension`, E5/E6) y `cases` lista sus combinaciones de

@@ -135,6 +135,103 @@ class AngleFlexure(InputModel):
         None, description="Single angle, major principal axis (Mw): leg whose toe is in compression")
 
 
+class Concrete(InputModel):
+    fc: PositiveNumber = Field(..., description="Specified compressive strength f'c (MPa)")
+    wc: PositiveNumber = Field(..., ge=1500, le=2500, description="Weight of concrete per unit volume (kg/m3), I2.1b")
+    lightweight: StrictBool = Field(..., description="Lightweight concrete: f'c limit of I1.3(a); must be declared")
+
+
+class ReinforcingBar(InputModel):
+    area: PositiveNumber = Field(..., description="Bar area (mm2)")
+    db: PositiveNumber = Field(..., description="Nominal bar diameter (mm)")
+    x: FiniteNumber = Field(..., description="Bar center from the section centroid, along x (mm)")
+    y: FiniteNumber = Field(..., description="Bar center from the section centroid, along y (mm)")
+
+
+class TransverseReinforcement(InputModel):
+    db: PositiveNumber = Field(..., description="Tie or hoop bar diameter (mm)")
+    spacing: PositiveNumber = Field(..., description="Center-to-center spacing (mm)")
+
+
+class EncasedBasis(InputModel):
+    """Encased W-shape (I2.1, I3.3): concrete outline, bars and the flexural method of I3.3a."""
+    H: PositiveNumber = Field(..., description="Concrete depth, parallel to the web of the steel shape (mm)")
+    B: PositiveNumber = Field(..., description="Concrete width, parallel to the flanges of the steel shape (mm)")
+    Fysr: PositiveNumber = Field(..., description="Specified minimum yield stress of the reinforcing bars (MPa)")
+    bars: list[ReinforcingBar] = Field(..., min_length=1, description="Continuous longitudinal bars")
+    transverse: TransverseReinforcement
+    flexure_method: Literal["steel", "composite"] = Field(
+        "steel", description="I3.3a(2) plastic on the steel section, or I3.3a(3) plastic on the composite section")
+    anchors_provided: StrictBool = Field(False, description="I3.3a(3): steel anchors provided along the member")
+
+
+class StudAnchors(InputModel):
+    count: PositiveCount = Field(..., description="Studs between the point of maximum moment and the point of zero moment")
+    d: PositiveNumber = Field(..., description="Shank diameter dsa (mm)")
+    Fu: PositiveNumber = Field(..., description="Specified minimum tensile strength of the stud (MPa)")
+    length: PositiveNumber = Field(..., description="Length after installation, base to top of the head (mm)")
+    per_rib: PositiveCount = Field(1, description="Studs in one deck rib (deck perpendicular to the beam)")
+    over_web: StrictBool = Field(..., description="I8.1: welded to the flange directly over the web")
+
+
+class ChannelAnchors(InputModel):
+    count: PositiveCount = Field(..., description="Channels between the point of maximum moment and the point of zero moment")
+    la: PositiveNumber = Field(..., description="Channel length (mm)")
+    tf: PositiveNumber = Field(..., description="Channel flange thickness (mm)")
+    tw: PositiveNumber = Field(..., description="Channel web thickness (mm)")
+
+
+class FormedDeck(InputModel):
+    orientation: Literal["perpendicular", "parallel"] = Field(..., description="Deck ribs relative to the steel beam")
+    hr: PositiveNumber = Field(..., description="Nominal rib height (mm)")
+    wr: PositiveNumber = Field(..., description="Average width of the concrete rib or haunch (mm)")
+    emid_ht_at_least_50: Optional[StrictBool] = Field(
+        None, description="I8.2a: emid-ht >= 50 mm; required with the deck perpendicular to the beam")
+
+
+class CompositeBeamBasis(InputModel):
+    """Composite beam with steel anchors (I3.2, I8.2); the moment sense is explicit, as in Chapter F (DF-9)."""
+    moment: Literal["positive", "negative"] = Field(..., description="Sense of Mux in this load combination")
+    span: PositiveNumber = Field(..., description="Beam span, center-to-center of supports (mm)")
+    left_beam_spacing: Optional[PositiveNumber] = Field(None, description="Distance to the adjacent beam on the left (mm)")
+    left_edge_distance: Optional[PositiveNumber] = Field(None, description="Distance to the slab edge on the left (mm)")
+    right_beam_spacing: Optional[PositiveNumber] = Field(None, description="Distance to the adjacent beam on the right (mm)")
+    right_edge_distance: Optional[PositiveNumber] = Field(None, description="Distance to the slab edge on the right (mm)")
+    tc: PositiveNumber = Field(..., description="Concrete thickness above the deck, or of the solid slab (mm)")
+    deck: Optional[FormedDeck] = None
+    studs: Optional[StudAnchors] = None
+    channels: Optional[ChannelAnchors] = None
+    shored: StrictBool = Field(..., description="I3.1b: temporary shores used during construction")
+    Mu_construction: Optional[PositiveNumber] = Field(
+        None, description="I3.1b: required strength before the concrete reaches 75% of f'c (kN*m), when unshored")
+
+    @model_validator(mode="after")
+    def one_limit_per_side(self):
+        for side in ("left", "right"):
+            given = [getattr(self, f"{side}_beam_spacing"), getattr(self, f"{side}_edge_distance")]
+            if sum(v is not None for v in given) != 1:
+                raise ValueError(f"Indique {side}_beam_spacing o {side}_edge_distance (solo uno).")
+        return self
+
+
+class CompositeBasis(InputModel):
+    """Chapter I: the member type is declared, never deduced from the section."""
+    kind: Literal["filled", "encased", "beam"]
+    concrete: Concrete
+    interaction: Literal["H1", "I5"] = Field(
+        "H1", description="I5(a)/(b): H1.1, or Equations I5-1a/b (filled noncompact or slender sections)")
+    encased: Optional[EncasedBasis] = None
+    beam: Optional[CompositeBeamBasis] = None
+
+    @model_validator(mode="after")
+    def data_of_the_declared_kind(self):
+        if (self.kind == "encased") != (self.encased is not None):
+            raise ValueError("composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso.")
+        if (self.kind == "beam") != (self.beam is not None):
+            raise ValueError("composite.beam corresponde solo a kind = beam, y es obligatorio en ese caso.")
+        return self
+
+
 class CustomSectionType(str, Enum):
     SOLID_CIRCULAR = "SOLID_CIRCULAR"
     SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
@@ -177,9 +274,12 @@ class SteelCase(InputModel):
     flexure: Optional[FlexureBasis] = None
     shear: Optional[ShearBasis] = None
     custom_section: Optional[CustomSection] = None
+    composite: Optional[CompositeBasis] = None
 
     @model_validator(mode="after")
     def demand(self):
+        if self.composite is not None and self.custom_section is not None:
+            raise ValueError("Un miembro compuesto usa un perfil del catálogo, no custom_section.")
         if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy)):
             raise ValueError("La combinación debe tener al menos una demanda distinta de cero "
                              "(Pu, Mux, Muy, Mw, Mz, Vux, Vuy).")
@@ -205,7 +305,7 @@ class Obligation(BaseModel):
 class Check(BaseModel):
     """One required strength of a load combination (axial, flexure or shear) or their interaction (H)."""
     id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z", "shear_x", "shear_y", "interaction"]
-    chapter: Literal["D", "E", "F", "G", "H"]
+    chapter: Literal["D", "E", "F", "G", "H", "I"]
     demand: float = Field(..., description="|Pu| or |Vu| (kN), |Mu| (kN*m); interaction value for Chapter H")
     unit: Literal["kN", "kN·m", "–"]
     status: Status
@@ -223,7 +323,8 @@ class DesignResult(BaseModel):
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
     scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
-                  "F (flexión), G (cortante) y H (interacción H1, H2 en ángulos simples y H4). Longitudes efectivas, análisis de segundo "
+                  "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
+                  "I5 e I8.2). Longitudes efectivas, análisis de segundo "
                   "orden, combinaciones de carga, conexiones, torsión y demás capítulos quedan fuera de este resultado.")
 
     @computed_field

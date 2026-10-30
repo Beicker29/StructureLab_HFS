@@ -66,6 +66,24 @@ def shear_obligations(section: Section, axis: str) -> list[Obligation]:
                                                            "paralelos al cortante.")]
 
 
+def composite_obligations(case: SteelCase, demand: str) -> list[Obligation]:
+    """Chapter I limit states of each demand ("axial", "flexure" or "shear"), from I2, I3 and I4."""
+    kind = case.composite.kind
+    if demand == "axial" and case.Pu < 0:
+        return [Obligation(id="TY", provision="I2.1c / I2.2c", reason="Fluencia en tracción del acero y del refuerzo.")]
+    if demand == "axial":
+        return [Obligation(id="FB-x", provision="I2", reason="Pandeo por flexión respecto de x."),
+                Obligation(id="FB-y", provision="I2", reason="Pandeo por flexión respecto de y."),
+                Obligation(id="LB", provision="I1.2 / I1.4", reason="Pandeo local: clasificación de rellenos; no requerido "
+                                                                    "en embebidos.")]
+    if demand == "shear":
+        return [Obligation(id="V", provision="I4", reason="Resistencia a cortante del miembro compuesto.")]
+    out = [Obligation(id="Y", provision="I3", reason="Resistencia a flexión de la sección compuesta.")]
+    if kind == "filled":
+        out.append(Obligation(id="LB", provision="I1.4", reason="Clasificación del relleno para flexión (Tabla I1.1b)."))
+    return out
+
+
 def interaction_obligations(case: SteelCase, section: Section) -> list[Obligation]:
     """H1 whenever axial force and flexure, or flexure about two axes, act together; H4 for flanges with holes.
 

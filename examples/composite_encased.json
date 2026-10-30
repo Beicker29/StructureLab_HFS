@@ -1,0 +1,24 @@
+{
+  "section_name": "W10X45",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 4267, "Ly": 4267, "Lz": 4267},
+  "composite": {
+    "kind": "encased",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "encased": {
+      "H": 610, "B": 610, "Fysr": 420,
+      "bars": [
+        {"area": 510, "db": 25.4, "x": 241.3, "y": 241.3}, {"area": 510, "db": 25.4, "x": 241.3, "y": -241.3},
+        {"area": 510, "db": 25.4, "x": -241.3, "y": 241.3}, {"area": 510, "db": 25.4, "x": -241.3, "y": -241.3},
+        {"area": 510, "db": 25.4, "x": 241.3, "y": 0}, {"area": 510, "db": 25.4, "x": -241.3, "y": 0},
+        {"area": 510, "db": 25.4, "x": 0, "y": 241.3}, {"area": 510, "db": 25.4, "x": 0, "y": -241.3}
+      ],
+      "transverse": {"db": 10, "spacing": 300},
+      "flexure_method": "composite",
+      "anchors_provided": true
+    }
+  },
+  "cases": [
+    {"name": "Compression and flexure", "Pu": 3000, "Mux": 300}
+  ]
+}

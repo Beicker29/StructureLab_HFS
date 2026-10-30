@@ -2,11 +2,11 @@
 
 ## Alcance
 
-- El repositorio implementa los capítulos D, E, F, G y H (H1, H2 en ángulos simples, H4) de ANSI/AISC 360-22, solo LRFD (no añadir ASD). Los demás
+- El repositorio implementa los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapa 1) de ANSI/AISC 360-22, solo LRFD (no añadir ASD). Los demás
   se reincorporan en el orden de la [hoja de ruta](docs/ROADMAP.md), uno por vez.
 - Fuente normativa: `a360-22w.pdf` y las erratas del repositorio. Alcance,
   decisiones y consultas abiertas: [D](docs/chapter-d.md), [E](docs/chapter-e.md), [F](docs/chapter-f.md),
-  [G](docs/chapter-g.md) y [H](docs/chapter-h.md).
+  [G](docs/chapter-g.md), [H](docs/chapter-h.md) e [I](docs/chapter-i.md).
 - Antes de trabajar, registrar rama/SHA y cambios locales. No borrar trabajo del
   usuario ni archivos no versionados desconocidos; no cambiar permisos.
 - Sin commit ni push salvo autorización.
