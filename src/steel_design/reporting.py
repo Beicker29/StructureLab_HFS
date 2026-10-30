@@ -25,7 +25,7 @@ _SECTION_NAMES = {"area": "Ag", "ix": "Ix", "iy": "Iy", "iw": "Iw", "iz": "Iz", 
                   "b_tdes_ratio": "b/tdes", "h_tw_ratio": "h/tw", "h_tdes_ratio": "h/tdes", "d_t_ratio": "D/t"}
 _ELEMENTS = {"flange": "ala", "web": "alma", "wall_b": "pared b", "wall_h": "pared h", "wall": "pared",
              "long_leg": "ala larga", "short_leg": "ala corta", "flange_legs": "alas horizontales",
-             "web_legs": "alas verticales", "walls": "paredes paralelas al cortante"}
+             "web_legs": "alas verticales", "walls": "paredes paralelas al cortante", "bar": "barra"}
 _LABELS = {"Lc_over_r_o": "(Lc/r)o", "Cv_equation": "Ec. Cv", "Fcr_equation": "Ec. Fcr", "D_t": "D/t", "a_over_ri": "a/ri", "slenderness_equation": "Ec. de esbeltez",
            "Fez_equation": "Ec. Fez", "Fe_torsion_equation": "Ec. Fe torsional", "symmetry_axis": "Eje de simetría",
            "connected_leg": "Ala conectada", "leg_ratio": "bl/bs", "ro_mm": "r̄o (mm)",

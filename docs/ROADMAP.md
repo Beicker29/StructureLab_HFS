@@ -20,7 +20,7 @@ se reincorporan, uno por vez, con la misma estructura y oráculos independientes
 - Capítulo F, etapa 2: F9 ángulos dobles (eje x) y F10 ángulos simples en ejes
   geométricos y principales (`Mw`, `Mz`), verificado con cálculos independientes.
 - Capítulo G (cortante): G2.1 sin rigidizadores, G3, G4, G5 y G6, verificado con
-  cálculos independientes ([detalle](chapter-g.md)).
+  cálculos independientes ([detalle](chapter-g.md)). Barras y platinas macizas por G4 (DG-4).
 - Capítulo H, etapa 1: H1.1, H1.2 (con amplificación de Cb opcional) y H4, verificado
   con cálculos independientes ([detalle](chapter-h.md)).
 - Contraste con 43 casos de los AISC Design Examples v16.0 (D, E, F, G, H): coincidencia
@@ -31,5 +31,4 @@ se reincorporan, uno por vez, con la misma estructura y oráculos independientes
 1. Revisión ingenieril de las decisiones de [D](chapter-d.md), [E](chapter-e.md), [F](chapter-f.md), [G](chapter-g.md) y [H](chapter-h.md);
    corregir en el catálogo la fila IPE 80 y completar los datos de IPE/HEA/HEB.
 2. Capítulo H, etapa 2: H2 para ángulos simples con fuerzas combinadas (tensiones en A, B, C).
-3. Consulta pendiente DG-4: cortante en barras macizas.
-4. Aplicación web sobre `steel_design.execution.execute_payload`.
+3. Aplicación web sobre `steel_design.execution.execute_payload`.
