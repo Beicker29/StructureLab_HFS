@@ -54,7 +54,9 @@ SHEAR_PROVISIONS = {("W", "x"): "G2.1", ("CHANNEL", "x"): "G2.1", ("W", "y"): "G
                     ("RECTANGULAR_HSS", "x"): "G4", ("RECTANGULAR_HSS", "y"): "G4",
                     ("CIRCULAR_HSS", "x"): "G5", ("CIRCULAR_HSS", "y"): "G5",
                     ("SINGLE_ANGLE", "x"): "G3", ("SINGLE_ANGLE", "y"): "G3",
-                    ("DOUBLE_ANGLE", "x"): "G3", ("DOUBLE_ANGLE", "y"): "G3"}
+                    ("DOUBLE_ANGLE", "x"): "G3", ("DOUBLE_ANGLE", "y"): "G3",
+                    ("SOLID_RECTANGULAR", "x"): "G4", ("SOLID_RECTANGULAR", "y"): "G4",
+                    ("SOLID_CIRCULAR", "x"): "G4", ("SOLID_CIRCULAR", "y"): "G4"}
 
 
 def shear_obligations(section: Section, axis: str) -> list[Obligation]:

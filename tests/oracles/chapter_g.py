@@ -2,6 +2,8 @@
 
 Decimal arithmetic (50 digits); reads data/sections.xlsx with openpyxl; never imports steel_design.
 Webs without stiffeners. HSS: h = hi - 2*ri (clear distance less the inside corner radius, G4).
+Solid bars: G4 other symmetric shapes, Aw = d*t, h/t = d/t, kv = 5; round bars Aw = 0.5*Ag, Cv2 = 1
+(user decision DG-4 in docs/chapter-g.md).
 Regenerates tests/fixtures/chapter_g/reference.json:
 
     python tests/oracles/chapter_g.py
@@ -16,6 +18,7 @@ import openpyxl
 getcontext().prec = 50
 ROOT = Path(__file__).resolve().parents[2]
 E = D(200000)
+PI = D("3.14159265358979323846264338327950288419716939937510")
 SHEETS = {"W": "W_IPE_HEA_HEB", "CHANNEL": "C", "RECTANGULAR_HSS": "PTE_RECT", "CIRCULAR_HSS": "PTE_RED",
           "SINGLE_ANGLE": "L", "DOUBLE_ANGLE": "2L"}
 _WB = None
@@ -102,6 +105,16 @@ def angle(name, fy, axis):
     return n * D("0.6") * fy * b * t * cv2(b / t, D("1.2"), fy), D("0.90")      # G3-1
 
 
+def bar(H, B, fy, axis):
+    fy = D(fy)
+    d, t = (D(H), D(B)) if axis == "x" else (D(B), D(H))                        # d parallel to the shear
+    return D("0.6") * fy * d * t * cv2(d / t, D(5), fy), D("0.90")              # G4-1
+
+
+def solid_round(D_, fy):
+    return D("0.6") * D(fy) * (PI * D(D_) ** 2 / 4) / 2, D("0.90")              # G4-1, Aw = Ag/2, Cv2 = 1 (DG-4)
+
+
 CASES = {
     "W-G2.1a": dict(kind="i", name="W24X62", family="W", fy=345, axis="x"),
     "W-G2.1b": dict(kind="i", name="W24X55", family="W", fy=345, axis="x"),
@@ -119,12 +132,18 @@ CASES = {
     "2L-G3-LLBB-x": dict(kind="angle", name="2L4X3-1/2X3/8LLBB", fy=345, axis="x"),
     "2L-G3-SLBB-x": dict(kind="angle", name="2L4X3-1/2X3/8SLBB", fy=345, axis="x"),
     "2L-G3-LLBB-y": dict(kind="angle", name="2L4X3-1/2X3/8LLBB", fy=345, axis="y"),
+    "BAR-G4-x": dict(kind="bar", H=100, B=20, fy=345, axis="x"),
+    "BAR-G4-y": dict(kind="bar", H=100, B=20, fy=345, axis="y"),
+    "BAR-G4-G2-10": dict(kind="bar", H=650, B=10, fy=345, axis="x"),
+    "BAR-G4-G2-11": dict(kind="bar", H=10, B=750, fy=345, axis="y"),
+    "ROUND-G4": dict(kind="round", D_=50, fy=250),
 }
 
 
 def build(spec):
     args = {k: v for k, v in spec.items() if k != "kind"}
-    vn, phi = {"i": i_shape, "rhss": rect_hss, "chss": round_hss, "angle": angle}[spec["kind"]](**args)
+    modes = {"i": i_shape, "rhss": rect_hss, "chss": round_hss, "angle": angle, "bar": bar, "round": solid_round}
+    vn, phi = modes[spec["kind"]](**args)
     return {"spec": spec, "Vn_kN": vn / 1000, "phi_v": phi, "phiVn_kN": phi * vn / 1000}
 
 

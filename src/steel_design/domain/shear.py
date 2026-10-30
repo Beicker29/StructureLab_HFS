@@ -3,8 +3,8 @@
 Axis convention: "x" is the shear that accompanies bending about x (parallel to y, resisted by the
 web of I-shapes and channels, the H walls of rectangular HSS and the legs parallel to y of angles);
 "y" accompanies bending about y. Families: rolled I-shapes and channels (G2.1, G6), single and
-double angles (G3), rectangular HSS (G4) and round HSS (G5). Webs without transverse stiffeners.
-Formulas live in codes/aisc_360_22/shear.py. Missing data or decisions raise structured errors.
+double angles (G3), rectangular HSS and solid bars (G4), round HSS (G5). Webs without transverse
+stiffeners. Formulas live in codes/aisc_360_22/shear.py. Missing data or decisions raise structured errors.
 """
 import math
 
@@ -116,6 +116,21 @@ def _double_angle(section, E, Fy, axis):
     return _legs(section, E, Fy, web if axis == "x" else flange, 2, "web_legs" if axis == "x" else "flange_legs")
 
 
+def _solid(section, E, Fy, axis):
+    """G4, other doubly symmetric shapes (DG-4): Aw = d*t, h = d parallel to the shear, t across it."""
+    if section.type.upper() == "SOLID_CIRCULAR":
+        _require(section, "area")
+        aw = 0.5 * section.area
+        out = eq.web_strength(Fy=Fy, Aw=aw, Cv=1.0, equation="G4-1")
+        return "G4", eq.PHI_V, [], {**out, "Aw_mm2": aw, "Cv2": 1.0}
+    _require(section, "h", "b")
+    d, t = (section.h, section.b) if axis == "x" else (section.b, section.h)
+    cv = eq.cv2(h_tw=d / t, kv=eq.KV_HSS, E=E, Fy=Fy)
+    out = eq.web_strength(Fy=Fy, Aw=d * t, Cv=cv["Cv"], equation="G4-1")
+    return "G4", eq.PHI_V, [_element("bar", d / t, cv, eq.KV_HSS)], {
+        **out, "h_mm": d, "t_mm": t, "Aw_mm2": d * t, "Cv2": cv["Cv"], "Cv_equation": cv["equation"]}
+
+
 def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
     """Nominal and design shear strength in one direction ("x": accompanies Mux; "y": accompanies Muy)."""
     family = section.type.upper()
@@ -133,14 +148,19 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
         provision, phi, rows, out = _single_angle(section, E, Fy, axis)
     elif family == "DOUBLE_ANGLE":
         provision, phi, rows, out = _double_angle(section, E, Fy, axis)
+    elif family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
+        provision, phi, rows, out = _solid(section, E, Fy, axis)
     else:
-        _blocked("El Capítulo G no define el área de cortante de las barras macizas; pendiente de decisión.", section)
+        _blocked("Familia sin disposición de cortante en este cálculo.", section)
 
     mode = {"limit_state": "shear", "provision": provision, "applies": True, **out, "Vn_kN": out["Vn"] / 1000.0,
             "phi_v": phi, "available_kN": eq.design_strength(out["Vn"], phi)}
     notes = []
     if family == "CIRCULAR_HSS" and out["Lv_mm"] is None:
         notes.append("Lv no indicado: Fcr con G5-2b solamente (límite inferior de G5, conservador; decisión DG-2).")
+    if family == "SOLID_CIRCULAR":
+        notes.append("Barra redonda: G4 define Aw = d·tw y esta sección no tiene espesor de alma; se usa "
+                     "Aw = 0.5·Ag y Cv2 = 1, criterio del usuario (decisión DG-4).")
     return {
         "chapter": "G", "code": "ANSI/AISC 360-22", "axis": axis, "section": section.name, "family": family,
         "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lv_mm": case.shear.Lv if case.shear else None},

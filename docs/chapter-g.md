@@ -25,7 +25,8 @@ verifica por separado (la interacción con torsión, H3, queda fuera del alcance
 | PTE redondo | G5: Vn = Fcr·Ag/2 | igual |
 | Ángulo simple | G3 con el ala larga (paralela a y en el catálogo) | G3 con el ala corta |
 | Ángulo doble | G3 con las 2 alas verticales (LLBB: largas; SLBB: cortas) | G3 con las 2 alas horizontales |
-| Barras macizas | INCOMPLETO (DG-4) | INCOMPLETO |
+| Barra o platina rectangular | G4: Aw = H·B, h/t = H/B, kv = 5 | G4: Aw = H·B, h/t = B/H, kv = 5 |
+| Barra redonda | G4-1 con Aw = 0,5·Ag, Cv2 = 1 (DG-4) | igual |
 
 h de los PTE: el catálogo da h = Ht − 3·tdes, que coincide con la distancia libre menos el
 radio interior de esquina de G4 (hi − 2·ri, con ri = 0,5·tdes en la hoja PTE_RECT); el
@@ -54,6 +55,11 @@ tolerancia relativa 1e-9. Vn y φv·Vn en kN:
 | 2L-G3-LLBB-x | 2L4X3-1/2X3/8LLBB, x | 345 | 402.43 | 0.90 | 362.19 |
 | 2L-G3-SLBB-x | 2L4X3-1/2X3/8SLBB, x | 345 | 350.75 | 0.90 | 315.67 |
 | 2L-G3-LLBB-y | 2L4X3-1/2X3/8LLBB, y | 345 | 350.75 | 0.90 | 315.67 |
+| BAR-G4-x | Barra 100 x 20 mm, x | 345 | 414.00 | 0.90 | 372.60 |
+| BAR-G4-y | Barra 100 x 20 mm, y | 345 | 414.00 | 0.90 | 372.60 |
+| BAR-G4-G2-10 | Platina 650 x 10 mm, x (G2-10) | 345 | 1225.90 | 0.90 | 1103.31 |
+| BAR-G4-G2-11 | Platina 10 x 750 mm, y (G2-11) | 345 | 1208.00 | 0.90 | 1087.20 |
+| ROUND-G4 | Barra redonda D = 50 mm | 250 | 147.26 | 0.90 | 132.54 |
 
 En los PTE redondos del catálogo (D/t ≤ 41) gobierna siempre 0,6Fy; las ramas G5-2a y
 G5-2b se prueban con las fórmulas. Contraste con los AISC Design Examples G.1B–G.7 en
@@ -69,8 +75,13 @@ G5-2b se prueban con las fórmulas. Contraste con los AISC Design Examples G.1B�
 - **DG-3** Ángulos dobles: G3 se aplica a cada ángulo y se suman las dos alas
   paralelas al cortante; las alas verticales se identifican por LLBB/SLBB, igual que en
   F9 (DF-10).
-- **DG-4** Barras macizas: el Capítulo G no define su área de cortante sin ambigüedad
-  (G4 habla de almas, G5 de PTE redondos). INCOMPLETO hasta consultar al usuario.
+- **DG-4** Barras y platinas macizas: se diseñan con G4, apartado «other singly or doubly
+  symmetric shapes» (indicación del usuario, 2026-10-30), con φv = 0,90 de G1(a).
+  Rectangulares: Aw = d·t = área bruta, h = d (dimensión paralela al cortante), t = la
+  dimensión perpendicular, Cv2 de G2.2 con kv = 5. Redondas: G4 define Aw = d·tw y la sección
+  no tiene espesor de alma; se usa la mitad del área bruta, Aw = 0,5·Ag (indicación del
+  usuario, 2026-10-30), y Cv2 = 1 (lectura de la implementación: sin alma, no hay h/t con
+  el que evaluar G2.2). La memoria lo indica.
 - **DG-5** Convención `Vux`/`Vuy`: el cortante se nombra por el momento al que acompaña,
   no por la dirección de la fuerza.
 
