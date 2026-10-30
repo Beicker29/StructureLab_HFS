@@ -10,7 +10,7 @@ import pytest
 
 from steel_design.codes.aisc_360_22 import compression as eq
 from steel_design.domain.compression import compression_strength
-from steel_design.domain.errors import IncompleteSectionDataError, RuleNotImplementedError
+from steel_design.errors import IncompleteSectionDataError, RuleNotImplementedError
 from steel_design.models import SteelCase
 
 from conftest import ROOT

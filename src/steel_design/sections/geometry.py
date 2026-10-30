@@ -1,7 +1,7 @@
 """Solid custom sections (mm): area, moments of inertia and radii of gyration."""
 import math
 
-from ..domain.errors import ValidationError
+from ..errors import ValidationError
 from ..models import CustomSectionType, SteelCase
 from .models import Section
 

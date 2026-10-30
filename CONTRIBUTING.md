@@ -18,6 +18,7 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 | `tests/test_inputs.py` | Rechazo de entradas inválidas o incompletas |
 | `tests/test_catalog.py` | Importación del Excel: familias, unidades, relaciones B4 |
 | `tests/test_interfaces.py` | CLI (sin escritura por defecto, `--output`, errores), lotes y ejemplos |
+| `tests/test_reporting.py` | Memoria de cálculo: contenido trazable al resultado, caso bloqueado sin resistencia, PDF y CLI |
 
 ## Oráculo independiente
 

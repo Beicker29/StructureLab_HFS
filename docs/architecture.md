@@ -2,19 +2,20 @@
 
 ```text
 src/steel_design/
-├── models.py                    entrada (SteelCase) y resultado (DesignResult)
-├── sections/                    catálogo: loader.py (Excel → Section, unidades),
-│                                models.py, repository.py, geometry.py (macizos), identity.py
+├── models.py                    entrada (SteelCase), resultado (DesignResult), tipos y política de entrada
+├── errors.py                    errores estructurados
+├── sections/                    catálogo: loader.py (hojas/cabeceras del Excel → Section, unidades),
+│                                models.py, repository.py, geometry.py (macizos), identity.py (nombres, AISC_Manual_Label 2L)
 ├── codes/aisc_360_22/
 │   └── compression.py           fórmulas puras E1, E3–E7 y límites λr de B4.1a
 ├── domain/
 │   ├── compression.py           clasificación, selección, ejecución y resistencia gobernante
 │   ├── coverage.py              obligaciones del capítulo E derivadas del texto, independientes
-│   ├── validation.py            validación de caso y sección
-│   └── errors.py                errores estructurados
+│   └── validation.py            validación de caso y sección
 ├── engine.py                    sección → compresión → obligaciones → estado
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
-└── run.py                       CLI (JSON en stdout; archivo solo con --output)
+├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
+└── run.py                       CLI (JSON en stdout; archivos solo con --output, --report, --pdf → results/ ignorado)
 ```
 
 ## Flujo
@@ -29,6 +30,9 @@ src/steel_design/
 4. `coverage.discharge` cruza obligaciones y modos. Si falta alguno, el estado es
    `INCOMPLETE`; si no, `PASS` o `FAIL` según `Pu / disponible`.
 
+Los ángulos dobles leen su ángulo simple componente a través de la función
+`catalog` que el motor pasa a `compression_strength`.
+
 Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` o
 `IncompleteSectionDataError`; el motor lo convierte en `INCOMPLETE` con el motivo.
 
@@ -39,8 +43,9 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Ecuaciones E3-2…E7-7, φc/Ωc, λr | `codes/aisc_360_22/compression.py` |
 | Elementos B4.1a por familia, selección de modos, E7 por modo | `domain/compression.py` |
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |
-| Unidades del catálogo y relaciones b/t derivadas | `sections/loader.py` |
+| Hojas, cabeceras y unidades del catálogo; b/tdes, h/tdes, D/t de PTE | `sections/loader.py` |
 | Decisión PASS/FAIL/INCOMPLETE | `engine.py` |
+| Presentación de la memoria de cálculo | `reporting.py` |
 
 Ninguna interfaz (CLI, futura web) calcula capacidades: todas llaman a `engine`.
 

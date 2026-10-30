@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from steel_design.domain.errors import ValidationError
+from steel_design.errors import ValidationError
 from steel_design.execution import execute_payload, overall_status
 
 from conftest import CATALOG, ROOT
@@ -21,7 +21,7 @@ def cli(*args, cwd):
 @pytest.mark.parametrize("example", EXAMPLES, ids=lambda p: p.stem)
 def test_examples_run_in_memory(engine, example):
     results = execute_payload(json.loads(example.read_text(encoding="utf-8")), engine)
-    assert overall_status([r for _, r in results]).value == "PASS"
+    assert overall_status([r for _, _, r in results]).value == "PASS"
 
 
 def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):

@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import ConfigDict, Field
-from ..input_contracts import InputModel, NonNegativeNumber, NonBlankString, PositiveCount
+from ..models import InputModel, NonNegativeNumber, NonBlankString, PositiveCount
 
 
 class SectionSource(InputModel):

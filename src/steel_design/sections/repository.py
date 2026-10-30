@@ -1,6 +1,6 @@
 from typing import Dict, Optional, List
 
-from ..domain.errors import AmbiguousSectionError
+from ..errors import AmbiguousSectionError
 from .identity import section_identity
 from .models import Section
 
@@ -9,7 +9,7 @@ class SectionRepository:
     """Own snapshots of all records; only unique identities can be selected.
 
     load is additive, including repeated loads. No first/last/identical-record
-    winner is inferred. get_all/get_duplicates are diagnostic, not selection.
+    winner is inferred.
     """
 
     def __init__(self):
@@ -39,16 +39,3 @@ class SectionRepository:
                 },
             )
         return records[0].model_copy(deep=True) if records else None
-
-    def get_all(self) -> List[Section]:
-        """All records, including ambiguous/invalid physical data, for diagnosis.
-
-        This is deliberately not a list of selectable or certified sections.
-        Use get(name) for selection, then the engine's physical validation.
-        """
-        return [record.model_copy(deep=True) for records in self._sections.values() for record in records]
-
-    def get_duplicates(self) -> Dict[str, List[Section]]:
-        """Ambiguous identities and every candidate, without discarding evidence."""
-        return {identity: [record.model_copy(deep=True) for record in records]
-                for identity, records in self._sections.items() if len(records) > 1}

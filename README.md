@@ -22,6 +22,7 @@ directamente al motor.
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\Activate.ps1
 ```
 
 ## Uso
@@ -31,7 +32,19 @@ python -m steel_design.run examples/w_shape_case.json            # imprime JSON
 python -m steel_design.run examples/bundle_case.json --output r.json
 ```
 
-No se escribe nada en disco salvo con `--output`. Desde Python:
+No se escribe nada en disco salvo que se pida. Memoria de cálculo en texto o PDF
+(el PDF requiere el extra `pdf`: `pip install -e ".[pdf]"`, incluido en `dev`):
+
+```powershell
+python -m steel_design.run examples/channel_case.json --pdf            # results/channel_case.pdf
+python -m steel_design.run examples/channel_case.json --report m.txt --pdf m.pdf
+```
+
+Sin ruta, `--report` y `--pdf` escriben en `results/<nombre del JSON>`: carpeta local,
+creada al pedirla, ignorada por Git y nunca leída por el motor. Los ejemplos y la
+documentación no guardan memorias generadas (se regeneran con el comando).
+
+Desde Python:
 
 ```python
 from steel_design.engine import SteelDesignEngine
@@ -46,6 +59,13 @@ result = SteelDesignEngine(repo).run(SteelCase(
     lengths={"Lx": 4000, "Ly": 1000, "Lz": 4000}))
 print(result.status, result.capacity_kN, result.compression["governing_mode"])  # PASS 2254.31 FTB
 ```
+
+La memoria se obtiene del mismo resultado, sin recalcular:
+`blocks = report_blocks(case, result)` (modelo del documento), `render_text(blocks)`
+(texto) y `pdf_bytes([blocks, ...])` (PDF en memoria, p. ej. para una respuesta web),
+todos en `steel_design.reporting`. El PDF usa una fuente Unicode del sistema
+(DejaVu Sans, Segoe UI o Arial) para φ, Ω, λ y Σ; sin ella recurre a Helvetica con
+símbolos escritos en letras.
 
 ### Entrada (unidades: mm, MPa, kN)
 

@@ -11,10 +11,10 @@ commit `d3a1b02`) y se reincorporarán, uno por vez, con la misma estructura.
   ([detalle](chapter-e.md)).
 - Comprobación de obligaciones independiente de la selección.
 - Ejecución en memoria; CLI sin escritura por defecto.
+- Memoria de cálculo en texto y PDF generada desde el resultado estructurado.
 
 ## Siguiente
 
 1. Revisión ingenieril de las decisiones D-1 a D-12 de [chapter-e.md](chapter-e.md).
-2. Memoria de cálculo legible (texto/PDF) a partir del resultado estructurado.
-3. Reincorporar capítulos por orden (D, F, G, H) con oráculos independientes.
-4. Aplicación web sobre `steel_design.execution.execute_payload`.
+2. Reincorporar capítulos por orden (D, F, G, H) con oráculos independientes.
+3. Aplicación web sobre `steel_design.execution.execute_payload`.
