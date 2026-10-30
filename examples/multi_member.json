@@ -1,5 +1,4 @@
 {
-  "design_method": "LRFD",
   "material": {
     "Fy": 345,
     "Fu": 450

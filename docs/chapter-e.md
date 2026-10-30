@@ -29,33 +29,33 @@ declarado. No es una validación por terceros.
 directamente y sin importar el paquete. Resultados (kN); L = 3000 mm y K = 1 salvo
 indicación:
 
-| Caso | Perfil y datos | Fy | Esbelto | Gobierna | Pn | φPn | Pn/Ω |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| RHSS-nonslender | PTE100X100X4MM | 345 | no | FB-x | 312.96 | 281.67 | 187.40 |
-| RHSS-slender | PTE120X60X2MM, L=1500 | 345 | sí | FB-y | 140.66 | 126.59 | 84.23 |
-| RHSS-torsional-length-E4-2 | PTE150X50X3MM, L=1000, Lz=6000 | 345 | sí | FB-y | 266.31 | 239.68 | 159.47 |
-| C-flexural | C15X50 | 345 | no | FB-y | 882.55 | 794.30 | 528.47 |
-| C-flexural-torsional | C15X50, L=1000 | 345 | no | FB-y | 2811.81 | 2530.63 | 1683.72 |
-| C-FTB-governs | C15X50, L=4000, Ly=1000 | 345 | no | FTB | 2504.79 | 2254.31 | 1499.87 |
-| C-slender | C12X20.7, L=1500 | 450 | sí | FB-y | 1042.30 | 938.07 | 624.13 |
-| W-torsional | W14X90 | 345 | no | TB | 5466.31 | 4919.68 | 3273.24 |
-| W-slender-web | W8X10 | 345 | sí | FB-y | 168.25 | 151.42 | 100.75 |
-| W-bracing-offset-E4-10 | W14X90, L=6000, ya=200 | 345 | no | FB-y | 4379.00 | 3941.10 | 2622.16 |
-| CHSS-nonslender | PTER4"X3.00MM, L=2500 | 345 | no | FB-x | 251.31 | 226.18 | 150.49 |
-| CHSS-torsional-length | PTER4"X3.00MM, L=2500, Lz=5000 | 345 | no | FB-x | 251.31 | 226.18 | 150.49 |
-| CHSS-slender-E7-7 | PTER24"X12.70MM, L=8000 | 450 | sí | FB-x | 8653.36 | 7788.03 | 5181.66 |
-| L-E5a-equal | L4X4X1/4, L=2000, E5(a), ala larga | 250 | sí | FB-E5 | 147.20 | 132.48 | 88.14 |
-| L-E5b-short-leg | L6X4X3/8, L=2500, E5(b), ala corta | 250 | sí | FB-E5 | 313.38 | 282.04 | 187.65 |
-| L-E5a-slender-leg | L4X4X1/4, L=600, E5(a), ala larga | 345 | sí | FB-E5 | 233.52 | 210.17 | 139.83 |
-| L-E4-3-equal-legs | L4X4X1/4, L=2000, E5(a), ala larga | 450 | sí | FB-E5 | 152.37 | 137.14 | 91.24 |
-| L-E4-3-governs | L6X6X5/16, L=600, Lz=3000, E5(b), ala larga | 450 | sí | FTB | 489.10 | 440.19 | 292.88 |
-| L-E4-4-unequal-legs | L6X4X3/8, L=2000, E5(a), ala corta | 450 | sí | FB-E5 | 349.07 | 314.16 | 209.02 |
-| 2L-contact-welded | 2L4X4X1/4, L=2000, soldado, a=500 | 345 | sí | FTB | 536.70 | 483.03 | 321.38 |
-| 2L-separated-snug | 2L4X4X1/4X3/4, L=2000, snug-tight, a=800 | 345 | sí | FTB | 458.05 | 412.24 | 274.28 |
-| 2L-LLBB-pretensioned | 2L8X4X1/2LLBB, pretensado, a=1500 | 345 | sí | FTB | 1151.19 | 1036.07 | 689.33 |
+| Caso | Perfil y datos | Fy | Esbelto | Gobierna | Pn | φc·Pn |
+| --- | --- | --- | --- | --- | --- | --- |
+| RHSS-nonslender | PTE100X100X4MM | 345 | no | FB-x | 312.96 | 281.67 |
+| RHSS-slender | PTE120X60X2MM, L=1500 | 345 | sí | FB-y | 140.66 | 126.59 |
+| RHSS-torsional-length-E4-2 | PTE150X50X3MM, L=1000, Lz=6000 | 345 | sí | FB-y | 266.31 | 239.68 |
+| C-flexural | C15X50 | 345 | no | FB-y | 882.55 | 794.30 |
+| C-flexural-torsional | C15X50, L=1000 | 345 | no | FB-y | 2811.81 | 2530.63 |
+| C-FTB-governs | C15X50, L=4000, Ly=1000 | 345 | no | FTB | 2504.79 | 2254.31 |
+| C-slender | C12X20.7, L=1500 | 450 | sí | FB-y | 1042.30 | 938.07 |
+| W-torsional | W14X90 | 345 | no | TB | 5466.31 | 4919.68 |
+| W-slender-web | W8X10 | 345 | sí | FB-y | 168.25 | 151.42 |
+| W-bracing-offset-E4-10 | W14X90, L=6000, ya=200 | 345 | no | FB-y | 4379.00 | 3941.10 |
+| CHSS-nonslender | PTER4"X3.00MM, L=2500 | 345 | no | FB-x | 251.31 | 226.18 |
+| CHSS-torsional-length | PTER4"X3.00MM, L=2500, Lz=5000 | 345 | no | FB-x | 251.31 | 226.18 |
+| CHSS-slender-E7-7 | PTER24"X12.70MM, L=8000 | 450 | sí | FB-x | 8653.36 | 7788.03 |
+| L-E5a-equal | L4X4X1/4, L=2000, E5(a), ala larga | 250 | sí | FB-E5 | 147.20 | 132.48 |
+| L-E5b-short-leg | L6X4X3/8, L=2500, E5(b), ala corta | 250 | sí | FB-E5 | 313.38 | 282.04 |
+| L-E5a-slender-leg | L4X4X1/4, L=600, E5(a), ala larga | 345 | sí | FB-E5 | 233.52 | 210.17 |
+| L-E4-3-equal-legs | L4X4X1/4, L=2000, E5(a), ala larga | 450 | sí | FB-E5 | 152.37 | 137.14 |
+| L-E4-3-governs | L6X6X5/16, L=600, Lz=3000, E5(b), ala larga | 450 | sí | FTB | 489.10 | 440.19 |
+| L-E4-4-unequal-legs | L6X4X3/8, L=2000, E5(a), ala corta | 450 | sí | FB-E5 | 349.07 | 314.16 |
+| 2L-contact-welded | 2L4X4X1/4, L=2000, soldado, a=500 | 345 | sí | FTB | 536.70 | 483.03 |
+| 2L-separated-snug | 2L4X4X1/4X3/4, L=2000, snug-tight, a=800 | 345 | sí | FTB | 458.05 | 412.24 |
+| 2L-LLBB-pretensioned | 2L8X4X1/2LLBB, pretensado, a=1500 | 345 | sí | FTB | 1151.19 | 1036.07 |
 
-El software coincide con todos los modos (Fe, Fn, área, Pn) en LRFD y ASD con
-tolerancia relativa 1e-9.
+El software coincide con todos los modos (Fe, Fn, área, Pn) y con φc·Pn (LRFD) con
+tolerancia relativa 1e-9. El programa trabaja solo con LRFD (φc = 0,90).
 
 ## Decisiones ingenieriles vigentes
 
@@ -65,6 +65,7 @@ tolerancia relativa 1e-9.
 - **D-4** Ancho de paredes de PTE rectangular: columna `b`/`h` del catálogo = dimensión exterior − 3·tdes (B4.1b(d), radio interior no conocido).
 - **D-5** Ángulos (E5): `ra` es ry si se conecta el ala larga y rx si se conecta la corta (convención del catálogo: rx > ry, ala larga paralela a y). En alas iguales se usa el ala larga.
 - **D-6** E = 200000 MPa obligatorio; otro valor se rechaza.
+- **D-13** Solo LRFD (indicación del usuario): φc = 0,90 (E1).
 - **D-7** PTE rectangular con Lz > min(Lx, Ly): E4-2 con el término de Cw omitido, porque el catálogo no trae Cw (indicación del usuario; es el Fe más bajo de E4-2).
 - **D-8** Ángulo simple, E4: se usa r̄o del catálogo. Alas iguales: E4-3 con el eje w como eje de simetría (Few) y H del catálogo. Alas desiguales: E4-4 con las coordenadas del centro de corte en ejes principales (wo, zo), obtenidas de x, y, t y tan α (intersección de las líneas medias de las alas); se verifica que reproducen el r̄o del catálogo (E4-9) con tolerancia del 2 % (máximo observado 0,65 %).
 - **D-9** Ángulo simple, E4: longitud efectiva sobre los ejes principales = Kx·Lx, que exige Lx = Ly y Kx = Ky (si no, se bloquea); Lcz = Kz·Lz. Pn = Fn·Ag (E4-1), porque E4 se aplica a ángulos con b/t > 0,71√(E/Fy) y E7 limita su Fn a E3.

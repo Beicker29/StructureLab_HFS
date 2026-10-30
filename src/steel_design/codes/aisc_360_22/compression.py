@@ -10,7 +10,6 @@ import math
 E_STEEL = 200000.0   # MPa, S22 E3 (definition of E)
 G_STEEL = 77200.0    # MPa, S22 E4 (definition of G)
 PHI_C = 0.90         # S22 E1, LRFD
-OMEGA_C = 1.67       # S22 E1, ASD
 
 # Table B4.1a, members subjected to axial compression: case -> (coefficient, form)
 _B41A = {
@@ -196,15 +195,7 @@ def e7_round_hss_area(*, Ag: float, D_over_t: float, E: float, Fy: float) -> dic
     return {"Ae_mm2": min(ae, Ag), "Ae_equation_mm2": ae, "equation": "E7-7", "bounded_to_Ag": ae > Ag}
 
 
-def available_strength(Pn_N: float) -> dict:
-    """E1: phi_c*Pn (LRFD) and Pn/Omega_c (ASD), in kN."""
-    return {"LRFD": PHI_C * Pn_N / 1000.0, "ASD": Pn_N / OMEGA_C / 1000.0}
+def available_strength(Pn_N: float) -> float:
+    """E1: design compressive strength phi_c*Pn (LRFD), in kN."""
+    return PHI_C * Pn_N / 1000.0
 
-
-def design_factor(method: str) -> dict:
-    """E1 factor for "LRFD" or "ASD" (DesignMethod is a str enum)."""
-    if method == "LRFD":
-        return {"design_method": "LRFD", "phi": PHI_C, "omega": None, "capacity_expression": "phi*Pn"}
-    if method == "ASD":
-        return {"design_method": "ASD", "phi": None, "omega": OMEGA_C, "capacity_expression": "Pn/omega"}
-    raise ValueError(f"Método de diseño no admitido: {method!r}; se esperaba LRFD o ASD")

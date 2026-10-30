@@ -1,6 +1,5 @@
 {
   "section_name": "2L4X4X1/4",
-  "design_method": "LRFD",
   "material": {
     "Fy": 345,
     "Fu": 450

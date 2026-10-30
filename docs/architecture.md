@@ -7,10 +7,10 @@ src/steel_design/
 ├── sections/                    catálogo: loader.py (hojas/cabeceras del Excel → Section, unidades),
 │                                models.py, repository.py, geometry.py (macizos), identity.py (nombres, AISC_Manual_Label 2L)
 ├── codes/aisc_360_22/
-│   ├── tension.py               fórmulas puras D2-1, D2-2, D3-1 y factores φt/Ωt
+│   ├── tension.py               fórmulas puras D2-1, D2-2, D3-1 y factores φt
 │   └── compression.py           fórmulas puras E1, E3–E7 y límites λr de B4.1a
 ├── domain/
-│   ├── tension.py               capítulo D: fluencia y rotura, gobierno por resistencia disponible
+│   ├── tension.py               capítulo D: fluencia y rotura, gobierno por resistencia de diseño φt·Pn
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
 │   ├── coverage.py              obligaciones de los capítulos D y E derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección
@@ -42,8 +42,8 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 
 | Concepto | Propietario |
 | --- | --- |
-| Ecuaciones D2-1, D2-2, D3-1, φt/Ωt | `codes/aisc_360_22/tension.py` |
-| Ecuaciones E3-2…E7-7, φc/Ωc, λr | `codes/aisc_360_22/compression.py` |
+| Ecuaciones D2-1, D2-2, D3-1, φt | `codes/aisc_360_22/tension.py` |
+| Ecuaciones E3-2…E7-7, φc, λr | `codes/aisc_360_22/compression.py` |
 | Estados límite de tracción y modo gobernante | `domain/tension.py` |
 | Elementos B4.1a por familia, selección de modos, E7 por modo | `domain/compression.py` |
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |

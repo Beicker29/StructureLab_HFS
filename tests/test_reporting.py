@@ -22,7 +22,7 @@ def test_report_shows_inputs_modes_and_governing_values(engine):
     for name, mode in c["modes"].items():
         assert f"Modo {name}:" in text and _fmt(mode["Pn_kN"]) in text and mode["Fe_equation"] in text
     assert "Modo gobernante: FTB" in text
-    assert _fmt(c["available"]["LRFD"]) in text and _fmt(c["available"]["ASD"]) in text
+    assert _fmt(c["available_kN"]) in text and "Pn/Ω" not in text and "ASD" not in text
     assert _fmt(result.ratio) in text
 
 

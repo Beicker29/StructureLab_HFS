@@ -13,22 +13,16 @@
     "TY": {
      "Pn_kN": "5899.5",
      "LRFD_kN": "5309.550",
-     "ASD_kN": "3532.634730538922155688622754",
      "area_mm2": "17100"
     },
     "TR": {
      "Pn_kN": "6075.0",
      "LRFD_kN": "4556.250",
-     "ASD_kN": "3037.5",
      "area_mm2": "13500.0"
     }
    },
    "LRFD_kN": "4556.250",
-   "ASD_kN": "3037.5",
-   "governing": {
-    "LRFD": "TR",
-    "ASD": "TR"
-   }
+   "governing": "TR"
   },
   "W-yielding-governs": {
    "family": "W",
@@ -41,24 +35,18 @@
     "TY": {
      "Pn_kN": "5899.5",
      "LRFD_kN": "5309.550",
-     "ASD_kN": "3532.634730538922155688622754",
      "area_mm2": "17100"
     },
     "TR": {
      "Pn_kN": "7695",
      "LRFD_kN": "5771.25",
-     "ASD_kN": "3847.5",
      "area_mm2": "17100"
     }
    },
    "LRFD_kN": "5309.550",
-   "ASD_kN": "3532.634730538922155688622754",
-   "governing": {
-    "LRFD": "TY",
-    "ASD": "TY"
-   }
+   "governing": "TY"
   },
-  "W-governing-differs-by-method": {
+  "W-rupture-governs-larger-Pn": {
    "family": "W",
    "section": "W14X90",
    "Fy": 345,
@@ -69,22 +57,16 @@
     "TY": {
      "Pn_kN": "5899.5",
      "LRFD_kN": "5309.550",
-     "ASD_kN": "3532.634730538922155688622754",
      "area_mm2": "17100"
     },
     "TR": {
      "Pn_kN": "7073.55",
      "LRFD_kN": "5305.1625",
-     "ASD_kN": "3536.775",
      "area_mm2": "15719"
     }
    },
    "LRFD_kN": "5305.1625",
-   "ASD_kN": "3532.634730538922155688622754",
-   "governing": {
-    "LRFD": "TR",
-    "ASD": "TY"
-   }
+   "governing": "TR"
   },
   "C-case2-U": {
    "family": "CHANNEL",
@@ -97,22 +79,16 @@
     "TY": {
      "Pn_kN": "2370",
      "LRFD_kN": "2133.00",
-     "ASD_kN": "1419.161676646706586826347305",
      "area_mm2": "9480"
     },
     "TR": {
      "Pn_kN": "2924.00",
      "LRFD_kN": "2193.0000",
-     "ASD_kN": "1462",
      "area_mm2": "7310.00"
     }
    },
    "LRFD_kN": "2133.00",
-   "ASD_kN": "1419.161676646706586826347305",
-   "governing": {
-    "LRFD": "TY",
-    "ASD": "TY"
-   }
+   "governing": "TY"
   },
   "L-case8-U": {
    "family": "SINGLE_ANGLE",
@@ -125,22 +101,16 @@
     "TY": {
      "Pn_kN": "312.5",
      "LRFD_kN": "281.250",
-     "ASD_kN": "187.1257485029940119760479042",
      "area_mm2": "1250"
     },
     "TR": {
      "Pn_kN": "264.0",
      "LRFD_kN": "198.000",
-     "ASD_kN": "132",
      "area_mm2": "660.0"
     }
    },
    "LRFD_kN": "198.000",
-   "ASD_kN": "132",
-   "governing": {
-    "LRFD": "TR",
-    "ASD": "TR"
-   }
+   "governing": "TR"
   },
   "2L-welded": {
    "family": "DOUBLE_ANGLE",
@@ -153,22 +123,16 @@
     "TY": {
      "Pn_kN": "859.05",
      "LRFD_kN": "773.1450",
-     "ASD_kN": "514.4011976047904191616766467",
      "area_mm2": "2490"
     },
     "TR": {
      "Pn_kN": "974.835",
      "LRFD_kN": "731.12625",
-     "ASD_kN": "487.4175",
      "area_mm2": "2166.30"
     }
    },
    "LRFD_kN": "731.12625",
-   "ASD_kN": "487.4175",
-   "governing": {
-    "LRFD": "TR",
-    "ASD": "TR"
-   }
+   "governing": "TR"
   },
   "RHSS-slotted": {
    "family": "RECTANGULAR_HSS",
@@ -181,22 +145,16 @@
     "TY": {
      "Pn_kN": "481.9682593296474675",
      "LRFD_kN": "433.771433396682720750",
-     "ASD_kN": "288.6037481015853098802395210",
      "area_mm2": "1397.0094473323115"
     },
     "TR": {
      "Pn_kN": "486.00",
      "LRFD_kN": "364.5000",
-     "ASD_kN": "243",
      "area_mm2": "1080.00"
     }
    },
    "LRFD_kN": "364.5000",
-   "ASD_kN": "243",
-   "governing": {
-    "LRFD": "TR",
-    "ASD": "TR"
-   }
+   "governing": "TR"
   },
   "CHSS-slotted": {
    "family": "CIRCULAR_HSS",
@@ -209,22 +167,16 @@
     "TY": {
      "Pn_kN": "337.199550371570589",
      "LRFD_kN": "303.47959533441353010",
-     "ASD_kN": "201.9158984260901730538922156",
      "area_mm2": "977.3900010770162"
     },
     "TR": {
      "Pn_kN": "371.925",
      "LRFD_kN": "278.94375",
-     "ASD_kN": "185.9625",
      "area_mm2": "826.50"
     }
    },
    "LRFD_kN": "278.94375",
-   "ASD_kN": "185.9625",
-   "governing": {
-    "LRFD": "TR",
-    "ASD": "TR"
-   }
+   "governing": "TR"
   }
  }
 }

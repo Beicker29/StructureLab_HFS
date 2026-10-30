@@ -1,6 +1,5 @@
 {
   "section_name": "W14X90",
-  "design_method": "LRFD",
   "material": {
     "Fy": 345,
     "Fu": 450

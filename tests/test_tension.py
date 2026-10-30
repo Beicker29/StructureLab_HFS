@@ -17,35 +17,32 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_d/reference.json").read_t
 REL = 1e-12
 
 
-def tension_case(name, *, Pu=-100, Fy=345, Fu=450, An=None, U=1.0, method="LRFD", **extra):
+def tension_case(name, *, Pu=-100, Fy=345, Fu=450, An=None, U=1.0, **extra):
     tension = {"An": An, "U": U} if An is not None else None
-    return SteelCase(section_name=name, design_method=method, material={"Fy": Fy, "Fu": Fu}, Pu=Pu,
+    return SteelCase(section_name=name, material={"Fy": Fy, "Fu": Fu}, Pu=Pu,
                      tension=tension, **extra)
 
 
-@pytest.mark.parametrize("method", ["LRFD", "ASD"])
 @pytest.mark.parametrize("case_id", sorted(REFERENCE))
-def test_catalog_profiles_match_independent_calculation(engine, case_id, method):
+def test_catalog_profiles_match_independent_calculation(engine, case_id):
     ref = REFERENCE[case_id]
     result = engine.run(tension_case(ref["section"], Fy=ref["Fy"], Fu=ref["Fu"], An=float(ref["An"]),
-                                     U=float(ref["U"]), method=method))
+                                     U=float(ref["U"])))
     t = result.tension
     assert result.chapter == "D" and result.family == ref["family"]
     for mode, expected in ref["modes"].items():
         assert t["modes"][mode]["Pn_kN"] == pytest.approx(float(expected["Pn_kN"]), rel=REL)
         assert t["modes"][mode]["area_mm2"] == pytest.approx(float(expected["area_mm2"]), rel=REL)
-        assert t["modes"][mode]["available_kN"]["LRFD"] == pytest.approx(float(expected["LRFD_kN"]), rel=REL)
-        assert t["modes"][mode]["available_kN"]["ASD"] == pytest.approx(float(expected["ASD_kN"]), rel=REL)
-    assert t["available"]["LRFD"] == pytest.approx(float(ref["LRFD_kN"]), rel=REL)
-    assert t["available"]["ASD"] == pytest.approx(float(ref["ASD_kN"]), rel=REL)
-    assert t["governing_mode"] == ref["governing"][method]
-    assert result.capacity_kN == t["available"][method]
+        assert t["modes"][mode]["available_kN"] == pytest.approx(float(expected["LRFD_kN"]), rel=REL)
+    assert t["available_kN"] == pytest.approx(float(ref["LRFD_kN"]), rel=REL)
+    assert t["governing_mode"] == ref["governing"]
+    assert result.capacity_kN == t["available_kN"]
 
 
 def test_reference_bank_covers_all_catalog_families_and_both_governing_modes():
     assert {c["family"] for c in REFERENCE.values()} == {
         "W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE"}
-    assert any(c["governing"]["LRFD"] != c["governing"]["ASD"] for c in REFERENCE.values())
+    assert {c["governing"] for c in REFERENCE.values()} == {"TY", "TR"}
 
 
 def test_governing_is_lowest_available_not_lowest_nominal(engine):

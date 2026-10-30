@@ -1,6 +1,5 @@
 {
   "section_name": "PTE100X100X4MM",
-  "design_method": "ASD",
   "material": {
     "Fy": 345,
     "Fu": 450

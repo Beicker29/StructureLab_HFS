@@ -31,19 +31,18 @@ def case(family, name, Fy, Fu, An, U):
     ty = fy * ag / 1000                     # D2-1 (kN)
     ae = an * u                             # D3-1
     tr = fu * ae / 1000                     # D2-2 (kN)
-    modes = {"TY": {"Pn_kN": ty, "LRFD_kN": D("0.90") * ty, "ASD_kN": ty / D("1.67"), "area_mm2": ag},
-             "TR": {"Pn_kN": tr, "LRFD_kN": D("0.75") * tr, "ASD_kN": tr / D("2.00"), "area_mm2": ae}}
+    modes = {"TY": {"Pn_kN": ty, "LRFD_kN": D("0.90") * ty, "area_mm2": ag},     # phi_t = 0.90
+             "TR": {"Pn_kN": tr, "LRFD_kN": D("0.75") * tr, "area_mm2": ae}}     # phi_t = 0.75
     return {"family": family, "section": name, "Fy": Fy, "Fu": Fu, "An": An, "U": U, "modes": modes,
             "LRFD_kN": min(m["LRFD_kN"] for m in modes.values()),
-            "ASD_kN": min(m["ASD_kN"] for m in modes.values()),
-            "governing": {k: min(modes, key=lambda n: modes[n][k + "_kN"]) for k in ("LRFD", "ASD")}}
+            "governing": min(modes, key=lambda n: modes[n]["LRFD_kN"])}
 
 
 CASES = {
     "W-rupture-governs": dict(family="W", name="W14X90", Fy=345, Fu=450, An=15000, U="0.9"),
     "W-yielding-governs": dict(family="W", name="W14X90", Fy=345, Fu=450, An=17100, U=1),
-    # TR/TY nominal ratio 1.1990 lies between 2/1.67 = 1.1976 (ASD) and 0.90/0.75 = 1.2 (LRFD): LRFD -> TR, ASD -> TY.
-    "W-governing-differs-by-method": dict(family="W", name="W14X90", Fy=345, Fu=450, An=15719, U=1),
+    # Nominal TR/TY = 1.199 < 0.90/0.75 = 1.2: rupture governs although its Pn is the larger one.
+    "W-rupture-governs-larger-Pn": dict(family="W", name="W14X90", Fy=345, Fu=450, An=15719, U=1),
     "C-case2-U": dict(family="CHANNEL", name="C15X50", Fy=250, Fu=400, An=8600, U="0.85"),
     "L-case8-U": dict(family="SINGLE_ANGLE", name="L4X4X1/4", Fy=250, Fu=400, An=1100, U="0.6"),
     "2L-welded": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", Fy=345, Fu=450, An=2490, U="0.87"),

@@ -1,8 +1,8 @@
 """Chapter D for one member: tensile yielding (D2-1) and tensile rupture (D2-2, D3-1).
 
 An (B4.3b) and U (Table D3.1) are user data. Both limit states are always
-evaluated; the governing one is the lowest available strength of each method,
-because their resistance factors differ (D2). Formulas live in codes/aisc_360_22/tension.py.
+evaluated; the governing one is the lowest design strength phi_t*Pn, not the
+lowest Pn, because their resistance factors differ (D2). LRFD only. Formulas live in codes/aisc_360_22/tension.py.
 """
 import math
 
@@ -31,7 +31,6 @@ def least_radius(section: Section) -> float | None:
 
 def tension_strength(case: SteelCase, section: Section) -> dict:
     """Nominal and available tensile strength of one member (Chapter D)."""
-    method = case.design_method.value
     if case.tension is None:
         _incomplete("La tracción requiere tension: An (B4.3b) y U (Tabla D3.1).", section, ["tension.An", "tension.U"])
     if case.material.Fu is None:
@@ -50,14 +49,13 @@ def tension_strength(case: SteelCase, section: Section) -> dict:
     modes = {
         "TY": {"limit_state": "tensile_yielding", "provision": "D2(a)", "area_basis": "Ag", "area_mm2": ag,
                "stress_mpa": case.material.Fy, "Pn_equation": yielding["equation"], "Pn_kN": yielding["Pn_N"] / 1000.0,
-               "available_kN": eq.available_strength(yielding["Pn_N"], "yielding")},
+               "phi_t": eq.PHI_T["yielding"], "available_kN": eq.available_strength(yielding["Pn_N"], "yielding")},
         "TR": {"limit_state": "tensile_rupture", "provision": "D2(b) + D3", "area_basis": "Ae", "area_mm2": net["Ae_mm2"],
                "An_mm2": an, "U": u, "Ae_equation": net["equation"], "stress_mpa": case.material.Fu,
                "Pn_equation": rupture["equation"], "Pn_kN": rupture["Pn_N"] / 1000.0,
-               "available_kN": eq.available_strength(rupture["Pn_N"], "rupture")},
+               "phi_t": eq.PHI_T["rupture"], "available_kN": eq.available_strength(rupture["Pn_N"], "rupture")},
     }
-    governing = {m: min(modes, key=lambda k: modes[k]["available_kN"][m]) for m in ("LRFD", "ASD")}
-    available = {m: modes[governing[m]]["available_kN"][m] for m in ("LRFD", "ASD")}
+    governing = min(modes, key=lambda k: modes[k]["available_kN"])
 
     notes = []
     radius, length = least_radius(section), case.tension.fabricated_length
@@ -72,16 +70,14 @@ def tension_strength(case: SteelCase, section: Section) -> dict:
                      "(se recomienda esbeltez de cada componente entre conectores ≤ 300).")
     return {
         "chapter": "D", "code": "ANSI/AISC 360-22",
-        "section": section.name, "family": section.type.upper(), "design_method": method,
+        "section": section.name, "family": section.type.upper(),
         "inputs": {"Fy_mpa": case.material.Fy, "Fu_mpa": case.material.Fu, "Ag_mm2": ag, "An_mm2": an, "U": u},
         "provisions": ["D2", "D3"],
         "modes": modes,
-        "governing_mode": governing[method],
-        "governing_equation": modes[governing[method]]["Pn_equation"],
-        "Pn_kN": modes[governing[method]]["Pn_kN"],
-        "available": available,
-        "available_kN": available[method],
-        "governing_by_method": governing,
+        "governing_mode": governing,
+        "governing_equation": modes[governing]["Pn_equation"],
+        "Pn_kN": modes[governing]["Pn_kN"],
+        "available_kN": modes[governing]["available_kN"],
         "requirements": [],
         "notes": notes,
         "limitations": list(_LIMITATIONS),

@@ -31,9 +31,8 @@ class SteelDesignEngine:
         section = self.section_for(case)
         chapter = "E" if case.Pu > 0 else "D"
         obligations = required_obligations(case, section)
-        common = dict(section=section.name, family=section.type, design_method=case.design_method.value,
-                      chapter=chapter, demand_kN=abs(case.Pu), obligations=obligations,
-                      section_data=section.model_dump(mode="json", exclude_none=True))
+        common = dict(section=section.name, family=section.type, chapter=chapter, demand_kN=abs(case.Pu),
+                      obligations=obligations, section_data=section.model_dump(mode="json", exclude_none=True))
         try:
             result = (compression_strength(case, section, catalog=self._catalog) if chapter == "E"
                       else tension_strength(case, section))

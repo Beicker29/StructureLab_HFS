@@ -1,12 +1,12 @@
 """ANSI/AISC 360-22 Chapter D formulations (tension). Pure functions; units N, mm, MPa.
 
-Each limit state has its own resistance factor, so available strengths are
-computed per limit state (D2) and the lowest available value governs.
+Each limit state has its own resistance factor, so design strengths are
+computed per limit state (D2) and the lowest design strength governs. LRFD only.
 """
 import math
 
-# D2(a) tensile yielding and D2(b) tensile rupture: (phi_t LRFD, Omega_t ASD)
-FACTORS = {"yielding": (0.90, 1.67), "rupture": (0.75, 2.00)}
+# D2(a) tensile yielding and D2(b) tensile rupture: phi_t (LRFD)
+PHI_T = {"yielding": 0.90, "rupture": 0.75}
 
 
 def _positive(**values):
@@ -35,7 +35,6 @@ def rupture_strength(*, Fu: float, Ae: float) -> dict:
     return {"Pn_N": Fu * Ae, "equation": "D2-2"}
 
 
-def available_strength(Pn_N: float, limit_state: str) -> dict:
-    """phi_t*Pn (LRFD) and Pn/Omega_t (ASD) in kN, with the D2 factors of that limit state."""
-    phi, omega = FACTORS[limit_state]
-    return {"LRFD": phi * Pn_N / 1000.0, "ASD": Pn_N / omega / 1000.0, "phi": phi, "omega": omega}
+def available_strength(Pn_N: float, limit_state: str) -> float:
+    """Design tensile strength phi_t*Pn (LRFD) in kN, with the D2 factor of that limit state."""
+    return PHI_T[limit_state] * Pn_N / 1000.0

@@ -5,11 +5,6 @@ from typing import Annotated, Literal, Optional
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 
 
-class DesignMethod(str, Enum):
-    LRFD = "LRFD"
-    ASD = "ASD"
-
-
 # JSON numbers only: bool and numeric strings are not engineering magnitudes.
 FiniteNumber = Annotated[float, Field(strict=True, allow_inf_nan=False)]
 PositiveNumber = Annotated[FiniteNumber, Field(gt=0)]
@@ -123,10 +118,9 @@ class SteelCase(InputModel):
     section_name: NonBlankString
     material: Material
     Pu: FiniteNumber = Field(..., description="Required axial strength (kN): > 0 compression (Chapter E), "
-                                               "< 0 tension (Chapter D); LRFD or ASD combination")
+                                               "< 0 tension (Chapter D); LRFD load combination")
     lengths: Optional[Lengths] = Field(None, description="Unbraced lengths; required for compression")
     factors: Factors = Field(default_factory=Factors)
-    design_method: DesignMethod = DesignMethod.LRFD
     single_angle_e5: Optional[SingleAngleE5Basis] = None
     double_angle_e6: Optional[DoubleAngleE6Basis] = None
     tension: Optional[TensionBasis] = None
@@ -158,12 +152,11 @@ class Obligation(BaseModel):
 class DesignResult(BaseModel):
     section: str
     family: str
-    design_method: str
     status: Status
     chapter: Literal["D", "E"]
     demand_kN: float = Field(..., description="|Pu| (kN)")
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
-    capacity_kN: Optional[float] = None
+    capacity_kN: Optional[float] = Field(None, description="Design strength phi*Pn (LRFD), kN")
     ratio: Optional[float] = None
     compression: Optional[dict] = Field(None, description="Full Chapter E result (modes, equations, intermediates)")
     tension: Optional[dict] = Field(None, description="Full Chapter D result (limit states, equations, intermediates)")

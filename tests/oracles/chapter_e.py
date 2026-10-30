@@ -221,7 +221,7 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None):
     pn = out[gov]["Pn_kN"]
     return {"family": family, "section": name, "Fy": fy, "Lx": Lx, "Ly": Ly, "Lz": Lz, "ya": ya, "e5": e5,
             "e6": e6, "slender": slender, "modes": out, "governing_mode": gov, "Pn_kN": pn,
-            "LRFD_kN": D("0.90") * pn, "ASD_kN": pn / D("1.67")}
+            "LRFD_kN": D("0.90") * pn}
 
 
 CASES = {

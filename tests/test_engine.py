@@ -44,10 +44,9 @@ def test_pass_fail_boundary_is_ratio_one(engine):
     assert engine.run(steel_case("PTE100X100X4MM", Pu=math.nextafter(capacity, math.inf))).status.value == "FAIL"
 
 
-def test_asd_and_lrfd_differ_only_by_e1_factors(engine):
-    lrfd = engine.run(steel_case("C15X50")).capacity_kN
-    asd = engine.run(steel_case("C15X50", method="ASD")).capacity_kN
-    assert lrfd == pytest.approx(asd * 0.90 * 1.67, rel=1e-12)
+def test_capacity_is_lrfd_design_strength(engine):
+    result = engine.run(steel_case("C15X50"))
+    assert result.capacity_kN == pytest.approx(0.90 * result.compression["Pn_kN"], rel=1e-15)
 
 
 @pytest.mark.parametrize("name, kwargs", [
