@@ -28,7 +28,7 @@ def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):
     run = cli(ROOT / "examples/channel.json", cwd=tmp_path)
     assert run.returncode == 0, run.stderr
     output = json.loads(run.stdout)
-    compression, tension = output["cases"]
+    compression, tension = output["cases"][:2]
     assert output["status"] == "PASS" and compression["checks"][0]["result"]["governing_mode"] == "FTB"
     assert tension["checks"][0]["chapter"] == "D" and output["governing"]["name"] == tension["name"]  # larger ratio
     assert list(tmp_path.iterdir()) == []

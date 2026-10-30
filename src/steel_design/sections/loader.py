@@ -24,13 +24,15 @@ SHEET_FAMILY = {"W_IPE_HEA_HEB": "W", "C": "CHANNEL", "L": "SINGLE_ANGLE", "2L":
 COLUMNS = {
     "area": "A", "d": "d", "h": "h", "bf": "bf", "b": "b", "od": "OD", "tf": "tf", "t": "t", "tdes": "tdes",
     "tw": "tw", "ho": "ho", "h_out": "Ht", "b_out": "B", "ix": "Ix", "iy": "Iy", "iw": "Iw", "iz": "Iz", "x": "x", "y": "y",
-    "tan_alpha": "tan(α)", "sx": "Sx", "sy": "Sy", "zx": "Zx", "zy": "Zy", "rx": "rx", "ry": "ry", "rz": "rz", "j": "J", "cw": "Cw", "ro": "ro", "H": "H",
+    "tan_alpha": "tan(α)", "sx": "Sx", "sy": "Sy", "zx": "Zx", "zy": "Zy",
+    "sw_a": "SwA", "sw_b": "SwB", "sw_c": "SwC", "sz_a": "SzA", "sz_b": "SzB", "sz_c": "SzC", "rx": "rx", "ry": "ry", "rz": "rz", "j": "J", "cw": "Cw", "ro": "ro", "H": "H",
     "bf_2tf_ratio": "bf/2tf", "b_t_ratio": "b/t", "b_tdes_ratio": "b/tdes", "h_tw_ratio": "h/tw",
     "h_tdes_ratio": "h/tdes", "d_t_ratio": "D/t",
 }
 
 # AISC v16 metric database units: 10^6 mm4 (Ix, Iy, Iw, Iz), 10^3 mm4 (J), 10^3 mm3 (S, Z), 10^9 mm6 (Cw).
-SCALE = {"ix": 1e6, "iy": 1e6, "iw": 1e6, "iz": 1e6, "j": 1e3, "cw": 1e9, "sx": 1e3, "sy": 1e3, "zx": 1e3, "zy": 1e3}
+SCALE = {"ix": 1e6, "iy": 1e6, "iw": 1e6, "iz": 1e6, "j": 1e3, "cw": 1e9, "sx": 1e3, "sy": 1e3, "zx": 1e3, "zy": 1e3,
+         "sw_a": 1e3, "sw_b": 1e3, "sw_c": 1e3, "sz_a": 1e3, "sz_b": 1e3, "sz_c": 1e3}
 # Sheet-specific exceptions, verified with S = I/c (tests/test_catalog.py): PTE_RED stores Sx, Sy in mm3.
 SHEET_SCALE = {"PTE_RED": {"sx": 1.0, "sy": 1.0}}
 

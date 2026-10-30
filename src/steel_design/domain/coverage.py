@@ -20,7 +20,8 @@ EXPECTED_ELEMENTS = {
 
 # B4.1b flexure elements expected per (family, axis), and limit states per Table User Note F1.1.
 FLEXURE_ELEMENTS = {"W": {"flange", "web"}, "CHANNEL": {"flange", "web"}, "RECTANGULAR_HSS": {"flange", "web"},
-                    "CIRCULAR_HSS": {"wall"}, "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set()}
+                    "CIRCULAR_HSS": {"wall"}, "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(),
+                    "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"flange_legs", "web_legs"}}
 FLEXURE_STATES = {
     ("W", "x"): ("Y", "LTB", "FLB", "TFR"), ("CHANNEL", "x"): ("Y", "LTB", "FLB", "TFR"),
     ("W", "y"): ("Y", "FLB"), ("CHANNEL", "y"): ("Y", "FLB"),
@@ -37,8 +38,10 @@ def flexure_obligations(section: Section, axis: str) -> list[Obligation]:
     family = section.type.upper()
     if family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
         states = ("Y", "LTB")                     # F11
-    elif family in {"SINGLE_ANGLE", "DOUBLE_ANGLE"}:
-        states = ("Y", "LTB", "LLB")              # F9/F10 (stage 2)
+    elif family == "SINGLE_ANGLE":
+        states = ("Y", "LTB", "LLB")              # F10
+    elif family == "DOUBLE_ANGLE":
+        states = ("Y", "LTB", "FLB", "WLB")       # F9
     else:
         states = FLEXURE_STATES.get((family, axis), ("Y",))
     out = [Obligation(id="classification", provision="B4.1b",

@@ -8,13 +8,15 @@ src/steel_design/
 │                                models.py, repository.py, geometry.py (macizos), identity.py (nombres, AISC_Manual_Label 2L)
 ├── codes/aisc_360_22/
 │   ├── tension.py               fórmulas puras D2-1, D2-2, D3-1 y factores φt
+│   ├── flexure.py               fórmulas puras F2–F13.1, Se de F7 y límites λp/λr de B4.1b
 │   └── compression.py           fórmulas puras E1, E3–E7 y límites λr de B4.1a
 ├── domain/
 │   ├── tension.py               capítulo D: fluencia y rotura, gobierno por resistencia de diseño φt·Pn
+│   ├── flexure.py               capítulo F: clasificación B4.1b, sección F por familia y eje, estados límite
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
-│   ├── coverage.py              obligaciones de los capítulos D y E derivadas del texto, independientes
+│   ├── coverage.py              obligaciones de D, E y F derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección
-├── engine.py                    sección → capítulo D (Pu < 0) o E (Pu > 0) → obligaciones → estado
+├── engine.py                    una comprobación por demanda (D/E por Pu, F por Mux/Muy/Mw/Mz) → estado
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
 ├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
 └── run.py                       CLI (JSON en stdout; archivos solo con --output, --report, --pdf → results/ ignorado)
@@ -33,7 +35,7 @@ src/steel_design/
    `INCOMPLETE`; si no, `PASS` o `FAIL` según `Pu / disponible`.
 
 Los ángulos dobles leen su ángulo simple componente a través de la función
-`catalog` que el motor pasa a `compression_strength`.
+`catalog` que el motor pasa a `compression_strength` y `flexure_strength` (J del componente en F9).
 
 Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` o
 `IncompleteSectionDataError`; el motor lo convierte en `INCOMPLETE` con el motivo.
@@ -45,6 +47,9 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Ecuaciones D2-1, D2-2, D3-1, φt | `codes/aisc_360_22/tension.py` |
 | Ecuaciones E3-2…E7-7, φc, λr | `codes/aisc_360_22/compression.py` |
 | Estados límite de tracción y modo gobernante | `domain/tension.py` |
+| Ecuaciones F2–F13.1, φb, λp/λr (B4.1b), Se de F7 | `codes/aisc_360_22/flexure.py` |
+| Sección de F por familia y eje, estados límite de flexión | `domain/flexure.py` |
+| Coherencia de datos del catálogo (r = √(I/A), S = I/c) | `domain/validation.py` |
 | Elementos B4.1a por familia, selección de modos, E7 por modo | `domain/compression.py` |
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |
 | Hojas, cabeceras y unidades del catálogo; b/tdes, h/tdes, D/t de PTE | `sections/loader.py` |

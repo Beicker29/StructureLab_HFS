@@ -22,6 +22,10 @@
     "U": 0.6,
     "fabricated_length": 2000
   },
+  "flexure": {
+    "Lb": 2000,
+    "lateral_torsional_restraint": "none"
+  },
   "cases": [
     {
       "name": "Combinación 1 — compresión",
@@ -30,6 +34,20 @@
     {
       "name": "Combinación 2 — tracción",
       "Pu": -150
+    },
+    {
+      "name": "Combinación 3 — flexión x (puntera comprimida)",
+      "Mux": 3,
+      "angle_flexure": {
+        "toe": "compression"
+      }
+    },
+    {
+      "name": "Combinación 4 — flexión eje principal w",
+      "Mw": 5,
+      "angle_flexure": {
+        "leg_in_compression": "long"
+      }
     }
   ]
 }

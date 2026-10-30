@@ -1,8 +1,8 @@
 # StructureLab_HFS
 
-Motor de cálculo de la **resistencia axial de miembros de acero** según
-ANSI/AISC 360-22: capítulo D (tracción) y capítulo E (compresión) (`a360-22w.pdf`;
-las erratas de enero 2025 y septiembre 2026 del repositorio no modifican D ni E). Perfiles del catálogo
+Motor de cálculo de la **resistencia de miembros de acero** según ANSI/AISC 360-22,
+solo LRFD: capítulo D (tracción), capítulo E (compresión) y capítulo F (flexión)
+(`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026 del repositorio). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
 
@@ -74,11 +74,15 @@ símbolos escritos en letras.
 | `section_name` | Nombre del catálogo, o nombre libre con `custom_section` |
 | `material.Fy`, `material.Fu`, `material.E` | Fu es obligatorio en tracción; `E` debe ser 200000 MPa en compresión (definición de E3) |
 | `Pu` | Resistencia requerida de la combinación LRFD: > 0 compresión (capítulo E), < 0 tracción (capítulo D) |
+| `Mux`, `Muy` | Momentos requeridos de la combinación (kN·m) respecto de los ejes geométricos, capítulo F |
+| `Mw`, `Mz` | Solo ángulos simples: momentos respecto de los ejes principales mayor y menor (kN·m), F10 |
 | `lengths.Lx/Ly/Lz` | Longitudes no arriostradas por eje y torsional (obligatorias en compresión) |
 | `tension` | Tracción: `An` (área neta, B4.3b, mm²), `U` (Tabla D3.1) y opcional `fabricated_length` (nota D1); An y U los aporta el usuario |
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
 | `single_angle_e5` | Requerido para ángulos simples: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3) |
 | `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
+| `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos) y `beta_w` (mm, F10-4, alas desiguales) |
+| `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`) |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
@@ -91,8 +95,9 @@ Ver `examples/` (un archivo por familia y `multi_member.json` con varios perfile
 
 ### Salida
 
-`status` (`PASS`/`FAIL`/`INCOMPLETE`), `capacity_kN`, `ratio`, `obligations`,
-`errors` y `compression` con `classification`, `provisions`, `modes`
+`status` (`PASS`/`FAIL`/`INCOMPLETE`), `ratio` (máximo), `errors` y `checks`: una
+comprobación por demanda (`axial`, `flexure_x`, `flexure_y`) con `chapter`, `demand`,
+`capacity` (φRn), `ratio`, `status`, `obligations` y `result` con `classification`, `provisions`, `modes`
 (Fe, Fn, área, Pn y ecuaciones por modo), `governing_mode`, `Pn_kN`,
 `available_kN` (φPn, LRFD), `notes` y `limitations`. Un dominio no soportado o con
 datos faltantes devuelve `INCOMPLETE` con el motivo; nunca una resistencia supuesta.
@@ -102,5 +107,7 @@ datos faltantes devuelve `INCOMPLETE` con el motivo; nunca una resistencia supue
 - [Arquitectura](docs/architecture.md)
 - [Capítulo D: alcance, verificación y decisiones](docs/chapter-d.md)
 - [Capítulo E: alcance, familias, verificación y decisiones](docs/chapter-e.md)
+- [Verificación con los AISC Design Examples v16.0](docs/design-examples.md)
+- [Capítulo F: alcance, verificación, decisiones e incidencias del catálogo](docs/chapter-f.md)
 - [Pruebas y validación](CONTRIBUTING.md)
 - [Hoja de ruta](docs/ROADMAP.md)

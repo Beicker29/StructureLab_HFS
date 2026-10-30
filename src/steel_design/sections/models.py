@@ -42,6 +42,13 @@ class Section(InputModel):
     sy: Optional[NonNegativeNumber] = Field(None, alias="Sy", description="Elastic section modulus about y (mm^3)")
     zx: Optional[NonNegativeNumber] = Field(None, alias="Zx", description="Plastic section modulus about x (mm^3)")
     zy: Optional[NonNegativeNumber] = Field(None, alias="Zy", description="Plastic section modulus about y (mm^3)")
+    # Single angles: elastic moduli at point A (short-leg toe), B (heel), C (long-leg toe), principal axes w, z
+    sw_a: Optional[NonNegativeNumber] = Field(None, alias="SwA", description="Angle: S about w at point A (mm^3)")
+    sw_b: Optional[NonNegativeNumber] = Field(None, alias="SwB", description="Angle: S about w at point B (mm^3)")
+    sw_c: Optional[NonNegativeNumber] = Field(None, alias="SwC", description="Angle: S about w at point C (mm^3)")
+    sz_a: Optional[NonNegativeNumber] = Field(None, alias="SzA", description="Angle: S about z at point A (mm^3)")
+    sz_b: Optional[NonNegativeNumber] = Field(None, alias="SzB", description="Angle: S about z at point B (mm^3)")
+    sz_c: Optional[NonNegativeNumber] = Field(None, alias="SzC", description="Angle: S about z at point C (mm^3)")
     # Radius of gyration
     rx: Optional[NonNegativeNumber] = Field(None, description="Radius of gyration about x-axis (mm)")
     ry: Optional[NonNegativeNumber] = Field(None, description="Radius of gyration about y-axis (mm)")

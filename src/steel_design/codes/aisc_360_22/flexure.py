@@ -12,6 +12,7 @@ PHI_B = 0.90        # F1(a), LRFD
 # Table B4.1b (flexure): case -> (lambda_p coefficient, lambda_r coefficient, form)
 _B41B = {
     10: (0.38, 1.0, "sqrt"),   # flanges of rolled I-shapes, channels (major axis)
+    12: (0.54, 0.91, "sqrt"),  # legs of single angles (also double-angle legs through F9 -> F10.3)
     13: (0.38, 1.0, "sqrt"),   # flanges of I-shapes and channels, minor-axis flexure
     15: (3.76, 5.70, "sqrt"),  # webs of doubly symmetric I-shapes and channels
     17: (1.12, 1.40, "sqrt"),  # flanges of rectangular HSS
@@ -201,6 +202,85 @@ def f11_ltb(*, E, Fy, S, Z, d, t, Lb, Cb) -> dict:
         return {**out, "applies": True, "Mn": min(Cb * (1.52 - 0.274 * x * Fy / E) * Fy * S, mp), "equation": "F11-3"}
     fcr = 1.9 * E * Cb / x                                                      # F11-5
     return {**out, "applies": True, "Fcr_mpa": fcr, "Mn": min(fcr * S, mp), "equation": "F11-4"}
+
+
+# --- F9 double angles loaded in the plane of symmetry (bending about x) ------------------------------------
+
+def f9_plastic(*, Fy, Zx, Sx, web_legs: str) -> dict:
+    """F9-1 to F9-5: web legs in tension Mp = FyZx <= 1.6My; in compression Mp = 1.5My (My = FySx)."""
+    _positive(Fy=Fy, Zx=Zx, Sx=Sx)
+    my = Fy * Sx                                                                # F9-3
+    if web_legs == "tension":
+        return {"Mn": min(Fy * Zx, 1.6 * my), "My": my, "equation": "F9-2"}
+    return {"Mn": 1.5 * my, "My": my, "equation": "F9-5"}
+
+
+def f9_mcr(*, E, Iy, J, d, Lb, web_legs: str) -> dict:
+    """F9-10 with B from F9-11 (web legs in tension) or F9-12 (in compression); d = web leg width."""
+    _positive(E=E, Iy=Iy, J=J, d=d, Lb=Lb)
+    b = 2.3 * d / Lb * math.sqrt(Iy / J) * (1 if web_legs == "tension" else -1)
+    return {"Mcr": 1.95 * E / Lb * math.sqrt(Iy * J) * (b + math.sqrt(1 + b**2)), "B": b,
+            "B_equation": "F9-11" if web_legs == "tension" else "F9-12"}
+
+
+def f10_from_mcr(*, My, Mcr) -> dict:
+    """F10-2 (My/Mcr <= 1) or F10-3: lateral-torsional buckling strength from the elastic moment."""
+    _positive(My=My, Mcr=Mcr)
+    if My / Mcr <= 1.0:
+        return {"Mn": min((1.92 - 1.17 * math.sqrt(My / Mcr)) * My, 1.5 * My), "equation": "F10-2"}
+    return {"Mn": (0.92 - 0.17 * Mcr / My) * Mcr, "equation": "F10-3"}
+
+
+def f9_ltb(*, E, Fy, Zx, Sx, ry, Iy, J, d, Lb, web_legs: str) -> dict:
+    """F9.2: web legs in tension (F9-6 to F9-9) or in compression (F9-10/F9-12 with F10-2/F10-3)."""
+    _positive(E=E, Fy=Fy, Zx=Zx, Sx=Sx, ry=ry, Iy=Iy, J=J, d=d, Lb=Lb)
+    my = Fy * Sx
+    mcr = f9_mcr(E=E, Iy=Iy, J=J, d=d, Lb=Lb, web_legs=web_legs)
+    out = {"Lb_mm": Lb, "My": my, "Mcr": mcr["Mcr"], "B": mcr["B"], "B_equation": mcr["B_equation"]}
+    if web_legs == "compression":
+        return {**out, "applies": True, **f10_from_mcr(My=my, Mcr=mcr["Mcr"])}
+    mp = min(Fy * Zx, 1.6 * my)
+    lp = 1.76 * ry * math.sqrt(E / Fy)                                          # F9-8
+    lr = 1.95 * (E / Fy) * math.sqrt(Iy * J) / Sx * math.sqrt(2.36 * (Fy / E) * d * Sx / J + 1)  # F9-9
+    out.update(Lp_mm=lp, Lr_mm=lr)
+    if Lb <= lp:
+        return {**out, "applies": False, "reason": "Lb ≤ Lp: el pandeo lateral-torsional no aplica (F9.2(a)(1))."}
+    if Lb <= lr:
+        return {**out, "applies": True, "Mn": _between(mp, my, Lb, lp, lr), "equation": "F9-6"}
+    return {**out, "applies": True, "Mn": mcr["Mcr"], "equation": "F9-7"}
+
+
+# --- F10 single angles --------------------------------------------------------------------------------
+
+def f10_plastic(*, My) -> dict:
+    _positive(My=My)
+    return {"Mn": 1.5 * My, "My": My, "equation": "F10-1"}
+
+
+def f10_mcr_principal(*, E, Ag, rz, t, Lb, Cb, beta_w) -> dict:
+    """F10-4: major principal axis; Cb limited to 1.5; beta_w signed by the caller."""
+    _positive(E=E, Ag=Ag, rz=rz, t=t, Lb=Lb, Cb=Cb)
+    cb = min(Cb, 1.5)
+    k = 4.4 * beta_w * rz / (Lb * t)
+    return {"Mcr": 9 * E * Ag * rz * t * cb / (8 * Lb) * (math.sqrt(1 + k**2) + k), "Cb_used": cb,
+            "beta_w_mm": beta_w, "Mcr_equation": "F10-4"}
+
+
+def f10_mcr_geometric(*, E, b, t, Lb, Cb, toe: str) -> dict:
+    """F10-5a (maximum compression at the toe) or F10-5b (maximum tension at the toe), equal-leg angles."""
+    _positive(E=E, b=b, t=t, Lb=Lb, Cb=Cb)
+    root = math.sqrt(1 + 0.88 * (Lb * t / b**2) ** 2)
+    sign, eqn = (-1, "F10-5a") if toe == "compression" else (1, "F10-5b")
+    return {"Mcr": 0.58 * E * b**4 * t * Cb / Lb**2 * (root + sign), "Mcr_equation": eqn}
+
+
+def f10_leg_local(*, E, Fy, Sc, b_t, lim: dict) -> dict:
+    """F10-6 (noncompact) or F10-7/F10-8 (slender); the caller handles compact legs."""
+    _positive(E=E, Fy=Fy, Sc=Sc, b_t=b_t)
+    if b_t <= lim["lambda_r"]:
+        return {"Mn": Fy * Sc * (2.43 - 1.72 * b_t * math.sqrt(Fy / E)), "equation": "F10-6"}
+    fcr = 0.71 * E / b_t**2                                                     # F10-8
+    return {"Mn": fcr * Sc, "Fcr_mpa": fcr, "equation": "F10-7"}
 
 
 # --- F13.1 bolt holes in the tension flange --------------------------------------------------------------
