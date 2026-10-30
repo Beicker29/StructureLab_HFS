@@ -54,42 +54,71 @@ def _fmt(value) -> str:
 
 # --- document model ------------------------------------------------------------------------
 
+CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y"}
+FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
+                  "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada"}
+
+
+def _check_title(check) -> str:
+    if check.id == "axial":
+        return "Compresión (Capítulo E)" if check.chapter == "E" else "Tracción (Capítulo D)"
+    return f"{CHECK_TITLES[check.id]} (Capítulo F)"
+
+
+def _capacity_label(check) -> str:
+    return {"E": "φc·Pn", "D": "φt·Pn", "F": "φb·Mn"}[check.chapter]
+
+
 def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = None) -> list[dict]:
-    """Neutral document model of the report of one member (Spanish), Chapter D or E."""
-    c = result.compression if result.chapter == "E" else result.tension
-    capacity_label = "φc·Pn" if result.chapter == "E" else "φt·Pn"
-    action = "compresión" if result.chapter == "E" else "tracción"
+    """Neutral document model of the report of one member and one load combination (Spanish)."""
+    chapters = sorted({c.chapter for c in result.checks})
+    action = " + ".join(_check_title(c).split(" (")[0].lower() for c in result.checks)
     blocks = [{"kind": "title", "member": result.section, "case": title, "status": result.status.value,
                "action": action,
-               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo {result.chapter}"), ("Método", "LRFD"),
-                        ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
+               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo{'s' if len(chapters) > 1 else ''} {', '.join(chapters)}"),
+                        ("Método", "LRFD"), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
                "ratio": result.ratio}]
-    if c is not None:
-        blocks.append({"kind": "summary", "items": [
-            (f"Demanda |Pu| ({action})", f"{_fmt(result.demand_kN)} kN"),
-            (f"Capacidad {capacity_label}", f"{_fmt(result.capacity_kN)} kN"),
-            ("Pu / capacidad", _fmt(result.ratio)),
-            ("Modo gobernante", f"{c['governing_mode']} · {c['governing_equation']}"),
-        ]})
+    cards = []
+    for c in result.checks:
+        value = (f"{_fmt(c.capacity)} {c.unit} · {c.ratio:.3f}" if c.capacity is not None else "no calculada")
+        cards.append((f"{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · Pu/cap.".replace(
+            "Pu/cap.", "Mu/cap." if c.chapter == "F" else "Pu/cap."), value))
+    if cards:
+        blocks.append({"kind": "summary", "items": cards[:4]})
     blocks += _data_blocks(case, result)
-    if c is None:
-        blocks.append({"kind": "h1", "text": "2. Cálculo no realizado"})
-        for error in result.errors:
-            blocks.append({"kind": "alert", "text": f"{error.get('code')}: {error.get('message')}",
-                           "detail": str(error["details"]) if error.get("details") else None})
-        blocks.append({"kind": "p", "text": "El estado es INCOMPLETO: no se informa ninguna resistencia supuesta."})
-        return blocks
-    blocks += (_compression_blocks(case, result, c, capacity_label) if result.chapter == "E"
-               else _tension_blocks(case, result, c, capacity_label))
-    blocks.append({"kind": "h1", "text": f"6. Obligaciones del Capítulo {result.chapter} (comprobación independiente)"})
-    blocks.append({"kind": "table", "headers": ["Obligación", "Disposición", "Atendida por"],
-                   "rows": [[o.id, o.provision, o.satisfied_by or "NO ATENDIDA"] for o in result.obligations]})
-    for error in result.errors:
-        blocks.append({"kind": "alert", "text": f"{error.get('code')}: {error.get('id', '')} "
-                                                f"{error.get('message', '')}".strip(), "detail": None})
-    blocks.append({"kind": "h1", "text": "7. Notas y limitaciones"})
-    for text in c["notes"] + c["limitations"] + [result.scope]:
+    notes, limitations = [], []
+    for number, check in enumerate(result.checks, start=2):
+        blocks.append({"kind": "h1", "text": f"{number}. {_check_title(check)}"})
+        r = check.result
+        if r is None:
+            for error in check.errors:
+                blocks.append({"kind": "alert", "text": f"{error.get('code')}: {error.get('message')}",
+                               "detail": str(error["details"]) if error.get("details") else None})
+            blocks.append({"kind": "p", "text": "Comprobación INCOMPLETA: no se informa ninguna resistencia supuesta."})
+            continue
+        if check.chapter == "E":
+            blocks += _compression_blocks(case, check, r)
+        elif check.chapter == "D":
+            blocks += _tension_blocks(case, check, r)
+        else:
+            blocks += _flexure_blocks(case, check, r)
+        blocks.append({"kind": "h2", "text": f"Obligaciones del Capítulo {check.chapter} (comprobación independiente)"})
+        blocks.append({"kind": "table", "headers": ["Obligación", "Disposición", "Atendida por"],
+                       "rows": [[o.id, o.provision, o.satisfied_by or "NO ATENDIDA"] for o in check.obligations]})
+        for error in check.errors:
+            blocks.append({"kind": "alert", "text": f"{error.get('code')}: {error.get('id', '')} "
+                                                    f"{error.get('message', '')}".strip(), "detail": None})
+        notes += [n for n in r["notes"] if n not in notes]
+        limitations += [x for x in r["limitations"] if x not in limitations]
+    final = len(result.checks) + 2
+    if result.interaction_pending:
+        blocks.append({"kind": "h1", "text": f"{final}. Interacción"})
+        blocks.append({"kind": "alert", "text": "La combinación tiene más de una demanda. La interacción del Capítulo H "
+                                                "aún no está implementada: el estado no puede ser CUMPLE.", "detail": None})
+        final += 1
+    blocks.append({"kind": "h1", "text": f"{final}. Notas y limitaciones"})
+    for text in notes + limitations + [result.scope]:
         blocks.append({"kind": "note", "text": text})
     return blocks
 
@@ -100,18 +129,18 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     origin = (f"catálogo {source.get('sheet')} fila {source.get('row')} (sha256 {source.get('sha256', '')[:12]})"
               if source else "sección definida en la entrada")
     f, ln, mat = case.factors, case.lengths, case.material
-    material = f"Fy = {_fmt(mat.Fy)} MPa" + (f"; Fu = {_fmt(mat.Fu)} MPa" if mat.Fu else "")
-    if result.chapter == "E":
-        material += f"; E = {_fmt(mat.E)} MPa"
+    material = f"Fy = {_fmt(mat.Fy)} MPa" + (f"; Fu = {_fmt(mat.Fu)} MPa" if mat.Fu else "") + f"; E = {_fmt(mat.E)} MPa"
+    demands = [f"Pu = {_fmt(case.Pu)} kN ({'compresión' if case.Pu > 0 else 'tracción'})"] if case.Pu else []
+    demands += [f"Mu{a} = {_fmt(m)} kN·m" for a, m in (("x", case.Mux), ("y", case.Muy)) if m]
     items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin), ("Material", material),
-             ("Demanda (LRFD)", f"Pu = {_fmt(case.Pu)} kN "
-                                  f"({'compresión' if case.Pu > 0 else 'tracción'})")]
-    if result.chapter == "D" and case.tension:
+             ("Demandas (LRFD)", "; ".join(demands))]
+    ids = {c.id for c in result.checks}
+    if case.Pu < 0 and case.tension:
         t = case.tension
         items.append(("Sección neta", f"An = {_fmt(t.An)} mm² (B4.3b); U = {_fmt(t.U)} (Tabla D3.1); datos del usuario"))
         if t.fabricated_length:
             items.append(("Longitud fabricada", f"{_fmt(t.fabricated_length)} mm (Nota de D1)"))
-    if result.chapter == "E":
+    if case.Pu > 0:
         if f.xa or f.ya:
             items.append(("Arriostramiento desplazado", f"xa = {_fmt(f.xa)} mm; ya = {_fmt(f.ya)} mm"))
         if case.single_angle_e5:
@@ -123,8 +152,14 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
             b = case.double_angle_e6
             items.append(("Base E6", f"conectores {b.connectors}; a = {_fmt(b.a)} mm; conexión de extremo "
                                      f"soldada o pretensada: {_fmt(b.end_connection_welded_or_pretensioned)}"))
+    if ids & {"flexure_x", "flexure_y"}:
+        fl = case.flexure
+        items.append(("Flexión", f"Lb = {_fmt(fl.Lb) + ' mm' if fl and fl.Lb else 'no indicado'}; "
+                                 f"Cb = {_fmt(fl.Cb if fl else 1.0)}; agujeros en el ala traccionada: "
+                                 f"{'no declarado' if not fl or fl.tension_flange_holes is None else _fmt(fl.tension_flange_holes)}"
+                                 + (f" (Afn = {_fmt(fl.Afn)} mm²)" if fl and fl.Afn else "")))
     blocks.append({"kind": "kv", "items": items})
-    if result.chapter == "E" and ln is not None:
+    if case.Pu > 0 and ln is not None:
         blocks.append({"kind": "table", "headers": ["Eje", "K", "L (mm)", "Lc = K·L (mm)"], "rows": [
             ["x", f.Kx, ln.Lx, f.Kx * ln.Lx], ["y", f.Ky, ln.Ly, f.Ky * ln.Ly],
             ["z (torsión)", f.Kz, ln.Lz, f.Kz * ln.Lz]]})
@@ -135,13 +170,19 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     return blocks
 
 
-def _tension_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_label: str) -> list[dict]:
-    blocks = [{"kind": "h1", "text": "2. Área neta efectiva (D3)"},
+def _verification(check) -> tuple:
+    symbol = "Mu" if check.chapter == "F" else "|Pu|"
+    return ("Verificación", f"{symbol} / {_capacity_label(check)} = {_fmt(check.demand)} / {_fmt(check.capacity)} "
+                            f"= {_fmt(check.ratio)}")
+
+
+def _tension_blocks(case: SteelCase, check, c: dict) -> list[dict]:
+    blocks = [{"kind": "h2", "text": "Área neta efectiva (D3)"},
               {"kind": "p", "text": f"Ae = An·U = {_fmt(c['inputs']['An_mm2'])} · {_fmt(c['inputs']['U'])} = "
                                     f"{_fmt(c['modes']['TR']['area_mm2'])} mm² (D3-1)"},
-              {"kind": "h1", "text": "3. Disposiciones aplicadas"},
+              {"kind": "h2", "text": "Disposiciones aplicadas"},
               {"kind": "p", "text": ", ".join(c["provisions"])},
-              {"kind": "h1", "text": "4. Estados límite (D2)"}]
+              {"kind": "h2", "text": "Estados límite (D2)"}]
     rows = []
     for name, m in c["modes"].items():
         rows.append([name, LIMIT_STATES.get(m["limit_state"], m["limit_state"]), m["Pn_equation"],
@@ -153,32 +194,27 @@ def _tension_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_lab
     blocks.append({"kind": "p", "text": "Cada estado límite tiene su propio factor (D2), por lo que gobierna la menor "
                                         "resistencia de diseño φt·Pn, no la menor Pn."})
     gov = c["modes"][c["governing_mode"]]
-    blocks += [{"kind": "h1", "text": "5. Resistencia"},
+    blocks += [{"kind": "h2", "text": "Resistencia"},
                {"kind": "kv", "items": [
                    ("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
                    ("Resistencia de diseño", f"min(φt·Pn) = {_fmt(c['available_kN'])} kN ({c['governing_mode']})"),
-                   ("Verificación", f"|Pu| / {capacity_label} = {_fmt(result.demand_kN)} / {_fmt(result.capacity_kN)} "
-                                    f"= {_fmt(result.ratio)}")]}]
+                   _verification(check)]}]
     return blocks
 
 
-def _compression_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_label: str) -> list[dict]:
-    blocks = []
-    # 2-3. Classification and provisions
-    blocks.append({"kind": "h1", "text": "2. Clasificación de elementos (B4.1a)"})
-    rows = [[_ELEMENTS.get(r["element"], r["element"]), r["b4_case"], r["ratio"], r["lambda_r"], "esbelto" if r["slender"] else "no esbelto"]
-            for r in c["classification"]["elements"]]
+def _compression_blocks(case: SteelCase, check, c: dict) -> list[dict]:
+    blocks = [{"kind": "h2", "text": "Clasificación de elementos (B4.1a)"}]
+    rows = [[_ELEMENTS.get(r["element"], r["element"]), r["b4_case"], r["ratio"], r["lambda_r"],
+             "esbelto" if r["slender"] else "no esbelto"] for r in c["classification"]["elements"]]
     if rows:
         blocks.append({"kind": "table", "headers": ["Elemento", "Caso", "λ = b/t", "λr", "Clase"], "rows": rows})
     else:
         blocks.append({"kind": "p", "text": c["classification"]["reference"]})
     blocks.append({"kind": "p", "text": f"Sección {'con' if c['classification']['slender'] else 'sin'} "
                                         "elementos esbeltos."})
-    blocks.append({"kind": "h1", "text": "3. Disposiciones aplicadas"})
+    blocks.append({"kind": "h2", "text": "Disposiciones aplicadas"})
     blocks.append({"kind": "p", "text": ", ".join(c["provisions"])})
-
-    # 4. Limit states
-    blocks.append({"kind": "h1", "text": "4. Estados límite"})
+    blocks.append({"kind": "h2", "text": "Estados límite"})
     blocks.append({"kind": "table",
                    "headers": ["Modo", "Disposición", "Ec. Fe", "Fe (MPa)", "Ec. Fn", "Fn (MPa)", "Área (mm²)", "Pn (kN)"],
                    "rows": [[name, m["provision"], m["Fe_equation"], m["Fe_mpa"], m["Fn_equation"], m["Fn_mpa"],
@@ -186,7 +222,7 @@ def _compression_blocks(case: SteelCase, result: DesignResult, c: dict, capacity
                             for name, m in c["modes"].items()],
                    "highlight": list(c["modes"]).index(c["governing_mode"])})
     for name, m in c["modes"].items():
-        blocks.append({"kind": "h2", "text": f"Modo {name}: {LIMIT_STATES.get(m['limit_state'], m['limit_state'])} "
+        blocks.append({"kind": "h3", "text": f"Modo {name}: {LIMIT_STATES.get(m['limit_state'], m['limit_state'])} "
                                              f"({m['provision']}, eje {m['axis']})"})
         items = [(_label(k), _fmt(v)) for k, v in m.items()
                  if k not in _MODE_KEYS and isinstance(v, (int, float, str)) and not isinstance(v, bool)]
@@ -199,26 +235,64 @@ def _compression_blocks(case: SteelCase, result: DesignResult, c: dict, capacity
         if area.get("plates"):
             blocks.append({"kind": "table",
                            "headers": ["Elemento", "n", "b (mm)", "t (mm)", "Ec.", "be (mm)", "(b − be)·t (mm²)"],
-                           "rows": [[_ELEMENTS.get(p["element"], p["element"]), p["count"], p["b_mm"], p["t_mm"], p["equation"], p["be_mm"],
-                                     p["area_loss_mm2"]] for p in area["plates"]]})
+                           "rows": [[_ELEMENTS.get(p["element"], p["element"]), p["count"], p["b_mm"], p["t_mm"],
+                                     p["equation"], p["be_mm"], p["area_loss_mm2"]] for p in area["plates"]]})
             blocks.append({"kind": "p", "text": f"Ae = Ag − Σ n·(b − be)·t = {_fmt(area['Ae_mm2'])} mm² (E7-1)"})
         elif area.get("equation") in {"E7-6", "E7-7"}:
             blocks.append({"kind": "p", "text": f"Ae = {_fmt(area['Ae_mm2'])} mm² ({area['equation']}; valor de "
                                                 f"la ecuación {_fmt(area['Ae_equation_mm2'])}, limitado a Ag: "
                                                 f"{_fmt(area['bounded_to_Ag'])})"})
-
-    # 5. Strength
-    blocks.append({"kind": "h1", "text": "5. Resistencia"})
     gov = c["modes"][c["governing_mode"]]
     items = [("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
              ("Pn", f"{_fmt(c['Pn_kN'])} kN ({c['governing_equation']})"),
              ("Resistencia de diseño", f"φc·Pn = 0.90 · Pn = {_fmt(c['available_kN'])} kN"),
-             ("Verificación", f"Pu / {capacity_label} = {_fmt(result.demand_kN)} / {_fmt(result.capacity_kN)} "
-                              f"= {_fmt(result.ratio)}")]
+             _verification(check)]
     for req in c["requirements"]:
         items.append((f"Requisito {req['id']}", f"a/ri = {_fmt(req['a_over_ri'])} ≤ {_fmt(req['limit'])} → "
                                                 f"{'cumple' if req['satisfied'] else 'NO cumple'}"))
-    blocks.append({"kind": "kv", "items": items})
+    blocks += [{"kind": "h2", "text": "Resistencia"}, {"kind": "kv", "items": items}]
+    return blocks
+
+
+_FLEXURE_KEYS = {"limit_state", "provision", "applies", "reason", "Mn", "Mn_kNm", "design_kNm", "equation"}
+
+
+def _flexure_blocks(case: SteelCase, check, c: dict) -> list[dict]:
+    blocks = [{"kind": "h2", "text": "Clasificación de elementos (B4.1b)"}]
+    rows = [[_ELEMENTS.get(r["element"], r["element"]), r["b4_case"], r["ratio"], r["lambda_p"], r["lambda_r"], r["class"]]
+            for r in c["classification"]["elements"]]
+    if rows:
+        blocks.append({"kind": "table", "headers": ["Elemento", "Caso", "λ", "λp", "λr", "Clase"], "rows": rows})
+    else:
+        blocks.append({"kind": "p", "text": "Barra maciza: sin elementos esbeltos (F11)."})
+    blocks += [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])},
+               {"kind": "h2", "text": "Estados límite"}]
+    names = list(c["modes"])
+    blocks.append({"kind": "table", "headers": ["Estado límite", "Disposición", "Ec.", "Mn (kN·m)", "φb·Mn (kN·m)"],
+                   "rows": [[f"{k} — {FLEXURE_STATES.get(k, k)}", m["provision"],
+                             m["equation"] if m["applies"] else "no aplica",
+                             m["Mn_kNm"] if m["applies"] else "–", m["design_kNm"] if m["applies"] else "–"]
+                            for k, m in c["modes"].items()],
+                   "highlight": names.index(c["governing_mode"])})
+    for name, m in c["modes"].items():
+        extra = [(_label(k), _fmt(v)) for k, v in m.items()
+                 if k not in _FLEXURE_KEYS and isinstance(v, (int, float, str)) and not isinstance(v, bool) and v is not None]
+        if m["applies"] or extra:
+            blocks.append({"kind": "h3", "text": f"{name}: {FLEXURE_STATES.get(name, name)} ({m['provision']})"})
+            if not m["applies"]:
+                blocks.append({"kind": "note", "text": m["reason"]})
+            items = extra + ([("Mn", f"{_fmt(m['Mn_kNm'])} kN·m ({m['equation']})")] if m["applies"] else [])
+            if items:
+                blocks.append({"kind": "kv", "items": items, "compact": True})
+        else:
+            blocks.append({"kind": "note", "text": f"{name}: {m['reason']}"})
+    gov = c["modes"][c["governing_mode"]]
+    blocks += [{"kind": "h2", "text": "Resistencia"}, {"kind": "kv", "items": [
+        ("Estado límite gobernante", f"{c['governing_mode']} — {FLEXURE_STATES.get(c['governing_mode'], '')} "
+                                     f"({gov['equation']})"),
+        ("Mn", f"{_fmt(c['Mn_kNm'])} kN·m"),
+        ("Resistencia de diseño", f"φb·Mn = 0.90 · Mn = {_fmt(c['available_kNm'])} kN·m"),
+        _verification(check)]}]
     return blocks
 
 
@@ -247,6 +321,8 @@ def render_text(blocks: list[dict]) -> str:
             out += ["", f"## {b['text']}"]
         elif kind == "h2":
             out += ["", f"### {b['text']}"]
+        elif kind == "h3":
+            out += ["", f"#### {b['text']}"]
         elif kind == "kv":
             out += [("  " if b.get("compact") else "") + f"{k}: {v}" for k, v in b["items"]]
         elif kind == "table":
@@ -336,7 +412,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
             pdf.add_page()
         pdf.ln(space)
         pdf.set_font(FONT, "B", size)
-        pdf.set_text_color(*_NAVY)
+        pdf.set_text_color(*(_NAVY if size >= 9.5 else _INK))
         pdf.multi_cell(0, size * 0.5, clean(text), new_x="LMARGIN", new_y="NEXT")
         if size >= 11:
             pdf.set_draw_color(*_NAVY)
@@ -439,7 +515,9 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
             elif kind == "h1":
                 heading(b["text"], 12, 4)
             elif kind == "h2":
-                heading(b["text"], 9.5, 2)
+                heading(b["text"], 10, 2.5)
+            elif kind == "h3":
+                heading(b["text"], 8.8, 1.5)
             elif kind == "kv":
                 table(["", ""], [list(item) for item in b["items"]], kv=True, compact=b.get("compact", False))
             elif kind == "table":

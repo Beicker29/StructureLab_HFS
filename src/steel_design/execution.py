@@ -35,13 +35,13 @@ def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str 
 
 
 def governing(executions: list[tuple[str | None, SteelCase, DesignResult]]) -> dict | None:
-    """Load combination with the largest demand/capacity ratio among those with a strength."""
-    rated = [(tag, r) for tag, _, r in executions if r.ratio is not None]
+    """Load combination and check with the largest demand/capacity ratio among the evaluated checks."""
+    rated = [(tag, c) for tag, _, r in executions for c in r.checks if c.ratio is not None]
     if not rated:
         return None
-    tag, r = max(rated, key=lambda item: item[1].ratio)
-    return {"name": tag, "chapter": r.chapter, "status": r.status.value, "ratio": r.ratio,
-            "capacity_kN": r.capacity_kN, "demand_kN": r.demand_kN}
+    tag, c = max(rated, key=lambda item: item[1].ratio)
+    return {"name": tag, "check": c.id, "chapter": c.chapter, "status": c.status.value, "ratio": c.ratio,
+            "capacity": c.capacity, "demand": c.demand, "unit": c.unit}
 
 
 def overall_status(results: list[DesignResult]) -> Status:

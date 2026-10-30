@@ -30,12 +30,18 @@ class Section(InputModel):
     tdes: Optional[NonNegativeNumber] = Field(None, alias="tdes", description="HSS design thickness (mm)")
     tw: Optional[NonNegativeNumber] = Field(None, description="Web thickness (mm)")
     ho: Optional[NonNegativeNumber] = Field(None, alias="ho", description="Distance between flange centroids (mm)")
+    h_out: Optional[NonNegativeNumber] = Field(None, alias="Ht", description="Rectangular HSS outside depth (mm)")
+    b_out: Optional[NonNegativeNumber] = Field(None, alias="B", description="Rectangular HSS outside width (mm)")
     
     # Moments of inertia (geometric x/y axes)
     ix: Optional[NonNegativeNumber] = Field(None, alias="Ix", description="Moment of inertia about x-axis (mm^4)")
     iy: Optional[NonNegativeNumber] = Field(None, alias="Iy", description="Moment of inertia about y-axis (mm^4)")
     iw: Optional[NonNegativeNumber] = Field(None, alias="Iw", description="Angle: moment of inertia about the major principal axis w (mm^4)")
     iz: Optional[NonNegativeNumber] = Field(None, alias="Iz", description="Angle: moment of inertia about the minor principal axis z (mm^4)")
+    sx: Optional[NonNegativeNumber] = Field(None, alias="Sx", description="Elastic section modulus about x (mm^3)")
+    sy: Optional[NonNegativeNumber] = Field(None, alias="Sy", description="Elastic section modulus about y (mm^3)")
+    zx: Optional[NonNegativeNumber] = Field(None, alias="Zx", description="Plastic section modulus about x (mm^3)")
+    zy: Optional[NonNegativeNumber] = Field(None, alias="Zy", description="Plastic section modulus about y (mm^3)")
     # Radius of gyration
     rx: Optional[NonNegativeNumber] = Field(None, description="Radius of gyration about x-axis (mm)")
     ry: Optional[NonNegativeNumber] = Field(None, description="Radius of gyration about y-axis (mm)")

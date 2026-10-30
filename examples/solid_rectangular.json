@@ -19,6 +19,9 @@
     "U": 1.0,
     "fabricated_length": 1000
   },
+  "flexure": {
+    "Lb": 1000
+  },
   "cases": [
     {
       "name": "Combinación 1 — compresión",
@@ -27,6 +30,10 @@
     {
       "name": "Combinación 2 — tracción",
       "Pu": -400
+    },
+    {
+      "name": "Combinación 3 — flexión x",
+      "Mux": 8
     }
   ]
 }

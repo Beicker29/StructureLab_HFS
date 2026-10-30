@@ -16,8 +16,9 @@ def test_report_shows_inputs_modes_and_governing_values(engine):
     text = calculation_report(case, result)
     c = result.compression
     assert "RESULTADO: PASS" in text and "catálogo C fila" in text
-    for heading in ("## 1. Datos", "## 2. Clasificación", "## 3. Disposiciones", "## 4. Estados límite",
-                    "## 5. Resistencia", "## 6. Obligaciones", "## 7. Notas"):
+    for heading in ("## 1. Datos", "## 2. Compresión (Capítulo E)", "### Clasificación de elementos (B4.1a)",
+                    "### Disposiciones aplicadas", "### Estados límite", "### Resistencia",
+                    "### Obligaciones del Capítulo E", "## 3. Notas y limitaciones"):
         assert heading in text
     for name, mode in c["modes"].items():
         assert f"Modo {name}:" in text and _fmt(mode["Pn_kN"]) in text and mode["Fe_equation"] in text
@@ -35,8 +36,8 @@ def test_report_lists_effective_widths_of_slender_elements(engine):
 def test_report_of_blocked_case_has_no_strength(engine):
     case = steel_case("2L4X4X1/4")
     text = calculation_report(case, engine.run(case))
-    assert "RESULTADO: INCOMPLETE" in text and "Cálculo no realizado" in text
-    assert "## 5. Resistencia" not in text and "double_angle_e6" in text
+    assert "RESULTADO: INCOMPLETE" in text and "Comprobación INCOMPLETA" in text
+    assert "### Resistencia" not in text and "double_angle_e6" in text
 
 
 def test_pdf_is_built_in_memory(engine):

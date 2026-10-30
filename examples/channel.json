@@ -14,6 +14,10 @@
     "U": 0.85,
     "fabricated_length": 4000
   },
+  "flexure": {
+    "Lb": 2000,
+    "tension_flange_holes": false
+  },
   "cases": [
     {
       "name": "Combinación 1 — compresión",
@@ -22,6 +26,14 @@
     {
       "name": "Combinación 2 — tracción",
       "Pu": -1500
+    },
+    {
+      "name": "Combinación 3 — flexión x",
+      "Mux": 150
+    },
+    {
+      "name": "Combinación 4 — flexión y",
+      "Muy": 15
     }
   ]
 }

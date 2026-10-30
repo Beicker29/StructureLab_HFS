@@ -92,5 +92,5 @@ def test_tension_does_not_require_lengths_nor_e(engine):
 def test_tension_report(engine):
     case = tension_case("W14X90", An=15000, U=0.9, Pu=-2000)
     text = calculation_report(case, engine.run(case))
-    assert "tracción W14X90" in text and "Ae = An·U" in text and "## 4. Estados límite (D2)" in text
+    assert "tracción W14X90" in text and "Ae = An·U" in text and "### Estados límite (D2)" in text
     assert "Obligaciones del Capítulo D" in text and "min(φt·Pn) = 4556.250 kN (TR)" in text

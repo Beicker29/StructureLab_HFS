@@ -41,3 +41,16 @@ def test_repository_rejects_ambiguous_identities(sections):
     with pytest.raises(AmbiguousSectionError):
         repo.get("w14x90")
     assert repo.get("W99X1") is None
+
+
+def test_section_moduli_follow_s_equals_i_over_c(sections):
+    """Unit conventions per sheet (PTE_RED stores S in mm3): S = I/c on doubly symmetric axes."""
+    for name, depth in (("W14X90", "d"), ("PTE100X50X3MM", "h_out"), ('PTER4"X3.00MM', "od")):
+        s = sections[name]
+        assert s.sx == pytest.approx(s.ix / (getattr(s, depth) / 2), rel=0.02), name
+
+
+def test_only_known_catalog_inconsistency_is_ipe_80(catalog):
+    from steel_design.domain.validation import section_inconsistencies
+    flagged = {s.name for s in catalog if section_inconsistencies(s)}
+    assert flagged == {"IPE 80"}   # Iy is 10x too large (contradicts ry and Sy); fix the catalog row

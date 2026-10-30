@@ -1,8 +1,8 @@
-"""Input and result models for axial members (ANSI/AISC 360-22 Chapters D and E). Units: N, mm, MPa, kN."""
+"""Input and result models (ANSI/AISC 360-22 Chapters D, E and F, LRFD). Units: N, mm, MPa, kN, kN*m."""
 from enum import Enum
 from typing import Annotated, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, computed_field, model_validator
 
 
 # JSON numbers only: bool and numeric strings are not engineering magnitudes.
@@ -93,6 +93,23 @@ class TensionBasis(InputModel):
         None, description="Fabricated member length (mm), only for the D1 User Note L/r <= 300")
 
 
+class FlexureBasis(InputModel):
+    """Member data for Chapter F (supplied by the user)."""
+    Lb: Optional[PositiveNumber] = Field(None, description="Unbraced length for lateral-torsional buckling (mm)")
+    Cb: PositiveNumber = Field(1.0, description="LTB modification factor (F1); 1.0 when not given (lower bound of F1-1)")
+    tension_flange_holes: Optional[StrictBool] = Field(
+        None, description="F13.1: bolt holes in the tension flange (I-shapes and channels, major axis); must be declared")
+    Afn: Optional[PositiveNumber] = Field(None, description="Net area of the tension flange (mm2), when it has holes")
+
+    @model_validator(mode="after")
+    def holes_need_net_area(self):
+        if self.tension_flange_holes and self.Afn is None:
+            raise ValueError("tension_flange_holes = true requiere Afn.")
+        if self.tension_flange_holes is False and self.Afn is not None:
+            raise ValueError("Afn solo corresponde a un ala traccionada con agujeros.")
+        return self
+
+
 class CustomSectionType(str, Enum):
     SOLID_CIRCULAR = "SOLID_CIRCULAR"
     SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
@@ -117,19 +134,22 @@ class CustomSection(InputModel):
 class SteelCase(InputModel):
     section_name: NonBlankString
     material: Material
-    Pu: FiniteNumber = Field(..., description="Required axial strength (kN): > 0 compression (Chapter E), "
+    Pu: FiniteNumber = Field(0.0, description="Required axial strength (kN): > 0 compression (Chapter E), "
                                                "< 0 tension (Chapter D); LRFD load combination")
+    Mux: FiniteNumber = Field(0.0, description="Required flexural strength about x (kN*m), Chapter F")
+    Muy: FiniteNumber = Field(0.0, description="Required flexural strength about y (kN*m), Chapter F")
     lengths: Optional[Lengths] = Field(None, description="Unbraced lengths; required for compression")
     factors: Factors = Field(default_factory=Factors)
     single_angle_e5: Optional[SingleAngleE5Basis] = None
     double_angle_e6: Optional[DoubleAngleE6Basis] = None
     tension: Optional[TensionBasis] = None
+    flexure: Optional[FlexureBasis] = None
     custom_section: Optional[CustomSection] = None
 
     @model_validator(mode="after")
-    def axial_demand(self):
-        if self.Pu == 0:
-            raise ValueError("Pu debe ser distinto de cero: > 0 compresión, < 0 tracción.")
+    def demand(self):
+        if self.Pu == 0 and self.Mux == 0 and self.Muy == 0:
+            raise ValueError("La combinación debe tener al menos una demanda distinta de cero (Pu, Mux, Muy).")
         if self.Pu > 0 and self.lengths is None:
             raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
         return self
@@ -149,18 +169,76 @@ class Obligation(BaseModel):
     satisfied_by: Optional[str] = None
 
 
+class Check(BaseModel):
+    """One required strength of a load combination (axial or flexure about one axis)."""
+    id: Literal["axial", "flexure_x", "flexure_y"]
+    chapter: Literal["D", "E", "F"]
+    demand: float = Field(..., description="|Pu| (kN) or |Mu| (kN*m)")
+    unit: Literal["kN", "kN·m"]
+    status: Status
+    capacity: Optional[float] = Field(None, description="Design strength phi*Rn (LRFD)")
+    ratio: Optional[float] = None
+    result: Optional[dict] = Field(None, description="Full chapter result (modes, equations, intermediates)")
+    obligations: list[Obligation] = Field(default_factory=list)
+    errors: list[dict] = Field(default_factory=list)
+
+
 class DesignResult(BaseModel):
     section: str
     family: str
     status: Status
-    chapter: Literal["D", "E"]
-    demand_kN: float = Field(..., description="|Pu| (kN)")
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
-    capacity_kN: Optional[float] = Field(None, description="Design strength phi*Pn (LRFD), kN")
-    ratio: Optional[float] = None
-    compression: Optional[dict] = Field(None, description="Full Chapter E result (modes, equations, intermediates)")
-    tension: Optional[dict] = Field(None, description="Full Chapter D result (limit states, equations, intermediates)")
-    obligations: list[Obligation] = Field(default_factory=list)
-    errors: list[dict] = Field(default_factory=list)
-    scope: str = ("Resistencia axial del miembro según ANSI/AISC 360-22, Capítulos D (tracción) y E (compresión). "
-                  "Las longitudes efectivas, combinaciones de carga, conexiones y demás capítulos quedan fuera de este resultado.")
+    checks: list[Check] = Field(default_factory=list)
+    interaction_pending: bool = Field(False, description="More than one required strength: Chapter H not yet available")
+    scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión) y "
+                  "F (flexión). Longitudes efectivas, combinaciones de carga, conexiones, cortante, interacción y "
+                  "demás capítulos quedan fuera de este resultado.")
+
+    @computed_field
+    @property
+    def ratio(self) -> Optional[float]:
+        """Largest demand/capacity ratio among the evaluated checks."""
+        ratios = [c.ratio for c in self.checks if c.ratio is not None]
+        return max(ratios) if ratios else None
+
+    @computed_field
+    @property
+    def errors(self) -> list[dict]:
+        out = [{**e, "check": c.id} for c in self.checks for e in c.errors]
+        if self.interaction_pending:
+            out.append({"code": "INTERACTION_PENDING", "message": "La combinación tiene más de una demanda; la "
+                        "interacción (Capítulo H) aún no está implementada: no se puede concluir el cumplimiento."})
+        return out
+
+    # Convenience accessors for the axial check (Python API; not serialized).
+    def check(self, check_id: str) -> Optional[Check]:
+        return next((c for c in self.checks if c.id == check_id), None)
+
+    @property
+    def chapter(self) -> Optional[str]:
+        axial = self.check("axial")
+        return axial.chapter if axial else None
+
+    @property
+    def compression(self) -> Optional[dict]:
+        axial = self.check("axial")
+        return axial.result if axial and axial.chapter == "E" else None
+
+    @property
+    def tension(self) -> Optional[dict]:
+        axial = self.check("axial")
+        return axial.result if axial and axial.chapter == "D" else None
+
+    @property
+    def capacity_kN(self) -> Optional[float]:
+        axial = self.check("axial")
+        return axial.capacity if axial else None
+
+    @property
+    def demand_kN(self) -> Optional[float]:
+        axial = self.check("axial")
+        return axial.demand if axial else None
+
+    @property
+    def obligations(self) -> list[Obligation]:
+        return [o for c in self.checks for o in c.obligations]

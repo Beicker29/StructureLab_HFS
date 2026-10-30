@@ -29,8 +29,8 @@ def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):
     assert run.returncode == 0, run.stderr
     output = json.loads(run.stdout)
     compression, tension = output["cases"]
-    assert output["status"] == "PASS" and compression["compression"]["governing_mode"] == "FTB"
-    assert tension["chapter"] == "D" and output["governing"]["name"] == tension["name"]  # larger ratio
+    assert output["status"] == "PASS" and compression["checks"][0]["result"]["governing_mode"] == "FTB"
+    assert tension["checks"][0]["chapter"] == "D" and output["governing"]["name"] == tension["name"]  # larger ratio
     assert list(tmp_path.iterdir()) == []
 
 
@@ -39,7 +39,7 @@ def test_single_case_payload_prints_one_result(tmp_path):
     source.write_text(json.dumps({"section_name": "W14X90", "material": {"Fy": 345}, "Pu": 100,
                                   "lengths": {"Lx": 3000, "Ly": 3000, "Lz": 3000}}), encoding="utf-8")
     output = json.loads(cli(source, cwd=tmp_path).stdout)
-    assert output["chapter"] == "E" and output["status"] == "PASS"
+    assert output["checks"][0]["chapter"] == "E" and output["status"] == "PASS"
 
 
 def test_cli_optional_output_file(tmp_path):

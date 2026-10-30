@@ -1,6 +1,6 @@
-"""Chapter D and E obligations, written from the Specification text independently of the selection.
+"""Chapter D, E and F obligations, written from the Specification text independently of the selection.
 
-It never imports domain.compression or domain.tension. An obligation is discharged
+It never imports domain.compression, domain.tension or domain.flexure. An obligation is discharged
 only when the result contains a mode or classification that matches it; anything
 unmatched keeps the result INCOMPLETE, so a missing limit state is never a PASS.
 """
@@ -18,7 +18,36 @@ EXPECTED_ELEMENTS = {
 }
 
 
+# B4.1b flexure elements expected per (family, axis), and limit states per Table User Note F1.1.
+FLEXURE_ELEMENTS = {"W": {"flange", "web"}, "CHANNEL": {"flange", "web"}, "RECTANGULAR_HSS": {"flange", "web"},
+                    "CIRCULAR_HSS": {"wall"}, "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set()}
+FLEXURE_STATES = {
+    ("W", "x"): ("Y", "LTB", "FLB", "TFR"), ("CHANNEL", "x"): ("Y", "LTB", "FLB", "TFR"),
+    ("W", "y"): ("Y", "FLB"), ("CHANNEL", "y"): ("Y", "FLB"),
+    ("RECTANGULAR_HSS", "x"): ("Y", "FLB", "WLB", "LTB"), ("RECTANGULAR_HSS", "y"): ("Y", "FLB", "WLB", "LTB"),
+    ("CIRCULAR_HSS", "x"): ("Y", "LB"), ("CIRCULAR_HSS", "y"): ("Y", "LB"),
+}
+_STATE_TEXT = {"Y": ("F1.1", "Fluencia (momento plástico)."), "LTB": ("F1.1", "Pandeo lateral-torsional."),
+               "FLB": ("F1.1", "Pandeo local del ala comprimida."), "WLB": ("F1.1", "Pandeo local del alma."),
+               "LB": ("F8", "Pandeo local de la pared."), "LLB": ("F10", "Pandeo local del ala del ángulo."),
+               "TFR": ("F13.1", "Rotura del ala traccionada si tiene agujeros (requiere declararlo).")}
+
+
+def flexure_obligations(section: Section, axis: str) -> list[Obligation]:
+    family = section.type.upper()
+    if family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
+        states = ("Y", "LTB")                     # F11
+    elif family in {"SINGLE_ANGLE", "DOUBLE_ANGLE"}:
+        states = ("Y", "LTB", "LLB")              # F9/F10 (stage 2)
+    else:
+        states = FLEXURE_STATES.get((family, axis), ("Y",))
+    out = [Obligation(id="classification", provision="B4.1b",
+                      reason="Todo elemento comprimido debe clasificarse en flexión (compacto/no compacto/esbelto).")]
+    return out + [Obligation(id=k, provision=_STATE_TEXT[k][0], reason=_STATE_TEXT[k][1]) for k in states]
+
+
 def required_obligations(case: SteelCase, section: Section) -> list[Obligation]:
+    """Obligations of the axial check (Chapter D or E)."""
     if case.Pu < 0:
         # D2: the lower of tensile yielding in the gross section and rupture in the net section.
         return [Obligation(id="TY", provision="D2(a)", reason="Fluencia en tracción en la sección bruta."),
@@ -55,8 +84,11 @@ def discharge(obligations: list[Obligation], section: Section, result: dict) -> 
     modes = result["modes"]
     classification = result.get("classification") or {"elements": [], "slender": False}
     elements = {row["element"] for row in classification["elements"]}
+    expected = (FLEXURE_ELEMENTS if result.get("chapter") == "F" else EXPECTED_ELEMENTS).get(family)
+    if result.get("chapter") == "F" and family in {"W", "CHANNEL"} and result.get("axis") == "y":
+        expected = {"flange"}
     for item in obligations:
-        if item.id == "classification" and elements == EXPECTED_ELEMENTS.get(family):
+        if item.id == "classification" and elements == expected:
             item.satisfied_by = "clasificación"
         elif item.id == "FB" and "FB-E5" in modes:
             item.satisfied_by = "FB-E5"
@@ -64,7 +96,7 @@ def discharge(obligations: list[Obligation], section: Section, result: dict) -> 
             item.satisfied_by = "E6, esbeltez modificada (FB-y, FTB)"
         elif item.id in modes:
             item.satisfied_by = item.id
-    if classification["slender"]:
+    if classification.get("slender"):
         e7 = Obligation(id="LB", provision="E7", reason="Elementos esbeltos: Pn = Fn·Ae en todo modo global "
                         "(en ángulo simple E4 usa Ag según E4/E7).")
         if all(m["area_basis"] == "Ae" or (family == "SINGLE_ANGLE" and m["limit_state"] == "flexural_torsional_buckling")

@@ -20,29 +20,31 @@ _NUMBER = TypeAdapter(FiniteNumber)
 SHEET_FAMILY = {"W_IPE_HEA_HEB": "W", "C": "CHANNEL", "L": "SINGLE_ANGLE", "2L": "DOUBLE_ANGLE",
                 "PTE_RECT": "RECTANGULAR_HSS", "PTE_RED": "CIRCULAR_HSS"}
 
-# Section field -> catalog header (only properties used by Chapter E).
+# Section field -> catalog header (only properties used by Chapters D, E and F).
 COLUMNS = {
     "area": "A", "d": "d", "h": "h", "bf": "bf", "b": "b", "od": "OD", "tf": "tf", "t": "t", "tdes": "tdes",
-    "tw": "tw", "ho": "ho", "ix": "Ix", "iy": "Iy", "iw": "Iw", "iz": "Iz", "x": "x", "y": "y",
-    "tan_alpha": "tan(α)", "rx": "rx", "ry": "ry", "rz": "rz", "j": "J", "cw": "Cw", "ro": "ro", "H": "H",
+    "tw": "tw", "ho": "ho", "h_out": "Ht", "b_out": "B", "ix": "Ix", "iy": "Iy", "iw": "Iw", "iz": "Iz", "x": "x", "y": "y",
+    "tan_alpha": "tan(α)", "sx": "Sx", "sy": "Sy", "zx": "Zx", "zy": "Zy", "rx": "rx", "ry": "ry", "rz": "rz", "j": "J", "cw": "Cw", "ro": "ro", "H": "H",
     "bf_2tf_ratio": "bf/2tf", "b_t_ratio": "b/t", "b_tdes_ratio": "b/tdes", "h_tw_ratio": "h/tw",
     "h_tdes_ratio": "h/tdes", "d_t_ratio": "D/t",
 }
 
-# AISC v16 metric database units: 10^6 mm4 (Ix, Iy, Iw, Iz), 10^3 mm4 (J), 10^9 mm6 (Cw).
-SCALE = {"ix": 1e6, "iy": 1e6, "iw": 1e6, "iz": 1e6, "j": 1e3, "cw": 1e9}
+# AISC v16 metric database units: 10^6 mm4 (Ix, Iy, Iw, Iz), 10^3 mm4 (J), 10^3 mm3 (S, Z), 10^9 mm6 (Cw).
+SCALE = {"ix": 1e6, "iy": 1e6, "iw": 1e6, "iz": 1e6, "j": 1e3, "cw": 1e9, "sx": 1e3, "sy": 1e3, "zx": 1e3, "zy": 1e3}
+# Sheet-specific exceptions, verified with S = I/c (tests/test_catalog.py): PTE_RED stores Sx, Sy in mm3.
+SHEET_SCALE = {"PTE_RED": {"sx": 1.0, "sy": 1.0}}
 
 PLACEHOLDERS = {"", "-", "–", "—", "N/A", "NA", "NONE", "NULL",
                 "#DIV/0!", "#N/A", "#VALUE!", "#REF!", "#NUM!", "#NAME?", "#NULL!"}
 
 
-def _number(value, *, section, field, row):
+def _number(value, *, section, field, row, scale):
     if value is None or (isinstance(value, str) and value.strip().upper() in PLACEHOLDERS):
         return None
     try:
         if isinstance(value, bool):
             raise ValueError
-        return _NUMBER.validate_python(float(value) * SCALE.get(field, 1.0))
+        return _NUMBER.validate_python(float(value) * scale)
     except (TypeError, ValueError, PydanticValidationError):
         raise CatalogSchemaError("El valor del catálogo debe ser un número finito.",
                                  details={"section": section, "field": field, "value": repr(value), "row": row})
@@ -86,7 +88,9 @@ def load_sections_from_excel(filepath: str) -> list[Section]:
             if original is None or not str(original).strip():
                 continue
             name = section_identity(str(original))
-            values = {field: _number(row[i], section=name, field=field, row=row_number) if i is not None else None
+            scales = {**SCALE, **SHEET_SCALE.get(sheet_name.strip(), {})}
+            values = {field: _number(row[i], section=name, field=field, row=row_number,
+                                     scale=scales.get(field, 1.0)) if i is not None else None
                       for field, i in ((f, index.get(f)) for f in COLUMNS)}
             if values["area"] is None:
                 raise CatalogSchemaError("Falta el área A, obligatoria.", details={"section": name, "row": row_number})
