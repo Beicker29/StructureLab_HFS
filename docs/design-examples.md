@@ -11,9 +11,11 @@ construyen con las propiedades impresas en el ejemplo, convertidas a SI; A del H
 (no impresa) y S de los Pipe se obtienen de la geometría (radio exterior 2t, anillo) y se
 contrastan con los valores del Manual (5,37 in² y Z = 31,0 in³).
 
-An y U de los ejemplos del Capítulo D se toman del ejemplo (son datos del usuario, DD-1).
+An y U de los ejemplos del Capítulo D se toman del ejemplo (son datos del usuario, DD-1). En H.4 los
+momentos ya amplificados por el ejemplo (B1 del Apéndice 8) se dan como dato (DH-3); en H.3 se pide la
+amplificación de Cb de H1.2 y An = Ag, U = 1 (sin agujeros).
 
-| Ejemplo | Caso | φRn ejemplo (kip, kip-ft) | Programa | Diferencia | Gobierna |
+| Ejemplo | Caso | Ejemplo (φRn en kip o kip-ft; razón en H) | Programa | Diferencia | Gobierna |
 | --- | --- | --- | --- | --- | --- |
 | D.1 | W8X21, rotura en conexión | 211 | 210.7 | -0.14 % | TR |
 | D.2 | L4X4X1/2, rotura | 140 | 140.2 | +0.16 % | TR |
@@ -48,6 +50,16 @@ An y U de los ejemplos del Capítulo D se toman del ejemplo (son datos del usuar
 | F.11C-w | L4X4X1/4 eje w, Lb = 6 ft, Cb = 1.14 | 7.49 | 7.492 | +0.02 % | LTB |
 | F.12 | Barra 5 x 3 in, Lb = 6 ft | 70.4 | 70.31 | -0.12 % | Y |
 | F.13 | Barra redonda D = 1 in, Lb = 2.5 ft | 0.59 | 0.589 | -0.16 % | Y |
+| G.1B | W24X62, cortante en el alma, G2.1(a) φv = 1.00 | 306 | 305.1 | -0.29 % | V |
+| G.2B | C15X33.9, cortante en el alma, G2.1(b) | 162 | 162.6 | +0.39 % | V |
+| G.3 | L5X3X1/4, ala larga vertical (G3) | 33.8 | 33.75 | -0.15 % | V |
+| G.4 | HSS6X4X3/8, paredes anchas verticales (G4) | 93.6 | 93.4 | -0.22 % | V |
+| G.5 | HSS16.000X0.375, Lv = 192 in (G5) | 232 | 232.2 | +0.09 % | V |
+| G.6 | W21X48, cortante en el eje menor (G6) | 189 | 188.9 | -0.08 % | V |
+| G.7 | C9X20, cortante en el eje menor (G6) | 59.1 | 59.15 | +0.08 % | V |
+| H.1B | W14X99, Pu = 400 kips, Mux = 250, Muy = 80 kip-ft, L = 14 ft (H1-1a) | 0.929 | 0.9294 | +0.05 % | H1 |
+| H.3 | W14X82 en tracción, Pu = 174 kips, Mux = 192, Muy = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2) | 0.873 | 0.8732 | +0.02 % | H1 |
+| H.4 | W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft | 0.979 | 0.9808 | +0.19 % | H1 |
 
 ## Diferencias explicadas
 
@@ -68,6 +80,7 @@ estado por estado.
 
 ## Fuera del alcance de esta verificación
 
-WT (D.3, E.7, E.8, F.10), miembros armados (E.2, E.3, E.12, E.13, F.14), pasadores y barras
-de ojo (D.7, D.8), placas con agujeros al tresbolillo (D.9: An lo da el usuario) y flexión
-biaxial con interacción (F.11C completo, E.14B: Capítulo H).
+WT (D.3, E.7, E.8, F.10), miembros armados (E.2, E.3, E.12, E.13, F.14, G.8), pasadores y barras
+de ojo (D.7, D.8), placas con agujeros al tresbolillo (D.9: An lo da el usuario), ángulos simples
+con fuerzas combinadas (F.11C completo, E.14B: H2), H.1A y H.2 (tablas del Manual y H2) y torsión
+(H.5, H.6: H3).

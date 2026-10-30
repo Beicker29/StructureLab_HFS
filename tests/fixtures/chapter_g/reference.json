@@ -1,0 +1,187 @@
+{
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) G1-G6; catalog data/sections.xlsx",
+ "generator": "tests/oracles/chapter_g.py (Decimal; independent of steel_design)",
+ "cases": {
+  "W-G2.1a": {
+   "spec": {
+    "kind": "i",
+    "name": "W24X62",
+    "family": "W",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "1358.2926",
+   "phi_v": "1.00",
+   "phiVn_kN": "1358.2926"
+  },
+  "W-G2.1b": {
+   "spec": {
+    "kind": "i",
+    "name": "W24X55",
+    "family": "W",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "1239.93",
+   "phi_v": "0.90",
+   "phiVn_kN": "1115.937"
+  },
+  "W-G2.1b-Cv1": {
+   "spec": {
+    "kind": "i",
+    "name": "W16X26",
+    "family": "W",
+    "fy": 450,
+    "axis": "x"
+   },
+   "Vn_kN": "645.40764296177474313922680025180193341896384450678",
+   "phi_v": "0.90",
+   "phiVn_kN": "580.8668786655972688253041202266217400770674600561"
+  },
+  "C-G2.1b": {
+   "spec": {
+    "kind": "i",
+    "name": "C15X33.9",
+    "family": "CHANNEL",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "804.4434",
+   "phi_v": "0.90",
+   "phiVn_kN": "723.99906"
+  },
+  "W-G6": {
+   "spec": {
+    "kind": "i",
+    "name": "W21X48",
+    "family": "W",
+    "fy": 345,
+    "axis": "y"
+   },
+   "Vn_kN": "934.1082",
+   "phi_v": "0.90",
+   "phiVn_kN": "840.69738"
+  },
+  "C-G6": {
+   "spec": {
+    "kind": "i",
+    "name": "C9X20",
+    "family": "CHANNEL",
+    "fy": 345,
+    "axis": "y"
+   },
+   "Vn_kN": "292.5531",
+   "phi_v": "0.90",
+   "phiVn_kN": "263.29779"
+  },
+  "RHSS-G4-x": {
+   "spec": {
+    "kind": "rhss",
+    "name": "PTE100X50X3MM",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "105.8381478",
+   "phi_v": "0.90",
+   "phiVn_kN": "95.25433302"
+  },
+  "RHSS-G4-y": {
+   "spec": {
+    "kind": "rhss",
+    "name": "PTE100X50X3MM",
+    "fy": 345,
+    "axis": "y"
+   },
+   "Vn_kN": "48.0851478",
+   "phi_v": "0.90",
+   "phiVn_kN": "43.27663302"
+  },
+  "RHSS-G4-slender": {
+   "spec": {
+    "kind": "rhss",
+    "name": "PTE100X40X1.5MM",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "47.712469348987849258099398190922495833276143814215",
+   "phi_v": "0.90",
+   "phiVn_kN": "42.941222414089064332289458371830246249948529432794"
+  },
+  "CHSS-G5-no-Lv": {
+   "spec": {
+    "kind": "chss",
+    "name": "PTER4\"X3.00MM",
+    "fy": 345
+   },
+   "Vn_kN": "101.1598651114711767",
+   "phi_v": "0.90",
+   "phiVn_kN": "91.04387860032405903"
+  },
+  "CHSS-G5-Lv": {
+   "spec": {
+    "kind": "chss",
+    "name": "PTER4\"X3.00MM",
+    "fy": 345,
+    "Lv": 1000
+   },
+   "Vn_kN": "101.1598651114711767",
+   "phi_v": "0.90",
+   "phiVn_kN": "91.04387860032405903"
+  },
+  "L-G3-long": {
+   "spec": {
+    "kind": "angle",
+    "name": "L5X3X1/4",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "166.93515",
+   "phi_v": "0.90",
+   "phiVn_kN": "150.241635"
+  },
+  "L-G3-short": {
+   "spec": {
+    "kind": "angle",
+    "name": "L5X3X1/4",
+    "fy": 345,
+    "axis": "y"
+   },
+   "Vn_kN": "100.16109",
+   "phi_v": "0.90",
+   "phiVn_kN": "90.144981"
+  },
+  "2L-G3-LLBB-x": {
+   "spec": {
+    "kind": "angle",
+    "name": "2L4X3-1/2X3/8LLBB",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "402.43284",
+   "phi_v": "0.90",
+   "phiVn_kN": "362.189556"
+  },
+  "2L-G3-SLBB-x": {
+   "spec": {
+    "kind": "angle",
+    "name": "2L4X3-1/2X3/8SLBB",
+    "fy": 345,
+    "axis": "x"
+   },
+   "Vn_kN": "350.747838",
+   "phi_v": "0.90",
+   "phiVn_kN": "315.6730542"
+  },
+  "2L-G3-LLBB-y": {
+   "spec": {
+    "kind": "angle",
+    "name": "2L4X3-1/2X3/8LLBB",
+    "fy": 345,
+    "axis": "y"
+   },
+   "Vn_kN": "350.747838",
+   "phi_v": "0.90",
+   "phiVn_kN": "315.6730542"
+  }
+ }
+}

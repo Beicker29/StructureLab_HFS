@@ -1,4 +1,4 @@
-"""Chapter F: catalog profiles vs independent hand calculations, selection, blocks, interaction.
+"""Chapter F: catalog profiles vs independent hand calculations, selection and blocks.
 
 Expected values: tests/fixtures/chapter_f/reference.json from tests/oracles/chapter_f.py
 (Decimal, written from a360-22w.pdf F1-F13 and B4.1b, no product import).
@@ -127,15 +127,7 @@ def test_geometric_axis_f10_rejects_axial_compression(engine):
     assert result.check("flexure_x").errors[0]["code"] == "FLEXURE_DOMAIN_BLOCKED"
 
 
-def test_combination_with_two_demands_waits_for_chapter_h(engine):
-    result = engine.run(SteelCase(section_name="W14X90", material={"Fy": 345}, Pu=500, Mux=200,
-                                  lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000},
-                                  flexure={"Lb": 3000, "tension_flange_holes": False}))
-    assert [c.status.value for c in result.checks] == ["PASS", "PASS"]
-    assert result.status.value == "INCOMPLETE" and result.errors[-1]["code"] == "INTERACTION_PENDING"
-
-
-def test_a_known_failure_is_not_hidden_by_pending_interaction(engine):
+def test_a_known_failure_is_not_hidden_by_the_interaction(engine):
     result = engine.run(SteelCase(section_name="W14X90", material={"Fy": 345}, Pu=500, Mux=5000,
                                   lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000},
                                   flexure={"Lb": 3000, "tension_flange_holes": False}))

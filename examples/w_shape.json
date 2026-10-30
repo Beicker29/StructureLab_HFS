@@ -35,6 +35,19 @@
     {
       "name": "Combinación 4 — flexión y",
       "Muy": 150
+    },
+    {
+      "name": "Combinación 5 — flexocompresión biaxial y cortante",
+      "Pu": 1200,
+      "Mux": 300,
+      "Muy": 60,
+      "Vux": 350
+    },
+    {
+      "name": "Combinación 6 — tracción y flexión",
+      "Pu": -1000,
+      "Mux": 350,
+      "Vux": 250
     }
   ]
 }

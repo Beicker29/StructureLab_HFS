@@ -1,7 +1,8 @@
 # StructureLab_HFS
 
 Motor de cálculo de la **resistencia de miembros de acero** según ANSI/AISC 360-22,
-solo LRFD: capítulo D (tracción), capítulo E (compresión) y capítulo F (flexión)
+solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante) y H
+(interacción de fuerza axial y flexión)
 (`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026 del repositorio). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
@@ -13,9 +14,11 @@ normativas y limitaciones. Está pensado para que una futura aplicación web lla
 directamente al motor.
 
 > No es una certificación AISC global. `PASS` significa que se evaluaron todos los
-> estados límite del capítulo aplicable (D o E) exigidos para el miembro y que
-> `|Pu| ≤ φPn`. El programa trabaja solo con LRFD. Las longitudes efectivas, combinaciones de carga, conexiones y demás
-> capítulos quedan fuera del alcance.
+> estados límite exigidos por los capítulos aplicables a cada demanda, que cada
+> demanda no supera su resistencia de diseño y que la interacción (H1, H4) es ≤ 1. El
+> programa trabaja solo con LRFD. Las longitudes efectivas, el análisis de segundo orden
+> (Capítulo C), las combinaciones de carga, las conexiones, la torsión y demás capítulos
+> quedan fuera del alcance.
 
 ## Instalación
 
@@ -76,12 +79,14 @@ símbolos escritos en letras.
 | `Pu` | Resistencia requerida de la combinación LRFD: > 0 compresión (capítulo E), < 0 tracción (capítulo D) |
 | `Mux`, `Muy` | Momentos requeridos de la combinación (kN·m) respecto de los ejes geométricos, capítulo F |
 | `Mw`, `Mz` | Solo ángulos simples: momentos respecto de los ejes principales mayor y menor (kN·m), F10 |
+| `Vux`, `Vuy` | Cortantes requeridos (kN) que acompañan a `Mux` (paralelo a y, alma) y a `Muy` (paralelo a x), capítulo G |
 | `lengths.Lx/Ly/Lz` | Longitudes no arriostradas por eje y torsional (obligatorias en compresión) |
 | `tension` | Tracción: `An` (área neta, B4.3b, mm²), `U` (Tabla D3.1) y opcional `fabricated_length` (nota D1); An y U los aporta el usuario |
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
 | `single_angle_e5` | Requerido para ángulos simples: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3) |
 | `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
-| `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos) y `beta_w` (mm, F10-4, alas desiguales) |
+| `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos) y `beta_w` (mm, F10-4, alas desiguales); `tension_cb_amplification` (H1.2, opcional) |
+| `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`) |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
 
@@ -89,14 +94,16 @@ símbolos escritos en letras.
 material, longitudes, `tension`, E5/E6) y `cases` lista sus combinaciones de
 carga; cada combinación aporta su demanda y puede sobrescribir cualquier dato. La salida
 trae un resultado por combinación, el estado global y la combinación `governing` (mayor
-relación demanda/capacidad). Cuando se incorporen flexión, cortante e interacción, cada
-combinación llevará sus demandas simultáneas (Pu, Mu, Vu) en el mismo archivo.
+relación demanda/capacidad). Cada combinación lleva sus demandas simultáneas (Pu, Mu, Vu);
+Pr y Mr deben venir de un análisis de segundo orden (Capítulo C, decisión DH-3).
 Ver `examples/` (un archivo por familia y `multi_member.json` con varios perfiles).
 
 ### Salida
 
 `status` (`PASS`/`FAIL`/`INCOMPLETE`), `ratio` (máximo), `errors` y `checks`: una
-comprobación por demanda (`axial`, `flexure_x`, `flexure_y`) con `chapter`, `demand`,
+comprobación por demanda (`axial`, `flexure_x`, `flexure_y`, `flexure_w`, `flexure_z`,
+`shear_x`, `shear_y`) más `interaction` (Capítulo H) cuando actúan juntas fuerza axial y
+flexión o flexión en dos ejes, con `chapter`, `demand`,
 `capacity` (φRn), `ratio`, `status`, `obligations` y `result` con `classification`, `provisions`, `modes`
 (Fe, Fn, área, Pn y ecuaciones por modo), `governing_mode`, `Pn_kN`,
 `available_kN` (φPn, LRFD), `notes` y `limitations`. Un dominio no soportado o con
@@ -109,5 +116,7 @@ datos faltantes devuelve `INCOMPLETE` con el motivo; nunca una resistencia supue
 - [Capítulo E: alcance, familias, verificación y decisiones](docs/chapter-e.md)
 - [Verificación con los AISC Design Examples v16.0](docs/design-examples.md)
 - [Capítulo F: alcance, verificación, decisiones e incidencias del catálogo](docs/chapter-f.md)
+- [Capítulo G: alcance, verificación y decisiones](docs/chapter-g.md)
+- [Capítulo H: alcance, verificación y decisiones](docs/chapter-h.md)
 - [Pruebas y validación](CONTRIBUTING.md)
 - [Hoja de ruta](docs/ROADMAP.md)
