@@ -2,7 +2,8 @@
 
 Motor de cálculo de la **resistencia de miembros de acero** según ANSI/AISC 360-22,
 solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante), H
-(interacción de fuerza axial y flexión) e I (miembros compuestos: PTE rellenos, W embebidos y vigas)
+(interacción de fuerza axial y flexión) e I (miembros compuestos: PTE rellenos, W embebidos, vigas,
+muros de placas y anclajes de componentes)
 (`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026 del repositorio). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
@@ -47,6 +48,45 @@ Sin ruta, `--report` y `--pdf` escriben en `results/<nombre del JSON>`: carpeta 
 creada al pedirla, ignorada por Git y nunca leída por el motor. Los ejemplos y la
 documentación no guardan memorias generadas (se regeneran con el comando).
 
+### Resultados y PDF de los ejemplos
+
+Desde la raíz del repositorio, con el entorno activado. `--output` no crea carpetas, por eso
+se crea `results` primero. Cada ejemplo deja `results/<ejemplo>.json` (resultado),
+`results/<ejemplo>.txt` (memoria) y `results/<ejemplo>.pdf` (memoria en PDF).
+
+Todos a la vez:
+
+```powershell
+New-Item -ItemType Directory -Force results | Out-Null
+Get-ChildItem examples\*.json | ForEach-Object {
+    python -m steel_design.run $_.FullName --output "results\$($_.BaseName).json" --report --pdf | Out-Null
+}
+```
+
+Uno por uno:
+
+```powershell
+New-Item -ItemType Directory -Force results | Out-Null
+python -m steel_design.run examples/w_shape.json --output results/w_shape.json --report --pdf
+python -m steel_design.run examples/channel.json --output results/channel.json --report --pdf
+python -m steel_design.run examples/rectangular_hss.json --output results/rectangular_hss.json --report --pdf
+python -m steel_design.run examples/rectangular_hss_slender.json --output results/rectangular_hss_slender.json --report --pdf
+python -m steel_design.run examples/circular_hss.json --output results/circular_hss.json --report --pdf
+python -m steel_design.run examples/single_angle.json --output results/single_angle.json --report --pdf
+python -m steel_design.run examples/double_angle.json --output results/double_angle.json --report --pdf
+python -m steel_design.run examples/solid_rectangular.json --output results/solid_rectangular.json --report --pdf
+python -m steel_design.run examples/multi_member.json --output results/multi_member.json --report --pdf
+python -m steel_design.run examples/composite_filled.json --output results/composite_filled.json --report --pdf
+python -m steel_design.run examples/composite_encased.json --output results/composite_encased.json --report --pdf
+python -m steel_design.run examples/composite_beam.json --output results/composite_beam.json --report --pdf
+python -m steel_design.run examples/composite_method2.json --output results/composite_method2.json --report --pdf
+python -m steel_design.run examples/composite_wall.json --output results/composite_wall.json --report --pdf
+python -m steel_design.run examples/composite_anchor.json --output results/composite_anchor.json --report --pdf
+```
+
+Quite `--output ...` si solo necesita las memorias; sin ningún argumento adicional el resultado se
+imprime en pantalla y no se escribe nada.
+
 Desde Python:
 
 ```python
@@ -89,7 +129,7 @@ símbolos escritos en letras.
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
-| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`), `concrete` (`fc`, `wc`, `lightweight`), `interaction` (`H1`, `I5`), y `encased` o `beam` según el tipo ([detalle](docs/chapter-i.md)) |
+| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`, `wall`), `concrete` (`fc`, `wc`, `lightweight`), `interaction` (`H1`, `I5`, `M2`, `M2S`), `encased`, `beam` o `wall` según el tipo, y `anchor` para un anclaje I8.3 ([detalle](docs/chapter-i.md)) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
 material, longitudes, `tension`, E5/E6) y `cases` lista sus combinaciones de

@@ -1,4 +1,4 @@
-# Capítulo I — alcance implementado (etapa 1)
+# Capítulo I — alcance implementado (etapas 1 y 2)
 
 Fuente: ANSI/AISC 360-22, `a360-22w.pdf`: Specification pp. 16.1-89 a 16.1-120 y Commentary pp. 16.1-418 a
 16.1-472 (Fig. C-I3.8 para los bloques de tensiones). Errata de septiembre 2026: I5-2 usa Fysr. Solo LRFD.
@@ -10,17 +10,51 @@ El tipo de miembro se declara en `composite.kind`; no se deduce de la sección.
 
 | Tipo | Compresión | Tracción | Flexión | Cortante | Interacción |
 | --- | --- | --- | --- | --- | --- |
-| `filled`: PTE rectangular y redondo, sin barras | I2.2b, φc = 0,75 | I2-14, φt = 0,90 | I3.4b, φb = 0,90 | I4-1, φv = 0,90 | H1.1 o I5-1 |
-| `encased`: W embebido | I2.1b, φc = 0,75 | I2-8, φt = 0,90 | I3.3a(2) o (3), φb = 0,90 | I4.1(a): Capítulo G | H1.1 |
+| `filled`: PTE rectangular y redondo, sin barras | I2.2b, φc = 0,75 | I2-14, φt = 0,90 | I3.4b, φb = 0,90 | I4-1, φv = 0,90 | H1.1, I5-1, Método 2 (compacta) |
+| `encased`: W embebido | I2.1b, φc = 0,75 | I2-8, φt = 0,90 | I3.3a(2) o (3), φb = 0,90 | I4.1(a): Capítulo G | H1.1, Método 2 con I3.3a(3) |
 | `beam`: viga W con conectores | INCOMPLETO | INCOMPLETO | Positiva: I3.2a(a); negativa: I3.2b, Capítulo F | I4.3: Capítulo G | INCOMPLETO |
+| `wall`: muro de placas plano con placas de cierre | I2.3a, φc = 0,90 | I2-16, φt = 0,90 | I3.5 en su plano, φb = 0,90 | I4-2 en su plano, φv = 0,90 | I5(c): plástica |
 
-Fuera de esta etapa: muros de placas (I1.6, I2.3, I3.5, I4.4), transferencia de carga (I6), diafragmas (I7),
-anclajes de componentes (I8.3, I8.4), Apéndice 2 y Métodos 2 y 3 del Commentary de I5.
+`composite.anchor` añade el chequeo `anchor` (I8.3) a un miembro relleno, embebido o muro. En vigas se usa I8.2.
+
+Fuera del alcance: transferencia de carga (I6), diafragmas (I7), conexión ensayada (I8.4), Apéndice 2, Método 3 del
+Commentary de I5, muros con elementos de borde o en C e I, y flexión y cortante de muros fuera de su plano.
+
+## Método 2 de I5 (Commentary)
+
+- `M2S` (Método 2 simplificado): C-I5-1a y C-I5-1b con los puntos A'', B'' y C''; admite flexión en dos ejes.
+- `M2`: curva A''-C''-D''-B'' en un eje, con λ = Pn/Pno en A, C y D. El valor es demanda/curva a lo largo del rayo desde
+  el origen.
+
+Solo con compresión, en rellenos compactos o embebidos con `flexure_method = composite`. PC = C2·f'c·Ac; PD = PC/2;
+MD con el eje neutro plástico en el centroide; MC = MB = Mn de I3. Las ecuaciones de los puntos están en el Manual AISC
+Parte 6, que no está en el repositorio: se dedujeron de la distribución plástica y se contrastan con I.6 e I.11 (DI-12).
+
+## Muros de placas
+
+`composite.wall`: `length`, `tsc`, `t`, `tf` (placas de cierre, obligatorias según I1.6), `b`, `st` y `dtie`. El nombre
+`section_name` es libre, porque la sección se construye con estos datos.
+
+Requisitos, con `FAIL` si no se cumplen: placas entre 1 % y 10 % de la sección (I1.6), I1-4, st ≤ tsc y I1-5M.
+Rigidez I1-1, Pno I2-15, Mn con Fig. C-I3.8(a) y Commentary I3.5; cortante I4-2 con Asw = 2·t·L. I5(c) exige los métodos de
+I1.2, así que H1.1 no se ofrece: Mn se calcula a la fuerza axial requerida (DI-11).
+
+## Anclajes de componentes (I8.3)
+
+`composite.anchor`: `type` (`stud`, `channel`), `Qrv`, `Qrt` (kN por anclaje), `spacing`; pernos: `d`, `Fu`, `height`,
+`head_diameter` (con tracción), `edge_distance` (omitir si no hay borde libre), `breakout_in_shear`, `base_thickness`,
+`over_web`, `solid_slab`, `reinforcement_shear`, `reinforcement_tension`; canales: `la`, `tf`, `tw`.
+
+I8-3 con φ = 0,65, I8-4 con φ = 0,75, I8-5 si actúan juntos, y I8-2 con φ = 0,75 en canales. Requisitos: h/d mínimo, separación
+4d a 32d, d ≤ 19 mm (25 mm solo a cortante en losa maciza) y d ≤ 2,5 veces el metal base. Se bloquea lo que I8.3 remite a
+ACI 318, Capítulo 17: rotura a cortante o borde y separación cortos sin refuerzo declarado, cabeza menor que 1,6d, y
+cortante con tracción en concreto liviano.
 
 ## Entrada
 
 - `composite.concrete`: `fc` (MPa), `wc` (kg/m³) y `lightweight`, obligatorio porque define el límite de I1.3(a).
-- `composite.interaction`: `H1` (por defecto) o `I5`, solo en rellenos no compactos o esbeltos con flexión en un eje.
+- `composite.interaction`: `H1` (por defecto); `I5`, solo en rellenos no compactos o esbeltos con flexión en un eje;
+  `M2` o `M2S` (Commentary I5). Los muros no lo usan.
 - `composite.encased`: `H`, `B`, `Fysr`, `bars` (`area`, `db`, `x`, `y` desde el centroide), `transverse` (`db`,
   `spacing`), `flexure_method` (`steel` por defecto, o `composite`) y `anchors_provided`.
 - `composite.beam`: `moment` (`positive`, `negative`), `span`, un límite por lado (`left_beam_spacing` o
@@ -66,8 +100,24 @@ halla los ejes neutros por bisección. Coincidencia con tolerancia relativa 1e-9
 | beam-partial-web | W21X50, deck 76 mm, 8 pernos, PNA en el alma | – | C 612.42; φbMn 774.65 |
 | i5-high-axial | PTE120X60X2MM, Pu = 120, Mu = 3 (I5-1a) | no compacta | cp 0.172; cm 1.063; 0.944 |
 | i5-low-axial | igual, Pu = 10, Mu = 8 (I5-1b) | no compacta | 0.832 |
+| m2s-filled-high | PTE100X50X3MM, L = 2000, Pu = 100, Mu = 4 (C-I5-1b) | compacta | PA 135.44; PC 42.64; 1.075 |
+| m2s-filled-low | igual, Pu = 10, Mu = 8 (C-I5-1a) | compacta | 0.915 |
+| m2-filled | igual, Pu = 40, Mu = 8 | compacta | MD'' 9.09; 0.922 |
+| m2s-encased | W10X45 embebido, L = 4267, Pu = 5000, Mu = 800 | – | PA 10668.37; PC 7423.71; 0.869 |
+| m2-encased | igual | – | MD'' 1296.30; 0.781 |
+| wall-C | L = 3000, tsc = 300, t = 10, tf = 20, Fy = 345, f'c = 35, altura 6000 | – | Pno 49220.80; φcPn 35050.64 |
+| wall-T | igual | – | φtPn 22107.60 |
+| wall-M | igual | – | a 942.91; Mn 26971.36 |
+| wall-V | igual | – | φvVn 16240.26 |
+| wall-PM-compression | igual, Pu = 8000, Mu = 20000 | – | Mc 27124.28; 0.737 |
+| wall-PM-tension | igual, Pu = −3000, Mu = 15000 | – | Mc 22377.02; 0.670 |
+| stud-shear | d = 19, Fu = 450, Qrv = 50 | – | Qcv 82.93; 0.603 |
+| stud-tension | igual, Qrt = 60 | – | Qct 95.69; 0.627 |
+| stud-interaction | igual, Qrv = 40, Qrt = 60 (I8-5) | – | 0.756 |
+| channel-shear | la = 100, tf = 8, tw = 6, f'c = 35, Qrv = 100 | – | Qc 246.88; 0.405 |
 
-Contraste con los AISC Design Examples I.1, I.4 a I.7 e I.9 a I.11 en [design-examples.md](design-examples.md).
+Contraste con los AISC Design Examples I.1, I.4 a I.7, I.9 a I.11 e I.12 en [design-examples.md](design-examples.md). Los
+Design Examples no traen muros de placas: esa parte solo tiene el oráculo.
 
 ## Decisiones
 
@@ -90,6 +140,14 @@ Contraste con los AISC Design Examples I.1, I.4 a I.7 e I.9 a I.11 en [design-ex
 - **DI-9** Compresión: se toma el mayor entre I2 y el acero solo del Capítulo E, como permiten I2.1b e I2.2b.
 - **DI-10** Los límites usan los valores métricos impresos (75 mm, 19 mm). Por eso, un deck de 3 in (76,2 mm) o un perno
   de 3/4 in (19,05 mm) dan `FAIL` por conversión estricta; use 75 mm y 19 mm al declarar esos productos.
+- **DI-11** Muros, I5(c): I1.2 no da una fórmula de interacción. Se toma Mn de la distribución plástica a P = Pr/0,90 (φc = φt =
+  φb = 0,90) y el valor es Mr/(0,90·Mn); si Pr/0,90 excede la sección, el valor es P/Pmáx. La estabilidad se comprueba
+  en el chequeo axial. Esquinas rectas, como Fig. C-I3.8.
+- **DI-12** Método 2: se implementan `M2` y `M2S` (indicación del usuario, 2026-10-30, sin distinguirlos). `M2` también compara la
+  demanda con la curva nominal sin φ ni λ y gobierna el mayor valor, porque el Commentary y los ejemplos I.6 e I.11 advierten
+  que D'' puede salir de esa curva y lo declaran inseguro. No se usa el punto E: el tramo recto A''-C'' queda del lado seguro.
+- **DI-13** I8.1 limita d a 19 mm salvo solo cortante en losa maciza, aunque la Tabla I.12-1 del ejemplo lista 1 in a tracción. Se
+  sigue la Specification.
 
 ## Limitaciones
 

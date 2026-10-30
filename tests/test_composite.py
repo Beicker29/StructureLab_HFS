@@ -7,6 +7,7 @@ import json
 
 import pytest
 
+from steel_design.codes.aisc_360_22 import composite as eq
 from steel_design.domain.compression import compression_strength
 from steel_design.models import SteelCase
 from steel_design.reporting import calculation_report
@@ -22,9 +23,51 @@ def concrete(spec):
     return {"fc": spec["fc"], "wc": spec.get("wc", 2320), "lightweight": False}
 
 
+def anchor_case(spec, member=None, **overrides):
+    """A stud or channel of I8.3 in a filled member, with the limits of I8.3 met unless overridden."""
+    anchor = {"type": spec["type_"], "Qrv": spec.get("Qrv", 0), "Qrt": spec.get("Qrt", 0), "spacing": 500}
+    if spec["type_"] == "stud":
+        anchor.update(d=spec["d"], Fu=spec["Fu"], height=160, head_diameter=32, breakout_in_shear=False, base_thickness=10)
+    else:
+        anchor.update(la=spec["la"], tf=spec["tf"], tw=spec["tw"])
+    anchor.update(overrides)
+    return SteelCase(section_name="PTE100X50X3MM", material={"Fy": 345},
+                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": member == "lightweight"},
+                                "anchor": anchor})
+
+
+WALL = {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
+
+
+def wall_member(fc=35, wall=None, **demands):
+    return SteelCase(section_name="MURO", material={"Fy": 345}, **demands,
+                     composite={"kind": "wall", "concrete": {"fc": fc, "wc": 2320, "lightweight": False},
+                                "wall": {**WALL, **(wall or {})}})
+
+
+def wall_case(spec):
+    kind = spec["kind"]
+    if kind == "wall_compression":
+        lengths = {"Lx": spec["height"], "Ly": spec["height"], "Lz": spec["height"]}
+        return wall_member(Pu=1, lengths=lengths), "axial", "available_kN", "phiPn_kN"
+    if kind == "wall_tension":
+        return wall_member(Pu=-1), "axial", "available_kN", "phiPn_kN"
+    if kind == "wall_moment":
+        return wall_member(Mux=1), "flexure_x", "Mn_kNm", "Mn_kNm"
+    if kind == "wall_shear":
+        return wall_member(Vux=1), "shear_x", "available_kN", "phiVn_kN"
+    return (wall_member(Pu=spec["Pu"], Mux=spec["Mu"], lengths={"Lx": 6000, "Ly": 6000, "Lz": 6000}),
+            "interaction", "ratio", "ratio")
+
+
 def build(spec):
     """(case, check id, field of the result, expected key) from one oracle spec."""
-    kind, fy = spec["kind"], spec["fy"]
+    kind = spec["kind"]
+    if kind == "anchor":
+        return anchor_case(spec), "anchor", "ratio", "ratio"
+    if kind.startswith("wall"):
+        return wall_case(spec)
+    fy = spec["fy"]
     data = {"section_name": spec["name"], "material": {"Fy": fy}}
     lengths = {"Lx": spec.get("L", 1), "Ly": spec.get("L", 1), "Lz": spec.get("L", 1)}
     if "bars" in spec:
@@ -43,8 +86,8 @@ def build(spec):
         return SteelCase(**data, **{moment: 1}), "flexure_y" if moment == "Muy" else "flexure_x", "Mn_kNm", "Mn_kNm"
     if kind == "filled_shear":
         return SteelCase(**data, Vux=1), "shear_x", "available_kN", "phiVn_kN"
-    if kind == "i5":
-        data["composite"]["interaction"] = "I5"
+    if kind in {"i5", "method2"}:
+        data["composite"]["interaction"] = "I5" if kind == "i5" else ("M2S" if spec["simplified"] else "M2")
         return SteelCase(**data, Pu=spec["Pu"], Mux=spec["Mu"], lengths=lengths), "interaction", "ratio", "ratio"
     deck = None
     if spec["hr"]:
@@ -193,13 +236,129 @@ def test_beam_with_axial_force_is_blocked(engine):
     assert result.status.value == "INCOMPLETE"
 
 
+def test_method2_ratio_follows_the_segments():
+    points = [(0.0, 100.0), (50.0, 120.0), (100.0, 100.0), (400.0, 0.0)]
+    assert eq.method2_ratio(Pr=0.0, Mr=50.0, points=points) == pytest.approx(0.5)
+    assert eq.method2_ratio(Pr=200.0, Mr=0.0, points=points) == pytest.approx(0.5)
+    assert eq.method2_ratio(Pr=50.0, Mr=120.0, points=points) == pytest.approx(1.0)
+    assert eq.method2_ratio(Pr=100.0, Mr=200.0, points=points) == pytest.approx(12 / 7)   # 2P = 140 - 0.4P on C-D
+
+
+def test_method2_is_less_conservative_than_h1_on_a_stocky_member(engine):
+    h1 = engine.run(encased(method="composite", anchors=True, Pu=5000, Mux=800, lengths=LENGTHS)).check("interaction").ratio
+    case = encased(method="composite", anchors=True, Pu=5000, Mux=800, lengths=LENGTHS)
+    data = case.model_dump(exclude_none=True)
+    data["composite"]["interaction"] = "M2S"
+    assert engine.run(SteelCase(**data)).check("interaction").ratio < h1
+
+
+@pytest.mark.parametrize("build_case, code", [
+    (lambda: filled("PTE120X60X2MM", interaction="M2", Pu=10, Mux=1, lengths=LENGTHS), "COMPOSITE_DOMAIN_BLOCKED"),
+    (lambda: filled(interaction="M2", Pu=-10, Mux=1), "COMPOSITE_DOMAIN_BLOCKED"),
+    (lambda: filled(interaction="M2", Mux=1, Muy=1), "COMPOSITE_DOMAIN_BLOCKED"),
+    (lambda: filled(interaction="M2", Pu=10, Mux=1, Muy=1, lengths=LENGTHS), "COMPOSITE_DOMAIN_BLOCKED"),
+])
+def test_method2_domain(engine, build_case, code):
+    assert engine.run(build_case()).check("interaction").errors[0]["code"] == code
+
+
+def test_method2_simplified_admits_biaxial_flexure(engine):
+    check = engine.run(filled(interaction="M2S", Mux=1, Muy=1)).check("interaction")
+    flexures = engine.run(filled(Mux=1, Muy=1))
+    expected = 1 / flexures.check("flexure_x").capacity + 1 / flexures.check("flexure_y").capacity
+    assert check.ratio == pytest.approx(expected) and check.result["governing_equation"] == "C-I5-1a"
+
+
+def test_method2_needs_the_composite_flexural_method(engine):
+    data = encased(Pu=5000, Mux=800, lengths=LENGTHS).model_dump(exclude_none=True)
+    data["composite"]["interaction"] = "M2"
+    assert engine.run(SteelCase(**data)).check("interaction").errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+
+
+@pytest.mark.parametrize("wall, requirement", [
+    ({"tsc": 600, "t": 2, "tf": 2}, "rho_s"), ({"t": 40, "dtie": 40}, "rho_s"), ({"b": 400}, "b/t"), ({"st": 400}, "st"),
+    ({"t": 4, "st": 290, "dtie": 8, "b": 100}, "st/t"),
+])
+def test_wall_limits_of_i16_fail_the_check(engine, wall, requirement):
+    check = engine.run(wall_member(wall=wall, Mux=1)).check("flexure_x")
+    assert check.status.value == "FAIL" and any(e.get("id") == requirement for e in check.errors)
+
+
+def test_wall_covers_only_the_plane_of_the_wall(engine):
+    result = engine.run(wall_member(Muy=1, Vuy=1))
+    assert {e["code"] for e in result.errors} == {"COMPOSITE_DOMAIN_BLOCKED"}
+
+
+def test_wall_rejects_another_interaction_method():
+    with pytest.raises(ValueError):
+        SteelCase(section_name="MURO", material={"Fy": 345}, Mux=1,
+                  composite={"kind": "wall", "interaction": "M2", "concrete": {"fc": 35, "wc": 2320, "lightweight": False},
+                             "wall": WALL})
+
+
+def test_wall_axial_force_beyond_the_section_gives_a_failing_ratio(engine):
+    result = engine.run(wall_member(Pu=-100000, Mux=1))
+    assert result.check("interaction").ratio > 1 and result.status.value == "FAIL"
+
+
+def test_wall_moment_reproduces_the_uniform_compression_limit():
+    args = dict(Fy=345, fc=35, H=3000, t=10, tf=20, bi=280)
+    squash = 345 * (2 * 10 * 3000 + 2 * 20 * 280) + 0.85 * 35 * 280 * 2960
+    assert eq.wall_plastic_moment(**args, P=squash)["within_section"]
+    assert not eq.wall_plastic_moment(**args, P=squash * 1.01)["within_section"]
+    assert eq.wall_plastic_moment(**args, P=squash)["Mp"] == pytest.approx(0.0, abs=1e3)
+
+
+STUD = dict(type_="stud", d=19, Fu=450)
+
+
+@pytest.mark.parametrize("spec, overrides, requirement", [
+    ({**STUD, "Qrv": 10}, {"height": 90}, "h/d"), ({**STUD, "Qrt": 10}, {"height": 140}, "h/d"),
+    ({**STUD, "Qrv": 10}, {"spacing": 70}, "spacing_min"), ({**STUD, "Qrv": 10}, {"spacing": 700}, "spacing_max"),
+    ({**STUD, "Qrv": 10}, {"base_thickness": 5}, "dsa_t"), ({**STUD, "Qrv": 10, "d": 22}, {"height": 160}, "dsa_max"),
+])
+def test_stud_limits_fail_the_check(engine, spec, overrides, requirement):
+    check = engine.run(anchor_case(spec, **overrides)).check("anchor")
+    assert check.status.value == "FAIL" and any(e.get("id") == requirement for e in check.errors)
+
+
+@pytest.mark.parametrize("spec, overrides", [
+    ({**STUD, "Qrv": 10}, {"breakout_in_shear": True}),
+    ({**STUD, "Qrt": 10}, {"spacing": 200}),
+    ({**STUD, "Qrt": 10}, {"edge_distance": 100}),
+    ({**STUD, "Qrt": 10}, {"head_diameter": 25}),
+])
+def test_stud_conditions_that_send_to_aci_are_blocked(engine, spec, overrides):
+    check = engine.run(anchor_case(spec, **overrides)).check("anchor")
+    assert check.status.value == "INCOMPLETE" and check.errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+
+
+def test_anchor_reinforcement_limits_the_strength(engine):
+    spec = {**STUD, "Qrv": 10}
+    check = engine.run(anchor_case(spec, breakout_in_shear=True, reinforcement_shear=50)).check("anchor")
+    assert check.result["modes"]["Q"]["Qcv_kN"] == pytest.approx(0.65 * 50)
+
+
+def test_stud_in_lightweight_concrete_under_interaction_is_blocked(engine):
+    check = engine.run(anchor_case({**STUD, "Qrv": 10, "Qrt": 10}, member="lightweight")).check("anchor")
+    assert check.errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+
+
+def test_anchors_of_composite_beams_belong_to_i82(engine):
+    data = beam().model_dump(exclude_none=True)
+    data["composite"]["anchor"] = {"type": "channel", "Qrv": 1, "spacing": 300, "la": 100, "tf": 8, "tw": 6}
+    assert engine.run(SteelCase(**data)).check("anchor").errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+
+
 def test_each_side_of_the_slab_declares_one_limit():
     with pytest.raises(ValueError):
         beam(left_edge_distance=500)
 
 
 @pytest.mark.parametrize("factory", [lambda: filled(Pu=10, Mux=1, Vux=1, lengths=LENGTHS),
-                                     lambda: encased(Pu=10, Mux=1, lengths=LENGTHS), beam])
+                                     lambda: encased(Pu=10, Mux=1, lengths=LENGTHS), beam,
+                                     lambda: wall_member(Pu=100, Mux=100, Vux=100, lengths=LENGTHS),
+                                     lambda: anchor_case({**STUD, "Qrv": 10, "Qrt": 10})])
 def test_reports_are_built_for_every_member_type(engine, factory):
     case = factory()
     text = calculation_report(case, engine.run(case))

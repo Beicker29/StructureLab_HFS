@@ -63,7 +63,7 @@ def _fmt(value) -> str:
 CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y",
                 "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z",
                 "shear_x": "Cortante paralelo a y (con Mux)", "shear_y": "Cortante paralelo a x (con Muy)",
-                "interaction": "Interacción de fuerzas combinadas"}
+                "interaction": "Interacción de fuerzas combinadas", "anchor": "Anclaje de componente"}
 FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
                   "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
                   "LLB": "pandeo local del ala del ángulo"}
@@ -98,8 +98,9 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
                "ratio": result.ratio}]
     cards = []
     for c in result.checks:
-        if c.id == "interaction":
-            label = f"Interacción ({c.result['governing_equation'] if c.result else c.chapter}): razón"
+        if c.unit == "–":
+            name = "Interacción" if c.id == "interaction" else CHECK_TITLES[c.id]
+            label = f"{name} ({c.result['governing_equation'] if c.result else c.chapter}): razón"
             value = f"{c.ratio:.3f}" if c.ratio is not None else "no calculada"
         else:
             label = f"{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · {_DEMAND_SYMBOL[c.chapter]}/cap."
