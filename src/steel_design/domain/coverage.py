@@ -13,7 +13,7 @@ from ..sections.models import Section
 EXPECTED_ELEMENTS = {
     "W": {"flange", "web"}, "CHANNEL": {"flange", "web"},
     "RECTANGULAR_HSS": {"wall_b", "wall_h"}, "CIRCULAR_HSS": {"wall"},
-    "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"legs"},
+    "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"long_leg", "short_leg"},
     "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(),
 }
 
@@ -55,11 +55,15 @@ def discharge(obligations: list[Obligation], section: Section, result: dict) -> 
             item.satisfied_by = "classification"
         elif item.id == "FB" and "FB-E5" in modes:
             item.satisfied_by = "FB-E5"
+        elif item.id == "E6" and result.get("built_up"):
+            item.satisfied_by = "E6 modified slenderness (FB-y, FTB)"
         elif item.id in modes:
             item.satisfied_by = item.id
     if result["classification"]["slender"]:
-        e7 = Obligation(id="LB", provision="E7", reason="Slender elements: Pn = Fn*Ae in every global mode.")
-        if all(m["area_basis"] == "Ae" for m in modes.values()):
+        e7 = Obligation(id="LB", provision="E7", reason="Slender elements: Pn = Fn*Ae in every global mode "
+                        "(single-angle E4 uses Ag per E4/E7).")
+        if all(m["area_basis"] == "Ae" or (family == "SINGLE_ANGLE" and m["limit_state"] == "flexural_torsional_buckling")
+               for m in modes.values()):
             e7.satisfied_by = "E7-1 (all modes)"
         obligations.append(e7)
     return [item for item in obligations if item.satisfied_by is None]

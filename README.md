@@ -58,6 +58,7 @@ print(result.status, result.capacity_kN, result.compression["governing_mode"])  
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
 | `design_method` | `LRFD` (φc = 0,90) o `ASD` (Ωc = 1,67) |
 | `single_angle_e5` | Requerido para ángulos simples: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3) |
+| `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
 
 Un lote `{"cases": [...]}` comparte los campos de nivel superior.

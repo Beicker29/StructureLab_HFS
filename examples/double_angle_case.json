@@ -9,5 +9,10 @@
     "Lx": 2000,
     "Ly": 2000,
     "Lz": 2000
+  },
+  "double_angle_e6": {
+    "connectors": "welded",
+    "a": 500,
+    "end_connection_welded_or_pretensioned": true
   }
 }

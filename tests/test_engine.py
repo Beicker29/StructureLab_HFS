@@ -51,7 +51,7 @@ def test_asd_and_lrfd_differ_only_by_e1_factors(engine):
 
 
 @pytest.mark.parametrize("name, kwargs", [
-    ("2L4X4X1/4", {}), ("L4X4X1/4", {}), ("PTE100X100X4MM", {"Lz": 6000}), ("C15X50", {"factors": {"xa": 5}}),
+    ("2L4X4X1/4", {}), ("L4X4X1/4", {}), ("W14X90", {"factors": {"xa": 5, "ya": 5}}), ("C15X50", {"factors": {"xa": 5}}),
 ])
 def test_blocked_domains_are_incomplete_never_pass(engine, name, kwargs):
     result = engine.run(steel_case(name, **kwargs))

@@ -18,10 +18,15 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_e/reference.json").read_t
 REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 
 
-def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, method="LRFD", xa=0, ya=0, e5=None, E=200000, Pu=100):
+def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, method="LRFD", xa=0, ya=0, e5=None, e6=None,
+              E=200000, Pu=100):
     return SteelCase(section_name=name, design_method=method, material={"Fy": Fy, "E": E}, Pu=Pu,
                      lengths={"Lx": Lx, "Ly": Ly or Lx, "Lz": Lz or Lx}, factors={"xa": xa, "ya": ya},
-                     single_angle_e5=e5)
+                     single_angle_e5=e5, double_angle_e6=e6)
+
+
+def e6_basis(connectors, a):
+    return {"connectors": connectors, "a": a, "end_connection_welded_or_pretensioned": True}
 
 
 def e5_basis(configuration, leg, L, **overrides):
@@ -32,17 +37,18 @@ def e5_basis(configuration, leg, L, **overrides):
 
 
 def reference_case(ref, method):
-    e5 = ref["e5"]
+    e5, e6 = ref["e5"], ref["e6"]
     return make_case(ref["section"], Fy=float(ref["Fy"]), Lx=float(ref["Lx"]), Ly=float(ref["Ly"]),
                      Lz=float(ref["Lz"]), ya=float(ref["ya"]), method=method,
-                     e5=e5_basis(e5[0], e5[1], float(e5[2])) if e5 else None)
+                     e5=e5_basis(e5[0], e5[1], float(e5[2])) if e5 else None,
+                     e6=e6_basis(e6[0], float(e6[1])) if e6 else None)
 
 
 @pytest.mark.parametrize("method", ["LRFD", "ASD"])
 @pytest.mark.parametrize("case_id", sorted(REFERENCE))
-def test_catalog_profiles_match_independent_calculation(sections, case_id, method):
+def test_catalog_profiles_match_independent_calculation(engine, case_id, method):
     ref = REFERENCE[case_id]
-    result = compression_strength(reference_case(ref, method), sections[ref["section"]])
+    result = engine.run(reference_case(ref, method)).compression
     assert result["family"] == ref["family"]
     assert result["classification"]["slender"] is ref["slender"]
     assert set(result["modes"]) == set(ref["modes"])
@@ -59,11 +65,12 @@ def test_catalog_profiles_match_independent_calculation(sections, case_id, metho
 
 def test_reference_bank_covers_every_supported_catalog_family():
     assert {c["family"] for c in REFERENCE.values()} == {
-        "W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE"}
+        "W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE"}
     governing = {(c["family"], c["governing_mode"]) for c in REFERENCE.values()}
-    assert {("W", "TB"), ("CHANNEL", "FTB"), ("CHANNEL", "FB-y")} <= governing
+    assert {("W", "TB"), ("CHANNEL", "FTB"), ("CHANNEL", "FB-y"), ("SINGLE_ANGLE", "FTB"),
+            ("DOUBLE_ANGLE", "FTB")} <= governing
     assert all(any(c["family"] == f and c["slender"] for c in REFERENCE.values())
-               for f in ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE"))
+               for f in ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE"))
 
 
 # --- Selection (Table User Note E1.1 checked against E3-E7) ---------------------------
@@ -93,11 +100,10 @@ def test_classification_reports_every_element(sections):
 # --- Blocks: missing data or decisions never produce a strength -----------------------
 
 @pytest.mark.parametrize("name, kwargs, error", [
-    ("PTE100X100X4MM", {"Lz": 6000}, IncompleteSectionDataError),        # E4 required, Cw absent
     ("C15X50", {"ya": 50}, RuleNotImplementedError),                     # E4(f)
     ("PTE100X100X4MM", {"xa": 10}, RuleNotImplementedError),             # E4(f)
     ("W14X90", {"xa": 10, "ya": 10}, RuleNotImplementedError),           # E4(f), both offsets
-    ("2L4X4X1/4", {}, RuleNotImplementedError),                          # double angles pending
+    ("2L4X4X1/4", {}, RuleNotImplementedError),                          # E6 data required
     ("L4X4X1/4", {}, RuleNotImplementedError),                           # no E5 basis -> Chapter H
     ("W14X90", {"E": 210000}, IncompleteSectionDataError),               # E defined as 200000 MPa
 ])
@@ -116,10 +122,37 @@ def test_single_angle_outside_e5_is_blocked(sections, overrides):
                              sections["L4X4X1/4"])
 
 
-def test_single_angle_requiring_e4_is_blocked(sections):
-    # b/t = 16 > 0.71*sqrt(E/Fy) = 14.97 at Fy = 450 MPa: E5 requires E4 flexural-torsional buckling.
-    with pytest.raises(RuleNotImplementedError, match="0.71"):
-        compression_strength(make_case("L4X4X1/4", Fy=450, e5=e5_basis("a", "long", 2000)), sections["L4X4X1/4"])
+def test_single_angle_e4_needs_coincident_geometric_lengths(sections):
+    # Principal-axis buckling (E4) is defined only if Lx = Ly and Kx = Ky.
+    with pytest.raises(RuleNotImplementedError, match="principal axes"):
+        compression_strength(make_case("L4X4X1/4", Fy=450, Lx=2000, Ly=1500, e5=e5_basis("a", "long", 2000)),
+                             sections["L4X4X1/4"])
+
+
+def test_unequal_angle_shear_center_reproduces_catalog_ro(sections):
+    from steel_design.domain.compression import angle_shear_center
+    for section in sections.values():
+        if section.type == "SINGLE_ANGLE":
+            wo, zo = angle_shear_center(section)
+            ro = math.sqrt(wo**2 + zo**2 + (section.iw + section.iz) / section.area)   # E4-9
+            assert ro == pytest.approx(section.ro, rel=0.01), section.name
+
+
+@pytest.mark.parametrize("name, contact", [("2L4X4X1/4", True), ("2L4X4X1/4X3/4", False),
+                                           ("2L8X4X1/2LLBB", True), ("2L8X4X1/2X3/8SLBB", False)])
+def test_double_angle_classification_follows_manual_label(engine, name, contact):
+    result = engine.run(make_case(name, e6=e6_basis("welded", 300))).compression
+    cases = {row["b4_case"] for row in result["classification"]["elements"]}
+    assert cases == ({1} if contact else {3})
+
+
+def test_double_angle_e6_requirements(engine):
+    blocked = engine.run(make_case("2L4X4X1/4", e6={**e6_basis("welded", 300),
+                                                    "end_connection_welded_or_pretensioned": False}))
+    assert blocked.status.value == "INCOMPLETE"                   # E6.1 end connection
+    spaced = engine.run(make_case("2L4X4X1/4", Lx=1000, e6=e6_basis("welded", 900), Pu=1))
+    assert spaced.status.value == "FAIL"                          # E6.2(a): a/ri > 3/4 governing slenderness
+    assert spaced.errors[0]["code"] == "REQUIREMENT_NOT_MET"
 
 
 def test_engine_reports_governing_capacity_and_status(engine):
