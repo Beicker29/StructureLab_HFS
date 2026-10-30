@@ -6,6 +6,34 @@ from ..models import CustomSectionType, SteelCase
 from .models import Section
 
 
+def build_box_section(case: SteelCase) -> Section:
+    """Welded box (mm): sharp corners; b and h are the clear distances, as in Design Guide 6, Example 2.5."""
+    box = case.composite.box
+    if 2 * box.t >= min(box.B, box.H):
+        raise ValidationError("Las placas deben dejar un núcleo de concreto positivo.", details={"section": case.section_name})
+    bi, hi = box.B - 2 * box.t, box.H - 2 * box.t
+    return Section(name=case.section_name, type="RECTANGULAR_HSS", A=box.B * box.H - bi * hi, tdes=box.t, Ht=box.H, B=box.B,
+                   b=bi, h=hi, Ix=(box.B * box.H**3 - bi * hi**3) / 12.0, Iy=(box.H * box.B**3 - hi * bi**3) / 12.0,
+                   Zx=(box.B * box.H**2 - bi * hi**2) / 4.0, Zy=(box.H * box.B**2 - hi * bi**2) / 4.0,
+                   **{"b/tdes": bi / box.t, "h/tdes": hi / box.t})
+
+
+def build_c_wall_section(case: SteelCase) -> Section:
+    """Steel of a C-shaped wall (mm); the catalog-free properties of Design Guide 38 live in codes/aisc_dg38/walls.py."""
+    wall = case.composite.c_wall
+    if 2 * wall.tp >= min(wall.tsc_w, wall.tsc_f) or wall.W <= wall.tsc_w + wall.tp or wall.L <= 2 * wall.tsc_f:
+        raise ValidationError("Las placas y las alas deben dejar un núcleo de concreto positivo.", details={"section": case.section_name})
+    return Section(name=case.section_name, type="COMPOSITE_WALL", A=wall.tp * (4 * wall.W + 2 * wall.L + 2 * wall.tsc_f - 12 * wall.tp))
+
+
+def build_coupling_beam_section(case: SteelCase) -> Section:
+    """Steel of a built-up box coupling beam (mm)."""
+    beam = case.composite.coupling_beam
+    if 2 * beam.tw >= beam.b or 2 * beam.tf >= beam.h:
+        raise ValidationError("Las placas deben dejar un núcleo de concreto positivo.", details={"section": case.section_name})
+    return Section(name=case.section_name, type="COMPOSITE_WALL", A=2 * beam.h * beam.tw + 2 * (beam.b - 2 * beam.tw) * beam.tf)
+
+
 def build_wall_section(case: SteelCase) -> Section:
     """Steel of a planar composite plate shear wall (mm): two full-length plates and two flange plates between them."""
     wall = case.composite.wall

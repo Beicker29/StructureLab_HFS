@@ -1,0 +1,23 @@
+{
+  "section_name": "PTER8\"X5.00MM",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+  "composite": {
+    "kind": "filled",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "interaction": "M2S",
+    "filled": {
+      "Fysr": 420,
+      "transverse": {"db": 10, "spacing": 300},
+      "bars": [
+        {"area": 200, "db": 16, "x": 0, "y": 55},
+        {"area": 200, "db": 16, "x": 0, "y": -55},
+        {"area": 200, "db": 16, "x": 55, "y": 0},
+        {"area": 200, "db": 16, "x": -55, "y": 0}
+      ]
+    }
+  },
+  "cases": [
+    {"name": "Compression, flexure and shear", "Pu": 600, "Mux": 40, "Vux": 100}
+  ]
+}

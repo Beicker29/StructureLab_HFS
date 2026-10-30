@@ -2,7 +2,7 @@
 
 ## Alcance
 
-- El repositorio implementa los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 y 2) de ANSI/AISC 360-22, solo LRFD (no añadir ASD). Los demás
+- El repositorio implementa los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 a 3), con los Apéndices 2 y 8.1, de ANSI/AISC 360-22, solo LRFD (no añadir ASD), y contenidos de las Design Guides 6 y 38 que no son norma. Los demás
   se reincorporan en el orden de la [hoja de ruta](docs/ROADMAP.md), uno por vez.
 - Fuente normativa: `a360-22w.pdf` y las erratas del repositorio. Las Design Guides y los Design Examples sirven para
   contrastar e interpretar, no son norma ([guías](docs/design-guides.md)). Alcance,

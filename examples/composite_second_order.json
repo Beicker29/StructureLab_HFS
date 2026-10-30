@@ -1,0 +1,17 @@
+{
+  "section_name": "PTE200X200X7MM",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+  "composite": {
+    "kind": "filled",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "interaction": "M2S",
+    "second_order": {
+      "axis": "x", "Mnt": 40, "Mlt": 30, "Pnt": 800, "Plt": 100, "M1_M2": -0.5,
+      "Pstory": 20000, "Pmf": 8000, "H": 500, "L": 4000, "drift": 10
+    }
+  },
+  "cases": [
+    {"name": "Appendix 8.1, B1 and B2"}
+  ]
+}
