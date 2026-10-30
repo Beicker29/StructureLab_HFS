@@ -4,7 +4,7 @@ No filesystem access; a future web API calls execute_payload directly.
 """
 import copy
 
-from .domain.errors import ValidationError
+from .errors import ValidationError
 from .engine import SteelDesignEngine
 from .models import DesignResult, SteelCase, Status
 
@@ -29,8 +29,9 @@ def prepare_cases(payload: dict) -> list[tuple[str | None, SteelCase]]:
             for i, c in enumerate(cases)]
 
 
-def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str | None, DesignResult]]:
-    return [(tag, engine.run(case)) for tag, case in prepare_cases(payload)]
+def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str | None, SteelCase, DesignResult]]:
+    """Run every case; returns (name or None, validated input case, result)."""
+    return [(tag, case, engine.run(case)) for tag, case in prepare_cases(payload)]
 
 
 def overall_status(results: list[DesignResult]) -> Status:

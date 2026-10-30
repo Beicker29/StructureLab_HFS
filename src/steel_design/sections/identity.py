@@ -5,7 +5,7 @@ Separators, units, punctuation and all non-ASCII characters remain significant.
 """
 import re
 
-from ..domain.errors import ValidationError
+from ..errors import ValidationError
 
 _UPPER_ASCII = str.maketrans("abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 _SPACE = re.compile(r"[ \t\r\n\f\v]+")

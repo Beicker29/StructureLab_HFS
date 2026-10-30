@@ -6,8 +6,6 @@ actually applied. Units: N, mm, MPa. Selection lives in domain/compression.py.
 """
 import math
 
-from ...design_methods import require_design_method
-
 
 E_STEEL = 200000.0   # MPa, S22 E3 (definition of E)
 G_STEEL = 77200.0    # MPa, S22 E4 (definition of G)
@@ -203,8 +201,10 @@ def available_strength(Pn_N: float) -> dict:
     return {"LRFD": PHI_C * Pn_N / 1000.0, "ASD": Pn_N / OMEGA_C / 1000.0}
 
 
-def design_factor(method) -> dict:
-    method = require_design_method(method).value
+def design_factor(method: str) -> dict:
+    """E1 factor for "LRFD" or "ASD" (DesignMethod is a str enum)."""
     if method == "LRFD":
-        return {"design_method": method, "phi": PHI_C, "omega": None, "capacity_expression": "phi*Pn"}
-    return {"design_method": method, "phi": None, "omega": OMEGA_C, "capacity_expression": "Pn/omega"}
+        return {"design_method": "LRFD", "phi": PHI_C, "omega": None, "capacity_expression": "phi*Pn"}
+    if method == "ASD":
+        return {"design_method": "ASD", "phi": None, "omega": OMEGA_C, "capacity_expression": "Pn/omega"}
+    raise ValueError(f"Unsupported design method: {method!r}; expected LRFD or ASD")

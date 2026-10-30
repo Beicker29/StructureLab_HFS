@@ -2,7 +2,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from ..models import SteelCase
 from ..sections.models import Section
-from .errors import ValidationError
+from ..errors import ValidationError
 
 
 def validate_case(case: SteelCase) -> SteelCase:

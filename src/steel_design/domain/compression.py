@@ -7,11 +7,13 @@ the governing mode is the lowest Pn (E1). Domains that need data or decisions
 not available here raise structured errors instead of returning a strength.
 """
 import math
+from typing import Callable
 
 from ..codes.aisc_360_22 import compression as eq
 from ..models import SteelCase
+from ..sections.identity import double_angle_label
 from ..sections.models import Section
-from .errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 
 
 SUPPORTED_FAMILIES = ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE",
@@ -326,20 +328,25 @@ def _effective_area(section: Section, classification: dict, Fn: float, E: float,
     return {"Ae_mm2": ae, "equation": "E7-1", "plates": plates}
 
 
-def compression_strength(case: SteelCase, section: Section, component: Section | None = None,
-                         in_contact: bool | None = None) -> dict:
+def compression_strength(case: SteelCase, section: Section,
+                         catalog: Callable[[str], Section] | None = None) -> dict:
     """Nominal and available compressive strength of one member (Chapter E).
 
-    Double angles also need the single-angle component and whether the legs are in
-    continuous contact (both resolved from the AISC_Manual_Label by the engine).
+    catalog(name) returns a catalog section; double angles use it for their
+    single-angle component (J, rz). Contact vs separators comes from the
+    AISC_Manual_Label: no separation suffix means continuous contact (D-11).
     """
     factor = eq.design_factor(case.design_method)
     family = section.type.upper()
     E, Fy = case.material.E, case.material.Fy
     if abs(E - eq.E_STEEL) > 1e-6:
         _incomplete("Chapter E defines E = 200000 MPa.", section, ["material.E"])
-    if family == "DOUBLE_ANGLE" and (component is None or in_contact is None):
-        _blocked("Double angles need their single-angle component and contact condition.", section)
+    component = in_contact = None
+    if family == "DOUBLE_ANGLE":
+        if catalog is None:
+            _blocked("Double angles need the catalog to read their single-angle component.", section)
+        label = double_angle_label(section.name)
+        component, in_contact = catalog(label["component"]), label["in_contact"]
     if family not in SUPPORTED_FAMILIES:
         _blocked("Chapter E is not implemented for this family.", section)
 

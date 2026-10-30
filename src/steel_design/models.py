@@ -1,11 +1,48 @@
 """Input and result models for member compression (ANSI/AISC 360-22 Chapter E). Units: N, mm, MPa, kN."""
 from enum import Enum
-from typing import Literal, Optional
+from typing import Annotated, Literal, Optional
 
-from pydantic import BaseModel, Field, StrictBool, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 
-from .design_methods import DesignMethod
-from .input_contracts import InputModel, NonBlankString, NonNegativeNumber, PositiveNumber
+
+class DesignMethod(str, Enum):
+    LRFD = "LRFD"
+    ASD = "ASD"
+
+
+# JSON numbers only: bool and numeric strings are not engineering magnitudes.
+FiniteNumber = Annotated[float, Field(strict=True, allow_inf_nan=False)]
+PositiveNumber = Annotated[FiniteNumber, Field(gt=0)]
+NonNegativeNumber = Annotated[FiniteNumber, Field(ge=0)]
+PositiveCount = Annotated[int, Field(strict=True, gt=0)]
+NonBlankString = Annotated[str, Field(strict=True, pattern=r"\S")]
+
+
+class InputModel(BaseModel):
+    """One policy for cases, nested objects and normalized section records.
+
+    Revalidation prevents model_copy/model_construct or later mutations from
+    bypassing the engine boundary. These Pydantic escape hatches are not trusted
+    input APIs. Output models deliberately do not inherit this policy.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid", allow_inf_nan=False, validate_default=True,
+        revalidate_instances="always",
+    )
+
+
+def unique_json_object(pairs):
+    """Reject duplicate keys before a JSON decoder loses the first value.
+
+    Used by the CLI when reading JSON input.
+    """
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON field {key!r}; supply exactly one value per field.")
+        result[key] = value
+    return result
 
 
 class Material(InputModel):
@@ -99,6 +136,7 @@ class DesignResult(BaseModel):
     design_method: str
     status: Status
     demand_kN: float
+    section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     capacity_kN: Optional[float] = None
     ratio: Optional[float] = None
     compression: Optional[dict] = Field(None, description="Full Chapter E result (modes, equations, intermediates)")
