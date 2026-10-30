@@ -179,3 +179,8 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# StructureLab_HFS: generated outputs and local scratch (never versioned)
+results/
+.tmp*/
+tests/.tmp_tests/
+*.whl

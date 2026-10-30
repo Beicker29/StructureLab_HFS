@@ -8,12 +8,7 @@ class DesignMethod(str, Enum):
 
 
 def require_design_method(value: str) -> DesignMethod:
-    """Reject unknown methods, including on zero-strength conversion paths.
-
-    Low-level D/E/G/H helpers historically accept case-insensitive tokens.
-    Whitespace, nonstrings and missing values are not method aliases.
-    SteelCase retains its stricter, uppercase JSON contract.
-    """
+    """Accept a DesignMethod or a case-insensitive "LRFD"/"ASD"; reject anything else."""
     if isinstance(value, str):
         try:
             return DesignMethod(value.upper())

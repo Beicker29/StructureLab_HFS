@@ -1,9 +1,0 @@
-{
-  "checkout_equals_after_wheel": true,
-  "changed": [
-    "steel_design/contracts.py",
-    "steel_design/execution.py",
-    "steel_design/preparation.py"
-  ],
-  "python_files": 46
-}

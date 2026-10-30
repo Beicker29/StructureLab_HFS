@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "structurelab-hfs"
-version = "0.2.0"
-description = "Steel member design engine with explicit AISC 360-22 coverage limits"
+version = "0.3.0"
+description = "Member compressive strength per ANSI/AISC 360-22 Chapter E"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -16,10 +16,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest==9.1.1",
-    "build==1.6.1",
     "ruff==0.17.3",
-    "twine==7.0.0",
-    "jsonschema==4.26.0",
+    "build==1.6.1",
 ]
 
 [project.scripts]
@@ -28,28 +26,17 @@ structurelab-hfs = "steel_design.run:main"
 [tool.setuptools]
 include-package-data = false
 
-# Conventional src-layout; only real steel_design packages are distributed.
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["steel_design", "steel_design.*"]
 namespaces = false
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.ruff]
 target-version = "py312"
-include = ["src/**/*.py", "tests/test_*.py", "scripts/*.py", "pyproject.toml"]
+include = ["src/**/*.py", "tests/**/*.py", "pyproject.toml"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]
-
-# Measured pre-existing debt; see docs/audit/hfs020/report.md.
-# Preserve normative code and previous evidence/tests in this packaging milestone.
-[tool.ruff.lint.per-file-ignores]
-"src/steel_design/domain/rules/composite_rules.py" = ["F841"]
-"scripts/audit_hfs017_probes.py" = ["E702"]
-"scripts/compare_hfs015.py" = ["F401", "E701", "E702", "E731"]
-"scripts/compare_hfs017.py" = ["E701", "E731"]
-"scripts/probe_hfs015.py" = ["E402", "E701"]
-"scripts/verify_hfs015_scope.py" = ["E701", "E702"]
-"tests/test_hfs014_summary_bundle.py" = ["F401", "E702"]
-"tests/test_hfs015_precision_advice.py" = ["E701", "E702"]
-"tests/test_hfs017_design_method.py" = ["E702"]

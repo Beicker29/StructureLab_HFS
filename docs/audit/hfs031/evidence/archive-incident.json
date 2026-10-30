@@ -1,5 +1,0 @@
-{
-  "error": "PermissionError reading .venv/31-verify/dist/structurelab_hfs-0.2.0-py3-none-any.whl in restricted shell",
-  "partial_archive": "archiving-restricted-attempt.zip",
-  "action": "retry read/archive outside sandbox; no ACL changes or deletions"
-}
