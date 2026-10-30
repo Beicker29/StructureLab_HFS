@@ -60,8 +60,8 @@ Puntos del catálogo: A = punta del ala corta, B = talón, C = punta del ala lar
 ## Entrada
 
 - `Mux`, `Muy` por combinación (kN·m). Una combinación con más de una demanda
-  (Pu, Mux, Muy) se calcula por componente pero queda INCOMPLETO hasta tener el
-  Capítulo H; un FAIL conocido se informa siempre (decisión DF-4).
+  (Pu, Mux, Muy) se calcula por componente y se combina en el chequeo de interacción
+  del Capítulo H ([chapter-h.md](chapter-h.md)); un FAIL conocido se informa siempre (DF-4).
 - `flexure` del miembro: `Lb` (mm, obligatorio cuando aplica el pandeo
   lateral-torsional), `Cb` (1,0 si no se indica: límite inferior de F1-1, DF-2) y
   `tension_flange_holes` (obligatorio en I y canales sobre el eje x, F13.1) con
@@ -119,8 +119,9 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
   miembros doblemente simétricos (indicación del usuario). La memoria lo señala.
 - **DF-3** La presencia de agujeros en el ala traccionada (F13.1) debe declararse en I
   y canales sobre el eje x; sin declaración, INCOMPLETO (indicación del usuario). Afg = bf·tf.
-- **DF-4** Combinaciones con más de una demanda: cada componente se calcula y el
-  estado global es INCOMPLETO hasta implementar el Capítulo H (indicación del usuario).
+- **DF-4** Combinaciones con más de una demanda: cada componente se calcula por separado;
+  desde la incorporación del Capítulo H se combinan con H1/H4 (los ángulos simples siguen
+  INCOMPLETO hasta H2).
 - **DF-5** F7-3: Se referido al ala comprimida con el eje neutro desplazado
   (Commentary F7): se descuenta (b − be)·t del ala comprimida a (H − t)/2 del
   centroide, incluida la inercia propia de la franja; c = H/2 + desplazamiento.
@@ -159,7 +160,7 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
 - Lb y Cb son datos del usuario; se supone que los apoyos restringen la rotación
   respecto del eje longitudinal (F1(b)). F1(d) (miembros con un eje de simetría en
   curvatura doble) no se evalúa: Cb es dato del usuario también para ángulos dobles.
-- Flexión simple respecto de un eje principal; flexión biaxial e interacción con carga
-  axial requieren el Capítulo H. Cortante (Capítulo G) aún no implementado.
+- Cada chequeo de flexión es respecto de un eje; la flexión biaxial y la carga axial se
+  combinan en el chequeo de interacción (Capítulo H). El cortante es el Capítulo G.
 - F13.2 a F13.4 (proporciones de miembros armados y cubreplacas) no aplican a los
   perfiles laminados del catálogo.

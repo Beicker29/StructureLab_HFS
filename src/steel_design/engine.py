@@ -1,12 +1,15 @@
-"""Design of one member for one LRFD load combination: one check per required strength, then the status.
+"""Design of one member for one LRFD load combination: one check per required strength, their interaction, status.
 
 Pu > 0: compression (Chapter E); Pu < 0: tension (Chapter D); Mux, Muy (and Mw, Mz for single
-angles about their principal axes): flexure (Chapter F).
-More than one nonzero demand needs the interaction of Chapter H (not yet available).
+angles about their principal axes): flexure (Chapter F); Vux, Vuy: shear (Chapter G). Axial force
+and flexure acting together, or flexure about two axes, add the interaction check (Chapter H).
 """
 from .domain.compression import compression_strength
-from .domain.coverage import discharge, flexure_obligations, required_obligations
+from .domain.coverage import (discharge, flexure_obligations, interaction_obligations, required_obligations,
+                              shear_obligations)
 from .domain.flexure import flexure_strength
+from .domain.interaction import COMBINED, amplified_cb_case, combined_strength, tension_cb_factor
+from .domain.shear import shear_strength
 from .domain.tension import tension_strength
 from .domain.validation import section_inconsistencies, validate_case, validate_section
 from .errors import IncompleteSectionDataError, RuleNotImplementedError, SectionNotFoundError
@@ -43,7 +46,9 @@ class SteelDesignEngine:
             return Check(**common, status=Status.INCOMPLETE, errors=[exc.to_dict()])
         unmet = discharge(obligations, section, result)
         violated = [r for r in result["requirements"] if not r["satisfied"]]
-        capacity = result["available_kN"] if unit == "kN" else result["available_kNm"]
+        capacity = {"kN": result.get("available_kN"), "kN·m": result.get("available_kNm"), "–": 1.0}[unit]
+        if unit == "–":
+            common["demand"] = demand = result["ratio"]
         ratio = demand / capacity
         if violated or (not unmet and ratio > 1.0):
             status = Status.FAIL
@@ -52,6 +57,16 @@ class SteelDesignEngine:
         errors = ([{"code": "UNMET_OBLIGATION", "id": o.id, "provision": o.provision} for o in unmet]
                   + [{"code": "REQUIREMENT_NOT_MET", **r} for r in violated])
         return Check(**common, status=status, capacity=capacity, ratio=ratio, result=result, errors=errors)
+
+    def _flexure_case(self, case: SteelCase, section: Section) -> tuple[SteelCase, dict | None]:
+        """H1.2: Cb amplified by axial tension when the user asks for it."""
+        if not (case.Pu < 0 and case.flexure and case.flexure.tension_cb_amplification):
+            return case, None
+        try:
+            factor = tension_cb_factor(case, section)
+        except IncompleteSectionDataError as exc:
+            return case, {"applies": False, "reason": str(exc)}
+        return (amplified_cb_case(case, factor) if factor["applies"] else case), factor
 
     def run(self, case: SteelCase) -> DesignResult:
         case = validate_case(case)
@@ -64,20 +79,39 @@ class SteelDesignEngine:
                        else (lambda: tension_strength(case, section)))
             checks.append(self._check("axial", chapter, abs(case.Pu), "kN", required_obligations(case, section),
                                       compute, section, inconsistent))
+        flexure_case, cb_factor = self._flexure_case(case, section)
         for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
             if moment:
-                checks.append(self._check(
+                check = self._check(
                     f"flexure_{axis}", "F", abs(moment), "kN·m", flexure_obligations(section, axis),
-                    lambda axis=axis: flexure_strength(case, section, axis, catalog=self._catalog),
-                    section, inconsistent))
-        pending = len(checks) > 1
+                    lambda axis=axis: flexure_strength(flexure_case, section, axis, catalog=self._catalog),
+                    section, inconsistent)
+                if cb_factor and check.result:
+                    check.result["notes"].append(_cb_note(cb_factor))
+                    check.result["inputs"]["H1_2_Cb_factor"] = cb_factor.get("factor")
+                checks.append(check)
+        for axis, shear in (("x", case.Vux), ("y", case.Vuy)):
+            if shear:
+                checks.append(self._check(f"shear_{axis}", "G", abs(shear), "kN", shear_obligations(section, axis),
+                                          lambda axis=axis: shear_strength(case, section, axis),
+                                          section, inconsistent))
+        combined = [c for c in checks if c.id in COMBINED]
+        if len(combined) > 1:
+            checks.append(self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
+                                      lambda: combined_strength(case, section, combined), section, []))
         statuses = {c.status for c in checks}
         if Status.FAIL in statuses:
             status = Status.FAIL                      # a known failure is never hidden by incompleteness
-        elif Status.INCOMPLETE in statuses or pending:
+        elif Status.INCOMPLETE in statuses:
             status = Status.INCOMPLETE
         else:
             status = Status.PASS
         return DesignResult(section=section.name, family=section.type, status=status, checks=checks,
-                            interaction_pending=pending,
                             section_data=section.model_dump(mode="json", exclude_none=True))
+
+
+def _cb_note(factor: dict) -> str:
+    if not factor["applies"]:
+        return f"H1.2 no aplicado: {factor['reason']}"
+    return (f"H1.2: Cb = {factor['Cb_user']:g} · √(1 + Pr/Pey) = {factor['Cb']:.3f} "
+            f"(Pey = {factor['Pey_N'] / 1000:.1f} kN, H1-2).")

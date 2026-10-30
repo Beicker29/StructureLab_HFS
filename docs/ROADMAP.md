@@ -1,7 +1,7 @@
 # Hoja de ruta
 
-El repositorio contiene los capítulos D, E y F de ANSI/AISC 360-22, solo por LRFD. Los capítulos
-G, H e I se retiraron (recuperables en el historial de Git, commit `d3a1b02`) y
+El repositorio contiene los capítulos D, E, F, G y H (H1, H4) de ANSI/AISC 360-22, solo por LRFD. El capítulo
+I se retiraron (recuperables en el historial de Git, commit `d3a1b02`) y
 se reincorporan, uno por vez, con la misma estructura y oráculos independientes.
 
 ## Hecho
@@ -19,13 +19,17 @@ se reincorporan, uno por vez, con la misma estructura y oráculos independientes
   ([detalle](chapter-f.md)). Resultado por comprobación (axial, flexión x, flexión y).
 - Capítulo F, etapa 2: F9 ángulos dobles (eje x) y F10 ángulos simples en ejes
   geométricos y principales (`Mw`, `Mz`), verificado con cálculos independientes.
-- Contraste con 33 casos de los AISC Design Examples v16.0 (D, E, F): coincidencia
+- Capítulo G (cortante): G2.1 sin rigidizadores, G3, G4, G5 y G6, verificado con
+  cálculos independientes ([detalle](chapter-g.md)).
+- Capítulo H, etapa 1: H1.1, H1.2 (con amplificación de Cb opcional) y H4, verificado
+  con cálculos independientes ([detalle](chapter-h.md)).
+- Contraste con 43 casos de los AISC Design Examples v16.0 (D, E, F, G, H): coincidencia
   dentro de ±1 % salvo dos diferencias explicadas ([detalle](design-examples.md)).
 
 ## Siguiente
 
-1. Revisión ingenieril de las decisiones de [D](chapter-d.md), [E](chapter-e.md) y [F](chapter-f.md);
+1. Revisión ingenieril de las decisiones de [D](chapter-d.md), [E](chapter-e.md), [F](chapter-f.md), [G](chapter-g.md) y [H](chapter-h.md);
    corregir en el catálogo la fila IPE 80 y completar los datos de IPE/HEA/HEB.
-2. Capítulo G (cortante), con oráculo independiente.
-3. Capítulo H (interacción), que cierra las combinaciones con más de una demanda.
+2. Capítulo H, etapa 2: H2 para ángulos simples con fuerzas combinadas (tensiones en A, B, C).
+3. Consulta pendiente DG-4: cortante en barras macizas.
 4. Aplicación web sobre `steel_design.execution.execute_payload`.

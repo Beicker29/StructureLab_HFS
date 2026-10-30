@@ -22,8 +22,8 @@ LIMIT_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-tors
 _LIMITATIONS = (
     "Lb y Cb son datos del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone que los apoyos "
     "restringen la rotación respecto del eje longitudinal (F1(b)).",
-    "Flexión simple respecto de un eje principal: la flexión biaxial y la combinación con carga axial requieren el "
-    "Capítulo H.",
+    "Flexión respecto de un eje: la flexión biaxial y la combinación con carga axial se verifican en el chequeo de "
+    "interacción (Capítulo H).",
 )
 
 

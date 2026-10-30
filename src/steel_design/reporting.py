@@ -25,8 +25,8 @@ _SECTION_NAMES = {"area": "Ag", "ix": "Ix", "iy": "Iy", "iw": "Iw", "iz": "Iz", 
                   "b_tdes_ratio": "b/tdes", "h_tw_ratio": "h/tw", "h_tdes_ratio": "h/tdes", "d_t_ratio": "D/t"}
 _ELEMENTS = {"flange": "ala", "web": "alma", "wall_b": "pared b", "wall_h": "pared h", "wall": "pared",
              "long_leg": "ala larga", "short_leg": "ala corta", "flange_legs": "alas horizontales",
-             "web_legs": "alas verticales"}
-_LABELS = {"Lc_over_r_o": "(Lc/r)o", "a_over_ri": "a/ri", "slenderness_equation": "Ec. de esbeltez",
+             "web_legs": "alas verticales", "walls": "paredes paralelas al cortante"}
+_LABELS = {"Lc_over_r_o": "(Lc/r)o", "Cv_equation": "Ec. Cv", "Fcr_equation": "Ec. Fcr", "D_t": "D/t", "a_over_ri": "a/ri", "slenderness_equation": "Ec. de esbeltez",
            "Fez_equation": "Ec. Fez", "Fe_torsion_equation": "Ec. Fe torsional", "symmetry_axis": "Eje de simetría",
            "connected_leg": "Ala conectada", "leg_ratio": "bl/bs", "ro_mm": "r̄o (mm)",
            "ro_from_geometry_mm": "r̄o geométrico (mm)", "ro2_mm2": "r̄o² (mm²)", "H": "H", "Ki": "Ki",
@@ -61,7 +61,9 @@ def _fmt(value) -> str:
 # --- document model ------------------------------------------------------------------------
 
 CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y",
-                "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z"}
+                "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z",
+                "shear_x": "Cortante paralelo a y (con Mux)", "shear_y": "Cortante paralelo a x (con Muy)",
+                "interaction": "Interacción de fuerzas combinadas"}
 FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
                   "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
                   "LLB": "pandeo local del ala del ángulo"}
@@ -70,11 +72,14 @@ FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-to
 def _check_title(check) -> str:
     if check.id == "axial":
         return "Compresión (Capítulo E)" if check.chapter == "E" else "Tracción (Capítulo D)"
-    return f"{CHECK_TITLES[check.id]} (Capítulo F)"
+    return f"{CHECK_TITLES[check.id]} (Capítulo {check.chapter})"
 
 
 def _capacity_label(check) -> str:
-    return {"E": "φc·Pn", "D": "φt·Pn", "F": "φb·Mn"}[check.chapter]
+    return {"E": "φc·Pn", "D": "φt·Pn", "F": "φb·Mn", "G": "φv·Vn", "H": "1.0"}[check.chapter]
+
+
+_DEMAND_SYMBOL = {"D": "|Pu|", "E": "Pu", "F": "Mu", "G": "Vu", "H": "H"}
 
 
 def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = None) -> list[dict]:
@@ -89,11 +94,15 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
                "ratio": result.ratio}]
     cards = []
     for c in result.checks:
-        value = (f"{_fmt(c.capacity)} {c.unit} · {c.ratio:.3f}" if c.capacity is not None else "no calculada")
-        cards.append((f"{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · Pu/cap.".replace(
-            "Pu/cap.", "Mu/cap." if c.chapter == "F" else "Pu/cap."), value))
+        if c.chapter == "H":
+            label = f"Interacción ({c.result['governing_equation'] if c.result else 'H'}): razón"
+            value = f"{c.ratio:.3f}" if c.ratio is not None else "no calculada"
+        else:
+            label = f"{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · {_DEMAND_SYMBOL[c.chapter]}/cap."
+            value = f"{_fmt(c.capacity)} {c.unit} · {c.ratio:.3f}" if c.capacity is not None else "no calculada"
+        cards.append((label, value))
     if cards:
-        blocks.append({"kind": "summary", "items": cards[:4]})
+        blocks.append({"kind": "summary", "items": cards[:6]})
     blocks += _data_blocks(case, result)
     notes, limitations = [], []
     for number, check in enumerate(result.checks, start=2):
@@ -109,6 +118,10 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
             blocks += _compression_blocks(case, check, r)
         elif check.chapter == "D":
             blocks += _tension_blocks(case, check, r)
+        elif check.chapter == "G":
+            blocks += _shear_blocks(case, check, r)
+        elif check.chapter == "H":
+            blocks += _interaction_blocks(case, check, r)
         else:
             blocks += _flexure_blocks(case, check, r)
         blocks.append({"kind": "h2", "text": f"Obligaciones del Capítulo {check.chapter} (comprobación independiente)"})
@@ -120,11 +133,6 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
         notes += [n for n in r["notes"] if n not in notes]
         limitations += [x for x in r["limitations"] if x not in limitations]
     final = len(result.checks) + 2
-    if result.interaction_pending:
-        blocks.append({"kind": "h1", "text": f"{final}. Interacción"})
-        blocks.append({"kind": "alert", "text": "La combinación tiene más de una demanda. La interacción del Capítulo H "
-                                                "aún no está implementada: el estado no puede ser CUMPLE.", "detail": None})
-        final += 1
     blocks.append({"kind": "h1", "text": f"{final}. Notas y limitaciones"})
     for text in notes + limitations + [result.scope]:
         blocks.append({"kind": "note", "text": text})
@@ -141,6 +149,7 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     demands = [f"Pu = {_fmt(case.Pu)} kN ({'compresión' if case.Pu > 0 else 'tracción'})"] if case.Pu else []
     demands += [f"Mu{a} = {_fmt(m)} kN·m" for a, m in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw),
                                                          ("z", case.Mz)) if m]
+    demands += [f"Vu{a} = {_fmt(v)} kN" for a, v in (("x", case.Vux), ("y", case.Vuy)) if v]
     items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin), ("Material", material),
              ("Demandas (LRFD)", "; ".join(demands))]
     ids = {c.id for c in result.checks}
@@ -169,12 +178,16 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
                                  + (f" (Afn = {_fmt(fl.Afn)} mm²)" if fl and fl.Afn else "")
                                  + (f"; restricción lateral-torsional: {fl.lateral_torsional_restraint}"
                                     if fl and fl.lateral_torsional_restraint else "")
-                                 + (f"; βw = {_fmt(fl.beta_w)} mm" if fl and fl.beta_w is not None else "")))
+                                 + (f"; βw = {_fmt(fl.beta_w)} mm" if fl and fl.beta_w is not None else "")
+                                 + ("; amplificación de Cb por tracción (H1.2) solicitada"
+                                    if fl and fl.tension_cb_amplification else "")))
         if case.angle_flexure:
             af = case.angle_flexure
             parts = [f"{k} = {v}" for k, v in (("alas verticales", af.web_legs), ("puntera", af.toe),
                                                ("ala comprimida", af.leg_in_compression)) if v]
             items.append(("Zona comprimida (dato)", "; ".join(parts)))
+    if ids & {"shear_x", "shear_y"} and case.shear and case.shear.Lv:
+        items.append(("Cortante", f"Lv = {_fmt(case.shear.Lv)} mm (G5)"))
     blocks.append({"kind": "kv", "items": items})
     if case.Pu > 0 and ln is not None:
         blocks.append({"kind": "table", "headers": ["Eje", "K", "L (mm)", "Lc = K·L (mm)"], "rows": [
@@ -188,7 +201,7 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
 
 
 def _verification(check) -> tuple:
-    symbol = "Mu" if check.chapter == "F" else "|Pu|"
+    symbol = _DEMAND_SYMBOL[check.chapter] if check.chapter in "FG" else "|Pu|"
     return ("Verificación", f"{symbol} / {_capacity_label(check)} = {_fmt(check.demand)} / {_fmt(check.capacity)} "
                             f"= {_fmt(check.ratio)}")
 
@@ -313,6 +326,49 @@ def _flexure_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     return blocks
 
 
+_SHEAR_KEYS = {"limit_state", "provision", "applies", "Vn", "Vn_kN", "phi_v", "available_kN", "equation"}
+
+
+def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
+    blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    rows = [[_ELEMENTS.get(r["element"], r["element"]), r["ratio"], "–" if r["kv"] is None else r["kv"], r["limit"],
+             r["Cv"], r["Cv_equation"]] for r in c["classification"]["elements"]]
+    if rows:
+        blocks += [{"kind": "h2", "text": "Coeficiente de cortante"},
+                   {"kind": "table", "headers": ["Elemento", "h/t", "kv", "Límite", "Cv", "Ec."], "rows": rows}]
+    m = c["modes"]["V"]
+    items = [(_label(k), _fmt(v)) for k, v in m.items()
+             if k not in _SHEAR_KEYS and isinstance(v, (int, float, str)) and not isinstance(v, bool) and v is not None]
+    items += [("Vn", f"{_fmt(m['Vn_kN'])} kN ({m['equation']})"),
+              ("Resistencia de diseño", f"φv·Vn = {m['phi_v']:.2f} · Vn = {_fmt(c['available_kN'])} kN"),
+              _verification(check)]
+    blocks += [{"kind": "h2", "text": "Resistencia"}, {"kind": "kv", "items": items}]
+    return blocks
+
+
+def _interaction_blocks(case: SteelCase, check, c: dict) -> list[dict]:
+    blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    rows = []
+    for name, m in c["modes"].items():
+        if name == "H1":
+            terms = f"Pr/Pc = {_fmt(m['Pr_Pc'])}; Mrx/Mcx = {_fmt(m['Mrx_Mcx'])}; Mry/Mcy = {_fmt(m['Mry_Mcy'])}"
+        else:
+            terms = f"Pr/Pc = {_fmt(m['Pr_Pc'])}; Mrx/Mcx = {_fmt(m['Mrx_Mcx'])} ({m['Mcx_basis']})"
+        rows.append([name, m["provision"], m["equation"], terms, m["ratio"]])
+    blocks += [{"kind": "h2", "text": "Ecuaciones de interacción"},
+               {"kind": "table", "headers": ["Comprobación", "Disposición", "Ec.", "Términos", "Valor"], "rows": rows,
+                "highlight": list(c["modes"]).index(c["governing_mode"])}]
+    h1 = c["modes"]["H1"]
+    blocks.append({"kind": "kv", "items": [
+        ("Pr, Pc", f"{_fmt(h1['Pr_kN'])} kN; {_fmt(h1['Pc_kN']) if h1['Pc_kN'] else '–'} kN ({h1['axial']})"),
+        ("Mrx, Mcx", f"{_fmt(h1['Mrx_kNm'])}; {_fmt(h1['Mcx_kNm']) if h1['Mcx_kNm'] else '–'} kN·m"),
+        ("Mry, Mcy", f"{_fmt(h1['Mry_kNm'])}; {_fmt(h1['Mcy_kNm']) if h1['Mcy_kNm'] else '–'} kN·m"),
+        ("Criterio", "H1-1a si Pr/Pc ≥ 0.2; si no, H1-1b"),
+        ("Verificación", f"{c['governing_mode']}: {_fmt(c['ratio'])} ≤ 1.0 → "
+                         f"{'cumple' if c['ratio'] <= 1.0 else 'NO cumple'}")]})
+    return blocks
+
+
 # --- plain text ----------------------------------------------------------------------------
 
 def _text_table(headers, rows) -> list[str]:
@@ -331,7 +387,7 @@ def render_text(blocks: list[dict]) -> str:
                        + (f" · {b['case']}" if b.get("case") else ""))
             out += [f"{k}: {v}" for k, v in b["meta"]]
             out += ["", f"RESULTADO: {b['status']} ({STATUS_TEXT[b['status']]})"
-                    + (f"   Pu/capacidad = {_fmt(b['ratio'])}" if b["ratio"] is not None else "")]
+                    + (f"   Demanda/capacidad máx. = {_fmt(b['ratio'])}" if b["ratio"] is not None else "")]
         elif kind == "summary":
             out.append("  |  ".join(f"{k}: {v}" for k, v in b["items"]))
         elif kind == "h1":
@@ -514,10 +570,12 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                 pdf.line(pdf.l_margin, pdf.get_y() + 2, pdf.w - pdf.r_margin, pdf.get_y() + 2)
                 pdf.ln(6)
             elif kind == "summary":
-                gap, n = 3, len(b["items"])
+                gap, n = 3, min(len(b["items"]), 3)                  # at most three cards per row
                 card_w, y = (width() - gap * (n - 1)) / n, pdf.get_y()
                 for i, (label, value) in enumerate(b["items"]):
-                    x = pdf.l_margin + i * (card_w + gap)
+                    if i and i % n == 0:
+                        y += 20
+                    x = pdf.l_margin + (i % n) * (card_w + gap)
                     pdf.set_fill_color(*_CARD)
                     pdf.rect(x, y, card_w, 17, style="F", round_corners=True, corner_radius=1.5)
                     pdf.set_xy(x + 3, y + 2.5)

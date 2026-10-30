@@ -9,14 +9,19 @@ src/steel_design/
 ├── codes/aisc_360_22/
 │   ├── tension.py               fórmulas puras D2-1, D2-2, D3-1 y factores φt
 │   ├── flexure.py               fórmulas puras F2–F13.1, Se de F7 y límites λp/λr de B4.1b
+│   ├── shear.py                 fórmulas puras G2-1…G6-1, Cv1/Cv2 y factores φv
+│   ├── interaction.py           fórmulas puras H1-1a/b, H1-2 y H4-1
 │   └── compression.py           fórmulas puras E1, E3–E7 y límites λr de B4.1a
 ├── domain/
 │   ├── tension.py               capítulo D: fluencia y rotura, gobierno por resistencia de diseño φt·Pn
 │   ├── flexure.py               capítulo F: clasificación B4.1b, sección F por familia y eje, estados límite
+│   ├── shear.py                 capítulo G: sección G por familia y dirección del cortante
+│   ├── interaction.py           capítulo H: H1/H4 con las resistencias de los demás chequeos, Cb de H1.2
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
-│   ├── coverage.py              obligaciones de D, E y F derivadas del texto, independientes
+│   ├── coverage.py              obligaciones de D, E, F, G y H derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección
-├── engine.py                    una comprobación por demanda (D/E por Pu, F por Mux/Muy/Mw/Mz) → estado
+├── engine.py                    una comprobación por demanda (D/E por Pu, F por Mux/Muy/Mw/Mz, G por Vux/Vuy),
+│                                interacción H si actúan juntas fuerza axial y flexión → estado
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
 ├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
 └── run.py                       CLI (JSON en stdout; archivos solo con --output, --report, --pdf → results/ ignorado)
@@ -49,6 +54,10 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Estados límite de tracción y modo gobernante | `domain/tension.py` |
 | Ecuaciones F2–F13.1, φb, λp/λr (B4.1b), Se de F7 | `codes/aisc_360_22/flexure.py` |
 | Sección de F por familia y eje, estados límite de flexión | `domain/flexure.py` |
+| Ecuaciones G2-1…G6-1, Cv1, Cv2, φv | `codes/aisc_360_22/shear.py` |
+| Sección de G por familia y dirección del cortante | `domain/shear.py` |
+| Ecuaciones H1-1a/b, H1-2, H4-1 | `codes/aisc_360_22/interaction.py` |
+| Qué chequeos interactúan y con qué resistencias | `domain/interaction.py` |
 | Coherencia de datos del catálogo (r = √(I/A), S = I/c) | `domain/validation.py` |
 | Elementos B4.1a por familia, selección de modos, E7 por modo | `domain/compression.py` |
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |

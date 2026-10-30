@@ -184,7 +184,7 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     basis = case.single_angle_e5
     if basis is None:
         _blocked("La compresión de un ángulo simple requiere single_angle_e5; en otro caso E5 remite el "
-                 "miembro al Capítulo H (H2), carga axial más flexión, fuera del alcance de este programa.", section)
+                 "miembro al Capítulo H (H2), carga axial más flexión, aún no implementado.", section)
     conditions = {"E5(1) cargado en los extremos a través de la misma ala": basis.loaded_at_ends_through_same_leg,
                   "E5(2) soldado o con al menos dos pernos": basis.welded_or_two_bolts_min,
                   "E5(3) sin cargas transversales intermedias": basis.no_intermediate_transverse_loads}
@@ -194,7 +194,7 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     if leg_ratio >= 1.7:
         failed.append("E5(5) relación ala larga/ala corta < 1.7")
     if failed:
-        _blocked("No se cumplen las condiciones de E5; evaluar con el Capítulo H (H2), fuera del alcance de este programa.", section, failed=failed)
+        _blocked("No se cumplen las condiciones de E5; evaluar con el Capítulo H (H2), aún no implementado.", section, failed=failed)
     _require(section, "area", "rx", "ry", "rz")
     connected = basis.connected_leg if leg_ratio > 1 else "long"
     # Catalog convention: rx > ry, so the long leg is parallel to y. ra is the
@@ -206,7 +206,7 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
                                               connected_leg=connected, leg_ratio=leg_ratio,
                                               L_over_rz=basis.L / section.rz)
     if not slenderness["within_200"]:
-        _blocked("E5(4): Lc/r de E5 supera 200; evaluar con el Capítulo H (H2), fuera del alcance de este programa.",
+        _blocked("E5(4): Lc/r de E5 supera 200; evaluar con el Capítulo H (H2), aún no implementado.",
                  section, Lc_over_r=slenderness["Lc_over_r"])
     lc_r = slenderness["Lc_over_r"]
     mode = {"limit_state": "flexural_buckling", "provision": "E5(" + basis.configuration + ")", "axis": "a",

@@ -1,6 +1,6 @@
-"""Chapter D, E and F obligations, written from the Specification text independently of the selection.
+"""Chapter D, E, F, G and H obligations, written from the Specification text independently of the selection.
 
-It never imports domain.compression, domain.tension or domain.flexure. An obligation is discharged
+It never imports domain.compression, domain.tension, domain.flexure, domain.shear or domain.interaction. An obligation is discharged
 only when the result contains a mode or classification that matches it; anything
 unmatched keeps the result INCOMPLETE, so a missing limit state is never a PASS.
 """
@@ -47,6 +47,33 @@ def flexure_obligations(section: Section, axis: str) -> list[Obligation]:
     out = [Obligation(id="classification", provision="B4.1b",
                       reason="Todo elemento comprimido debe clasificarse en flexión (compacto/no compacto/esbelto).")]
     return out + [Obligation(id=k, provision=_STATE_TEXT[k][0], reason=_STATE_TEXT[k][1]) for k in states]
+
+
+# Chapter G section per family (shear accompanying Mux / Muy).
+SHEAR_PROVISIONS = {("W", "x"): "G2.1", ("CHANNEL", "x"): "G2.1", ("W", "y"): "G6", ("CHANNEL", "y"): "G6",
+                    ("RECTANGULAR_HSS", "x"): "G4", ("RECTANGULAR_HSS", "y"): "G4",
+                    ("CIRCULAR_HSS", "x"): "G5", ("CIRCULAR_HSS", "y"): "G5",
+                    ("SINGLE_ANGLE", "x"): "G3", ("SINGLE_ANGLE", "y"): "G3",
+                    ("DOUBLE_ANGLE", "x"): "G3", ("DOUBLE_ANGLE", "y"): "G3"}
+
+
+def shear_obligations(section: Section, axis: str) -> list[Obligation]:
+    """G1: shear yielding and shear buckling of the elements parallel to the shear, in one obligation (Cv)."""
+    provision = SHEAR_PROVISIONS.get((section.type.upper(), axis), "G1")
+    return [Obligation(id="V", provision=provision, reason="Fluencia y pandeo por cortante (Cv) de los elementos "
+                                                           "paralelos al cortante.")]
+
+
+def interaction_obligations(case: SteelCase, section: Section) -> list[Obligation]:
+    """H1 whenever axial force and flexure, or flexure about two axes, act together; H4 for flanges with holes."""
+    out = [Obligation(id="H1", provision="H1.1" if case.Pu >= 0 else "H1.2",
+                      reason="Interacción de fuerza axial y flexión (H1-1a/H1-1b).")]
+    flexure = case.flexure
+    if (section.type.upper() in {"W", "CHANNEL"} and case.Pu < 0 and case.Mux and flexure
+            and flexure.tension_flange_holes):
+        out.append(Obligation(id="H4", provision="H4", reason="Rotura del ala traccionada con agujeros bajo tracción "
+                                                              "y flexión (H4-1)."))
+    return out
 
 
 def required_obligations(case: SteelCase, section: Section) -> list[Obligation]:

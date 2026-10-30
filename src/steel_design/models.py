@@ -104,6 +104,9 @@ class FlexureBasis(InputModel):
         None, description="Single angles (F10): lateral-torsional restraint along the length")
     beta_w: Optional[NonNegativeNumber] = Field(
         None, description="Single angles (F10-4): |beta_w| (mm) of unequal-leg angles; sign from the leg in compression")
+    tension_cb_amplification: StrictBool = Field(
+        False, description="H1.2: multiply Cb by sqrt(1 + Pr/Pey) when axial tension acts with flexure "
+                           "(doubly symmetric members only)")
 
     @model_validator(mode="after")
     def holes_need_net_area(self):
@@ -112,6 +115,13 @@ class FlexureBasis(InputModel):
         if self.tension_flange_holes is False and self.Afn is not None:
             raise ValueError("Afn solo corresponde a un ala traccionada con agujeros.")
         return self
+
+
+class ShearBasis(InputModel):
+    """Member data for Chapter G (supplied by the user)."""
+    Lv: Optional[PositiveNumber] = Field(
+        None, description="Round HSS (G5-2a): distance from maximum to zero shear force (mm); "
+                          "without it only G5-2b is used (lower bound)")
 
 
 class AngleFlexure(InputModel):
@@ -155,6 +165,9 @@ class SteelCase(InputModel):
     Muy: FiniteNumber = Field(0.0, description="Required flexural strength about y (kN*m), Chapter F")
     Mw: FiniteNumber = Field(0.0, description="Single angles: required flexural strength about the major principal axis w (kN*m)")
     Mz: FiniteNumber = Field(0.0, description="Single angles: required flexural strength about the minor principal axis z (kN*m)")
+    Vux: FiniteNumber = Field(0.0, description="Required shear strength that accompanies Mux, parallel to y "
+                                                "(web of I-shapes, H walls of HSS) (kN), Chapter G")
+    Vuy: FiniteNumber = Field(0.0, description="Required shear strength that accompanies Muy, parallel to x (kN), Chapter G")
     angle_flexure: Optional[AngleFlexure] = None
     lengths: Optional[Lengths] = Field(None, description="Unbraced lengths; required for compression")
     factors: Factors = Field(default_factory=Factors)
@@ -162,12 +175,14 @@ class SteelCase(InputModel):
     double_angle_e6: Optional[DoubleAngleE6Basis] = None
     tension: Optional[TensionBasis] = None
     flexure: Optional[FlexureBasis] = None
+    shear: Optional[ShearBasis] = None
     custom_section: Optional[CustomSection] = None
 
     @model_validator(mode="after")
     def demand(self):
-        if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz)):
-            raise ValueError("La combinación debe tener al menos una demanda distinta de cero (Pu, Mux, Muy, Mw, Mz).")
+        if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy)):
+            raise ValueError("La combinación debe tener al menos una demanda distinta de cero "
+                             "(Pu, Mux, Muy, Mw, Mz, Vux, Vuy).")
         if self.Pu > 0 and self.lengths is None:
             raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
         return self
@@ -188,13 +203,13 @@ class Obligation(BaseModel):
 
 
 class Check(BaseModel):
-    """One required strength of a load combination (axial or flexure about one axis)."""
-    id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z"]
-    chapter: Literal["D", "E", "F"]
-    demand: float = Field(..., description="|Pu| (kN) or |Mu| (kN*m)")
-    unit: Literal["kN", "kN·m"]
+    """One required strength of a load combination (axial, flexure or shear) or their interaction (H)."""
+    id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z", "shear_x", "shear_y", "interaction"]
+    chapter: Literal["D", "E", "F", "G", "H"]
+    demand: float = Field(..., description="|Pu| or |Vu| (kN), |Mu| (kN*m); interaction value for Chapter H")
+    unit: Literal["kN", "kN·m", "–"]
     status: Status
-    capacity: Optional[float] = Field(None, description="Design strength phi*Rn (LRFD)")
+    capacity: Optional[float] = Field(None, description="Design strength phi*Rn (LRFD); 1.0 for Chapter H")
     ratio: Optional[float] = None
     result: Optional[dict] = Field(None, description="Full chapter result (modes, equations, intermediates)")
     obligations: list[Obligation] = Field(default_factory=list)
@@ -207,10 +222,9 @@ class DesignResult(BaseModel):
     status: Status
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
-    interaction_pending: bool = Field(False, description="More than one required strength: Chapter H not yet available")
-    scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión) y "
-                  "F (flexión). Longitudes efectivas, combinaciones de carga, conexiones, cortante, interacción y "
-                  "demás capítulos quedan fuera de este resultado.")
+    scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
+                  "F (flexión), G (cortante) y H (interacción H1 y H4). Longitudes efectivas, análisis de segundo "
+                  "orden, combinaciones de carga, conexiones, torsión y demás capítulos quedan fuera de este resultado.")
 
     @computed_field
     @property
@@ -222,11 +236,7 @@ class DesignResult(BaseModel):
     @computed_field
     @property
     def errors(self) -> list[dict]:
-        out = [{**e, "check": c.id} for c in self.checks for e in c.errors]
-        if self.interaction_pending:
-            out.append({"code": "INTERACTION_PENDING", "message": "La combinación tiene más de una demanda; la "
-                        "interacción (Capítulo H) aún no está implementada: no se puede concluir el cumplimiento."})
-        return out
+        return [{**e, "check": c.id} for c in self.checks for e in c.errors]
 
     # Convenience accessors for the axial check (Python API; not serialized).
     def check(self, check_id: str) -> Optional[Check]:

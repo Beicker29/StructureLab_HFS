@@ -24,7 +24,8 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 
 ## Oráculo independiente
 
-`tests/oracles/chapter_d.py`, `chapter_e.py` y `chapter_f.py` se escriben directamente desde la Specification, en
+`tests/oracles/chapter_d.py`, `chapter_e.py`, `chapter_f.py`, `chapter_g.py` y `chapter_h.py` (este último
+reutiliza los oráculos D, E y F para las resistencias) se escriben directamente desde la Specification, en
 Decimal, leyendo `data/sections.xlsx` con sus propias escalas de unidades y **sin
 importar `steel_design`**. Las pruebas consumen el resultado congelado
 `tests/fixtures/chapter_<x>/reference.json`. Para añadir un caso:
@@ -33,6 +34,8 @@ importar `steel_design`**. Las pruebas consumen el resultado congelado
 python tests/oracles/chapter_e.py   # regenera la referencia del capítulo E
 python tests/oracles/chapter_d.py   # regenera la referencia del capítulo D
 python tests/oracles/chapter_f.py   # regenera la referencia del capítulo F
+python tests/oracles/chapter_g.py   # regenera la referencia del capítulo G
+python tests/oracles/chapter_h.py   # regenera la referencia del capítulo H
 ```
 
 Revisar el diff de la referencia: un valor de referencia solo cambia por una

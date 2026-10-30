@@ -59,6 +59,7 @@ EXTRA = [
     pipe("HSS6.000X0.500", OD=6.0, t=0.465, A=8.09, r=1.96),
     pipe("PIPE10STD", OD=10.75, t=0.340, A=11.5, r=3.68),
     pipe("PIPE8XS", OD=8.625, t=0.465),
+    pipe("HSS16.000X0.375", OD=16.0, t=16.0 / 45.8, A=17.2, r=5.53),
 ]
 
 E6_WELDED = dict(connectors="welded", a=32 * IN, end_connection_welded_or_pretensioned=True)
@@ -80,6 +81,16 @@ def beam(name, Fy, Lb=None, Cb=1.0, axis="Mux", holes=False, **extra):
     flexure = {"Cb": Cb, **({"Lb": Lb * FT} if Lb else {}), **({"tension_flange_holes": False} if holes is False else {})}
     flexure.update(extra.pop("flexure", {}))
     return dict(section_name=name, material={"Fy": Fy}, flexure=flexure, **{axis: 1.0}, **extra)
+
+
+def shear(name, Fy, axis="Vux", **extra):
+    return dict(section_name=name, material={"Fy": Fy}, **{axis: 1.0}, **extra)
+
+
+def combined(name, Fy, L, Pu, Mux, Muy, Cb=1.0, **extra):
+    flexure = {"Lb": L * FT, "Cb": Cb, "tension_flange_holes": False, **extra.pop("flexure", {})}
+    return dict(section_name=name, material={"Fy": Fy, **extra.pop("material", {})}, Pu=Pu * KIP, Mux=Mux * KIPFT,
+                Muy=Muy * KIPFT, lengths={"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}, flexure=flexure, **extra)
 
 
 CONTINUOUS = 0.5   # ft: continuously braced (Lb below Lp)
@@ -135,6 +146,21 @@ EXAMPLES = {
              custom_section={"type": "SOLID_RECTANGULAR", "H": 5 * IN, "B": 3 * IN}), "flexure_x", 70.4, "kip-ft"),
     "F.13": ("Barra redonda D = 1 in, Lb = 2.5 ft", beam("ROUND", FY50, 2.5, holes=None,
              custom_section={"type": "SOLID_CIRCULAR", "diameter": 1 * IN}), "flexure_x", 0.590, "kip-ft"),
+    "G.1B": ("W24X62, cortante en el alma, G2.1(a) φv = 1.00", shear("W24X62", FY50), "shear_x", 306, "kip"),
+    "G.2B": ("C15X33.9, cortante en el alma, G2.1(b)", shear("C15X33.9", FY50), "shear_x", 162, "kip"),
+    "G.3": ("L5X3X1/4, ala larga vertical (G3)", shear("L5X3X1/4", FY50), "shear_x", 33.8, "kip"),
+    "G.4": ("HSS6X4X3/8, paredes anchas verticales (G4)", shear("HSS6X4X3/8", FY50), "shear_x", 93.6, "kip"),
+    "G.5": ("HSS16.000X0.375, Lv = 192 in (G5)", shear("HSS16.000X0.375", FY50, shear={"Lv": 192 * IN}),
+            "shear_x", 232, "kip"),
+    "G.6": ("W21X48, cortante en el eje menor (G6)", shear("W21X48", FY50, "Vuy"), "shear_y", 189, "kip"),
+    "G.7": ("C9X20, cortante en el eje menor (G6)", shear("C9X20", FY50, "Vuy"), "shear_y", 59.1, "kip"),
+    "H.1B": ("W14X99, Pu = 400 kips, Mux = 250, Muy = 80 kip-ft, L = 14 ft (H1-1a)",
+             combined("W14X99", FY50, 14, 400, 250, 80), "interaction", 0.929, "ratio"),
+    "H.3": ("W14X82 en tracción, Pu = 174 kips, Mux = 192, Muy = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2)",
+            combined("W14X82", FY50, 30, -174, 192, 67.6, Cb=1.14, flexure={"tension_cb_amplification": True},
+                     material={"Fu": 65 * KSI}, tension={"An": 24.0 * IN**2, "U": 1.0}), "interaction", 0.873, "ratio"),
+    "H.4": ("W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft",
+            combined("W10X33", FY50, 14, 30, 91.8, 13.1, Cb=1.14), "interaction", 0.979, "ratio"),
 }
 
 # Differences explained by the example itself (simplified, conservative hand method): program / example
@@ -156,6 +182,8 @@ def examples_engine(catalog):
 def program_value(engine, data, check_id, unit):
     check = engine.run(SteelCase(**data)).check(check_id)
     assert check.capacity is not None, check.errors
+    if unit == "ratio":
+        return check.ratio, check
     return check.capacity / (KIP if unit == "kip" else KIPFT), check
 
 
