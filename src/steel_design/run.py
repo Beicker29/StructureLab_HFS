@@ -11,7 +11,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from .errors import SteelDesignError
 from .engine import SteelDesignEngine
-from .execution import execute_payload, overall_status
+from .execution import execute_payload, governing, overall_status
 from .models import unique_json_object
 from .reporting import pdf_bytes, render_text, report_blocks
 from .sections.loader import load_sections_from_excel
@@ -61,6 +61,7 @@ def main(argv=None):
         output = executions[0][2].model_dump(mode="json")
     else:
         output = {"status": overall_status([r for _, _, r in executions]).value,
+                  "governing": governing(executions),
                   "cases": [{"name": tag, **r.model_dump(mode="json")} for tag, _, r in executions]}
     text = json.dumps(output, indent=2, allow_nan=False)
     if args.output:

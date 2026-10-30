@@ -79,7 +79,7 @@ def test_selection_by_family(sections):
     assert compression_strength(make_case("W14X90"), sections["W14X90"])["provisions"] == ["E1", "E3", "E4(a)"]
     assert compression_strength(make_case("C15X50"), sections["C15X50"])["provisions"] == ["E1", "E3", "E4(b)"]
     hss = compression_strength(make_case("PTE100X100X4MM"), sections["PTE100X100X4MM"])
-    assert hss["provisions"] == ["E1", "E3"] and "E4 not applicable" in hss["notes"][0]
+    assert hss["provisions"] == ["E1", "E3"] and "E4 no aplica" in hss["notes"][0]
     slender = compression_strength(make_case("PTE120X60X2MM"), sections["PTE120X60X2MM"])
     assert slender["provisions"] == ["E1", "E3", "E7"]
     assert all(m["area_basis"] == "Ae" and m["Pn_equation"] == "E7-1" for m in slender["modes"].values())
@@ -124,7 +124,7 @@ def test_single_angle_outside_e5_is_blocked(sections, overrides):
 
 def test_single_angle_e4_needs_coincident_geometric_lengths(sections):
     # Principal-axis buckling (E4) is defined only if Lx = Ly and Kx = Ky.
-    with pytest.raises(RuleNotImplementedError, match="principal axes"):
+    with pytest.raises(RuleNotImplementedError, match="ejes principales"):
         compression_strength(make_case("L4X4X1/4", Fy=450, Lx=2000, Ly=1500, e5=e5_basis("a", "long", 2000)),
                              sections["L4X4X1/4"])
 

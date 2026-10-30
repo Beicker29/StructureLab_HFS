@@ -1,8 +1,8 @@
 # StructureLab_HFS
 
-Motor de cálculo de la **resistencia a compresión de miembros de acero** según
-ANSI/AISC 360-22, capítulo E (`a360-22w.pdf`, erratas de enero 2025 y septiembre
-2026 en el repositorio; ninguna modifica el capítulo E). Perfiles del catálogo
+Motor de cálculo de la **resistencia axial de miembros de acero** según
+ANSI/AISC 360-22: capítulo D (tracción) y capítulo E (compresión) (`a360-22w.pdf`;
+las erratas de enero 2025 y septiembre 2026 del repositorio no modifican D ni E). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
 
@@ -13,8 +13,8 @@ normativas y limitaciones. Está pensado para que una futura aplicación web lla
 directamente al motor.
 
 > No es una certificación AISC global. `PASS` significa que se evaluaron todos los
-> estados límite del capítulo E exigidos para el miembro y que `Pu ≤ φPn` (o
-> `Pn/Ω`). Las longitudes efectivas, combinaciones de carga, conexiones y demás
+> estados límite del capítulo aplicable (D o E) exigidos para el miembro y que
+> `|Pu| ≤ φPn` (o `Pn/Ω`). Las longitudes efectivas, combinaciones de carga, conexiones y demás
 > capítulos quedan fuera del alcance.
 
 ## Instalación
@@ -28,16 +28,16 @@ python -m venv .venv
 ## Uso
 
 ```powershell
-python -m steel_design.run examples/w_shape_case.json            # imprime JSON
-python -m steel_design.run examples/bundle_case.json --output r.json
+python -m steel_design.run examples/w_shape.json                 # imprime JSON
+python -m steel_design.run examples/multi_member.json --output r.json
 ```
 
 No se escribe nada en disco salvo que se pida. Memoria de cálculo en texto o PDF
 (el PDF requiere el extra `pdf`: `pip install -e ".[pdf]"`, incluido en `dev`):
 
 ```powershell
-python -m steel_design.run examples/channel_case.json --pdf            # results/channel_case.pdf
-python -m steel_design.run examples/channel_case.json --report m.txt --pdf m.pdf
+python -m steel_design.run examples/channel.json --pdf            # results/channel.pdf
+python -m steel_design.run examples/channel.json --report m.txt --pdf m.pdf
 ```
 
 Sin ruta, `--report` y `--pdf` escriben en `results/<nombre del JSON>`: carpeta local,
@@ -72,16 +72,23 @@ símbolos escritos en letras.
 | Campo | Descripción |
 | --- | --- |
 | `section_name` | Nombre del catálogo, o nombre libre con `custom_section` |
-| `material.Fy`, `material.E` | `E` debe ser 200000 MPa (definición de E3) |
-| `Pu` | Resistencia requerida a compresión (> 0) |
-| `lengths.Lx/Ly/Lz` | Longitudes no arriostradas por eje y torsional |
+| `material.Fy`, `material.Fu`, `material.E` | Fu es obligatorio en tracción; `E` debe ser 200000 MPa en compresión (definición de E3) |
+| `Pu` | Resistencia requerida: > 0 compresión (capítulo E), < 0 tracción (capítulo D) |
+| `lengths.Lx/Ly/Lz` | Longitudes no arriostradas por eje y torsional (obligatorias en compresión) |
+| `tension` | Tracción: `An` (área neta, B4.3b, mm²), `U` (Tabla D3.1) y opcional `fabricated_length` (nota D1); An y U los aporta el usuario |
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
 | `design_method` | `LRFD` (φc = 0,90) o `ASD` (Ωc = 1,67) |
 | `single_angle_e5` | Requerido para ángulos simples: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3) |
 | `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
 
-Un lote `{"cases": [...]}` comparte los campos de nivel superior.
+**Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
+material, método, longitudes, `tension`, E5/E6) y `cases` lista sus combinaciones de
+carga; cada combinación aporta su demanda y puede sobrescribir cualquier dato. La salida
+trae un resultado por combinación, el estado global y la combinación `governing` (mayor
+relación demanda/capacidad). Cuando se incorporen flexión, cortante e interacción, cada
+combinación llevará sus demandas simultáneas (Pu, Mu, Vu) en el mismo archivo.
+Ver `examples/` (un archivo por familia y `multi_member.json` con varios perfiles).
 
 ### Salida
 
@@ -94,6 +101,7 @@ datos faltantes devuelve `INCOMPLETE` con el motivo; nunca una resistencia supue
 ## Documentación
 
 - [Arquitectura](docs/architecture.md)
-- [Alcance normativo del capítulo E, familias, decisiones y pendientes](docs/chapter-e.md)
+- [Capítulo D: alcance, verificación y decisiones](docs/chapter-d.md)
+- [Capítulo E: alcance, familias, verificación y decisiones](docs/chapter-e.md)
 - [Pruebas y validación](CONTRIBUTING.md)
 - [Hoja de ruta](docs/ROADMAP.md)

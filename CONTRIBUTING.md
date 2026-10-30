@@ -14,6 +14,7 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 | Archivo | Garantía |
 | --- | --- |
 | `tests/test_compression.py` | Perfiles reales contra cálculos independientes (todas las familias soportadas, LRFD y ASD); selección; bloqueos; propiedades de fórmulas (continuidad E3/E5, c2, E4-4 → E4-3, E6, E7-7) |
+| `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes (LRFD y ASD), modo gobernante por resistencia disponible, datos faltantes, nota D1, memoria |
 | `tests/test_engine.py` | Obligaciones independientes; frontera PASS/FAIL; INCOMPLETE ante dominios bloqueados; barra maciza a mano |
 | `tests/test_inputs.py` | Rechazo de entradas inválidas o incompletas |
 | `tests/test_catalog.py` | Importación del Excel: familias, unidades, relaciones B4 |
@@ -22,13 +23,14 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 
 ## Oráculo independiente
 
-`tests/oracles/chapter_e.py` se escribe directamente desde la Specification, en
+`tests/oracles/chapter_e.py` y `tests/oracles/chapter_d.py` se escriben directamente desde la Specification, en
 Decimal, leyendo `data/sections.xlsx` con sus propias escalas de unidades y **sin
 importar `steel_design`**. Las pruebas consumen el resultado congelado
-`tests/fixtures/chapter_e/reference.json`. Para añadir un caso:
+`tests/fixtures/chapter_<x>/reference.json`. Para añadir un caso:
 
 ```powershell
-python tests/oracles/chapter_e.py   # regenera la referencia
+python tests/oracles/chapter_e.py   # regenera la referencia del capítulo E
+python tests/oracles/chapter_d.py   # regenera la referencia del capítulo D
 ```
 
 Revisar el diff de la referencia: un valor de referencia solo cambia por una

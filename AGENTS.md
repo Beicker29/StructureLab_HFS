@@ -2,10 +2,10 @@
 
 ## Alcance
 
-- El repositorio implementa solo el capítulo E de ANSI/AISC 360-22. No añadir
-  otros capítulos sin una tarea autorizada de la [hoja de ruta](docs/ROADMAP.md).
+- El repositorio implementa los capítulos D y E de ANSI/AISC 360-22. Los demás
+  se reincorporan en el orden de la [hoja de ruta](docs/ROADMAP.md), uno por vez.
 - Fuente normativa: `a360-22w.pdf` y las erratas del repositorio. Alcance,
-  decisiones y consultas abiertas: [docs/chapter-e.md](docs/chapter-e.md).
+  decisiones y consultas abiertas: [capítulo D](docs/chapter-d.md) y [capítulo E](docs/chapter-e.md).
 - Antes de trabajar, registrar rama/SHA y cambios locales. No borrar trabajo del
   usuario ni archivos no versionados desconocidos; no cambiar permisos.
 - Sin commit ni push salvo autorización.
@@ -13,8 +13,8 @@
 ## Arquitectura
 
 - Una fuente de verdad por concepto ([arquitectura](docs/architecture.md)):
-  fórmulas en `codes/aisc_360_22/compression.py`; clasificación y selección en
-  `domain/compression.py`; obligaciones independientes en `domain/coverage.py`.
+  fórmulas en `codes/aisc_360_22/<capítulo>.py`; selección y cálculo en
+  `domain/<capítulo>.py`; obligaciones independientes en `domain/coverage.py`.
 - Las interfaces (CLI, web) llaman a `engine`/`execution`; nunca calculan capacidades.
 - No fusionar ecuaciones por parecido algebraico; exigir equivalencia de norma,
   dominio, unidades y estado límite.
@@ -36,7 +36,7 @@
 ## Verificación
 
 - Seguir [CONTRIBUTING.md](CONTRIBUTING.md). Cambios de cálculo requieren casos en
-  el oráculo independiente `tests/oracles/chapter_e.py` (no importa el paquete).
+  el oráculo independiente del capítulo (`tests/oracles/chapter_<x>.py`, no importa el paquete).
 - No modificar valores de referencia para hacer pasar un cambio.
 - Cerrar cada tarea con: cambios, pruebas reales (comando y resultado), diferencias
   numéricas, riesgos y pendientes.

@@ -44,7 +44,7 @@ def _number(value, *, section, field, row):
             raise ValueError
         return _NUMBER.validate_python(float(value) * SCALE.get(field, 1.0))
     except (TypeError, ValueError, PydanticValidationError):
-        raise CatalogSchemaError("Catalog value must be a finite number.",
+        raise CatalogSchemaError("El valor del catálogo debe ser un número finito.",
                                  details={"section": section, "field": field, "value": repr(value), "row": row})
 
 
@@ -72,13 +72,13 @@ def load_sections_from_excel(filepath: str) -> list[Section]:
             continue
         family = SHEET_FAMILY.get(sheet_name.strip())
         if family is None:
-            raise CatalogSchemaError("Unknown catalog sheet.", details={"sheet": sheet_name,
+            raise CatalogSchemaError("Hoja del catálogo desconocida.", details={"sheet": sheet_name,
                                                                       "expected": sorted(SHEET_FAMILY)})
         sheet = workbook[sheet_name]
         headers = [str(h).strip() if h is not None else None for h in next(sheet.iter_rows(max_row=1, values_only=True))]
         missing = [h for h in ("shape", "A") if h not in headers]
         if missing:
-            raise CatalogSchemaError("Catalog sheet is missing required columns.",
+            raise CatalogSchemaError("Faltan columnas obligatorias en la hoja del catálogo.",
                                      details={"sheet": sheet_name, "missing": missing})
         index = {field: headers.index(header) for field, header in COLUMNS.items() if header in headers}
         for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
@@ -89,7 +89,7 @@ def load_sections_from_excel(filepath: str) -> list[Section]:
             values = {field: _number(row[i], section=name, field=field, row=row_number) if i is not None else None
                       for field, i in ((f, index.get(f)) for f in COLUMNS)}
             if values["area"] is None:
-                raise CatalogSchemaError("Required area A is missing.", details={"section": name, "row": row_number})
+                raise CatalogSchemaError("Falta el área A, obligatoria.", details={"section": name, "row": row_number})
             _derive_ratios(values, family)
             try:
                 sections.append(Section(
@@ -98,7 +98,7 @@ def load_sections_from_excel(filepath: str) -> list[Section]:
                                          sheet=sheet_name, row=row_number, original_name=str(original)),
                     **values))
             except PydanticValidationError as exc:
-                raise CatalogSchemaError("Invalid catalog properties.", details={
+                raise CatalogSchemaError("Propiedades del catálogo no válidas.", details={
                     "section": name, "sheet": sheet_name, "row": row_number,
                     "fields": exc.errors(include_url=False, include_context=False, include_input=False)}) from exc
     return sections

@@ -9,7 +9,8 @@ from pathlib import Path
 
 from .models import DesignResult, SteelCase
 
-LIMIT_STATES = {"flexural_buckling": "pandeo por flexión", "torsional_buckling": "pandeo torsional",
+LIMIT_STATES = {"tensile_yielding": "fluencia en la sección bruta", "tensile_rupture": "rotura en la sección neta",
+                "flexural_buckling": "pandeo por flexión", "torsional_buckling": "pandeo torsional",
                 "flexural_torsional_buckling": "pandeo flexotorsional",
                 "constrained_axis_torsional_buckling": "pandeo torsional con arriostramiento desplazado"}
 STATUS_TEXT = {"PASS": "CUMPLE", "FAIL": "NO CUMPLE", "INCOMPLETE": "INCOMPLETO"}
@@ -54,54 +55,26 @@ def _fmt(value) -> str:
 # --- document model ------------------------------------------------------------------------
 
 def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = None) -> list[dict]:
-    """Neutral document model of the report of one member (Spanish)."""
-    c = result.compression
-    member = title or result.section
+    """Neutral document model of the report of one member (Spanish), Chapter D or E."""
+    c = result.compression if result.chapter == "E" else result.tension
     method = case.design_method.value
-    capacity_label = "φc·Pn" if method == "LRFD" else "Pn/Ωc"
-    blocks = [{"kind": "title", "member": member, "status": result.status.value,
-               "meta": [("Norma", "ANSI/AISC 360-22, Capítulo E"), ("Método", method),
+    sub = "c" if result.chapter == "E" else "t"
+    capacity_label = f"φ{sub}·Pn" if method == "LRFD" else f"Pn/Ω{sub}"
+    action = "compresión" if result.chapter == "E" else "tracción"
+    blocks = [{"kind": "title", "member": result.section, "case": title, "status": result.status.value,
+               "action": action,
+               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo {result.chapter}"), ("Método", method),
                         ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
                "ratio": result.ratio}]
     if c is not None:
-        gov = c["modes"][c["governing_mode"]]
         blocks.append({"kind": "summary", "items": [
-            ("Demanda Pu", f"{_fmt(result.demand_kN)} kN"),
+            (f"Demanda |Pu| ({action})", f"{_fmt(result.demand_kN)} kN"),
             (f"Capacidad {capacity_label}", f"{_fmt(result.capacity_kN)} kN"),
             ("Pu / capacidad", _fmt(result.ratio)),
             ("Modo gobernante", f"{c['governing_mode']} · {c['governing_equation']}"),
         ]})
-
-    # 1. Data
-    blocks.append({"kind": "h1", "text": "1. Datos"})
-    source = result.section_data.get("source") or {}
-    origin = (f"catálogo {source.get('sheet')} fila {source.get('row')} (sha256 {source.get('sha256', '')[:12]})"
-              if source else "sección definida en la entrada")
-    f, ln = case.factors, case.lengths
-    items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin),
-             ("Material", f"Fy = {_fmt(case.material.Fy)} MPa; E = {_fmt(case.material.E)} MPa"),
-             ("Método y demanda", f"{method}; Pu = {_fmt(case.Pu)} kN")]
-    if f.xa or f.ya:
-        items.append(("Arriostramiento desplazado", f"xa = {_fmt(f.xa)} mm; ya = {_fmt(f.ya)} mm"))
-    if case.single_angle_e5:
-        b = case.single_angle_e5
-        items.append(("Base E5", f"configuración E5({b.configuration}); ala conectada {b.connected_leg}; "
-                                 f"L = {_fmt(b.L)} mm; condiciones (1) {_fmt(b.loaded_at_ends_through_same_leg)}, "
-                                 f"(2) {_fmt(b.welded_or_two_bolts_min)}, (3) {_fmt(b.no_intermediate_transverse_loads)}"))
-    if case.double_angle_e6:
-        b = case.double_angle_e6
-        items.append(("Base E6", f"conectores {b.connectors}; a = {_fmt(b.a)} mm; conexión de extremo "
-                                 f"soldada o pretensada: {_fmt(b.end_connection_welded_or_pretensioned)}"))
-    blocks.append({"kind": "kv", "items": items})
-    blocks.append({"kind": "table", "headers": ["Eje", "K", "L (mm)", "Lc = K·L (mm)"], "rows": [
-        ["x", f.Kx, ln.Lx, f.Kx * ln.Lx], ["y", f.Ky, ln.Ly, f.Ky * ln.Ly],
-        ["z (torsión)", f.Kz, ln.Lz, f.Kz * ln.Lz]]})
-    blocks.append({"kind": "h2", "text": "Propiedades de la sección utilizadas"})
-    blocks.append({"kind": "table", "headers": ["Propiedad", "Valor", "Unidad"], "rows": [
-        [_SECTION_NAMES.get(k, k), v, _SECTION_UNITS.get(k, "–" if k.endswith("ratio") else "mm")]
-        for k, v in result.section_data.items() if k not in {"name", "type", "source"}]})
-
+    blocks += _data_blocks(case, result)
     if c is None:
         blocks.append({"kind": "h1", "text": "2. Cálculo no realizado"})
         for error in result.errors:
@@ -109,7 +82,94 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
                            "detail": str(error["details"]) if error.get("details") else None})
         blocks.append({"kind": "p", "text": "El estado es INCOMPLETO: no se informa ninguna resistencia supuesta."})
         return blocks
+    blocks += (_compression_blocks(case, result, c, capacity_label) if result.chapter == "E"
+               else _tension_blocks(case, result, c, capacity_label))
+    blocks.append({"kind": "h1", "text": f"6. Obligaciones del Capítulo {result.chapter} (comprobación independiente)"})
+    blocks.append({"kind": "table", "headers": ["Obligación", "Disposición", "Atendida por"],
+                   "rows": [[o.id, o.provision, o.satisfied_by or "NO ATENDIDA"] for o in result.obligations]})
+    for error in result.errors:
+        blocks.append({"kind": "alert", "text": f"{error.get('code')}: {error.get('id', '')} "
+                                                f"{error.get('message', '')}".strip(), "detail": None})
+    blocks.append({"kind": "h1", "text": "7. Notas y limitaciones"})
+    for text in c["notes"] + c["limitations"] + [result.scope]:
+        blocks.append({"kind": "note", "text": text})
+    return blocks
 
+
+def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
+    blocks = [{"kind": "h1", "text": "1. Datos"}]
+    source = result.section_data.get("source") or {}
+    origin = (f"catálogo {source.get('sheet')} fila {source.get('row')} (sha256 {source.get('sha256', '')[:12]})"
+              if source else "sección definida en la entrada")
+    f, ln, mat = case.factors, case.lengths, case.material
+    material = f"Fy = {_fmt(mat.Fy)} MPa" + (f"; Fu = {_fmt(mat.Fu)} MPa" if mat.Fu else "")
+    if result.chapter == "E":
+        material += f"; E = {_fmt(mat.E)} MPa"
+    items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin), ("Material", material),
+             ("Método y demanda", f"{case.design_method.value}; Pu = {_fmt(case.Pu)} kN "
+                                  f"({'compresión' if case.Pu > 0 else 'tracción'})")]
+    if result.chapter == "D" and case.tension:
+        t = case.tension
+        items.append(("Sección neta", f"An = {_fmt(t.An)} mm² (B4.3b); U = {_fmt(t.U)} (Tabla D3.1); datos del usuario"))
+        if t.fabricated_length:
+            items.append(("Longitud fabricada", f"{_fmt(t.fabricated_length)} mm (Nota de D1)"))
+    if result.chapter == "E":
+        if f.xa or f.ya:
+            items.append(("Arriostramiento desplazado", f"xa = {_fmt(f.xa)} mm; ya = {_fmt(f.ya)} mm"))
+        if case.single_angle_e5:
+            b = case.single_angle_e5
+            items.append(("Base E5", f"configuración E5({b.configuration}); ala conectada {b.connected_leg}; "
+                                     f"L = {_fmt(b.L)} mm; condiciones (1) {_fmt(b.loaded_at_ends_through_same_leg)}, "
+                                     f"(2) {_fmt(b.welded_or_two_bolts_min)}, (3) {_fmt(b.no_intermediate_transverse_loads)}"))
+        if case.double_angle_e6:
+            b = case.double_angle_e6
+            items.append(("Base E6", f"conectores {b.connectors}; a = {_fmt(b.a)} mm; conexión de extremo "
+                                     f"soldada o pretensada: {_fmt(b.end_connection_welded_or_pretensioned)}"))
+    blocks.append({"kind": "kv", "items": items})
+    if result.chapter == "E" and ln is not None:
+        blocks.append({"kind": "table", "headers": ["Eje", "K", "L (mm)", "Lc = K·L (mm)"], "rows": [
+            ["x", f.Kx, ln.Lx, f.Kx * ln.Lx], ["y", f.Ky, ln.Ly, f.Ky * ln.Ly],
+            ["z (torsión)", f.Kz, ln.Lz, f.Kz * ln.Lz]]})
+    blocks.append({"kind": "h2", "text": "Propiedades de la sección utilizadas"})
+    blocks.append({"kind": "table", "headers": ["Propiedad", "Valor", "Unidad"], "rows": [
+        [_SECTION_NAMES.get(k, k), v, _SECTION_UNITS.get(k, "–" if k.endswith("ratio") else "mm")]
+        for k, v in result.section_data.items() if k not in {"name", "type", "source"}]})
+    return blocks
+
+
+def _tension_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_label: str) -> list[dict]:
+    method = case.design_method.value
+    blocks = [{"kind": "h1", "text": "2. Área neta efectiva (D3)"},
+              {"kind": "p", "text": f"Ae = An·U = {_fmt(c['inputs']['An_mm2'])} · {_fmt(c['inputs']['U'])} = "
+                                    f"{_fmt(c['modes']['TR']['area_mm2'])} mm² (D3-1)"},
+              {"kind": "h1", "text": "3. Disposiciones aplicadas"},
+              {"kind": "p", "text": ", ".join(c["provisions"])},
+              {"kind": "h1", "text": "4. Estados límite (D2)"}]
+    rows = []
+    for name, m in c["modes"].items():
+        a = m["available_kN"]
+        rows.append([name, LIMIT_STATES.get(m["limit_state"], m["limit_state"]), m["Pn_equation"],
+                     f"{'Fy' if name == 'TY' else 'Fu'} = {_fmt(m['stress_mpa'])}", f"{m['area_basis']} = {_fmt(m['area_mm2'])}",
+                     m["Pn_kN"], f"{a['phi']:.2f}", a["LRFD"], f"{a['omega']:.2f}", a["ASD"]])
+    blocks.append({"kind": "table", "headers": ["Modo", "Estado límite", "Ec.", "Tensión (MPa)", "Área (mm²)",
+                                                "Pn (kN)", "φt", "φt·Pn (kN)", "Ωt", "Pn/Ωt (kN)"],
+                   "rows": rows, "highlight": list(c["modes"]).index(c["governing_mode"])})
+    blocks.append({"kind": "p", "text": "Cada estado límite tiene su propio factor (D2), por lo que gobierna la menor "
+                                        "resistencia disponible, no la menor Pn."})
+    gov = c["modes"][c["governing_mode"]]
+    blocks += [{"kind": "h1", "text": "5. Resistencia"},
+               {"kind": "kv", "items": [
+                   ("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])} "
+                                       f"({method})"),
+                   ("LRFD", f"min(φt·Pn) = {_fmt(c['available']['LRFD'])} kN ({c['governing_by_method']['LRFD']})"),
+                   ("ASD", f"min(Pn/Ωt) = {_fmt(c['available']['ASD'])} kN ({c['governing_by_method']['ASD']})"),
+                   ("Verificación", f"|Pu| / {capacity_label} = {_fmt(result.demand_kN)} / {_fmt(result.capacity_kN)} "
+                                    f"= {_fmt(result.ratio)}")]}]
+    return blocks
+
+
+def _compression_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_label: str) -> list[dict]:
+    blocks = []
     # 2-3. Classification and provisions
     blocks.append({"kind": "h1", "text": "2. Clasificación de elementos (B4.1a)"})
     rows = [[_ELEMENTS.get(r["element"], r["element"]), r["b4_case"], r["ratio"], r["lambda_r"], "esbelto" if r["slender"] else "no esbelto"]
@@ -166,17 +226,6 @@ def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = 
         items.append((f"Requisito {req['id']}", f"a/ri = {_fmt(req['a_over_ri'])} ≤ {_fmt(req['limit'])} → "
                                                 f"{'cumple' if req['satisfied'] else 'NO cumple'}"))
     blocks.append({"kind": "kv", "items": items})
-
-    # 6-7. Obligations, notes
-    blocks.append({"kind": "h1", "text": "6. Obligaciones del Capítulo E (comprobación independiente)"})
-    blocks.append({"kind": "table", "headers": ["Obligación", "Disposición", "Atendida por"],
-                   "rows": [[o.id, o.provision, o.satisfied_by or "NO ATENDIDA"] for o in result.obligations]})
-    for error in result.errors:
-        blocks.append({"kind": "alert", "text": f"{error.get('code')}: {error.get('id', '')} "
-                                                f"{error.get('message', '')}".strip(), "detail": None})
-    blocks.append({"kind": "h1", "text": "7. Notas y limitaciones"})
-    for text in c["notes"] + c["limitations"] + [result.scope]:
-        blocks.append({"kind": "note", "text": text})
     return blocks
 
 
@@ -194,7 +243,8 @@ def render_text(blocks: list[dict]) -> str:
     for b in blocks:
         kind = b["kind"]
         if kind == "title":
-            out.append(f"# Memoria de cálculo — compresión {b['member']}")
+            out.append(f"# Memoria de cálculo — {b['action']} {b['member']}"
+                       + (f" · {b['case']}" if b.get("case") else ""))
             out += [f"{k}: {v}" for k, v in b["meta"]]
             out += ["", f"RESULTADO: {b['status']} ({STATUS_TEXT[b['status']]})"
                     + (f"   Pu/capacidad = {_fmt(b['ratio'])}" if b["ratio"] is not None else "")]
@@ -255,7 +305,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                 return
             self.set_font(FONT, "", 7.5)
             self.set_text_color(*_MUTED)
-            self.cell(0, 5, clean(f"Memoria de cálculo — compresión {self.member}"), new_x="LMARGIN", new_y="NEXT")
+            self.cell(0, 5, clean(f"Memoria de cálculo — {self.member}"), new_x="LMARGIN", new_y="NEXT")
             self.set_draw_color(*_RULE)
             self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
             self.ln(4)
@@ -266,7 +316,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
             self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
             self.set_font(FONT, "", 7.5)
             self.set_text_color(*_MUTED)
-            self.cell(0, 6, clean("StructureLab_HFS · ANSI/AISC 360-22, Capítulo E"))
+            self.cell(0, 6, clean("StructureLab_HFS · ANSI/AISC 360-22"))
             self.cell(0, 6, f"{self.page_no()} / {{nb}}", align="R")
 
     pdf = Report(format="A4")
@@ -348,16 +398,21 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
         for b in blocks:
             kind = b["kind"]
             if kind == "title":
-                pdf.member = b["member"]
+                pdf.member = b["member"] + (f" · {b['case']}" if b.get("case") else "")
                 pdf.set_fill_color(*_NAVY)
                 pdf.rect(0, 0, pdf.w, 4, style="F")
                 pdf.set_y(14)
                 pdf.set_font(FONT, "", 9)
                 pdf.set_text_color(*_MUTED)
-                pdf.cell(0, 5, clean("MEMORIA DE CÁLCULO · COMPRESIÓN"), new_x="LMARGIN", new_y="NEXT")
+                pdf.cell(0, 5, clean(f"MEMORIA DE CÁLCULO · {b['action'].upper()}"), new_x="LMARGIN", new_y="NEXT")
                 pdf.set_font(FONT, "B", 18)
                 pdf.set_text_color(*_NAVY)
                 pdf.multi_cell(width() - 42, 9, clean(b["member"]), new_x="LMARGIN", new_y="NEXT")
+                if b.get("case"):
+                    pdf.set_font(FONT, "", 10.5)
+                    pdf.set_text_color(*_INK)
+                    pdf.multi_cell(width() - 42, 5.5, clean(b["case"]), new_x="LMARGIN", new_y="NEXT")
+                    pdf.ln(1.5)
                 color = _STATUS_COLOR[b["status"]]
                 pdf.set_fill_color(*color)
                 pdf.rect(pdf.w - pdf.r_margin - 38, 19, 38, 10, style="F", round_corners=True, corner_radius=2)

@@ -30,7 +30,7 @@ class SectionRepository:
         records = self._sections.get(identity, [])
         if len(records) > 1:
             raise AmbiguousSectionError(
-                "Section identity is ambiguous; no catalog record was selected.",
+                "Identidad de sección ambigua: no se seleccionó ningún registro del catálogo.",
                 details={
                     "requested_name": name,
                     "identity": identity,

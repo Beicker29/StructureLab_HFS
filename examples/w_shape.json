@@ -1,0 +1,28 @@
+{
+  "section_name": "W14X90",
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 345,
+    "Fu": 450
+  },
+  "lengths": {
+    "Lx": 4000,
+    "Ly": 4000,
+    "Lz": 4000
+  },
+  "tension": {
+    "An": 15000,
+    "U": 0.9,
+    "fabricated_length": 4000
+  },
+  "cases": [
+    {
+      "name": "Combinación 1 — compresión",
+      "Pu": 2500
+    },
+    {
+      "name": "Combinación 2 — tracción",
+      "Pu": -2000
+    }
+  ]
+}

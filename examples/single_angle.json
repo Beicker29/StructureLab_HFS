@@ -2,9 +2,9 @@
   "section_name": "L4X4X1/4",
   "design_method": "LRFD",
   "material": {
-    "Fy": 250
+    "Fy": 250,
+    "Fu": 400
   },
-  "Pu": 100,
   "lengths": {
     "Lx": 2000,
     "Ly": 2000,
@@ -17,5 +17,20 @@
     "loaded_at_ends_through_same_leg": true,
     "welded_or_two_bolts_min": true,
     "no_intermediate_transverse_loads": true
-  }
+  },
+  "tension": {
+    "An": 1100,
+    "U": 0.6,
+    "fabricated_length": 2000
+  },
+  "cases": [
+    {
+      "name": "Combinación 1 — compresión",
+      "Pu": 100
+    },
+    {
+      "name": "Combinación 2 — tracción",
+      "Pu": -150
+    }
+  ]
 }

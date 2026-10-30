@@ -1,0 +1,28 @@
+{
+  "section_name": "PTE120X60X2MM",
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 345,
+    "Fu": 450
+  },
+  "lengths": {
+    "Lx": 1500,
+    "Ly": 1500,
+    "Lz": 1500
+  },
+  "tension": {
+    "An": 600,
+    "U": 0.9,
+    "fabricated_length": 1500
+  },
+  "cases": [
+    {
+      "name": "Combinación 1 — compresión",
+      "Pu": 100
+    },
+    {
+      "name": "Combinación 2 — tracción",
+      "Pu": -120
+    }
+  ]
+}

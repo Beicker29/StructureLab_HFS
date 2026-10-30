@@ -7,12 +7,14 @@ src/steel_design/
 ├── sections/                    catálogo: loader.py (hojas/cabeceras del Excel → Section, unidades),
 │                                models.py, repository.py, geometry.py (macizos), identity.py (nombres, AISC_Manual_Label 2L)
 ├── codes/aisc_360_22/
+│   ├── tension.py               fórmulas puras D2-1, D2-2, D3-1 y factores φt/Ωt
 │   └── compression.py           fórmulas puras E1, E3–E7 y límites λr de B4.1a
 ├── domain/
-│   ├── compression.py           clasificación, selección, ejecución y resistencia gobernante
-│   ├── coverage.py              obligaciones del capítulo E derivadas del texto, independientes
+│   ├── tension.py               capítulo D: fluencia y rotura, gobierno por resistencia disponible
+│   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
+│   ├── coverage.py              obligaciones de los capítulos D y E derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección
-├── engine.py                    sección → compresión → obligaciones → estado
+├── engine.py                    sección → capítulo D (Pu < 0) o E (Pu > 0) → obligaciones → estado
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
 ├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
 └── run.py                       CLI (JSON en stdout; archivos solo con --output, --report, --pdf → results/ ignorado)
@@ -40,7 +42,9 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 
 | Concepto | Propietario |
 | --- | --- |
+| Ecuaciones D2-1, D2-2, D3-1, φt/Ωt | `codes/aisc_360_22/tension.py` |
 | Ecuaciones E3-2…E7-7, φc/Ωc, λr | `codes/aisc_360_22/compression.py` |
+| Estados límite de tracción y modo gobernante | `domain/tension.py` |
 | Elementos B4.1a por familia, selección de modos, E7 por modo | `domain/compression.py` |
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |
 | Hojas, cabeceras y unidades del catálogo; b/tdes, h/tdes, D/t de PTE | `sections/loader.py` |
