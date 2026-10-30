@@ -214,14 +214,63 @@ class CompositeBeamBasis(InputModel):
         return self
 
 
+class PlateShearWall(InputModel):
+    """Filled composite plate shear wall, planar and rectangular, with flange (closure) plates (I1.6, Fig. C-I1.4(a))."""
+    length: PositiveNumber = Field(..., description="Wall length, in the direction of in-plane bending and shear (mm)")
+    tsc: PositiveNumber = Field(..., description="Wall thickness tsc (mm)")
+    t: PositiveNumber = Field(..., description="Thickness of each steel plate (mm)")
+    tf: PositiveNumber = Field(..., description="Thickness of each flange (closure) plate (mm); I1.6 requires them")
+    b: PositiveNumber = Field(..., description="I1-4: largest clear distance between rows of steel anchors or ties (mm)")
+    st: PositiveNumber = Field(..., description="I1-5: largest clear spacing of the ties (mm)")
+    dtie: PositiveNumber = Field(..., description="I1-6: effective diameter of the tie bar (mm)")
+
+
+class ComponentAnchor(InputModel):
+    """One anchor of a composite component (I8.3), with its required strengths for this load combination."""
+    type: Literal["stud", "channel"]
+    Qrv: NonNegativeNumber = Field(0.0, description="Required shear strength of one anchor (kN)")
+    Qrt: NonNegativeNumber = Field(0.0, description="Required tensile strength of one anchor (kN)")
+    spacing: PositiveNumber = Field(..., description="Center-to-center spacing of the anchors (mm)")
+    d: Optional[PositiveNumber] = Field(None, description="Stud: shank diameter (mm)")
+    Fu: Optional[PositiveNumber] = Field(None, description="Stud: specified minimum tensile strength (MPa)")
+    height: Optional[PositiveNumber] = Field(None, description="Stud: installed height, base to top of the head (mm)")
+    head_diameter: Optional[PositiveNumber] = Field(None, description="Stud: head diameter (mm); required with tension")
+    edge_distance: Optional[PositiveNumber] = Field(
+        None, description="Stud: anchor center to the free edge, perpendicular to the height (mm); omit if there is no free edge")
+    breakout_in_shear: Optional[StrictBool] = Field(None, description="Stud: concrete breakout in shear is an applicable limit state")
+    reinforcement_shear: Optional[PositiveNumber] = Field(
+        None, description="Stud: nominal strength of the anchor reinforcement in shear, per ACI 318 (kN)")
+    reinforcement_tension: Optional[PositiveNumber] = Field(
+        None, description="Stud: nominal strength of the anchor reinforcement in tension, per ACI 318 (kN)")
+    base_thickness: Optional[PositiveNumber] = Field(None, description="Stud, I8.1: thickness of the base metal (mm)")
+    over_web: StrictBool = Field(False, description="Stud, I8.1: welded to a flange directly over a web")
+    solid_slab: StrictBool = Field(False, description="Stud, I8.1: used solely for shear transfer in a solid slab")
+    la: Optional[PositiveNumber] = Field(None, description="Channel: length (mm)")
+    tf: Optional[PositiveNumber] = Field(None, description="Channel: flange thickness (mm)")
+    tw: Optional[PositiveNumber] = Field(None, description="Channel: web thickness (mm)")
+
+    @model_validator(mode="after")
+    def data_of_the_declared_type(self):
+        if not (self.Qrv or self.Qrt):
+            raise ValueError("El anclaje requiere Qrv o Qrt.")
+        needed = (("d", "Fu", "height", "breakout_in_shear", "base_thickness") if self.type == "stud" else ("la", "tf", "tw"))
+        missing = [name for name in needed if getattr(self, name) is None]
+        if missing:
+            raise ValueError(f"Anclaje {self.type}: faltan {', '.join(missing)}.")
+        return self
+
+
 class CompositeBasis(InputModel):
     """Chapter I: the member type is declared, never deduced from the section."""
-    kind: Literal["filled", "encased", "beam"]
+    kind: Literal["filled", "encased", "beam", "wall"]
     concrete: Concrete
-    interaction: Literal["H1", "I5"] = Field(
-        "H1", description="I5(a)/(b): H1.1, or Equations I5-1a/b (filled noncompact or slender sections)")
+    interaction: Literal["H1", "I5", "M2", "M2S"] = Field(
+        "H1", description="H1.1; Equations I5-1a/b (filled noncompact or slender); Commentary I5 Method 2 (M2) or "
+                          "Method 2 simplified (M2S), for encased and compact filled members. Walls use I5(c)")
     encased: Optional[EncasedBasis] = None
     beam: Optional[CompositeBeamBasis] = None
+    wall: Optional[PlateShearWall] = None
+    anchor: Optional[ComponentAnchor] = None
 
     @model_validator(mode="after")
     def data_of_the_declared_kind(self):
@@ -229,6 +278,10 @@ class CompositeBasis(InputModel):
             raise ValueError("composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso.")
         if (self.kind == "beam") != (self.beam is not None):
             raise ValueError("composite.beam corresponde solo a kind = beam, y es obligatorio en ese caso.")
+        if (self.kind == "wall") != (self.wall is not None):
+            raise ValueError("composite.wall corresponde solo a kind = wall, y es obligatorio en ese caso.")
+        if self.kind == "wall" and self.interaction != "H1":
+            raise ValueError("Los muros usan la distribución plástica de I5(c); no indique composite.interaction.")
         return self
 
 
@@ -280,7 +333,8 @@ class SteelCase(InputModel):
     def demand(self):
         if self.composite is not None and self.custom_section is not None:
             raise ValueError("Un miembro compuesto usa un perfil del catálogo, no custom_section.")
-        if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy)):
+        if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy,
+                    self.composite and self.composite.anchor)):
             raise ValueError("La combinación debe tener al menos una demanda distinta de cero "
                              "(Pu, Mux, Muy, Mw, Mz, Vux, Vuy).")
         if self.Pu > 0 and self.lengths is None:
@@ -304,7 +358,7 @@ class Obligation(BaseModel):
 
 class Check(BaseModel):
     """One required strength of a load combination (axial, flexure or shear) or their interaction (H)."""
-    id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z", "shear_x", "shear_y", "interaction"]
+    id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z", "shear_x", "shear_y", "interaction", "anchor"]
     chapter: Literal["D", "E", "F", "G", "H", "I"]
     demand: float = Field(..., description="|Pu| or |Vu| (kN), |Mu| (kN*m); interaction value for Chapter H")
     unit: Literal["kN", "kN·m", "–"]
@@ -324,7 +378,7 @@ class DesignResult(BaseModel):
     checks: list[Check] = Field(default_factory=list)
     scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
                   "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
-                  "I5 e I8.2). Longitudes efectivas, análisis de segundo "
+                  "I5, I8.2 e I8.3). Longitudes efectivas, análisis de segundo "
                   "orden, combinaciones de carga, conexiones, torsión y demás capítulos quedan fuera de este resultado.")
 
     @computed_field

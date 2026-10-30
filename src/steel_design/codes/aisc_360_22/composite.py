@@ -9,6 +9,12 @@ PHI_C = 0.75         # I2.1b
 PHI_T = 0.90         # I2.1c, I2.2c
 PHI_B = 0.90         # I3.2a, I3.3a, I3.4b
 PHI_V_FILLED = 0.90  # I4.2
+PHI_C_WALL = 0.90    # I2.3a
+PHI_V_WALL = 0.90    # I4.4
+PHI_STUD_V = 0.65    # I8.3a
+PHI_STUD_T = 0.75    # I8.3b
+PHI_CHANNEL = 0.75   # I8.3d
+G_STEEL = 77200.0    # MPa, I1.5
 
 
 def concrete_modulus(*, wc, fc) -> float:
@@ -103,7 +109,8 @@ def rect_plastic_moment(*, Fy, fc, Zs, t, bi, hi, r) -> dict:
     Zc = bi * hi**2 / 4 - 0.429 * r**2 * hi + 0.192 * r**3
     hn = min(0.85 * fc * Ac / (2 * (0.85 * fc * bi + 4 * Fy * t)), hi / 2)
     Zsn, Zcn = 2 * t * hn**2, bi * hn**2
-    return {"Mp": Fy * (Zs - Zsn) + 0.85 * fc * (Zc - Zcn) / 2, "hn_mm": hn, "Zc_mm3": Zc}
+    return {"Mp": Fy * (Zs - Zsn) + 0.85 * fc * (Zc - Zcn) / 2, "hn_mm": hn, "Zc_mm3": Zc,
+            "Md": Fy * Zs + 0.85 * fc * Zc / 2}                      # neutral axis at the centroid (point D)
 
 
 def rect_yield_moment(*, Fy, fc, H, tw, tf, bi) -> dict:
@@ -158,7 +165,7 @@ def round_plastic_moment(*, Fy, fc, D, t) -> dict:
         return axial, moment
 
     hn = _balance(lambda y: forces(y)[0], 0.0, ro)
-    return {"Mp": forces(hn)[1], "hn_mm": hn}
+    return {"Mp": forces(hn)[1], "hn_mm": hn, "Md": forces(0.0)[1]}
 
 
 def _w_band(*, axis, d, bf, tf, tw, As, Zs, hn) -> tuple[float, float]:
@@ -196,7 +203,7 @@ def encased_plastic_moment(*, axis, Fy, Fysr, fc, b, h, d, bf, tf, tw, As, Zs, b
         return axial, moment
 
     hn = _balance(lambda y: forces(y)[0], 0.0, h / 2)
-    return {"Mp": forces(hn)[1], "hn_mm": hn}
+    return {"Mp": forces(hn)[1], "hn_mm": hn, "Md": forces(0.0)[1]}
 
 
 def shear_filled(*, Av, Fy, Kc, Ac, fc) -> float:
@@ -225,6 +232,88 @@ def i5_interaction(*, Pr_Pc, Mr_Mc, cp, cm) -> dict:
     if Pr_Pc >= cp:
         return {"ratio": Pr_Pc + (1 - cp) / cm * Mr_Mc, "equation": "I5-1a"}
     return {"ratio": (1 - cm) / cp * Pr_Pc + Mr_Mc, "equation": "I5-1b"}
+
+
+def method2_simplified(*, Pr, PA, PC, Mrx, Mcx, Mry, Mcy) -> dict:
+    """Commentary I5, Method 2 simplified: C-I5-1a and C-I5-1b. Zero moments need no capacity."""
+    moments = (Mrx / Mcx if Mrx else 0.0) + (Mry / Mcy if Mry else 0.0)
+    if Pr <= PC:                                                     # both equations coincide at Pr = PC
+        return {"ratio": moments, "equation": "C-I5-1a"}
+    return {"ratio": (Pr - PC) / (PA - PC) + moments, "equation": "C-I5-1b"}
+
+
+def method2_ratio(*, Pr, Mr, points) -> float:
+    """Commentary I5, Method 2: demand over the curve (P, M) along the ray from the origin, between anchor points."""
+    for (p1, m1), (p2, m2) in zip(points, points[1:]):
+        dp, dm = p2 - p1, m2 - m1
+        cross = Pr * dm - Mr * dp
+        if cross == 0:
+            continue
+        factor = (p1 * dm - m1 * dp) / cross
+        position = -(Pr * m1 - Mr * p1) / cross
+        if factor > 0 and -1e-12 <= position <= 1 + 1e-12:
+            return 1 / factor
+    raise ValueError("The demand does not cross the interaction curve.")
+
+
+def wall_stiffness(*, Is, Ec, Ic) -> float:
+    """I1-1."""
+    return E_STEEL * Is + 0.35 * Ec * Ic
+
+
+def pno_wall(*, Fy, As, fc, Ac) -> float:
+    """I2-15."""
+    return Fy * As + 0.85 * fc * Ac
+
+
+def wall_shear(*, Asw, Fy, Ec, Ac) -> dict:
+    """I4-2 to I4-4."""
+    Ks = G_STEEL * Asw
+    Ksc = 0.7 * (Ec * Ac) * (E_STEEL * Asw) / (4 * E_STEEL * Asw + Ec * Ac)
+    return {"Vn": (Ks + Ksc) / math.sqrt(3 * Ks**2 + Ksc**2) * Asw * Fy, "Ks_N": Ks, "Ksc_N": Ksc}
+
+
+def wall_tie_limit(*, t, tsc, dtie) -> dict:
+    """I1-6 and I1-5M."""
+    alpha = 1.7 * (tsc / t - 2) * (t / dtie) ** 4
+    return {"alpha": alpha, "limit": 0.38 * math.sqrt(E_STEEL / (2 * alpha + 1))}
+
+
+def wall_plastic_moment(*, Fy, fc, H, t, tf, bi, P=0.0) -> dict:
+    """Plastic distribution of Fig. C-I3.8(a) (I1.2a, I3.5) at the axial force P (N, compression positive).
+
+    H is the wall length, bi the concrete thickness, t each long plate and tf each flange plate.
+    """
+    def forces(a):
+        """Axial force and moment about mid-length with the compression block a deep (mm)."""
+        rows = []                                                    # (force, distance from the top)
+        rows += [(2 * t * a * Fy, a / 2), (-2 * t * (H - a) * Fy, (H + a) / 2)]
+        for top, bottom in ((0.0, tf), (H - tf, H)):
+            above = min(max(a, top), bottom)                         # the part of the flange plate above a compresses
+            rows += [(bi * (above - top) * Fy, (top + above) / 2), (-bi * (bottom - above) * Fy, (above + bottom) / 2)]
+        depth = min(max(a - tf, 0.0), H - 2 * tf)
+        rows.append((0.85 * fc * bi * depth, tf + depth / 2))
+        return sum(f for f, _ in rows), sum(f * (H / 2 - y) for f, y in rows)
+
+    if not forces(0.0)[0] <= P <= forces(H)[0]:
+        return {"within_section": False, "Mp": 0.0, "a_mm": None, "P_max_N": forces(H)[0], "P_min_N": forces(0.0)[0]}
+    a = _balance(lambda y: P - forces(y)[0], 0.0, H)
+    return {"within_section": True, "Mp": forces(a)[1], "a_mm": a}
+
+
+def stud_shear_strength(*, Fu, Asa) -> float:
+    """I8-3."""
+    return Fu * Asa
+
+
+def stud_tension_strength(*, Fu, Asa) -> float:
+    """I8-4."""
+    return Fu * Asa
+
+
+def stud_interaction(*, Qrv, Qcv, Qrt, Qct) -> float:
+    """I8-5."""
+    return (Qrt / Qct) ** (5 / 3) + (Qrv / Qcv) ** (5 / 3)
 
 
 def effective_slab_width(*, span, left, right) -> dict:

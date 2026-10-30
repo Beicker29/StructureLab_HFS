@@ -5,7 +5,8 @@ angles about their principal axes): flexure (Chapter F); Vux, Vuy: shear (Chapte
 and flexure acting together, or flexure about two axes, add the interaction check (Chapter H).
 case.composite sends each demand to Chapter I, which uses Chapters E, F and G where it refers to them.
 """
-from .domain.composite import composite_compression, composite_flexure, composite_i5, composite_shear, composite_tension
+from .domain.composite import (composite_anchor, composite_compression, composite_flexure, composite_i5, composite_method2,
+                               composite_shear, composite_tension, composite_wall_interaction)
 from .domain.compression import compression_strength
 from .domain.coverage import (composite_obligations, discharge, flexure_obligations, interaction_obligations,
                               required_obligations, shear_obligations)
@@ -16,7 +17,7 @@ from .domain.tension import tension_strength
 from .domain.validation import section_inconsistencies, validate_case, validate_section
 from .errors import IncompleteSectionDataError, RuleNotImplementedError, SectionNotFoundError
 from .models import Check, DesignResult, Obligation, SteelCase, Status
-from .sections.geometry import build_custom_section
+from .sections.geometry import build_custom_section, build_wall_section
 from .sections.models import Section
 from .sections.repository import SectionRepository
 
@@ -34,6 +35,8 @@ class SteelDesignEngine:
     def section_for(self, case: SteelCase) -> Section:
         if case.custom_section is not None:
             return validate_section(build_custom_section(case))
+        if case.composite is not None and case.composite.kind == "wall":
+            return validate_section(build_wall_section(case))
         return self._catalog(case.section_name)
 
     def _check(self, check_id, chapter, demand, unit, obligations, compute, section, inconsistent) -> Check:
@@ -127,19 +130,29 @@ class SteelDesignEngine:
         for axis, shear in (("x", case.Vux), ("y", case.Vuy)):
             if shear:
                 steel = lambda axis=axis: shear_strength(case, section, axis)  # noqa: E731
-                obligations = composite_obligations(case, "shear") if kind == "filled" else shear_obligations(section, axis)
+                chapter_i = kind in {"filled", "wall"}
+                obligations = composite_obligations(case, "shear") if chapter_i else shear_obligations(section, axis)
                 checks.append(self._check(
-                    f"shear_{axis}", "I" if kind == "filled" else "G", abs(shear), "kN", obligations,
+                    f"shear_{axis}", "I" if chapter_i else "G", abs(shear), "kN", obligations,
                     lambda axis=axis, steel=steel: composite_shear(case, section, axis, steel), section, inconsistent))
         combined = [c for c in checks if c.id in COMBINED]
         if len(combined) > 1:
-            if case.composite.interaction == "I5":
-                obligations = [Obligation(id="I5", provision="I5(b)", reason="Ecuaciones I5-1a/b.")]
-                checks.append(self._check("interaction", "I", 0.0, "–", obligations,
-                                          lambda: composite_i5(case, section, combined), section, []))
-            else:
+            method = "wall" if kind == "wall" else case.composite.interaction
+            if method == "H1":
                 checks.append(self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
                                           lambda: combined_strength(case, section, combined), section, []))
+            else:
+                mode, provision, compute = {
+                    "I5": ("I5", "I5(b)", composite_i5), "M2": ("M2", "Commentary I5", composite_method2),
+                    "M2S": ("M2", "Commentary I5", composite_method2), "wall": ("I5c", "I5(c)", composite_wall_interaction)}[method]
+                obligations = [Obligation(id=mode, provision=provision, reason="Interacción de fuerza axial y flexión.")]
+                checks.append(self._check("interaction", "I", 0.0, "–", obligations,
+                                          lambda: compute(case, section, combined), section, []))
+        if case.composite.anchor:
+            obligations = [Obligation(id="V" if case.composite.anchor.type == "channel" else "Q", provision="I8.3",
+                                      reason="Resistencia de un anclaje de componente.")]
+            checks.append(self._check("anchor", "I", 0.0, "–", obligations, lambda: composite_anchor(case, section),
+                                      section, []))
         return checks
 
     def _result(self, section: Section, checks: list[Check]) -> DesignResult:

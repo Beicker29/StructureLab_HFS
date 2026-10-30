@@ -104,21 +104,23 @@ WC = 2323.0        # 145 lb/ft3
 F5 = 5 * KSI
 
 
-def filled_member(name, fc_ksi, L=None, **demands):
+def filled_member(name, fc_ksi, L=None, interaction="H1", **demands):
     data = dict(section_name=name, material={"Fy": FY50}, **demands,
-                composite={"kind": "filled", "concrete": {"fc": fc_ksi * KSI, "wc": WC, "lightweight": False}})
+                composite={"kind": "filled", "interaction": interaction,
+                           "concrete": {"fc": fc_ksi * KSI, "wc": WC, "lightweight": False}})
     if L:
         data["lengths"] = {"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}
     return data
 
 
-def encased_member(L=None, method="steel", **demands):
+def encased_member(L=None, method="steel", interaction="H1", anchor=None, **demands):
     """Examples I.9 to I.11: eight No. 8 bars at 9.5 in; ties No. 3 at 12 in (10 mm at 300 mm, the metric limit)."""
     e = 9.5 * IN
     positions = [(e, e), (e, 0.0), (e, -e), (0.0, e), (0.0, -e), (-e, e), (-e, 0.0), (-e, -e)]
     bars = [{"area": 0.79 * IN**2, "db": 1.0 * IN, "x": x, "y": y} for x, y in positions]
     data = dict(section_name="W10X45", material={"Fy": FY50}, **demands,
-                composite={"kind": "encased", "concrete": {"fc": F5, "wc": WC, "lightweight": False},
+                composite={"kind": "encased", "interaction": interaction, "anchor": anchor,
+                           "concrete": {"fc": F5, "wc": WC, "lightweight": False},
                            "encased": {"H": 24 * IN, "B": 24 * IN, "Fysr": 60 * KSI, "bars": bars,
                                        "transverse": {"db": 10, "spacing": 300}, "flexure_method": method,
                                        "anchors_provided": method == "composite"}})
@@ -232,6 +234,23 @@ EXAMPLES = {
                 "flexure_x", 673, "kip-ft"),
     "I.11-H1": ("W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, H1-1a",
                 encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite"), "interaction", 1.38, "ratio"),
+    "I.6-M2S": ("HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, Método 2 simplificado (C-I5-1b)",
+                filled_member("HSS10X6X3/8", 5, Pu=129 * KIP, Mux=120 * KIPFT, L=14, interaction="M2S"),
+                "interaction", 0.948, "ratio"),
+    "I.6-M2": ("HSS10X6X3/8 relleno, igual, Método 2 (razón obtenida con los puntos impresos en el ejemplo)",
+               filled_member("HSS10X6X3/8", 5, Pu=129 * KIP, Mux=120 * KIPFT, L=14, interaction="M2"),
+               "interaction", 0.963, "ratio"),
+    "I.11-M2S": ("W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, Método 2 simplificado (C-I5-1a)",
+                 encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite", interaction="M2S"),
+                 "interaction", 0.996, "ratio"),
+    "I.11-M2": ("W10X45 embebido, igual, Método 2 (razón obtenida con los puntos impresos en el ejemplo)",
+                encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite", interaction="M2"),
+                "interaction", 0.870, "ratio"),
+    "I.12": ("Perno de 3/4 in, Quv = 10.4 kips, Qut = 15.6 kips (I8-5)",
+             encased_member(anchor={"type": "stud", "Qrv": 10.4 * KIP, "Qrt": 15.6 * KIP, "spacing": 24 * IN, "d": 0.75 * IN,
+                                    "Fu": 65 * KSI, "height": 6 * IN, "head_diameter": 1.25 * IN, "breakout_in_shear": False,
+                                    "base_thickness": 1 * IN}),
+             "anchor", 0.962, "ratio"),
     "E.14B-Pc": ("L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7)", E14B, "axial", 168, "kip"),
     "E.14B-Mcw": ("L8X4X1/2 eje w, punta del ala larga comprimida, βw = −5.48 in", E14B, "flexure_w", 375 / 12, "kip-ft"),
     "E.14B-Mcz": ("L8X4X1/2 eje z, punteras traccionadas, fluencia en A", E14B, "flexure_z", 123 / 12, "kip-ft"),

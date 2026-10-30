@@ -291,6 +291,118 @@ def i5(name, fy, fc, wc, L, Pu, Mu):
     return {"csr": csr, "cp": cp, "cm": cm, "Pc_kN": pc, "Mc_kNm": mc, "ratio": ratio}
 
 
+def curve_moment(points, p):
+    """Moment of a piecewise-linear interaction curve at the axial force p."""
+    for (p1, m1), (p2, m2) in zip(points, points[1:]):
+        if p1 <= p <= p2:
+            return m1 + (m2 - m1) * (p - p1) / (p2 - p1)
+    return D(0)
+
+
+def scale_to_curve(pr, mr, points):
+    """Demand ratio by bisection of the scale that places (Pr, Mr) on the curve (the product intersects segments)."""
+    return bisect(lambda s: mr / s - curve_moment(points, pr / s), D("0.001"), D(100))
+
+
+def method2(kind, Pu, Mu, simplified, **member):
+    """Commentary I5, Method 2: anchor points A, B, C, D with the same slenderness factor on A, C and D."""
+    pr, mr = D(Pu), D(Mu)
+    fy, fc = D(member["fy"]), D(member["fc"])
+    if kind == "filled":
+        name, wc, L = member["name"], member["wc"], member["L"]
+        g = filled_rect(name)
+        axial = filled_compression(name, fy, fc, wc, L)
+        mb = filled_rect_flexure(name, fy, fc)["Mn_kNm"]
+        zc = g["bi"] * g["hi"] ** 2 / 4 - D("0.429") * g["t"] ** 2 * g["hi"] + D("0.192") * g["t"] ** 3
+        md = (fy * g["p"]["Zx"] + D("0.85") * fc * zc / 2) / 10**6
+        pc = D("0.85") * fc * g["Ac"] / 1000
+    else:
+        args = {k: member[k] for k in ("name", "H", "B", "Fysr", "bars")}
+        p, H, B, bars, _, ac = encased_data(args["name"], args["H"], args["B"], args["bars"])
+        axial = encased_compression(fy=fy, fc=fc, wc=member["wc"], L=member["L"], **args)
+        mb = encased_flexure(fy=fy, fc=fc, **args)["Mn_kNm"]
+        zr = sum(a * abs(y) for a, _, _, y in bars)
+        zc = B * H**2 / 4 - p["Zx"] - zr
+        md = (fy * p["Zx"] + D(args["Fysr"]) * zr + D("0.85") * fc * zc / 2) / 10**6
+        pc = D("0.85") * fc * ac / 1000
+    lam = axial["Pn_kN"] / axial["Pno_kN"]
+    pa_d, pc_d = D("0.75") * axial["Pn_kN"], D("0.75") * lam * pc
+    mc = D("0.90") * mb
+    if simplified:
+        ratio = mr / mc if pr < pc_d else (pr - pc_d) / (pa_d - pc_d) + mr / mc      # C-I5-1a, C-I5-1b
+        return {"PA_kN": pa_d, "PC_kN": pc_d, "Mc_kNm": mc, "ratio": ratio}
+    design = [(D(0), mc), (pc_d / 2, D("0.90") * md), (pc_d, mc), (pa_d, D(0))]
+    nominal = [(D(0), mb), (pc / 2, md), (pc, mb), (axial["Pno_kN"], D(0))]
+    ratios = scale_to_curve(pr, mr, design), scale_to_curve(pr, mr, nominal)
+    return {"PA_kN": pa_d, "PC_kN": pc_d, "MD_kNm": D("0.90") * md, "ratio": max(ratios)}
+
+
+def wall_data(L, tsc, t, tf):
+    L, tsc, t, tf = D(L), D(tsc), D(t), D(tf)
+    bi, hi = tsc - 2 * t, L - 2 * tf
+    return {"L": L, "tsc": tsc, "t": t, "tf": tf, "bi": bi, "hi": hi, "Ac": bi * hi, "As": L * tsc - bi * hi}
+
+
+def wall_compression(fy, fc, wc, height, L, tsc, t, tf):
+    fy, fc = D(fy), D(fc)
+    w = wall_data(L, tsc, t, tf)
+    pno = fy * w["As"] + D("0.85") * fc * w["Ac"]                                # I2-15
+    ec_ = ec(wc, fc)
+    # Steel inertias as the gross outline less the concrete core.
+    isx = (w["tsc"] * w["L"] ** 3 - w["bi"] * w["hi"] ** 3) / 12
+    isy = (w["L"] * w["tsc"] ** 3 - w["hi"] * w["bi"] ** 3) / 12
+    pns = [pn_of(pno, E * i + D("0.35") * ec_ * ic, height)                      # I1-1
+           for i, ic in ((isx, w["bi"] * w["hi"] ** 3 / 12), (isy, w["hi"] * w["bi"] ** 3 / 12))]
+    return {"Pno_kN": pno / 1000, "Pn_kN": min(pns) / 1000, "phiPn_kN": D("0.90") * min(pns) / 1000}
+
+
+def wall_tension(fy, L, tsc, t, tf):
+    pn = D(fy) * wall_data(L, tsc, t, tf)["As"]                                  # I2-16
+    return {"Pn_kN": pn / 1000, "phiPn_kN": D("0.90") * pn / 1000}
+
+
+def wall_moment(fy, fc, L, tsc, t, tf, P=0):
+    """Closed form of Fig. C-I3.8(a) with the axial force in the balance; the block ends in the long plates."""
+    fy, fc, P = D(fy), D(fc), D(P) * 1000
+    w = wall_data(L, tsc, t, tf)
+    H, t_, tf_, bi = w["L"], w["t"], w["tf"], w["bi"]
+    a = (2 * fy * H * t_ + D("0.85") * fc * bi * tf_ + P) / (4 * t_ * fy + D("0.85") * fc * bi)
+    assert tf_ <= a <= H - tf_
+    forces = [(bi * tf_ * fy, a - tf_ / 2), (D("0.85") * fc * (a - tf_) * bi, (a - tf_) / 2), (a * 2 * t_ * fy, a / 2),
+              ((H - a) * 2 * t_ * fy, (H - a) / 2), (bi * tf_ * fy, H - a - tf_ / 2)]
+    # Moments about the neutral axis; the axial force acts at mid-length.
+    mn = sum(f * y for f, y in forces) - P * (a - H / 2)
+    return {"a_mm": a, "Mn_kNm": mn / 10**6}
+
+
+def wall_shear_oracle(fy, fc, wc, L, tsc, t, tf):
+    w = wall_data(L, tsc, t, tf)
+    asw, ec_a = 2 * w["t"] * w["L"], ec(wc, fc) * w["Ac"]
+    ks = D(77200) * asw                                                          # I4-3
+    ksc = D("0.7") * ec_a * (E * asw) / (4 * E * asw + ec_a)                     # I4-4
+    vn = (ks + ksc) / sqrt(3 * ks**2 + ksc**2) * asw * D(fy)                     # I4-2
+    return {"Vn_kN": vn / 1000, "phiVn_kN": D("0.90") * vn / 1000}
+
+
+def wall_interaction(fy, fc, L, tsc, t, tf, Pu, Mu):
+    mn = wall_moment(fy, fc, L, tsc, t, tf, D(Pu) / D("0.90"))["Mn_kNm"]
+    return {"Mc_kNm": D("0.90") * mn, "ratio": D(Mu) / (D("0.90") * mn)}
+
+
+def anchor_oracle(type_, Qrv=0, Qrt=0, d=None, Fu=None, la=None, tf=None, tw=None, fc=None, wc=None):
+    qrv, qrt = D(Qrv), D(Qrt)
+    if type_ == "channel":
+        qn = D("0.3") * (D(tf) + D(tw) / 2) * D(la) * sqrt(D(fc) * ec(wc, fc)) / 1000       # I8-2
+        return {"Qc_kN": D("0.75") * qn, "ratio": qrv / (D("0.75") * qn)}
+    qn = PI * D(d) ** 2 / 4 * D(Fu) / 1000                                       # I8-3, I8-4
+    qcv, qct = D("0.65") * qn, D("0.75") * qn
+    if qrv and qrt:
+        ratio = (qrt / qct) ** (D(5) / 3) + (qrv / qcv) ** (D(5) / 3)            # I8-5
+    else:
+        ratio = qrv / qcv if qrv else qrt / qct
+    return {"Qcv_kN": qcv, "Qct_kN": qct, "ratio": ratio}
+
+
 BARS_8 = [(510, "25.4", x, y) for x, y in ((241.3, 241.3), (241.3, 0), (241.3, -241.3), (0, 241.3), (0, -241.3),
                                           (-241.3, 241.3), (-241.3, 0), (-241.3, -241.3))]
 CASES = {
@@ -321,11 +433,40 @@ CASES = {
                              tc=114, hr=76, n=8, d=19, Fu=450, Rg=1, Rp="0.6"),
     "i5-high-axial": dict(kind="i5", name="PTE120X60X2MM", fy=345, fc=35, wc=2320, L=2000, Pu=120, Mu=3),
     "i5-low-axial": dict(kind="i5", name="PTE120X60X2MM", fy=345, fc=35, wc=2320, L=2000, Pu=10, Mu=8),
+    "m2s-filled-high": dict(kind="method2", member="filled", name="PTE100X50X3MM", fy=345, fc=35, wc=2320, L=2000,
+                            Pu=100, Mu=4, simplified=True),
+    "m2s-filled-low": dict(kind="method2", member="filled", name="PTE100X50X3MM", fy=345, fc=35, wc=2320, L=2000,
+                           Pu=10, Mu=8, simplified=True),
+    "m2-filled": dict(kind="method2", member="filled", name="PTE100X50X3MM", fy=345, fc=35, wc=2320, L=2000,
+                      Pu=40, Mu=8, simplified=False),
+    "m2s-encased": dict(kind="method2", member="encased", name="W10X45", fy=345, fc=35, wc=2320, L=4267, H=610, B=610,
+                        Fysr=420, bars=BARS_8, Pu=5000, Mu=800, simplified=True),
+    "m2-encased": dict(kind="method2", member="encased", name="W10X45", fy=345, fc=35, wc=2320, L=4267, H=610, B=610,
+                       Fysr=420, bars=BARS_8, Pu=5000, Mu=800, simplified=False),
+    "wall-C": dict(kind="wall_compression", fy=345, fc=35, wc=2320, height=6000, L=3000, tsc=300, t=10, tf=20),
+    "wall-T": dict(kind="wall_tension", fy=345, L=3000, tsc=300, t=10, tf=20),
+    "wall-M": dict(kind="wall_moment", fy=345, fc=35, L=3000, tsc=300, t=10, tf=20),
+    "wall-V": dict(kind="wall_shear", fy=345, fc=35, wc=2320, L=3000, tsc=300, t=10, tf=20),
+    "wall-PM-compression": dict(kind="wall_interaction", fy=345, fc=35, L=3000, tsc=300, t=10, tf=20, Pu=8000, Mu=20000),
+    "wall-PM-tension": dict(kind="wall_interaction", fy=345, fc=35, L=3000, tsc=300, t=10, tf=20, Pu=-3000, Mu=15000),
+    "stud-shear": dict(kind="anchor", type_="stud", Qrv=50, d=19, Fu=450),
+    "stud-tension": dict(kind="anchor", type_="stud", Qrt=60, d=19, Fu=450),
+    "stud-interaction": dict(kind="anchor", type_="stud", Qrv=40, Qrt=60, d=19, Fu=450),
+    "channel-shear": dict(kind="anchor", type_="channel", Qrv=100, la=100, tf=8, tw=6, fc=35, wc=2320),
 }
 FUNCTIONS = {"filled_compression": filled_compression, "filled_rect_flexure": filled_rect_flexure,
              "filled_round_flexure": filled_round_flexure, "filled_shear": filled_shear,
              "encased_compression": encased_compression, "encased_tension": encased_tension,
-             "encased_flexure": encased_flexure, "beam_flexure": beam_flexure, "i5": i5}
+             "encased_flexure": encased_flexure, "beam_flexure": beam_flexure, "i5": i5,
+             "wall_compression": wall_compression, "wall_tension": wall_tension, "wall_moment": wall_moment,
+             "wall_shear": wall_shear_oracle, "wall_interaction": wall_interaction, "anchor": anchor_oracle}
+
+
+def run_case(spec):
+    if spec["kind"] == "method2":
+        args = {k: v for k, v in spec.items() if k not in {"kind", "member"}}
+        return method2(spec["member"], **args)
+    return FUNCTIONS[spec["kind"]](**{k: v for k, v in spec.items() if k != "kind"})
 
 
 def _plain(value):
@@ -339,9 +480,9 @@ def _plain(value):
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_i/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    cases = {cid: {"spec": spec, **FUNCTIONS[spec["kind"]](**{k: v for k, v in spec.items() if k != "kind"})}
-             for cid, spec in CASES.items()}
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) I1-I5, I8.2, Commentary Fig. C-I3.8; catalog data/sections.xlsx",
+    cases = {cid: {"spec": spec, **run_case(spec)} for cid, spec in CASES.items()}
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) I1-I5, I8.2, I8.3, Commentary Fig. C-I3.8 and I5; "
+                         "catalog data/sections.xlsx",
                "generator": "tests/oracles/chapter_i.py (Decimal; independent of steel_design)",
                "cases": _plain(cases)}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")

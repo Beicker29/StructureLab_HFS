@@ -1,0 +1,13 @@
+{
+  "section_name": "MURO-3000X300",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 6000, "Ly": 6000, "Lz": 6000},
+  "composite": {
+    "kind": "wall",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "wall": {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
+  },
+  "cases": [
+    {"name": "Compression, flexure and shear", "Pu": 8000, "Mux": 20000, "Vux": 5000}
+  ]
+}

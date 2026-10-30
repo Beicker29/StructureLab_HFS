@@ -1,0 +1,15 @@
+{
+  "section_name": "PTE100X50X3MM",
+  "material": {"Fy": 345},
+  "composite": {
+    "kind": "filled",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "anchor": {
+      "type": "stud", "Qrv": 40, "Qrt": 60, "spacing": 500, "d": 19, "Fu": 450, "height": 160, "head_diameter": 32,
+      "breakout_in_shear": false, "base_thickness": 10
+    }
+  },
+  "cases": [
+    {"name": "Stud under shear and tension"}
+  ]
+}

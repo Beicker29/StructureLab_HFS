@@ -11,14 +11,14 @@ src/steel_design/
 │   ├── flexure.py               fórmulas puras F2–F13.1, Se de F7 y límites λp/λr de B4.1b
 │   ├── shear.py                 fórmulas puras G2-1…G6-1, Cv1/Cv2 y factores φv
 │   ├── interaction.py           fórmulas puras H1-1a/b, H1-2, H2-1 y H4-1
-│   ├── composite.py             fórmulas puras I2, I3, I4, I5 e I8.2; bloques de Fig. C-I3.8
+│   ├── composite.py             fórmulas puras I1.6, I2, I3, I4, I5, I8.2, I8.3; Fig. C-I3.8 y Método 2 del Commentary
 │   └── compression.py           fórmulas puras E1, E3–E7 y límites λr de B4.1a
 ├── domain/
 │   ├── tension.py               capítulo D: fluencia y rotura, gobierno por resistencia de diseño φt·Pn
 │   ├── flexure.py               capítulo F: clasificación B4.1b, sección F por familia y eje, estados límite
 │   ├── shear.py                 capítulo G: sección G por familia y dirección del cortante
 │   ├── interaction.py           capítulo H: H1/H4 y H2 (ángulos simples) con las resistencias de los demás chequeos, Cb de H1.2
-│   ├── composite.py             capítulo I: rellenos, embebidos y vigas; remite a E, F y G donde la norma lo indica
+│   ├── composite.py             capítulo I: rellenos, embebidos, vigas, muros y anclajes; remite a E, F y G donde la norma lo indica
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
 │   ├── coverage.py              obligaciones de D, E, F, G y H derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección

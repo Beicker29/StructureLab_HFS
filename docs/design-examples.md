@@ -19,7 +19,9 @@ esperado es 1,0 porque esa es la carga que agota H2-1. Los puntos A y C de F.11C
 ejemplo llama A a la punta comprimida y el programa la rotula C. En I.1 no hay un número entero de pernos que dé los
 386 kips que selecciona el ejemplo: se usan 22 pernos (381 kips). Ese caso da `FAIL` en el estado global porque 3 in y
 3/4 in superan por conversión los límites métricos de 75 mm y 19 mm (DI-10); la prueba compara la resistencia.
-Los cajones de I.7 se construyen con las propiedades del ejemplo, y Z se obtiene de sus esquinas rectas.
+Los cajones de I.7 se construyen con las propiedades del ejemplo, y Z se obtiene de sus esquinas rectas. I.12 da `FAIL`
+en el estado por la misma razón (3/4 in frente a 19 mm); la prueba compara la razón. Los ejemplos I.6 e I.11 no imprimen una
+razón para el Método 2 completo: el valor esperado se calculó a mano con sus puntos A'', B'', C'' y D''.
 
 | Ejemplo | Caso | Ejemplo (φRn en kip o kip-ft; razón en H) | Programa | Diferencia | Gobierna |
 | --- | --- | --- | --- | --- | --- |
@@ -84,6 +86,11 @@ Los cajones de I.7 se construyen con las propiedades del ejemplo, y Z se obtiene
 | I.10 | W10X45 embebido, tracción (I2-8) | 936 | 939.7 | +0.40 % | TY |
 | I.11-Mc | W10X45 embebido, plástico compuesto I3.3a(3) | 673 | 671.7 | -0.20 % | Y |
 | I.11-H1 | W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, H1-1a | 1.38 | 1.381 | +0.06 % | H1 |
+| I.6-M2S | HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, Método 2 simplificado (C-I5-1b) | 0.948 | 0.9422 | -0.61 % | M2 |
+| I.6-M2 | igual, Método 2 (valor esperado obtenido de los puntos impresos) | 0.963 | 0.9588 | -0.44 % | M2 |
+| I.11-M2S | W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, Método 2 simplificado (C-I5-1a) | 0.996 | 0.9975 | +0.15 % | M2 |
+| I.11-M2 | igual, Método 2 (valor esperado obtenido de los puntos impresos) | 0.870 | 0.8699 | -0.01 % | M2 |
+| I.12 | Perno de 3/4 in, Quv = 10.4 kips, Qut = 15.6 kips (I8-5) | 0.962 | 0.9615 | -0.05 % | Q |
 
 ## Diferencias explicadas
 
@@ -106,5 +113,5 @@ estado por estado.
 
 WT (D.3, E.7, E.8, F.10), miembros armados (E.2, E.3, E.12, E.13, F.14, G.8), pasadores y barras
 de ojo (D.7, D.8), placas con agujeros al tresbolillo (D.9: An lo da el usuario), H.1A y H.2 (tablas
-del Manual y H2 en un perfil W), torsión (H.5, H.6: H3) y, del Capítulo I, I.2, I.3, I.8, I.12 e I.13 (viga armada de
-contraste no añadida, transferencia de carga, anclajes de componentes y vigas colectoras).
+del Manual y H2 en un perfil W), torsión (H.5, H.6: H3) y, del Capítulo I, I.2, I.3, I.8 e I.13 (viga de contraste no
+añadida, transferencia de carga y vigas colectoras).

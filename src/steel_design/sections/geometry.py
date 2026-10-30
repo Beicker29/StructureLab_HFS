@@ -6,6 +6,19 @@ from ..models import CustomSectionType, SteelCase
 from .models import Section
 
 
+def build_wall_section(case: SteelCase) -> Section:
+    """Steel of a planar composite plate shear wall (mm): two full-length plates and two flange plates between them."""
+    wall = case.composite.wall
+    if 2 * wall.t >= wall.tsc or 2 * wall.tf >= wall.length:
+        raise ValidationError("Las placas deben dejar un núcleo de concreto positivo.", details={"section": case.section_name})
+    between = wall.tsc - 2 * wall.t
+    area = 2 * wall.t * wall.length + 2 * wall.tf * between
+    ix = 2 * wall.t * wall.length**3 / 12.0 + 2 * wall.tf * between * ((wall.length - wall.tf) / 2) ** 2 + 2 * between * wall.tf**3 / 12.0
+    iy = (2 * wall.length * wall.t**3 / 12.0 + 2 * wall.length * wall.t * ((wall.tsc - wall.t) / 2) ** 2
+          + 2 * wall.tf * between**3 / 12.0)
+    return Section(name=case.section_name, type="COMPOSITE_WALL", A=area, Ix=ix, Iy=iy)
+
+
 def build_custom_section(case: SteelCase) -> Section:
     custom = case.custom_section
     if custom is None:
