@@ -18,12 +18,12 @@ def _merge(base: dict, override: dict) -> dict:
 
 def prepare_cases(payload: dict) -> list[tuple[str | None, SteelCase]]:
     if not isinstance(payload, dict):
-        raise ValidationError("Input must be a JSON object.", code="INVALID_INPUT")
+        raise ValidationError("La entrada debe ser un objeto JSON.", code="INVALID_INPUT")
     if "cases" not in payload:
         return [(None, SteelCase(**payload))]
     cases = payload["cases"]
     if not isinstance(cases, list) or not cases or not all(isinstance(c, dict) for c in cases):
-        raise ValidationError("cases must be a non-empty list of objects.", code="INVALID_CASE_BUNDLE")
+        raise ValidationError("cases debe ser una lista no vacía de objetos.", code="INVALID_CASE_BUNDLE")
     base = {k: v for k, v in payload.items() if k != "cases"}
     return [(str(c.get("name") or f"case_{i + 1}"), SteelCase(**_merge(base, {k: v for k, v in c.items() if k != "name"})))
             for i, c in enumerate(cases)]
@@ -32,6 +32,16 @@ def prepare_cases(payload: dict) -> list[tuple[str | None, SteelCase]]:
 def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str | None, SteelCase, DesignResult]]:
     """Run every case; returns (name or None, validated input case, result)."""
     return [(tag, case, engine.run(case)) for tag, case in prepare_cases(payload)]
+
+
+def governing(executions: list[tuple[str | None, SteelCase, DesignResult]]) -> dict | None:
+    """Load combination with the largest demand/capacity ratio among those with a strength."""
+    rated = [(tag, r) for tag, _, r in executions if r.ratio is not None]
+    if not rated:
+        return None
+    tag, r = max(rated, key=lambda item: item[1].ratio)
+    return {"name": tag, "chapter": r.chapter, "status": r.status.value, "ratio": r.ratio,
+            "capacity_kN": r.capacity_kN, "demand_kN": r.demand_kN}
 
 
 def overall_status(results: list[DesignResult]) -> Status:

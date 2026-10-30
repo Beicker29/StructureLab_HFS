@@ -13,10 +13,10 @@ _SPACE = re.compile(r"[ \t\r\n\f\v]+")
 
 def section_identity(name: str) -> str:
     if not isinstance(name, str):
-        raise ValidationError("Section name must be a string.", details={"field": "section_name"})
+        raise ValidationError("El nombre de la sección debe ser texto.", details={"field": "section_name"})
     identity = _SPACE.sub(" ", name).strip(" ").translate(_UPPER_ASCII)
     if not identity:
-        raise ValidationError("Section name must not be blank.", details={"field": "section_name"})
+        raise ValidationError("El nombre de la sección no puede estar vacío.", details={"field": "section_name"})
     return identity
 
 
@@ -31,6 +31,6 @@ def double_angle_label(name: str) -> dict:
     """
     match = _DOUBLE_ANGLE.match(section_identity(name))
     if match is None:
-        raise ValidationError("Not a double-angle AISC_Manual_Label.", details={"section": name})
+        raise ValidationError("No es un AISC_Manual_Label de ángulo doble.", details={"section": name})
     return {"component": f"L{match['a']}X{match['b']}X{match['t']}", "separation": match["gap"],
             "in_contact": match["gap"] is None, "configuration": match["config"]}

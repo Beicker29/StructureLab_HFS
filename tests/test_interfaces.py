@@ -25,19 +25,30 @@ def test_examples_run_in_memory(engine, example):
 
 
 def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):
-    run = cli(ROOT / "examples/channel_case.json", cwd=tmp_path)
+    run = cli(ROOT / "examples/channel.json", cwd=tmp_path)
     assert run.returncode == 0, run.stderr
     output = json.loads(run.stdout)
-    assert output["status"] == "PASS" and output["compression"]["governing_mode"] == "FTB"
+    compression, tension = output["cases"]
+    assert output["status"] == "PASS" and compression["compression"]["governing_mode"] == "FTB"
+    assert tension["chapter"] == "D" and output["governing"]["name"] == tension["name"]  # larger ratio
     assert list(tmp_path.iterdir()) == []
+
+
+def test_single_case_payload_prints_one_result(tmp_path):
+    source = tmp_path / "one.json"
+    source.write_text(json.dumps({"section_name": "W14X90", "material": {"Fy": 345}, "Pu": 100,
+                                  "lengths": {"Lx": 3000, "Ly": 3000, "Lz": 3000}}), encoding="utf-8")
+    output = json.loads(cli(source, cwd=tmp_path).stdout)
+    assert output["chapter"] == "E" and output["status"] == "PASS"
 
 
 def test_cli_optional_output_file(tmp_path):
     target = tmp_path / "result.json"
-    run = cli(ROOT / "examples/bundle_case.json", "--output", target, cwd=tmp_path)
+    run = cli(ROOT / "examples/multi_member.json", "--output", target, cwd=tmp_path)
     assert run.returncode == 0, run.stderr
     assert json.loads(target.read_text(encoding="utf-8")) == json.loads(run.stdout)
-    assert [c["name"] for c in json.loads(run.stdout)["cases"]] == ["W8X10 slender web", "W14X90 minor-axis offset bracing"]
+    assert [c["name"] for c in json.loads(run.stdout)["cases"]] == ["W8X10 — alma esbelta",
+                                                                    "W14X90 — arriostramiento desplazado"]
 
 
 def test_cli_structured_errors(tmp_path):

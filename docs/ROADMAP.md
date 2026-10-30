@@ -1,8 +1,8 @@
 # Hoja de ruta
 
-El repositorio contiene únicamente el capítulo E de ANSI/AISC 360-22. Los
-capítulos D, F, G, H e I se retiraron (recuperables en el historial de Git,
-commit `d3a1b02`) y se reincorporarán, uno por vez, con la misma estructura.
+El repositorio contiene los capítulos D y E de ANSI/AISC 360-22. Los capítulos
+F, G, H e I se retiraron (recuperables en el historial de Git, commit `d3a1b02`) y
+se reincorporan, uno por vez, con la misma estructura y oráculos independientes.
 
 ## Hecho
 
@@ -12,9 +12,11 @@ commit `d3a1b02`) y se reincorporarán, uno por vez, con la misma estructura.
 - Comprobación de obligaciones independiente de la selección.
 - Ejecución en memoria; CLI sin escritura por defecto.
 - Memoria de cálculo en texto y PDF generada desde el resultado estructurado.
+- Capítulo D (tracción): D2 y D3 con An y U del usuario, verificado con cálculos
+  independientes en las seis familias ([detalle](chapter-d.md)).
 
 ## Siguiente
 
-1. Revisión ingenieril de las decisiones D-1 a D-12 de [chapter-e.md](chapter-e.md).
-2. Reincorporar capítulos por orden (D, F, G, H) con oráculos independientes.
+1. Revisión ingenieril de las decisiones de [chapter-e.md](chapter-e.md) y [chapter-d.md](chapter-d.md).
+2. Reincorporar los capítulos siguientes por orden (F, G, H) con oráculos independientes.
 3. Aplicación web sobre `steel_design.execution.execute_payload`.

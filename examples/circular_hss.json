@@ -1,0 +1,28 @@
+{
+  "section_name": "PTER4\"X3.00MM",
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 345,
+    "Fu": 450
+  },
+  "lengths": {
+    "Lx": 2500,
+    "Ly": 2500,
+    "Lz": 2500
+  },
+  "tension": {
+    "An": 950,
+    "U": 0.87,
+    "fabricated_length": 2500
+  },
+  "cases": [
+    {
+      "name": "Combinación 1 — compresión",
+      "Pu": 200
+    },
+    {
+      "name": "Combinación 2 — tracción",
+      "Pu": -250
+    }
+  ]
+}

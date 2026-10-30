@@ -207,4 +207,4 @@ def design_factor(method: str) -> dict:
         return {"design_method": "LRFD", "phi": PHI_C, "omega": None, "capacity_expression": "phi*Pn"}
     if method == "ASD":
         return {"design_method": "ASD", "phi": None, "omega": OMEGA_C, "capacity_expression": "Pn/omega"}
-    raise ValueError(f"Unsupported design method: {method!r}; expected LRFD or ASD")
+    raise ValueError(f"Método de diseño no admitido: {method!r}; se esperaba LRFD o ASD")

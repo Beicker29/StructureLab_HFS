@@ -21,7 +21,10 @@ def test_valid_case_defaults():
 
 
 @pytest.mark.parametrize("changes", [
-    {"Pu": 0}, {"Pu": -10}, {"Pu": float("nan")}, {"Pu": "100"},          # compression demand only
+    {"Pu": 0}, {"Pu": float("nan")}, {"Pu": "100"},                      # nonzero finite number
+    {"lengths": None},                                                    # compression needs lengths
+    {"material": {"Fy": 345, "Fu": 300}},                                 # Fu < Fy
+    {"Pu": -10, "tension": {"An": 1000, "U": 1.2}},                       # U <= 1
     {"material": {"Fy": 0}}, {"lengths": {"Lx": 1000, "Ly": 1000}},
     {"factors": {"Kx": 0}}, {"factors": {"ya": -1}},
     {"design_method": "LFRD"}, {"Mux": 1}, {"loads": {"Pu": 1}},          # unknown fields

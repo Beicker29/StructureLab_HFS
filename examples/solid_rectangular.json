@@ -1,0 +1,33 @@
+{
+  "section_name": "BAR100X20",
+  "custom_section": {
+    "type": "SOLID_RECTANGULAR",
+    "H": 100,
+    "B": 20
+  },
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 250,
+    "Fu": 400
+  },
+  "lengths": {
+    "Lx": 1000,
+    "Ly": 1000,
+    "Lz": 1000
+  },
+  "tension": {
+    "An": 2000,
+    "U": 1.0,
+    "fabricated_length": 1000
+  },
+  "cases": [
+    {
+      "name": "Combinación 1 — compresión",
+      "Pu": 50
+    },
+    {
+      "name": "Combinación 2 — tracción",
+      "Pu": -400
+    }
+  ]
+}

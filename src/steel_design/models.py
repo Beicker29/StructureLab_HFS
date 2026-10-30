@@ -1,4 +1,4 @@
-"""Input and result models for member compression (ANSI/AISC 360-22 Chapter E). Units: N, mm, MPa, kN."""
+"""Input and result models for axial members (ANSI/AISC 360-22 Chapters D and E). Units: N, mm, MPa, kN."""
 from enum import Enum
 from typing import Annotated, Literal, Optional
 
@@ -40,14 +40,21 @@ def unique_json_object(pairs):
     result = {}
     for key, value in pairs:
         if key in result:
-            raise ValueError(f"Duplicate JSON field {key!r}; supply exactly one value per field.")
+            raise ValueError(f"Campo JSON duplicado {key!r}; indique un único valor por campo.")
         result[key] = value
     return result
 
 
 class Material(InputModel):
     Fy: PositiveNumber = Field(..., description="Specified minimum yield stress (MPa)")
+    Fu: Optional[PositiveNumber] = Field(None, description="Specified minimum tensile strength (MPa); required for tension (D2-2)")
     E: PositiveNumber = Field(200000.0, description="Modulus of elasticity (MPa); Chapter E defines 200000")
+
+    @model_validator(mode="after")
+    def fu_not_below_fy(self):
+        if self.Fu is not None and self.Fu < self.Fy:
+            raise ValueError("Fu no puede ser menor que Fy.")
+        return self
 
 
 class Lengths(InputModel):
@@ -83,6 +90,14 @@ class DoubleAngleE6Basis(InputModel):
         ..., description="E6.1: end connection welded or with pretensioned bolts, Class A or B faying surfaces")
 
 
+class TensionBasis(InputModel):
+    """Net section data for Chapter D, supplied by the user (not computed by the program)."""
+    An: PositiveNumber = Field(..., description="Net area per B4.3b (mm2); An = Ag for members without holes")
+    U: PositiveNumber = Field(..., le=1, description="Shear lag factor per Table D3.1 (0 < U <= 1)")
+    fabricated_length: Optional[PositiveNumber] = Field(
+        None, description="Fabricated member length (mm), only for the D1 User Note L/r <= 300")
+
+
 class CustomSectionType(str, Enum):
     SOLID_CIRCULAR = "SOLID_CIRCULAR"
     SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
@@ -107,13 +122,23 @@ class CustomSection(InputModel):
 class SteelCase(InputModel):
     section_name: NonBlankString
     material: Material
-    Pu: PositiveNumber = Field(..., description="Required axial compressive strength (kN), LRFD or ASD combination")
-    lengths: Lengths
+    Pu: FiniteNumber = Field(..., description="Required axial strength (kN): > 0 compression (Chapter E), "
+                                               "< 0 tension (Chapter D); LRFD or ASD combination")
+    lengths: Optional[Lengths] = Field(None, description="Unbraced lengths; required for compression")
     factors: Factors = Field(default_factory=Factors)
     design_method: DesignMethod = DesignMethod.LRFD
     single_angle_e5: Optional[SingleAngleE5Basis] = None
     double_angle_e6: Optional[DoubleAngleE6Basis] = None
+    tension: Optional[TensionBasis] = None
     custom_section: Optional[CustomSection] = None
+
+    @model_validator(mode="after")
+    def axial_demand(self):
+        if self.Pu == 0:
+            raise ValueError("Pu debe ser distinto de cero: > 0 compresión, < 0 tracción.")
+        if self.Pu > 0 and self.lengths is None:
+            raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
+        return self
 
 
 class Status(str, Enum):
@@ -123,7 +148,7 @@ class Status(str, Enum):
 
 
 class Obligation(BaseModel):
-    """A limit state required by Chapter E, derived independently of the selection."""
+    """A limit state required by the applicable chapter, derived independently of the selection."""
     id: str
     provision: str
     reason: str
@@ -135,12 +160,14 @@ class DesignResult(BaseModel):
     family: str
     design_method: str
     status: Status
-    demand_kN: float
+    chapter: Literal["D", "E"]
+    demand_kN: float = Field(..., description="|Pu| (kN)")
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     capacity_kN: Optional[float] = None
     ratio: Optional[float] = None
     compression: Optional[dict] = Field(None, description="Full Chapter E result (modes, equations, intermediates)")
+    tension: Optional[dict] = Field(None, description="Full Chapter D result (limit states, equations, intermediates)")
     obligations: list[Obligation] = Field(default_factory=list)
     errors: list[dict] = Field(default_factory=list)
-    scope: str = ("Member compressive strength per ANSI/AISC 360-22 Chapter E only. Effective lengths, "
-                  "load combinations, connections and other chapters are outside this result.")
+    scope: str = ("Resistencia axial del miembro según ANSI/AISC 360-22, Capítulos D (tracción) y E (compresión). "
+                  "Las longitudes efectivas, combinaciones de carga, conexiones y demás capítulos quedan fuera de este resultado.")
