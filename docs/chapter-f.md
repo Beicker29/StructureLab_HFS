@@ -120,8 +120,7 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
 - **DF-3** La presencia de agujeros en el ala traccionada (F13.1) debe declararse en I
   y canales sobre el eje x; sin declaración, INCOMPLETO (indicación del usuario). Afg = bf·tf.
 - **DF-4** Combinaciones con más de una demanda: cada componente se calcula por separado;
-  desde la incorporación del Capítulo H se combinan con H1/H4 (los ángulos simples siguen
-  INCOMPLETO hasta H2).
+  desde la incorporación del Capítulo H se combinan con H1/H4, y los ángulos simples con H2.
 - **DF-5** F7-3: Se referido al ala comprimida con el eje neutro desplazado
   (Commentary F7): se descuenta (b − be)·t del ala comprimida a (H − t)/2 del
   centroide, incluida la inercia propia de la franja; c = H/2 + desplazamiento.
@@ -154,8 +153,8 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
 
 ## Limitaciones
 
-- Ángulos: no se combinan Mux y Muy en ejes geométricos con Mw/Mz (la flexión biaxial
-  se resuelve en el Capítulo H, F10 Nota); no se cubren ángulos dobles respecto de y.
+- Ángulos: no se combinan Mux y Muy en ejes geométricos con otras demandas (H2 exige ejes
+  principales, DH-7); no se cubren ángulos dobles respecto de y.
 
 - Lb y Cb son datos del usuario; se supone que los apoyos restringen la rotación
   respecto del eje longitudinal (F1(b)). F1(d) (miembros con un eje de simetría en

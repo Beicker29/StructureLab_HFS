@@ -17,6 +17,14 @@ def h1(*, Pr, Pc, Mrx, Mcx, Mry, Mcy) -> dict:
     return {"ratio": ax / 2.0 + mx + my, "equation": "H1-1b", "Pr_Pc": ax, "Mrx_Mcx": mx, "Mry_Mcy": my}
 
 
+def h2(*, axial, w, z) -> dict:
+    """H2-1 at one point of the section; terms carry the sign of their stress (compression positive).
+
+    Required and available stress at a point share A or S, so each term is Pr/Pc or Mr/Mc (Commentary H2).
+    """
+    return {"ratio": abs(axial + w + z), "equation": "H2-1", "Pr_Pc": axial, "Mrw_Mcw": w, "Mrz_Mcz": z}
+
+
 def tension_cb_factor(*, Pr_N, E, Iy, Lb) -> dict:
     """H1.2: Cb may be multiplied by sqrt(1 + alpha*Pr/Pey), Pey = pi^2*E*Iy/Lb^2 (H1-2)."""
     for name, value in (("Pr_N", Pr_N), ("E", E), ("Iy", Iy), ("Lb", Lb)):

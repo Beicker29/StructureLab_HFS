@@ -95,6 +95,13 @@ def combined(name, Fy, L, Pu, Mux, Muy, Cb=1.0, **extra):
 
 CONTINUOUS = 0.5   # ft: continuously braced (Lb below Lp)
 
+# Example E.14B at the strength it prints, Pu = 85.9 kips: Mr = Pu*e*B1, with B1 from its Pe1w and Pe1z (kip-in).
+E14B_PU = 85.9
+E14B = dict(section_name="L8X4X1/2", material={"Fy": FY50}, Pu=E14B_PU * KIP,
+            Mw=1.44 * E14B_PU / (1 - E14B_PU / 3260) * KIPFT / 12, Mz=0.889 * E14B_PU / (1 - E14B_PU / 343) * KIPFT / 12,
+            lengths={"Lx": 5 * FT, "Ly": 5 * FT, "Lz": 5 * FT}, flexure={"Lb": 5 * FT, "beta_w": 5.48 * IN},
+            angle_flexure={"leg_in_compression": "long", "toe": "tension"})
+
 # id: (example, page, case data, check id, LRFD design strength printed in the example, unit, note)
 EXAMPLES = {
     "D.1": ("W8X21, rotura en conexión", tension("W8X21", 50, 65, 4.76, 0.908), "axial", 211, "kip"),
@@ -161,6 +168,14 @@ EXAMPLES = {
                      material={"Fu": 65 * KSI}, tension={"An": 24.0 * IN**2, "U": 1.0}), "interaction", 0.873, "ratio"),
     "H.4": ("W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft",
             combined("W10X33", FY50, 14, 30, 91.8, 13.1, Cb=1.14), "interaction", 0.979, "ratio"),
+    "E.14B-Pc": ("L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7)", E14B, "axial", 168, "kip"),
+    "E.14B-Mcw": ("L8X4X1/2 eje w, punta del ala larga comprimida, βw = −5.48 in", E14B, "flexure_w", 375 / 12, "kip-ft"),
+    "E.14B-Mcz": ("L8X4X1/2 eje z, punteras traccionadas, fluencia en A", E14B, "flexure_z", 123 / 12, "kip-ft"),
+    "E.14B": ("L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados: H2-1 en B ≈ 1.0", E14B, "interaction", 1.0, "ratio"),
+    "F.11C": ("L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14: H2-1 en la punta comprimida",
+              dict(section_name="L4X4X1/4", material={"Fy": FY50}, Mw=0.286 * KIPFT, Mz=1.05 * KIPFT,
+                   flexure={"Lb": 6 * FT, "Cb": 1.14}, angle_flexure={"toe": "compression"}),
+              "interaction", 0.292, "ratio"),
 }
 
 # Differences explained by the example itself (simplified, conservative hand method): program / example

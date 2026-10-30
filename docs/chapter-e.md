@@ -15,7 +15,8 @@ obligatorio de E3–E7.
 | Canal (`C`) | ala caso 1 (bf completo), alma caso 5 | E3 (x, y); E4(b) FTB (E4-3 con Fex, Nota de E4) | E7 con Fn de cada modo | Verificado |
 | PTE rectangular (`PTE_RECT`) | paredes caso 6 (b/tdes, h/tdes) | E3; E4-2 si Lz > min(Lx, Ly) (D-7) | E7 (c1 = 0,20) | Verificado |
 | PTE redondo (`PTE_RED`) | caso 9 (D/tdes) | E3; E4-2 (Cw = 0 del catálogo) si Lz > min(Lx, Ly) | E7.2 (E7-6/E7-7) | Verificado |
-| Ángulo simple (`L`) | ambas alas caso 3 | E5(a)/(b) con E3; E4 si b/t > 0,71√(E/Fy): E4-3 (alas iguales) o E4-4 (desiguales) | FB: E7 con Fn de E3; FTB: E4-1 con Ag | Verificado (solo ruta E5) |
+| Ángulo simple (`L`) | ambas alas caso 3 | E5(a)/(b) con E3; E4 si b/t > 0,71√(E/Fy): E4-3 (alas iguales) o E4-4 (desiguales) | FB: E7 con Fn de E3; FTB: E4-1 con Ag | Verificado |
+| Ángulo simple con `Mw` o `Mz`, fuera de E5 (D-14) | ambas alas caso 3 | E3 respecto de z; E4 si b/t > 0,71√(E/Fy) | FB: E7 con Fn de E3; FTB: E4-1 con Ag | Verificado |
 | Ángulo doble (`2L`) | alas caso 1(3) en contacto o 3(2) con separadores (D-11) | E3 (x); E3 + E6 (y); E4(b) FTB con E6 (E4-3) | E7 con Fn de cada modo | Verificado |
 | Barra maciza (entrada) | ninguno | E3 | — | Verificado |
 
@@ -50,6 +51,9 @@ indicación:
 | L-E4-3-equal-legs | L4X4X1/4, L=2000, E5(a), ala larga | 450 | sí | FB-E5 | 152.37 | 137.14 |
 | L-E4-3-governs | L6X6X5/16, L=600, Lz=3000, E5(b), ala larga | 450 | sí | FTB | 489.10 | 440.19 |
 | L-E4-4-unequal-legs | L6X4X3/8, L=2000, E5(a), ala corta | 450 | sí | FB-E5 | 349.07 | 314.16 |
+| L-H2-FBz-slender | L8X4X1/2, L=1524, fuera de E5 | 345 | sí | FB-z | 833.09 | 749.78 |
+| L-H2-FTB-equal | L4X4X1/4, L=2000, fuera de E5 | 450 | sí | FB-z | 209.12 | 188.21 |
+| L-H2-FTB-unequal | L6X4X3/8, L=2000, fuera de E5 | 450 | sí | FTB | 419.32 | 377.39 |
 | 2L-contact-welded | 2L4X4X1/4, L=2000, soldado, a=500 | 345 | sí | FTB | 536.70 | 483.03 |
 | 2L-separated-snug | 2L4X4X1/4X3/4, L=2000, snug-tight, a=800 | 345 | sí | FTB | 458.05 | 412.24 |
 | 2L-LLBB-pretensioned | 2L8X4X1/2LLBB, pretensado, a=1500 | 345 | sí | FTB | 1151.19 | 1036.07 |
@@ -72,12 +76,13 @@ tolerancia relativa 1e-9. El programa trabaja solo con LRFD (φc = 0,90).
 - **D-10** Ángulo doble: J = 2·J del ángulo simple de la hoja `L` (la hoja `2L` no trae J); término de Cw omitido según la Nota de E4; ri = rz del ángulo simple; Ki = 0,50.
 - **D-11** Ángulo doble: la nomenclatura AISC_Manual_Label indica la separación. Sin sufijo de separación = contacto continuo (caso 1(3), 0,56√(E/Fy)); con sufijo (`X3/8`, `X3/4`, `X1-1/2`) = separadores (caso 3(2), 0,45√(E/Fy)). Indicación del usuario.
 - **D-12** E6: la esbeltez modificada se aplica al pandeo con cortante en conectores (eje y, de simetría) y a Fey en E4-3; el eje x no se modifica (Commentary E6). E6.1 (conexión de extremo soldada o pretensada) es condición de aplicación; si no se cumple, se bloquea. E6.2(a) (a/ri ≤ ¾ de la esbeltez gobernante) se verifica: si no se cumple, el estado es FAIL.
+- **D-14** Ángulo simple fuera de E5: con `Mw` o `Mz` y sin `single_angle_e5`, Pn es el menor de E3/E7 respecto de z (el menor radio de giro) y E4 según el primer párrafo de E5, como en el Design Example E.14B; exige Lx = Ly y Kx = Ky (D-9). La excentricidad se combina con H2 (DH-8 en [chapter-h.md](chapter-h.md)).
 
 ## Limitaciones
 
 - Lc = K·L es dato del usuario; no se verifica E2/capítulo C/Apéndice 7.
 - Arriostramiento (Apéndice 6), conexiones y los demás requisitos de E6.2 (b)–(e) no se comprueban.
 - E4(f) (desplazamientos en ambas direcciones, o en canales/PTE) requiere análisis: bloqueado.
-- Ángulos simples fuera de E5 (o con Lc/r de E5 > 200) remiten al capítulo H: bloqueado.
+- Ángulos simples comprimidos sin E5 y sin `Mw` ni `Mz`: bloqueado, no se supone carga concéntrica. Con E5 incumplido (o Lc/r de E5 > 200), el mensaje pide omitir `single_angle_e5` e indicar los momentos (H2).
 - Nota E2 (Lc/r ≤ 200) solo se informa como recomendación.
 - 2L: a los dos lados de cada ángulo se aplica el mismo caso B4.1a (decisión D-11).

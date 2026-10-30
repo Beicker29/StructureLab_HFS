@@ -156,20 +156,23 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None):
         t = p["t"]
         lr = D("0.45") * rt                                      # B4.1a case 3
         plates = [(bl, t, lr, D("0.22"), 1), (bs, t, lr, D("0.22"), 1)]
-        config, leg, length = e5
-        length = D(length)
-        ra = p["ry"] if leg == "long" or bl == bs else p["rx"]  # geometric axis parallel to connected leg
-        s = length / ra
-        if config == "a":
-            lcr = 72 + D("0.75") * s if s <= 80 else 32 + D("1.25") * s
-            if leg == "short" and bl > bs:
-                lcr = max(lcr + 4 * ((bl / bs)**2 - 1), D("0.95") * length / p["rz"])
+        if e5 is None:                                           # outside E5: E3 about z, eccentricity in H2 (DH-8)
+            modes["FB-z"] = fe_flex(Lx, p["rz"])
         else:
-            lcr = 60 + D("0.8") * s if s <= 75 else 45 + s
-            if leg == "short" and bl > bs:
-                lcr = max(lcr + 6 * ((bl / bs)**2 - 1), D("0.82") * length / p["rz"])
-        assert lcr <= 200
-        modes["FB-E5"] = PI**2 * E / lcr**2
+            config, leg, length = e5
+            length = D(length)
+            ra = p["ry"] if leg == "long" or bl == bs else p["rx"]  # geometric axis parallel to connected leg
+            s = length / ra
+            if config == "a":
+                lcr = 72 + D("0.75") * s if s <= 80 else 32 + D("1.25") * s
+                if leg == "short" and bl > bs:
+                    lcr = max(lcr + 4 * ((bl / bs)**2 - 1), D("0.95") * length / p["rz"])
+            else:
+                lcr = 60 + D("0.8") * s if s <= 75 else 45 + s
+                if leg == "short" and bl > bs:
+                    lcr = max(lcr + 6 * ((bl / bs)**2 - 1), D("0.82") * length / p["rz"])
+            assert lcr <= 200
+            modes["FB-E5"] = PI**2 * E / lcr**2
         if bl / t > D("0.71") * rt:                              # E5: flexural-torsional per E4
             assert Lx == Ly
             few, fe_z = fe_flex(Lx, sqrt(p["Iw"] / ag)), fe_flex(Lx, p["rz"])
@@ -244,6 +247,9 @@ CASES = {
     "L-E4-3-equal-legs": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=450, Lx=2000, e5=("a", "long", 2000)),
     "L-E4-3-governs": dict(family="SINGLE_ANGLE", name="L6X6X5/16", fy=450, Lx=600, Lz=3000, e5=("b", "long", 600)),
     "L-E4-4-unequal-legs": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=450, Lx=2000, e5=("a", "short", 2000)),
+    "L-H2-FBz-slender": dict(family="SINGLE_ANGLE", name="L8X4X1/2", fy=345, Lx=1524),
+    "L-H2-FTB-equal": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=450, Lx=2000),
+    "L-H2-FTB-unequal": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=450, Lx=2000),
     "2L-contact-welded": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Lx=2000, e6=("welded", 500)),
     "2L-separated-snug": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4X3/4", fy=345, Lx=2000, e6=("snug_tight", 800)),
     "2L-LLBB-pretensioned": dict(family="DOUBLE_ANGLE", name="2L8X4X1/2LLBB", fy=345, Lx=3000, e6=("pretensioned", 1500)),

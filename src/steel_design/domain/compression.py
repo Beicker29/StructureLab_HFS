@@ -180,11 +180,17 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
 
 
 def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
-    """E5 effective slenderness route; eccentricity neglected only when E5 permits it."""
+    """E5 effective slenderness route, or E3/E7 and E4 with the eccentricity as Mw, Mz in H2 (decision DH-8)."""
     basis = case.single_angle_e5
+    principal_moments = bool(case.Mw or case.Mz)
+    if basis is not None and principal_moments:
+        _blocked("E5 evalúa el miembro como cargado axialmente: con Mw o Mz omita single_angle_e5 y la compresión se "
+                 "combina por H2 (decisión DH-8).", section)
     if basis is None:
-        _blocked("La compresión de un ángulo simple requiere single_angle_e5; en otro caso E5 remite el "
-                 "miembro al Capítulo H (H2), carga axial más flexión, aún no implementado.", section)
+        if principal_moments:
+            return _single_angle_h2_modes(case, section)
+        _blocked("La compresión de un ángulo simple requiere single_angle_e5; fuera de E5 indique los momentos Mw y Mz "
+                 "de la excentricidad para evaluar el miembro con H2.", section)
     conditions = {"E5(1) cargado en los extremos a través de la misma ala": basis.loaded_at_ends_through_same_leg,
                   "E5(2) soldado o con al menos dos pernos": basis.welded_or_two_bolts_min,
                   "E5(3) sin cargas transversales intermedias": basis.no_intermediate_transverse_loads}
@@ -194,7 +200,8 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     if leg_ratio >= 1.7:
         failed.append("E5(5) relación ala larga/ala corta < 1.7")
     if failed:
-        _blocked("No se cumplen las condiciones de E5; evaluar con el Capítulo H (H2), aún no implementado.", section, failed=failed)
+        _blocked("No se cumplen las condiciones de E5: omita single_angle_e5 e indique los momentos Mw y Mz de la "
+                 "excentricidad para evaluar el miembro con H2.", section, failed=failed)
     _require(section, "area", "rx", "ry", "rz")
     connected = basis.connected_leg if leg_ratio > 1 else "long"
     # Catalog convention: rx > ry, so the long leg is parallel to y. ra is the
@@ -206,8 +213,8 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
                                               connected_leg=connected, leg_ratio=leg_ratio,
                                               L_over_rz=basis.L / section.rz)
     if not slenderness["within_200"]:
-        _blocked("E5(4): Lc/r de E5 supera 200; evaluar con el Capítulo H (H2), aún no implementado.",
-                 section, Lc_over_r=slenderness["Lc_over_r"])
+        _blocked("E5(4): Lc/r de E5 supera 200: omita single_angle_e5 e indique los momentos Mw y Mz de la "
+                 "excentricidad para evaluar el miembro con H2.", section, Lc_over_r=slenderness["Lc_over_r"])
     lc_r = slenderness["Lc_over_r"]
     mode = {"limit_state": "flexural_buckling", "provision": "E5(" + basis.configuration + ")", "axis": "a",
             "slenderness_equation": slenderness["equation"], "L_mm": basis.L, "ra_mm": ra, "rz_mm": section.rz,
@@ -215,6 +222,24 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
             "Fe_mpa": math.pi**2 * case.material.E / lc_r**2, "Fe_equation": "E3-4"}
     notes = ["E5: excentricidad despreciada según E5(a)/(b); condiciones (1)-(3) declaradas por el usuario."]
     modes = {"FB-E5": mode}
+    if long_leg / section.t > 0.71 * math.sqrt(case.material.E / case.material.Fy):
+        modes["FTB"] = _single_angle_ftb(case, section, long_leg == short_leg)
+    else:
+        notes.append("E4 no requerido: b/t del ala más larga ≤ 0.71·√(E/Fy) (E5).")
+    return modes, notes
+
+
+def _single_angle_h2_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
+    """E5 first paragraph without its effective slenderness: E3/E7 about z (the least r), E4 per its b/t limit."""
+    f, ln = case.factors, case.lengths
+    if ln.Lx != ln.Ly or f.Kx != f.Ky:
+        _blocked("Ángulo simple fuera de E5: el pandeo ocurre respecto de los ejes principales w, z; se requiere Lx = Ly "
+                 "y Kx = Ky para que la longitud efectiva respecto de esos ejes girados esté definida.", section,
+                 Lx=ln.Lx, Ly=ln.Ly, Kx=f.Kx, Ky=f.Ky)
+    _require(section, "area", "rz")
+    long_leg, short_leg = _angle_legs(section)
+    modes = {"FB-z": _flexural_mode("z", case.material.E, f.Kx, ln.Lx, section.rz)}
+    notes = ["Ángulo simple fuera de E5: la excentricidad se considera con Mw y Mz en H2 (decisión DH-8)."]
     if long_leg / section.t > 0.71 * math.sqrt(case.material.E / case.material.Fy):
         modes["FTB"] = _single_angle_ftb(case, section, long_leg == short_leg)
     else:
