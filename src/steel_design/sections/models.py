@@ -34,6 +34,8 @@ class Section(InputModel):
     # Moments of inertia (geometric x/y axes)
     ix: Optional[NonNegativeNumber] = Field(None, alias="Ix", description="Moment of inertia about x-axis (mm^4)")
     iy: Optional[NonNegativeNumber] = Field(None, alias="Iy", description="Moment of inertia about y-axis (mm^4)")
+    iw: Optional[NonNegativeNumber] = Field(None, alias="Iw", description="Angle: moment of inertia about the major principal axis w (mm^4)")
+    iz: Optional[NonNegativeNumber] = Field(None, alias="Iz", description="Angle: moment of inertia about the minor principal axis z (mm^4)")
     # Radius of gyration
     rx: Optional[NonNegativeNumber] = Field(None, description="Radius of gyration about x-axis (mm)")
     ry: Optional[NonNegativeNumber] = Field(None, description="Radius of gyration about y-axis (mm)")
@@ -44,6 +46,9 @@ class Section(InputModel):
     cw: Optional[NonNegativeNumber] = Field(None, alias="Cw", description="Warping constant (mm^6)")
     ro: Optional[NonNegativeNumber] = Field(None, alias="ro", description="Polar radius of gyration about shear center (mm)")
     H: Optional[NonNegativeNumber] = Field(None, alias="H", description="Flexural-torsional constant (dimensionless)")
+    x: Optional[NonNegativeNumber] = Field(None, alias="x", description="Angle: centroid distance from the heel along x (mm)")
+    y: Optional[NonNegativeNumber] = Field(None, alias="y", description="Angle: centroid distance from the heel along y (mm)")
+    tan_alpha: Optional[NonNegativeNumber] = Field(None, alias="tan_alpha", description="Angle: tangent of the angle between the y and z axes")
 
     # Slenderness metrics from AISC database
     bf_2tf_ratio: Optional[NonNegativeNumber] = Field(None, alias="bf/2tf", description="Flange slenderness bf/2tf")

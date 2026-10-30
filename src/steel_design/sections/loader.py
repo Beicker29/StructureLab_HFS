@@ -33,8 +33,8 @@ PLACEHOLDER_VALUES = {
     "#NULL!",
 }
 
-# AISC v16 metric database units: 10^6 mm4 (Ix, Iy), 10^3 mm4 (J), 10^9 mm6 (Cw).
-UNIT_SCALE_BY_VARIABLE = {"Ix": 1e6, "Iy": 1e6, "J": 1e3, "Cw": 1e9}
+# AISC v16 metric database units: 10^6 mm4 (Ix, Iy, Iw, Iz), 10^3 mm4 (J), 10^9 mm6 (Cw).
+UNIT_SCALE_BY_VARIABLE = {"Ix": 1e6, "Iy": 1e6, "Iw": 1e6, "Iz": 1e6, "J": 1e3, "Cw": 1e9}
 
 # Section field -> accepted catalog headers (only properties used by Chapter E).
 FIELD_HEADER_CANDIDATES: Dict[str, Sequence[str]] = {
@@ -42,7 +42,8 @@ FIELD_HEADER_CANDIDATES: Dict[str, Sequence[str]] = {
     "area": ("A", "area [mm2]", "area", "Ag"),
     "d": ("d",), "h": ("h",), "bf": ("bf",), "b": ("b",), "od": ("OD",),
     "tf": ("tf",), "t": ("t", "tnom"), "tdes": ("tdes",), "tw": ("tw",), "ho": ("ho",),
-    "ix": ("Ix", "Ix [mm4]"), "iy": ("Iy", "Iy [mm4]"),
+    "ix": ("Ix", "Ix [mm4]"), "iy": ("Iy", "Iy [mm4]"), "iw": ("Iw",), "iz": ("Iz",),
+    "x": ("x",), "y": ("y",), "tan_alpha": ("tan(α)", "tan(alpha)"),
     "rx": ("rx", "rx [mm]"), "ry": ("ry", "ry [mm]"), "rz": ("rz", "rz [mm]"),
     "j": ("J", "J [mm4]"), "cw": ("Cw", "Cw [mm6]"), "ro": ("ro", "ro [mm]"), "H": ("H",),
     "bf_2tf_ratio": ("bf/2tf",), "b_t_ratio": ("b/t",), "b_tdes_ratio": ("b/tdes",),
