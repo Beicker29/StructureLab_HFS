@@ -15,7 +15,7 @@ directamente al motor.
 
 > No es una certificación AISC global. `PASS` significa que se evaluaron todos los
 > estados límite exigidos por los capítulos aplicables a cada demanda, que cada
-> demanda no supera su resistencia de diseño y que la interacción (H1, H4) es ≤ 1. El
+> demanda no supera su resistencia de diseño y que la interacción (H1, H2 en ángulos simples, H4) es ≤ 1. El
 > programa trabaja solo con LRFD. Las longitudes efectivas, el análisis de segundo orden
 > (Capítulo C), las combinaciones de carga, las conexiones, la torsión y demás capítulos
 > quedan fuera del alcance.
@@ -83,11 +83,11 @@ símbolos escritos en letras.
 | `lengths.Lx/Ly/Lz` | Longitudes no arriostradas por eje y torsional (obligatorias en compresión) |
 | `tension` | Tracción: `An` (área neta, B4.3b, mm²), `U` (Tabla D3.1) y opcional `fabricated_length` (nota D1); An y U los aporta el usuario |
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
-| `single_angle_e5` | Requerido para ángulos simples: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3) |
+| `single_angle_e5` | Ángulos simples comprimidos sin `Mw` ni `Mz`: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3). Fuera de E5 se omite y la excentricidad se da como `Mw` y `Mz` (H2) |
 | `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
 | `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos) y `beta_w` (mm, F10-4, alas desiguales); `tension_cb_amplification` (H1.2, opcional) |
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
-| `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`) |
+| `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,

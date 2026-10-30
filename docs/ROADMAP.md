@@ -1,8 +1,8 @@
 # Hoja de ruta
 
-El repositorio contiene los capítulos D, E, F, G y H (H1, H4) de ANSI/AISC 360-22, solo por LRFD. El capítulo
-I se retiraron (recuperables en el historial de Git, commit `d3a1b02`) y
-se reincorporan, uno por vez, con la misma estructura y oráculos independientes.
+El repositorio contiene los capítulos D, E, F, G y H (H1, H2 en ángulos simples, H4) de ANSI/AISC 360-22, solo por LRFD. El capítulo
+I se retiró (recuperable en el historial de Git, commit `d3a1b02`) y
+se reincorporará con la misma estructura y oráculo independiente.
 
 ## Hecho
 
@@ -23,12 +23,17 @@ se reincorporan, uno por vez, con la misma estructura y oráculos independientes
   cálculos independientes ([detalle](chapter-g.md)). Barras y platinas macizas por G4 (DG-4).
 - Capítulo H, etapa 1: H1.1, H1.2 (con amplificación de Cb opcional) y H4, verificado
   con cálculos independientes ([detalle](chapter-h.md)).
-- Contraste con 43 casos de los AISC Design Examples v16.0 (D, E, F, G, H): coincidencia
+- Capítulo H, etapa 2: H2 para ángulos simples en los puntos A, B y C, con compresión fuera de E5,
+  verificado con cálculos independientes y los ejemplos E.14B y F.11C.
+- Contraste con 48 casos de los AISC Design Examples v16.0 (D, E, F, G, H): coincidencia
   dentro de ±1 % salvo dos diferencias explicadas ([detalle](design-examples.md)).
 
 ## Siguiente
 
 1. Revisión ingenieril de las decisiones de [D](chapter-d.md), [E](chapter-e.md), [F](chapter-f.md), [G](chapter-g.md) y [H](chapter-h.md);
    corregir en el catálogo la fila IPE 80 y completar los datos de IPE/HEA/HEB.
-2. Capítulo H, etapa 2: H2 para ángulos simples con fuerzas combinadas (tensiones en A, B, C).
-3. Aplicación web sobre `steel_design.execution.execute_payload`.
+2. Aplicación web sobre `steel_design.execution.execute_payload`.
+3. Incorporación del Capítulo I (miembros compuestos), con su oráculo independiente
+   (`tests/oracles/chapter_i.py`) y su documento de alcance y decisiones (`docs/chapter-i.md`).
+   Fuente en `a360-22w.pdf`: Specification, pp. 16.1-89 a 16.1-120, y Commentary del Capítulo I,
+   pp. 16.1-418 a 16.1-472, como apoyo para interpretarla; revisar también las erratas del repositorio.

@@ -223,7 +223,7 @@ class DesignResult(BaseModel):
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
     scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
-                  "F (flexión), G (cortante) y H (interacción H1 y H4). Longitudes efectivas, análisis de segundo "
+                  "F (flexión), G (cortante) y H (interacción H1, H2 en ángulos simples y H4). Longitudes efectivas, análisis de segundo "
                   "orden, combinaciones de carga, conexiones, torsión y demás capítulos quedan fuera de este resultado.")
 
     @computed_field

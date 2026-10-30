@@ -346,8 +346,26 @@ def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     return blocks
 
 
+def _h2_blocks(c: dict) -> list[dict]:
+    rows = [[f"{m['point']} ({m['location']})", m["Pr_Pc"], m["Mrw_Mcw"], m["Mrz_Mcz"], m["ratio"]]
+            for m in c["modes"].values()]
+    m = c["modes"][c["governing_mode"]]
+    return [{"kind": "h2", "text": "Ecuación H2-1 en los puntos del ángulo"},
+            {"kind": "table", "headers": ["Punto", "Pr/Pc", "Mrw/Mcw", "Mrz/Mcz", "|Suma|"], "rows": rows,
+             "highlight": list(c["modes"]).index(c["governing_mode"])},
+            {"kind": "kv", "items": [
+                ("Pr, Pc", f"{_fmt(m['Pr_kN'])} kN; {_fmt(m['Pc_kN']) if m['Pc_kN'] else '–'} kN ({m['axial']})"),
+                ("Mrw, Mcw", f"{_fmt(m['Mrw_kNm'])}; {_fmt(m['Mcw_kNm']) if m['Mcw_kNm'] else '–'} kN·m"),
+                ("Mrz, Mcz", f"{_fmt(m['Mrz_kNm'])}; {_fmt(m['Mcz_kNm']) if m['Mcz_kNm'] else '–'} kN·m"),
+                ("Criterio", "Términos con el signo de su tensión: compresión positiva, tracción negativa"),
+                ("Verificación", f"{c['governing_mode']}: {_fmt(c['ratio'])} ≤ 1.0 → "
+                                 f"{'cumple' if c['ratio'] <= 1.0 else 'NO cumple'}")]}]
+
+
 def _interaction_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    if "H1" not in c["modes"]:
+        return blocks + _h2_blocks(c)
     rows = []
     for name, m in c["modes"].items():
         if name == "H1":

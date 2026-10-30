@@ -18,8 +18,8 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_e/reference.json").read_t
 REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 
 
-def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100):
-    return SteelCase(section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu,
+def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100, Mw=0):
+    return SteelCase(section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu, Mw=Mw,
                      lengths={"Lx": Lx, "Ly": Ly or Lx, "Lz": Lz or Lx}, factors={"xa": xa, "ya": ya},
                      single_angle_e5=e5, double_angle_e6=e6)
 
@@ -40,7 +40,8 @@ def reference_case(ref):
     return make_case(ref["section"], Fy=float(ref["Fy"]), Lx=float(ref["Lx"]), Ly=float(ref["Ly"]),
                      Lz=float(ref["Lz"]), ya=float(ref["ya"]),
                      e5=e5_basis(e5[0], e5[1], float(e5[2])) if e5 else None,
-                     e6=e6_basis(e6[0], float(e6[1])) if e6 else None)
+                     e6=e6_basis(e6[0], float(e6[1])) if e6 else None,
+                     Mw=1 if ref["family"] == "SINGLE_ANGLE" and not e5 else 0)     # outside E5 only with H2 (DH-8)
 
 
 @pytest.mark.parametrize("case_id", sorted(REFERENCE))
@@ -117,6 +118,17 @@ def test_single_angle_outside_e5_is_blocked(sections, overrides):
     with pytest.raises(RuleNotImplementedError):
         compression_strength(make_case("L4X4X1/4", e5={**e5_basis("a", "long", 2000), **overrides}),
                              sections["L4X4X1/4"])
+
+
+def test_e5_and_principal_moments_exclude_each_other(sections):
+    case = make_case("L4X4X1/4", Lx=2000, e5=e5_basis("a", "long", 2000), Mw=1)
+    with pytest.raises(RuleNotImplementedError, match="DH-8"):
+        compression_strength(case, sections["L4X4X1/4"])
+
+
+def test_single_angle_outside_e5_needs_coincident_geometric_lengths(sections):
+    with pytest.raises(RuleNotImplementedError, match="ejes principales"):
+        compression_strength(make_case("L8X4X1/2", Lx=2000, Ly=1500, Mw=1), sections["L8X4X1/2"])
 
 
 def test_single_angle_e4_needs_coincident_geometric_lengths(sections):

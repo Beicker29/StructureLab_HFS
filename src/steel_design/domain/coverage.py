@@ -67,7 +67,13 @@ def shear_obligations(section: Section, axis: str) -> list[Obligation]:
 
 
 def interaction_obligations(case: SteelCase, section: Section) -> list[Obligation]:
-    """H1 whenever axial force and flexure, or flexure about two axes, act together; H4 for flanges with holes."""
+    """H1 whenever axial force and flexure, or flexure about two axes, act together; H4 for flanges with holes.
+
+    Single angles: F10 sends them to H2, evaluated at every critical point of the section.
+    """
+    if section.type.upper() == "SINGLE_ANGLE":
+        return [Obligation(id=f"H2-{point}", provision="H2", reason=f"H2-1 en el punto {point} del ángulo, con el "
+                                                                    "signo de cada tensión.") for point in "ABC"]
     out = [Obligation(id="H1", provision="H1.1" if case.Pu >= 0 else "H1.2",
                       reason="Interacción de fuerza axial y flexión (H1-1a/H1-1b).")]
     flexure = case.flexure
@@ -90,7 +96,8 @@ def required_obligations(case: SteelCase, section: Section) -> list[Obligation]:
                       reason="Todo elemento comprimido debe clasificarse como no esbelto o esbelto.")]
     if family == "SINGLE_ANGLE":
         out.append(Obligation(id="FB", provision="E5 (with E3/E7)",
-                              reason="Pandeo por flexión con la esbeltez efectiva de E5, o Capítulo H fuera de E5."))
+                              reason="Pandeo por flexión con la esbeltez efectiva de E5 o, fuera de E5, respecto del "
+                                     "eje principal z con H2."))
         legs = [v for v in (section.d, section.b) if v]
         if section.t and legs and max(legs) / section.t > 0.71 * math.sqrt(case.material.E / case.material.Fy):
             out.append(Obligation(id="FTB", provision="E4 / E5",
@@ -124,6 +131,8 @@ def discharge(obligations: list[Obligation], section: Section, result: dict) -> 
             item.satisfied_by = "clasificación"
         elif item.id == "FB" and "FB-E5" in modes:
             item.satisfied_by = "FB-E5"
+        elif item.id == "FB" and "FB-z" in modes:
+            item.satisfied_by = "FB-z"
         elif item.id == "E6" and result.get("built_up"):
             item.satisfied_by = "E6, esbeltez modificada (FB-y, FTB)"
         elif item.id in modes:

@@ -13,7 +13,10 @@ contrastan con los valores del Manual (5,37 in² y Z = 31,0 in³).
 
 An y U de los ejemplos del Capítulo D se toman del ejemplo (son datos del usuario, DD-1). En H.4 los
 momentos ya amplificados por el ejemplo (B1 del Apéndice 8) se dan como dato (DH-3); en H.3 se pide la
-amplificación de Cb de H1.2 y An = Ag, U = 1 (sin agujeros).
+amplificación de Cb de H1.2 y An = Ag, U = 1 (sin agujeros). En E.14B se evalúa la resistencia que
+imprime el ejemplo, Pu = 85,9 kips, con los momentos amplificados según sus Pe1w y Pe1z; el valor
+esperado es 1,0 porque esa es la carga que agota H2-1. Los puntos A y C de F.11C son simétricos: el
+ejemplo llama A a la punta comprimida y el programa la rotula C.
 
 | Ejemplo | Caso | Ejemplo (φRn en kip o kip-ft; razón en H) | Programa | Diferencia | Gobierna |
 | --- | --- | --- | --- | --- | --- |
@@ -60,6 +63,11 @@ amplificación de Cb de H1.2 y An = Ag, U = 1 (sin agujeros).
 | H.1B | W14X99, Pu = 400 kips, Mux = 250, Muy = 80 kip-ft, L = 14 ft (H1-1a) | 0.929 | 0.9294 | +0.05 % | H1 |
 | H.3 | W14X82 en tracción, Pu = 174 kips, Mux = 192, Muy = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2) | 0.873 | 0.8732 | +0.02 % | H1 |
 | H.4 | W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft | 0.979 | 0.9808 | +0.19 % | H1 |
+| E.14B-Pc | L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7) | 168 | 168.5 | +0.29 % | FB-z |
+| E.14B-Mcw | L8X4X1/2 eje w, punta del ala larga comprimida, βw = −5.48 in | 31.25 | 31.27 | +0.08 % | LTB |
+| E.14B-Mcz | L8X4X1/2 eje z, punteras traccionadas, fluencia en A | 10.25 | 10.23 | -0.20 % | Y |
+| E.14B | L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados | 1.0 | 1.001 | +0.13 % | H2-B |
+| F.11C | L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14 | 0.292 | 0.2936 | +0.56 % | H2-C |
 
 ## Diferencias explicadas
 
@@ -81,6 +89,5 @@ estado por estado.
 ## Fuera del alcance de esta verificación
 
 WT (D.3, E.7, E.8, F.10), miembros armados (E.2, E.3, E.12, E.13, F.14, G.8), pasadores y barras
-de ojo (D.7, D.8), placas con agujeros al tresbolillo (D.9: An lo da el usuario), ángulos simples
-con fuerzas combinadas (F.11C completo, E.14B: H2), H.1A y H.2 (tablas del Manual y H2) y torsión
-(H.5, H.6: H3).
+de ojo (D.7, D.8), placas con agujeros al tresbolillo (D.9: An lo da el usuario), H.1A y H.2 (tablas
+del Manual y H2 en un perfil W) y torsión (H.5, H.6: H3).
