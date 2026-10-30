@@ -40,7 +40,7 @@ def reference(family):
         section = Section(name="F43", type="RECTANGULAR_HSS", A=area,
             h=120, b=60, tdes=5, Ix=ix, Iy=iy, Sx=ix/65, Sy=iy/35,
             Zx=zx, Zy=zy, rx=math.sqrt(ix/area), ry=math.sqrt(iy/area),
-            J=1e6, C=c, b_tdes_ratio=12, h_tdes_ratio=24)
+            J=1e6, Cw=0, C=c, b_tdes_ratio=12, h_tdes_ratio=24)
         vn_x, vn_y = .6*320*2*120*5, .6*320*2*60*5  # G4, Cv2=1
     else:
         area = math.pi*(100**2-90**2)/4
@@ -50,10 +50,11 @@ def reference(family):
         section = Section(name="F43", type="CIRCULAR_HSS", A=area,
             OD=100, tdes=5, Ix=ix, Iy=iy, Sx=ix/50, Sy=iy/50,
             Zx=zx, Zy=zy, rx=math.sqrt(ix/area), ry=math.sqrt(iy/area),
-            J=2*ix, C=c, d_t_ratio=20)
+            J=2*ix, Cw=0, C=c, d_t_ratio=20)
         vn_x = vn_y = .6*320*area/2  # G5 yielding proved independently of Lv
     # B4.1b compact: box max b/t=24 < 1.12*sqrt(625)=28;
     # round D/t=20 < .07*625=43.75. Lb=100 mm below rectangular Lp.
+    # HFS-031R0: Cw=0 is explicit in these stipulated synthetic sections; not a catalog default.
     # E3 controls the declared short/non-slender section vs E4 for these inputs.
     fe = math.pi**2*200000*(iy/area)/2000**2
     pn_compression = (.658**(320/fe))*320*area

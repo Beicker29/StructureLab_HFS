@@ -22,6 +22,7 @@ from steel_design.sections.repository import SectionRepository
 
 
 BANK = json.loads((Path(__file__).parent/'fixtures/hfs031/oracles.json').read_text(encoding='utf-8'))['cases']
+R_BANK = json.loads((Path(__file__).parent/'fixtures/hfs031r/formulas.json').read_text(encoding='utf-8'))['cases']
 METHODS = ['LRFD', 'ASD']
 # Decimal -> IEEE-754 plus exp/sqrt and printed constants: < 1e-10 relative;
 # absolute 1e-8 kN (1e-5 N) is far below input/engineering precision.
@@ -30,6 +31,18 @@ REL, ABS = 1e-10, 1e-8
 
 def expected(value):
     return pytest.approx(float(value), rel=REL, abs=ABS)
+
+
+def required_capacity(rule, c, s, finding):
+    # R0 contains these paths; it does NOT satisfy their numerical oracle.
+    # Only the demonstrated quarantine is an expected absence of a capacity.
+    # Unexpected exceptions still fail (xfail remains raises=AssertionError).
+    try:
+        return rule.check(c, s).capacity
+    except RuleNotImplementedError as exc:
+        if exc.code != "COMPRESSION_DOMAIN_BLOCKED" or finding not in exc.details.get("findings", []):
+            raise
+        raise AssertionError(f"{finding}: numerical implementation still unavailable under HFS-031R0 containment") from exc
 
 
 def case(method='LRFD', pu=1, **extra):
@@ -117,10 +130,9 @@ def channel(method='LRFD', *, omit_h=False):
 
 
 @pytest.mark.parametrize('method',METHODS)
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-46: channel E4 uses Fey instead of symmetry-axis Fex')
 def test_e4_channel_normative_symmetry_axis(method):
     c,s=channel(method)
-    assert AxialE4Rule().check(c,s).capacity == expected(BANK['E4-channel'][method+'_kN'])
+    assert required_capacity(AxialE4Rule(),c,s,"F-46") == expected(BANK['E4-channel'][method+'_kN'])
 
 
 @pytest.mark.parametrize('method',METHODS)
@@ -129,30 +141,33 @@ def test_e4_channel_normative_symmetry_axis(method):
 def test_e4_offset_normative_capacity(method,axis):
     o=BANK[f'E4-offset-{axis}']
     c,s=symmetric(method, **{axis+'a':float(o['offset'])})
-    assert AxialE4Rule().check(c,s).capacity == expected(o[method+'_kN'])
+    assert required_capacity(AxialE4Rule(),c,s,"F-47") == expected(o[method+'_kN'])
 
 
 def e5_params():
     for key,o in BANK.items():
         if not key.startswith(('E5-a-', 'E5-b-')):
             continue
-        marks=[]
-        if o['configuration']=='b' or float(o['s'])>80:
-            marks=[pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-36: E5-2/3/4 absent from one_leg helper')]
-        yield pytest.param(key,marks=marks,id=key)
+        yield pytest.param(key,id=key)
 
 
 @pytest.mark.parametrize('key',list(e5_params()))
 def test_e5_all_long_leg_slenderness_branches(key):
     o=BANK[key]
-    assert axial_calc.calculate_e5_effective_slenderness(float(o['s']),'one_leg') == expected(o['effective'])
+    actual = axial_calc.calculate_e5_slenderness(s=float(o['s']), configuration=o['configuration'].upper(),
+        connected_leg='EQUAL', leg_ratio=1, principal_slenderness=None)
+    assert actual['effective_slenderness'] == expected(o['effective'])
+    assert actual['eligible_slenderness'] == o['eligible_if_other_conditions_met']
 
 
 @pytest.mark.parametrize('key',[k for k in BANK if k.startswith('E5-short')])
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-36: no short-leg correction or principal-radius floor')
 def test_e5_short_leg_and_principal_radius_floor(key):
     o=BANK[key]
-    assert axial_calc.calculate_e5_effective_slenderness(float(o['s']),'one_leg') == expected(o['effective'])
+    actual = axial_calc.calculate_e5_slenderness(s=float(o['s']), configuration=key.split('-')[2].upper(),
+        connected_leg='SHORT', leg_ratio=float(o['leg_ratio']), principal_slenderness=float(o['L_over_rz']))
+    assert actual['effective_slenderness'] == expected(o['effective'])
+    assert actual['correction'] == expected(o['correction'])
+    assert actual['principal_floor'] == expected(o['floor'])
 
 
 @pytest.mark.parametrize('method',METHODS)
@@ -160,16 +175,16 @@ def test_e5_short_leg_and_principal_radius_floor(key):
 def test_e5_rule_capacity_above_branch(method):
     c=case(method,lengths=dict(Lx=3600,Ly=3600,Lz=3600))
     s=Section(name='audit',type='SINGLE_ANGLE',A=2000,rx=30,ry=30,b_t_ratio=8)
-    assert AxialE5Rule().check(c,s).capacity == expected(BANK['E5-a-120'][method+'_kN'])
+    assert required_capacity(AxialE5Rule(),c,s,"F-36") == expected(BANK['E5-a-120'][method+'_kN'])
 
 
 @pytest.mark.parametrize('key',[k for k in BANK if k.startswith('E7-round-100-') or k.startswith('E7-round-250-')])
 @pytest.mark.parametrize('method',METHODS)
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-35: QFy/Ag is not E7-1 Fn*Ae')
 def test_e7_round_independent_effective_area(key,method):
     o=BANK[key]
-    q=axial_calc.calculate_q_factor('CIRCULAR_HSS',{'d_t_ratio':float(o['D_over_t'])},200000,345)
-    pn=axial_calc.calculate_Fcr_slender(345,float(o['Fe']),q)*5000
+    ae=axial_calc.calculate_e7_round_area(Ag=5000,D_over_t=float(o['D_over_t']),E=200000,Fy=345)['Ae_mm2']
+    assert ae == expected(o['Ae'])
+    pn=axial_calc.calculate_Fcr(345,float(o['Fe']))*ae
     assert axial_calc.calculate_available_compressive_strength(pn,method)==expected(o[method+'_kN'])
 
 
@@ -177,22 +192,22 @@ def test_e7_round_independent_effective_area(key,method):
 @pytest.mark.parametrize('method',METHODS)
 def test_e7_round_nonslender_equivalence_is_bounded(key,method):
     o=BANK[key]
-    q=axial_calc.calculate_q_factor('CIRCULAR_HSS',{'d_t_ratio':50},200000,345)
-    pn=axial_calc.calculate_Fcr_slender(345,float(o['Fe']),q)*5000
+    ae=axial_calc.calculate_e7_round_area(Ag=5000,D_over_t=50,E=200000,Fy=345)['Ae_mm2']
+    pn=axial_calc.calculate_Fcr(345,float(o['Fe']))*ae
     assert axial_calc.calculate_available_compressive_strength(pn,method)==expected(o[method+'_kN'])
 
 
 @pytest.mark.parametrize('family',['W','CHANNEL','RECTANGULAR_HSS','SINGLE_ANGLE'])
 @pytest.mark.parametrize('method',METHODS)
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-35: no per-element E7-2..5 widths')
 def test_e7_nonround_widths(family,method):
-    o=BANK[f'E7-{family}-500']
-    ratios={'W':dict(bf_2tf_ratio=20,h_tw_ratio=75),
-            'CHANNEL':dict(b_t_ratio=10,h_tw_ratio=75),
-            'RECTANGULAR_HSS':dict(b_tdes_ratio=400/6,h_tdes_ratio=250/6),
-            'SINGLE_ANGLE':dict(b_t_ratio=50)}[family]
-    q=axial_calc.calculate_q_factor(family,ratios,200000,345)
-    pn=axial_calc.calculate_Fcr_slender(345,500,q)*float(o['Ag'])
+    # Explicitly superseded c2 variant, user TD-01; historical bank unchanged.
+    o=R_BANK[f'E7-{family}-500']
+    elements=[{**{k:float(row[k]) for k in ('b','t','lambda_r')},
+               'count':row['count'],'kind':row['kind']} for row in o['elements']]
+    fn=axial_calc.calculate_Fcr(345,500)
+    ae=axial_calc.calculate_e7_plate_area(Ag=float(o['Ag']),Fn=fn,Fy=345,elements=elements)['Ae_mm2']
+    assert ae == expected(o['Ae'])
+    pn=fn*ae
     assert axial_calc.calculate_available_compressive_strength(pn,method)==expected(o[method+'_kN'])
 
 
@@ -210,30 +225,32 @@ def round_e7(method='LRFD', ratio=100):
 
 
 @pytest.mark.parametrize('method',METHODS)
-def test_f35_direct_false_pass_but_public_engine_incomplete(method):
+def test_f35_direct_false_pass_is_contained_and_engine_incomplete(method):
     c,s=round_e7(method)
     correct=float(BANK['E7-round-100-80'][method+'_kN'])
-    legacy=AxialE7Rule().check(c,s).capacity
-    assert legacy>correct*1.12
-    c.loads.Pu=(correct+legacy)/2
-    direct=AxialE7Rule().check(c,s)
-    assert direct.status.value=='PASS' and c.loads.Pu>correct
+    c.loads.Pu=correct*1.05
+    local=AxialE7Rule().check(c,s)
+    assert local.capacity == expected(correct)
+    assert local.status.value == 'FAIL'
     result=run(c,s)
     assert result.status.value=='INCOMPLETE'
+    assert any(check.clause=='E7-1' and check.status.value=='FAIL' for check in result.checks)
     obligation=next(o for o in result.coverage.obligations if o.id=='N10.effective_area')
     assert not obligation.accepted_checks
 
 
 @pytest.mark.parametrize('method',METHODS)
-def test_f46_channel_false_pass_is_not_global_compliance(method):
+def test_f46_channel_false_pass_is_contained(method):
     c,s=channel(method)
     correct=float(BANK['E4-channel'][method+'_kN'])
-    current=min(AxialE3Rule().check(c,s).capacity,AxialE4Rule().check(c,s).capacity)
-    assert current>correct*1.3
-    c.loads.Pu=(correct+current)/2
+    c.loads.Pu=correct*1.05
+    local = AxialE4Rule().check(c,s)
+    assert local.capacity == expected(correct)
+    assert local.status.value == 'FAIL'
     result=run(c,s)
-    assert all(check.status.value=='PASS' for check in result.checks)
-    assert result.status.value=='INCOMPLETE'
+    assert any(check.clause=='E4-1' and check.status.value=='FAIL' for check in result.checks)
+    assert result.status.value=='INCOMPLETE'  # Existing aggregate contract; known local FAIL retained.
+    assert not result.coverage.complete
 
 
 @pytest.mark.parametrize('method',METHODS)
@@ -252,7 +269,7 @@ def test_e7_round_outside_upper_bound_not_accredited(method):
         c,s=round_e7(method,ratio)
         result=run(c,s)
         assert result.status.value=='INCOMPLETE'
-        assert any(check.clause=='E7-1' for check in result.checks)
+        assert not any(check.clause=='E7-1' for check in result.checks)
         assert not result.coverage.complete
 
 
@@ -276,14 +293,15 @@ def test_unrepresented_families_explicitly_rejected(family):
         run(case(),s)
 
 
-def test_missing_e4_H_is_silently_replaced_but_coverage_pending():
+def test_missing_e4_H_is_blocked_and_coverage_pending():
     c,s=channel(omit_h=True)
-    r=AxialE4Rule().check(c,s)
-    assert r.details['memory']['intermediate']['flexural_torsional_terms']['H']==1
+    with pytest.raises(IncompleteSectionDataError) as caught:
+        AxialE4Rule().check(c,s)
+    assert 'section.H' in caught.value.details['fields']
     assert run(c,s).status.value=='INCOMPLETE'
 
 
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-48: unknown flange combined with known web is labelled non_slender')
+# HFS-031R0: unknown classification is now contained, not a repair of B4.1a all families.
 def test_partial_classification_cannot_be_nonslender():
     assert axial_calc.classify_compression_elements('W',{'h_tw_ratio':20},200000,345)['overall']=='unknown'
 
@@ -317,7 +335,7 @@ def test_concentric_angle_principal_minor_axis(method):
            connection=dict(angle_compression_mode='both_legs'))
     s=Section(name='audit',type='SINGLE_ANGLE',A=float(o['Ag']),Ix=float(o['Ix']),Iy=float(o['Iy']),
               rx=float(o['ra']),ry=float(o['ra']),rz=float(o['rz']),b_t_ratio=10)
-    assert AxialE5Rule().check(c,s).capacity==expected(o[method+'_kN'])
+    assert required_capacity(AxialE5Rule(),c,s,"F-36")==expected(o[method+'_kN'])
 
 
 @pytest.mark.parametrize('method',METHODS)
@@ -326,7 +344,7 @@ def test_built_up_member_requires_e6_modified_slenderness(method):
     o=BANK['E6-snug-60']
     c=case(method,lengths=dict(Lx=5000,Ly=5000,Lz=5000))
     s=Section(name='audit',type='DOUBLE_ANGLE',A=5000,rx=50,ry=50)
-    assert AxialE3Rule().check(c,s).capacity==expected(o[method+'_kN'])
+    assert required_capacity(AxialE3Rule(),c,s,"F-38")==expected(o[method+'_kN'])
 
 
 @pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-48: continuous-contact double angle classified as separated angle')
@@ -335,11 +353,12 @@ def test_double_angle_continuous_contact_table_b41_case1():
     assert axial_calc.classify_compression_elements('DOUBLE_ANGLE',{'b_t_ratio':12},200000,345)['overall']=='non_slender'
 
 
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-48: direct E3 silently ignores unavailable principal axis')
+# HFS-031R0: direct missing-axis rejection is demonstrated.
 def test_direct_e3_missing_axis_must_not_issue_favorable_check():
     s=Section(name='audit',type='W',A=5000,rx=100,ry=None)
-    result=AxialE3Rule().check(case(),s)
-    assert result.status.value!='PASS'
+    with pytest.raises(IncompleteSectionDataError) as caught:
+        AxialE3Rule().check(case(),s)
+    assert 'section.ry' in caught.value.details['fields']
 
 
 @pytest.mark.parametrize('method',METHODS)
@@ -351,7 +370,7 @@ def test_e4_singly_symmetric_lower_root_with_correct_axis(method):
     assert actual==expected(o[method+'_kN'])
 
 
-@pytest.mark.xfail(strict=True,raises=AssertionError,reason='F-12: D/t fallback uses inside diameter despite available outside diameter')
+# HFS-031R: OD/tdes is now used; the original normative expected 20 is unchanged.
 def test_loader_compression_ratio_uses_outside_diameter(tmp_path):
     from openpyxl import Workbook
     from steel_design.sections.loader import load_sections_from_excel

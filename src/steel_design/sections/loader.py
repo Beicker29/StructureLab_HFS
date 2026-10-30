@@ -336,11 +336,12 @@ def load_sections_from_excel(filepath: str) -> List[Section]:
             if (field_values["h_tdes_ratio"] is None) and (field_values["h"] is not None) and (field_values["tdes"] not in (None, 0.0)):
                 field_values["h_tdes_ratio"] = field_values["h"] / field_values["tdes"]
             if field_values["d_t_ratio"] is None:
-                diameter = field_values["id"] if field_values["id"] not in (None, 0.0) else field_values["od"]
+                # S22 B4.1a / E7.2 define D as OUTSIDE diameter. ID is not an
+                # alternative. B4.2 design thickness cannot be inferred from
+                # nominal t without the product specification/fabrication data.
+                diameter = field_values["od"]
                 if (diameter is not None) and (field_values["tdes"] not in (None, 0.0)):
                     field_values["d_t_ratio"] = diameter / field_values["tdes"]
-                elif (diameter is not None) and (field_values["t"] not in (None, 0.0)):
-                    field_values["d_t_ratio"] = diameter / field_values["t"]
 
             try:
                 section = Section(

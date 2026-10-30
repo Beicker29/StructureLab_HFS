@@ -225,14 +225,14 @@ def test_f35_e7_execution_does_not_prove_correspondence(repository):
     repo.load([section])
     result = SteelDesignEngine(repo).run(SteelCase(**payload(dict(Pu=1))))
     assert result.status.value == "INCOMPLETE"
-    assert obligations(result)["N10.effective_area"].executed_checks
+    assert not obligations(result)["N10.effective_area"].executed_checks  # HFS-031R0 quarantine
     assert "F-35" in obligations(result)["N10.effective_area"].reason
 
 
 def test_f36_e5_conditions_and_branches_stay_pending(repository):
     result = SteelDesignEngine(repository).run(example("single_angle", dict(Pu=1)))
     assert result.status.value == "INCOMPLETE"
-    assert obligations(result)["N08.angle_alternative"].executed_checks
+    assert not obligations(result)["N08.angle_alternative"].executed_checks  # HFS-031R0 quarantine
     assert "F-36" in obligations(result)["N08.angle_alternative"].reason
 
 

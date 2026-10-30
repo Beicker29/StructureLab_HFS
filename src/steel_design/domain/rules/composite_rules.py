@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from ...tracing import traced_rule, emit_step, quantity
 from ..design_methods import require_case_method
+from ..evaluators.compression_evaluator import evaluate_compression
 from typing import Dict, Tuple
 
 from ...codes.aisc_360_22 import axial_calc, composite_calc, shear_calc
@@ -244,66 +245,7 @@ def _effective_inertia_and_pe(
 
 def _bare_steel_compression_capacity_k_n(case: SteelCase, section: Section) -> float:
     require_case_method(case, chapter="I")
-    fe_x = axial_calc.calculate_Fe_flexural(case.material.E, case.factors.Kx, case.lengths.Lx, _positive(section.rx))
-    fe_y = axial_calc.calculate_Fe_flexural(case.material.E, case.factors.Ky, case.lengths.Ly, _positive(section.ry))
-    fe_e3_candidates = [value for value in (fe_x, fe_y) if value > 0.0]
-    fe_e3 = min(fe_e3_candidates) if fe_e3_candidates else 0.0
-    fcr_e3 = axial_calc.calculate_Fcr(case.material.Fy, fe_e3)
-    pn_e3 = axial_calc.calculate_Pn(fcr_e3, _positive(section.area))
-    p_e3 = axial_calc.calculate_available_compressive_strength(pn_e3, case.design_method.value)
-
-    ro = _positive(section.ro)
-    if ro <= 0.0:
-        ro = axial_calc.calculate_ro_for_double_symmetric(_positive(section.area), _positive(section.ix), _positive(section.iy))
-    fe_e4 = axial_calc.calculate_Fe_torsional(
-        case.material.E,
-        axial_calc.NORMATIVE_G_MPA,
-        _positive(section.j),
-        _positive(section.cw),
-        case.factors.Kz,
-        case.lengths.Lz,
-        _positive(section.area),
-        ro,
-    )
-    fcr_e4 = axial_calc.calculate_Fcr(case.material.Fy, fe_e4)
-    pn_e4 = axial_calc.calculate_Pn(fcr_e4, _positive(section.area))
-    p_e4 = axial_calc.calculate_available_compressive_strength(pn_e4, case.design_method.value)
-
-    classification = axial_calc.classify_compression_elements(
-        profile_type=section.type,
-        slenderness={
-            "bf_2tf_ratio": section.bf_2tf_ratio,
-            "b_t_ratio": section.b_t_ratio,
-            "b_tdes_ratio": section.b_tdes_ratio,
-            "h_tw_ratio": section.h_tw_ratio,
-            "h_tdes_ratio": section.h_tdes_ratio,
-            "d_t_ratio": section.d_t_ratio,
-        },
-        E=case.material.E,
-        Fy=case.material.Fy,
-    )
-    p_e7 = 0.0
-    if classification.get("is_slender"):
-        q = axial_calc.calculate_q_factor(
-            section.type,
-            {
-                "bf_2tf_ratio": section.bf_2tf_ratio,
-                "b_t_ratio": section.b_t_ratio,
-                "b_tdes_ratio": section.b_tdes_ratio,
-                "h_tw_ratio": section.h_tw_ratio,
-                "h_tdes_ratio": section.h_tdes_ratio,
-                "d_t_ratio": section.d_t_ratio,
-            },
-            case.material.E,
-            case.material.Fy,
-        )
-        fe_for_e7 = min([value for value in (fe_e3, fe_e4) if value > 0.0], default=0.0)
-        fcr_e7 = axial_calc.calculate_Fcr_slender(case.material.Fy, fe_for_e7, q)
-        pn_e7 = axial_calc.calculate_Pn(fcr_e7, _positive(section.area))
-        p_e7 = axial_calc.calculate_available_compressive_strength(pn_e7, case.design_method.value)
-
-    candidates = [value for value in (p_e3, p_e4, p_e7) if value > 0.0]
-    return min(candidates) if candidates else 0.0
+    return evaluate_compression(case, section)['available_kN']
 
 
 def _sum_anchor_qn(case: SteelCase, *, segment: str) -> Dict[str, object]:

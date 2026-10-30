@@ -1,6 +1,6 @@
 import unittest
 
-from steel_design.domain.errors import RuleNotImplementedError
+from steel_design.domain.errors import RuleNotImplementedError, IncompleteSectionDataError
 from steel_design.domain.routing.profile_router import ProfileRouter
 from steel_design.domain.rules.composite_rules import (
     CompositeI2EncasedCompressionRule,
@@ -188,7 +188,7 @@ class ChapterIRulesTests(unittest.TestCase):
         self.assertGreater(result.capacity, 0.0)
         self.assertIn("Pno_n_I2_7", result.details["memory"]["intermediate"])
 
-    def test_i2_filled_compression_rule_returns_positive_capacity(self):
+    def test_i2_filled_compression_rule_returns_positive_capacity_requires_complete_steel_floor(self):
         case = _base_case(
             section_name="PTE100X60X4",
             loads=Loads(Pu=400.0, Mux=0.0, Muy=0.0, Vu=0.0),
@@ -199,10 +199,13 @@ class ChapterIRulesTests(unittest.TestCase):
                 "reinforcement": {"longitudinal_bars": []},
             },
         )
-        result = CompositeI2FilledCompressionRule().check(case, _rect_hss_section())
-        self.assertEqual("I2-2", result.clause)
-        self.assertGreater(result.capacity, 0.0)
-        self.assertIn("classification_I1_4", result.details["memory"]["intermediate"])
+        # HFS-031R0: the required bare-steel floor lacks J/Cw; no substitute.
+        with self.assertRaises(IncompleteSectionDataError) as raised:
+            CompositeI2FilledCompressionRule().check(case, _rect_hss_section())
+        self.assertEqual("COMPRESSION_DATA_INCOMPLETE", raised.exception.code)
+        self.assertIn("section.j", raised.exception.details["fields"])
+        self.assertIn("section.cw", raised.exception.details["fields"])
+
 
     def test_i3_1c_fails_when_no_anchor_capacity(self):
         case = _base_case(
@@ -254,7 +257,7 @@ class ChapterIRulesTests(unittest.TestCase):
         self.assertEqual("I4-1", result.clause)
         self.assertGreater(result.capacity, 0.0)
 
-    def test_i5_method_1_h1_1_returns_interaction_ratio(self):
+    def test_i5_method_1_h1_1_returns_interaction_ratio_requires_complete_steel_floor(self):
         case = _base_case(
             section_name="PTE100X60X4",
             loads=Loads(Pu=250.0, Mux=25.0, Muy=0.0, Vu=0.0),
@@ -266,11 +269,15 @@ class ChapterIRulesTests(unittest.TestCase):
                 "i5": {"method": "METHOD_1_H1_1"},
             },
         )
-        result = CompositeI5CombinedRule().check(case, _rect_hss_section())
-        self.assertEqual("I5", result.clause)
-        self.assertEqual("METHOD_1_H1_1", result.details["memory"]["inputs"]["method"])
+        # HFS-031R0: the required bare-steel floor lacks J/Cw; no substitute.
+        with self.assertRaises(IncompleteSectionDataError) as raised:
+            CompositeI5CombinedRule().check(case, _rect_hss_section())
+        self.assertEqual("COMPRESSION_DATA_INCOMPLETE", raised.exception.code)
+        self.assertIn("section.j", raised.exception.details["fields"])
+        self.assertIn("section.cw", raised.exception.details["fields"])
 
-    def test_i5_method_2_runs_for_filled_with_tabulated_points(self):
+
+    def test_i5_method_2_runs_for_filled_with_tabulated_points_requires_complete_steel_floor(self):
         case = _base_case(
             section_name="PTE100X60X4",
             loads=Loads(Pu=250.0, Mux=25.0, Muy=5.0, Vu=0.0),
@@ -282,16 +289,15 @@ class ChapterIRulesTests(unittest.TestCase):
                 "i5": {"method": "METHOD_2_PLASTIC_INTERACTION"},
             },
         )
-        result = CompositeI5CombinedRule().check(case, _rect_hss_section())
-        self.assertEqual("I5", result.clause)
-        self.assertEqual("METHOD_2_PLASTIC_INTERACTION", result.details["memory"]["inputs"]["method"])
-        method_data = result.details["memory"]["intermediate"]["method_data"]
-        self.assertEqual("6-3", method_data["table_reference"])
-        self.assertIn("interaction_points_by_axis", method_data)
-        self.assertIn("x", method_data["interaction_points_by_axis"])
-        self.assertIn("y", method_data["interaction_points_by_axis"])
+        # HFS-031R0: the required bare-steel floor lacks J/Cw; no substitute.
+        with self.assertRaises(IncompleteSectionDataError) as raised:
+            CompositeI5CombinedRule().check(case, _rect_hss_section())
+        self.assertEqual("COMPRESSION_DATA_INCOMPLETE", raised.exception.code)
+        self.assertIn("section.j", raised.exception.details["fields"])
+        self.assertIn("section.cw", raised.exception.details["fields"])
 
-    def test_i5_method_4_direct_interaction_runs_for_noncompact_filled(self):
+
+    def test_i5_method_4_direct_interaction_runs_for_noncompact_filled_requires_complete_steel_floor(self):
         case = _base_case(
             section_name="PTE200X200X2",
             loads=Loads(Pu=250.0, Mux=20.0, Muy=10.0, Vu=0.0),
@@ -303,9 +309,12 @@ class ChapterIRulesTests(unittest.TestCase):
                 "i5": {"method": "METHOD_4_DIRECT_INTERACTION"},
             },
         )
-        result = CompositeI5CombinedRule().check(case, _rect_hss_noncompact_section())
-        self.assertEqual("I5", result.clause)
-        self.assertEqual("METHOD_4_DIRECT_INTERACTION", result.details["memory"]["inputs"]["method"])
+        # HFS-031R0: the required bare-steel floor lacks J/Cw; no substitute.
+        with self.assertRaises(IncompleteSectionDataError) as raised:
+            CompositeI5CombinedRule().check(case, _rect_hss_noncompact_section())
+        self.assertEqual("COMPRESSION_DATA_INCOMPLETE", raised.exception.code)
+        self.assertIn("section.j", raised.exception.details["fields"])
+        self.assertIn("section.cw", raised.exception.details["fields"])
 
 
 if __name__ == "__main__":
