@@ -1,43 +1,18 @@
 {
-    "section_name":  "SR200X100",
-    "design_method":  "LRFD",
-    "material":  {
-                     "Fy":  345.0,
-                     "Fu":  450.0,
-                     "E":  200000.0
-                 },
-    "loads":  {
-                  "Pu":  150.0,
-                  "Mux":  6.0,
-                  "Muy":  0.0,
-                  "Vux":  0.0,
-                  "Vuy":  0.0
-              },
-    "lengths":  {
-                    "Lx":  3000.0,
-                    "Ly":  3000.0,
-                    "Lz":  3000.0,
-                    "Lb":  3000.0
-                },
-    "factors":  {
-                    "Kx":  1.0,
-                    "Ky":  1.0,
-                    "Kz":  1.0,
-                    "Cb":  1.0,
-                    "xa":  0.0,
-                    "ya":  0.0
-                },
-    "connection":  {
-                       "An":  15000.0,
-                       "U":  0.85
-                   },
-    "custom_section":  {
-                           "type":  "SOLID_RECTANGULAR",
-                           "H":  200.0,
-                           "B":  100.0
-                       },
-    "output":  {
-                   "write_results_json":  false
-               }
+  "section_name": "BAR100X20",
+  "custom_section": {
+    "type": "SOLID_RECTANGULAR",
+    "H": 100,
+    "B": 20
+  },
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 250
+  },
+  "Pu": 50,
+  "lengths": {
+    "Lx": 1000,
+    "Ly": 1000,
+    "Lz": 1000
+  }
 }
-

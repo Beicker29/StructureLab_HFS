@@ -1,5 +1,4 @@
-# An explicit allowlist also keeps tests automatically found by setuptools
-# out of the source distribution. The Excel catalog remains external.
+# Source distribution: package code only. The Excel catalog stays external (--sections).
 global-exclude *
 include pyproject.toml MANIFEST.in README.md
 recursive-include src/steel_design *.py

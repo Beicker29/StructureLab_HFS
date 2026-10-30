@@ -1,4 +1,4 @@
-"""Shared input policy; engineering relationships remain in domain.validation."""
+"""Shared input policy (strict finite JSON numbers, no extra fields)."""
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -8,7 +8,6 @@ from pydantic import BaseModel, ConfigDict, Field
 FiniteNumber = Annotated[float, Field(strict=True, allow_inf_nan=False)]
 PositiveNumber = Annotated[FiniteNumber, Field(gt=0)]
 NonNegativeNumber = Annotated[FiniteNumber, Field(ge=0)]
-UnitFactor = Annotated[PositiveNumber, Field(le=1)]
 PositiveCount = Annotated[int, Field(strict=True, gt=0)]
 NonBlankString = Annotated[str, Field(strict=True, pattern=r"\S")]
 
@@ -30,7 +29,7 @@ class InputModel(BaseModel):
 def unique_json_object(pairs):
     """Reject duplicate keys before a JSON decoder loses the first value.
 
-    Shared transport policy; keep ValueError/message for the legacy CLI.
+    Used by the CLI when reading JSON input.
     """
     result = {}
     for key, value in pairs:

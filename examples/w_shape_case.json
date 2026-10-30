@@ -1,38 +1,13 @@
 {
-    "section_name":  "W12X26",
-    "design_method":  "LRFD",
-    "material":  {
-                     "Fy":  345.0,
-                     "Fu":  450.0,
-                     "E":  200000.0
-                 },
-    "loads":  {
-                  "Pu":  180.0,
-                  "Mux":  45.0,
-                  "Muy":  2.0,
-                  "Vux":  1.0,
-                  "Vuy":  5.0
-              },
-    "lengths":  {
-                    "Lx":  7500.0,
-                    "Ly":  7500.0,
-                    "Lz":  7500.0,
-                    "Lb":  7500.0
-                },
-    "factors":  {
-                    "Kx":  1.0,
-                    "Ky":  1.0,
-                    "Kz":  1.0,
-                    "Cb":  1.0,
-                    "xa":  0.0,
-                    "ya":  0.0
-                },
-    "connection":  {
-                       "An":  150.0,
-                       "U":  0.85
-                   },
-    "output":  {
-                   "write_results_json":  false
-               }
+  "section_name": "W14X90",
+  "design_method": "LRFD",
+  "material": {
+    "Fy": 345
+  },
+  "Pu": 2500,
+  "lengths": {
+    "Lx": 4000,
+    "Ly": 4000,
+    "Lz": 4000
+  }
 }
-

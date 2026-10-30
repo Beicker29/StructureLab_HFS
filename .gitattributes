@@ -1,4 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-# HFS-022 schemas are generated as canonical UTF-8/LF bytes on every platform.
-docs/schemas/contracts/**/*.json text eol=lf
+*.pdf binary
+*.xlsx binary

@@ -1,57 +1,40 @@
-"""In-memory case preparation and execution, shared by transport adapters.
+"""In-memory execution of a JSON payload: one case, or a bundle {"cases": [...]} with shared defaults.
 
-No filesystem, clocks or presentation. Domain validation remains in the engine;
-bundle iteration is deliberately sequential and stops on the first exception.
+No filesystem access; a future web API calls execute_payload directly.
 """
 import copy
-from typing import NamedTuple, Iterator
 
-from .models import SteelCase
+from .domain.errors import ValidationError
 from .engine import SteelDesignEngine
-from .sections.models import Section
-from .results_model import EngineResult, AnalysisStatus, aggregate_case_statuses
-# Explicit reexports preserve the public preparation paths and object identity.
-from .preparation import (
-    OutputOptions as OutputOptions,
-    merge_case_payload as merge_case_payload,
-    extract_output_options as extract_output_options,
-    validate_bundle_shape as validate_bundle_shape,
-    prepare_cases as prepare_cases,
-)
+from .models import DesignResult, SteelCase, Status
 
 
-class CaseExecution(NamedTuple):
-    """Internal context of one actual execution, not a new serialized contract."""
-
-    case: SteelCase
-    section: Section
-    result: EngineResult
-    input_payload: dict
-    output_options: dict
-    case_tag: str | None
+def _merge(base: dict, override: dict) -> dict:
+    merged = copy.deepcopy(base)
+    for key, value in override.items():
+        merged[key] = _merge(merged[key], value) if isinstance(value, dict) and isinstance(merged.get(key), dict) else value
+    return merged
 
 
-def execute_case(*, engine: SteelDesignEngine, case: SteelCase,
-                 input_payload: dict | None = None, output_options: dict | None = None,
-                 case_tag: str | None = None) -> CaseExecution:
-    normalized_case, section, result = engine.run_with_context(case)
-    return CaseExecution(normalized_case, section, result,
-                         copy.deepcopy(input_payload if input_payload is not None else case.model_dump(mode="json")),
-                         copy.deepcopy(output_options if output_options is not None else OutputOptions().model_dump()),
-                         case_tag)
+def prepare_cases(payload: dict) -> list[tuple[str | None, SteelCase]]:
+    if not isinstance(payload, dict):
+        raise ValidationError("Input must be a JSON object.", code="INVALID_INPUT")
+    if "cases" not in payload:
+        return [(None, SteelCase(**payload))]
+    cases = payload["cases"]
+    if not isinstance(cases, list) or not cases or not all(isinstance(c, dict) for c in cases):
+        raise ValidationError("cases must be a non-empty list of objects.", code="INVALID_CASE_BUNDLE")
+    base = {k: v for k, v in payload.items() if k != "cases"}
+    return [(str(c.get("name") or f"case_{i + 1}"), SteelCase(**_merge(base, {k: v for k, v in c.items() if k != "name"})))
+            for i, c in enumerate(cases)]
 
 
-def iter_executions(payload: dict, engine: SteelDesignEngine) -> Iterator[CaseExecution]:
-    """Yield each executed case; errors propagate unchanged, without I/O."""
-    for case, case_payload, options, tag in prepare_cases(payload):
-        yield execute_case(engine=engine, case=case, input_payload=case_payload,
-                           output_options=options, case_tag=tag)
+def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str | None, DesignResult]]:
+    return [(tag, engine.run(case)) for tag, case in prepare_cases(payload)]
 
 
-def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[CaseExecution]:
-    """Materialize a single case or bundle in memory; no export is requested."""
-    return list(iter_executions(payload, engine))
-
-
-def execution_status(executions: list[CaseExecution]) -> AnalysisStatus:
-    return aggregate_case_statuses([item.result.status for item in executions])
+def overall_status(results: list[DesignResult]) -> Status:
+    statuses = {r.status for r in results}
+    if Status.INCOMPLETE in statuses:
+        return Status.INCOMPLETE
+    return Status.FAIL if Status.FAIL in statuses else Status.PASS
