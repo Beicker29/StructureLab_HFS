@@ -1,0 +1,15 @@
+{
+  "section_name": "CAJON-400X300X12",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+  "composite": {
+    "kind": "filled",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "box": {"B": 400, "H": 300, "t": 12},
+    "interaction": "M2S",
+    "biaxial_shape_factor": true
+  },
+  "cases": [
+    {"name": "Biaxial flexure with the shape factor", "Pu": 1500, "Mux": 150, "Muy": 120, "Vux": 200}
+  ]
+}

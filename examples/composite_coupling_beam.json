@@ -1,0 +1,12 @@
+{
+  "section_name": "VIGA-ACOPLE",
+  "material": {"Fy": 345},
+  "composite": {
+    "kind": "coupling_beam",
+    "concrete": {"fc": 40, "wc": 2320, "lightweight": false},
+    "coupling_beam": {"b": 450, "h": 600, "tf": 20, "tw": 12}
+  },
+  "cases": [
+    {"name": "Design Guide 38, A.3 and Equation 2-19", "Mux": 1800, "Vux": 1500}
+  ]
+}

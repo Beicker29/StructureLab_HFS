@@ -1,0 +1,23 @@
+{
+  "section_name": "MURO-FUEGO",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 5180, "Ly": 5180, "Lz": 5180},
+  "composite": {
+    "kind": "wall",
+    "concrete": {"fc": 40, "wc": 2320, "lightweight": false},
+    "wall": {"length": 3350, "tsc": 610, "t": 14.3, "tf": 14.3, "b": 305, "st": 305, "dtie": 25},
+    "fire": {
+      "required_rating_hours": 3,
+      "plate_temperature": 1004,
+      "element_thicknesses": [22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.3],
+      "element_temperatures": [788, 497, 368, 278, 208, 152, 109, 78, 57, 42, 33, 28, 26],
+      "vent": {
+        "s1": 3048, "s2": 3048, "diameter": 25.4, "dry_thickness": 38.1, "heating_time": 1790,
+        "water_content": 0.15, "water_density": 1000, "pour_height": 4267
+      }
+    }
+  },
+  "cases": [
+    {"name": "Design Guide 38, Chapter 6", "Pu": 16000}
+  ]
+}

@@ -5,8 +5,11 @@ angles about their principal axes): flexure (Chapter F); Vux, Vuy: shear (Chapte
 and flexure acting together, or flexure about two axes, add the interaction check (Chapter H).
 case.composite sends each demand to Chapter I, which uses Chapters E, F and G where it refers to them.
 """
-from .domain.composite import (composite_anchor, composite_compression, composite_flexure, composite_i5, composite_method2,
-                               composite_shear, composite_tension, composite_wall_interaction)
+from .domain.composite import (composite_anchor, composite_appendix_2_interaction, composite_compression, composite_flexure,
+                               composite_i5, composite_load_transfer, composite_method2, composite_shear,
+                               composite_tension, composite_wall_interaction, second_order_demands, uses_appendix_2)
+from .domain.speedcore import (c_wall_compression, c_wall_flexure, c_wall_interaction, c_wall_shear, c_wall_tension,
+                               coupling_beam_axial, coupling_beam_flexure, coupling_beam_shear, wall_fire)
 from .domain.compression import compression_strength
 from .domain.coverage import (composite_obligations, discharge, flexure_obligations, interaction_obligations,
                               required_obligations, shear_obligations)
@@ -17,7 +20,8 @@ from .domain.tension import tension_strength
 from .domain.validation import section_inconsistencies, validate_case, validate_section
 from .errors import IncompleteSectionDataError, RuleNotImplementedError, SectionNotFoundError
 from .models import Check, DesignResult, Obligation, SteelCase, Status
-from .sections.geometry import build_custom_section, build_wall_section
+from .sections.geometry import (build_box_section, build_c_wall_section, build_coupling_beam_section, build_custom_section,
+                                build_wall_section)
 from .sections.models import Section
 from .sections.repository import SectionRepository
 
@@ -37,6 +41,12 @@ class SteelDesignEngine:
             return validate_section(build_custom_section(case))
         if case.composite is not None and case.composite.kind == "wall":
             return validate_section(build_wall_section(case))
+        if case.composite is not None and case.composite.box is not None:
+            return validate_section(build_box_section(case))
+        if case.composite is not None and case.composite.kind == "c_wall":
+            return validate_section(build_c_wall_section(case))
+        if case.composite is not None and case.composite.kind == "coupling_beam":
+            return validate_section(build_coupling_beam_section(case))
         return self._catalog(case.section_name)
 
     def _check(self, check_id, chapter, demand, unit, obligations, compute, section, inconsistent) -> Check:
@@ -78,6 +88,20 @@ class SteelDesignEngine:
         section = self.section_for(case)
         inconsistent = section_inconsistencies(section)
         checks = []
+        if case.composite and case.composite.second_order:
+            try:
+                case, info = second_order_demands(case, section)
+            except (RuleNotImplementedError, IncompleteSectionDataError) as exc:
+                failed = Check(id="axial", chapter="I", demand=0.0, unit="kN", status=Status.INCOMPLETE, errors=[exc.to_dict()])
+                return self._result(section, [failed])
+            composite_checks = self._composite_checks(case, section, inconsistent)
+            note = (f"Apéndice 8.1: B1 = {info['B1']:.3f}, B2 = {info['B2']:.3f}; Pr = {info['Pr_kN']:.1f} kN, "
+                    f"Mr = {info['Mr_kNm']:.1f} kN·m (A-8-1, A-8-2).")
+            for check in composite_checks:
+                if check.result:
+                    check.result["notes"].append(note)
+                    check.result["second_order"] = info
+            return self._result(section, composite_checks)
         if case.composite:
             return self._result(section, self._composite_checks(case, section, inconsistent))
         if case.Pu:
@@ -112,6 +136,8 @@ class SteelDesignEngine:
         """Chapter I: negative flexure of a beam is Chapter F (I3.2b); steel-only shear is Chapter G (I4.1(a), I4.3)."""
         checks = []
         kind = case.composite.kind
+        if kind in {"c_wall", "coupling_beam"}:
+            return self._guide_member_checks(case, section, inconsistent)
         if case.Pu:
             compute = ((lambda: composite_compression(case, section, lambda: compression_strength(
                 case, section, catalog=self._catalog))) if case.Pu > 0 else (lambda: composite_tension(case, section)))
@@ -138,20 +164,56 @@ class SteelDesignEngine:
         combined = [c for c in checks if c.id in COMBINED]
         if len(combined) > 1:
             method = "wall" if kind == "wall" else case.composite.interaction
+            if uses_appendix_2(case, section) and case.Pu > 0:
+                method = "A2"
             if method == "H1":
                 checks.append(self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
                                           lambda: combined_strength(case, section, combined), section, []))
             else:
                 mode, provision, compute = {
                     "I5": ("I5", "I5(b)", composite_i5), "M2": ("M2", "Commentary I5", composite_method2),
-                    "M2S": ("M2", "Commentary I5", composite_method2), "wall": ("I5c", "I5(c)", composite_wall_interaction)}[method]
+                    "M2S": ("M2", "Commentary I5", composite_method2), "wall": ("I5c", "I5(c)", composite_wall_interaction),
+                    "A2": ("A2", "Apéndice 2, 2.1.4", composite_appendix_2_interaction)}[method]
                 obligations = [Obligation(id=mode, provision=provision, reason="Interacción de fuerza axial y flexión.")]
                 checks.append(self._check("interaction", "I", 0.0, "–", obligations,
                                           lambda: compute(case, section, combined), section, []))
-        if case.composite.anchor:
+        if case.composite.anchor and case.composite.anchor.Qrv + case.composite.anchor.Qrt > 0:
             obligations = [Obligation(id="V" if case.composite.anchor.type == "channel" else "Q", provision="I8.3",
                                       reason="Resistencia de un anclaje de componente.")]
             checks.append(self._check("anchor", "I", 0.0, "–", obligations, lambda: composite_anchor(case, section),
+                                      section, []))
+        if case.composite.load_transfer:
+            obligations = [Obligation(id="LT", provision="I6", reason="Transferencia de la fuerza longitudinal.")]
+            checks.append(self._check("load_transfer", "I", 0.0, "–", obligations, lambda: composite_load_transfer(case, section),
+                                      section, []))
+        if case.composite.fire:
+            obligations = [Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Muro bajo incendio.")]
+            checks.append(self._check("fire", "I", 0.0, "–", obligations, lambda: wall_fire(case, section), section, []))
+        return checks
+
+    def _guide_member_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
+        """C-shaped walls and coupling beams, by the plastic distribution that Design Guide 38 writes out."""
+        checks = []
+        wall = case.composite.kind == "c_wall"
+        flexure, shear = (c_wall_flexure, c_wall_shear) if wall else (coupling_beam_flexure, coupling_beam_shear)
+        if case.Pu:
+            compute = (lambda: c_wall_compression(case, section)) if case.Pu > 0 else (lambda: c_wall_tension(case, section))
+            if not wall:
+                compute = lambda: coupling_beam_axial(case, section)  # noqa: E731
+            checks.append(self._check("axial", "I", abs(case.Pu), "kN", composite_obligations(case, "axial"), compute,
+                                      section, inconsistent))
+        for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
+            if moment:
+                checks.append(self._check(f"flexure_{axis}", "I", abs(moment), "kN·m", composite_obligations(case, "flexure"),
+                                          lambda axis=axis: flexure(case, section, axis), section, inconsistent))
+        for axis, value in (("x", case.Vux), ("y", case.Vuy)):
+            if value:
+                checks.append(self._check(f"shear_{axis}", "I", abs(value), "kN", composite_obligations(case, "shear"),
+                                          lambda axis=axis: shear(case, section, axis), section, inconsistent))
+        combined = [c for c in checks if c.id in COMBINED]
+        if wall and len(combined) > 1:
+            obligations = [Obligation(id="I5c", provision="I5(c)", reason="Interacción de fuerza axial y flexión.")]
+            checks.append(self._check("interaction", "I", 0.0, "–", obligations, lambda: c_wall_interaction(case, section, combined),
                                       section, []))
         return checks
 

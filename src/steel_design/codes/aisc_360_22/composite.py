@@ -90,27 +90,39 @@ def critical_stress_round(*, D_t, Fy) -> float:
     return 0.72 * Fy / (D_t * Fy / E_STEEL) ** 0.2
 
 
-def pno_filled(*, cls, shape, Fy, As, fc, Ac, lam, limits, Fn=None) -> dict:
-    """I2-9a to I2-9e, without longitudinal reinforcement (Asr = 0)."""
+def pno_filled(*, cls, shape, Fy, As, fc, Ac, lam, limits, Fn=None, Asr=0.0, Ec=None) -> dict:
+    """I2-9a to I2-9e. Ac excludes the bars; Asr*Es/Ec is the bar area transformed to concrete."""
     c2 = 0.95 if shape == "round" else 0.85
-    pp = Fy * As + c2 * fc * Ac                                      # I2-9b
+    concrete = Ac + (Asr * E_STEEL / Ec if Asr else 0.0)
+    pp = Fy * As + c2 * fc * concrete                                # I2-9b
     if cls == "compact":
         return {"Pno": pp, "equation": "I2-9a", "Pp": pp}
     if cls == "noncompact":
-        py = Fy * As + 0.7 * fc * Ac                                 # I2-9d
+        py = Fy * As + 0.7 * fc * concrete                           # I2-9d
         pno = pp - (pp - py) / (limits["r"] - limits["p"]) ** 2 * (lam - limits["p"]) ** 2
         return {"Pno": pno, "equation": "I2-9c", "Pp": pp, "Py": py}
-    return {"Pno": Fn * As + 0.7 * fc * Ac, "equation": "I2-9e", "Fn": Fn}
+    return {"Pno": Fn * As + 0.7 * fc * concrete, "equation": "I2-9e", "Fn": Fn}
 
 
-def rect_plastic_moment(*, Fy, fc, Zs, t, bi, hi, r) -> dict:
-    """Mp of a filled rectangular section: Fig. C-I3.8(a) with the catalog Zs and rounded inside corners (Example I.6)."""
+def rect_plastic_moment(*, Fy, fc, Zs, t, bi, hi, r, Fysr=0.0, bars=()) -> dict:
+    """Mp of a filled rectangular section: Fig. C-I3.8(a) with the catalog Zs and rounded inside corners (Example I.6).
+
+    bars = [(area, v from the bending axis)]: at Fysr, on the compressed side they displace concrete.
+    """
     Ac = bi * hi - (4 - math.pi) * r**2
     Zc = bi * hi**2 / 4 - 0.429 * r**2 * hi + 0.192 * r**3
-    hn = min(0.85 * fc * Ac / (2 * (0.85 * fc * bi + 4 * Fy * t)), hi / 2)
-    Zsn, Zcn = 2 * t * hn**2, bi * hn**2
-    return {"Mp": Fy * (Zs - Zsn) + 0.85 * fc * (Zc - Zcn) / 2, "hn_mm": hn, "Zc_mm3": Zc,
-            "Md": Fy * Zs + 0.85 * fc * Zc / 2}                      # neutral axis at the centroid (point D)
+
+    def forces(hn):
+        above = [(a, v) for a, v in bars if v > hn]
+        below = [(a, v) for a, v in bars if v <= hn]
+        above_a, above_q = sum(a for a, _ in above), sum(a * v for a, v in above)
+        axial = (0.85 * fc * (Ac / 2 - bi * hn - above_a) - 4 * Fy * t * hn + Fysr * above_a - Fysr * sum(a for a, _ in below))
+        moment = (Fy * (Zs - 2 * t * hn**2) + 0.85 * fc * (Zc - bi * hn**2) / 2 - 0.85 * fc * above_q + Fysr * above_q
+                  - Fysr * sum(a * v for a, v in below))
+        return axial, moment
+
+    hn = _balance(lambda y: forces(y)[0], 0.0, hi / 2)
+    return {"Mp": forces(hn)[1], "hn_mm": hn, "Zc_mm3": Zc, "Md": forces(0.0)[1]}   # Md: neutral axis at the centroid (point D)
 
 
 def rect_yield_moment(*, Fy, fc, H, tw, tf, bi) -> dict:
@@ -145,8 +157,11 @@ def _balance(force, low, high) -> float:
     return (low + high) / 2
 
 
-def round_plastic_moment(*, Fy, fc, D, t) -> dict:
-    """Mp of a filled round section: plastic distribution of I1.2a with 0.95f'c; annulus and circle from D and t."""
+def round_plastic_moment(*, Fy, fc, D, t, Fysr=0.0, bars=()) -> dict:
+    """Mp of a filled round section: plastic distribution of I1.2a with 0.95f'c; annulus and circle from D and t.
+
+    bars = [(area, v from the bending axis)]: at Fysr, on the compressed side they displace concrete.
+    """
     ro, ri = D / 2, D / 2 - t
 
     def segment(r, y):
@@ -160,8 +175,13 @@ def round_plastic_moment(*, Fy, fc, D, t) -> dict:
         outer, inner = segment(ro, y), segment(ri, y)
         steel_above = outer[0] - inner[0]
         steel_total = math.pi * (ro**2 - ri**2)
-        axial = 0.95 * fc * inner[0] + Fy * steel_above - Fy * (steel_total - steel_above)
-        moment = 0.95 * fc * inner[1] + 2 * Fy * (outer[1] - inner[1])
+        above = [(a, v) for a, v in bars if v > y]
+        below = [(a, v) for a, v in bars if v <= y]
+        above_a, above_q = sum(a for a, _ in above), sum(a * v for a, v in above)
+        axial = (0.95 * fc * (inner[0] - above_a) + Fy * steel_above - Fy * (steel_total - steel_above)
+                 + Fysr * above_a - Fysr * sum(a for a, _ in below))
+        moment = (0.95 * fc * (inner[1] - above_q) + 2 * Fy * (outer[1] - inner[1]) + Fysr * above_q
+                  - Fysr * sum(a * v for a, v in below))
         return axial, moment
 
     hn = _balance(lambda y: forces(y)[0], 0.0, ro)
@@ -256,9 +276,54 @@ def method2_ratio(*, Pr, Mr, points) -> float:
     raise ValueError("The demand does not cross the interaction curve.")
 
 
+def transfer_force(*, Pr, Fs_As, Pno, applied_to, steel_fraction=None) -> dict:
+    """I6-1, I6-2a/b; concurrent force per Commentary I6.2: difference with the share of I6-1 (Fs_As is FyAs or FnAs)."""
+    if applied_to == "steel":
+        return {"Vr": Pr * (1 - Fs_As / Pno), "equation": "I6-1"}
+    if applied_to == "concrete":
+        return {"Vr": Pr * (Fs_As / Pno), "equation": "I6-2"}
+    return {"Vr": Pr * abs(steel_fraction - Fs_As / Pno), "equation": "I6.2c (Commentary)"}
+
+
+def bearing_transfer(*, fc, A1) -> float:
+    """I6-3, nominal."""
+    return 1.7 * fc * A1
+
+
+def bond_stress(*, t, H, rectangular) -> float:
+    """Fin of I6-5, MPa."""
+    return min(2100 * t / H**2, 0.72) if rectangular else min(5300 * t / H**2, 1.4)
+
+
+def bond_transfer(*, pb, Lin, Fin) -> float:
+    """I6-5, nominal."""
+    return pb * Lin * Fin
+
+
 def wall_stiffness(*, Is, Ec, Ic) -> float:
     """I1-1."""
     return E_STEEL * Is + 0.35 * Ec * Ic
+
+
+def wall_axial_stiffness(*, As, Ec, Ac) -> float:
+    """I1-2."""
+    return E_STEEL * As + 0.45 * Ec * Ac
+
+
+def wall_shear_stiffness(*, Asw, Ec, Ac) -> float:
+    """I1-3, Gc = 0.4Ec."""
+    return G_STEEL * Asw + 0.4 * Ec * Ac
+
+
+def wall_slender_plate_stress(*, b_t, Fy) -> float:
+    """Commentary I1.6a, C-I1-1: for plates beyond the limit of I1-4. (b/t) squared as in Design Guide 38, Equation 2-2;
+    the Commentary prints it without the exponent, which would never reduce Fy (see docs/chapter-i.md, DI-15)."""
+    return min(math.pi**2 * E_STEEL / (12 * 0.8**2 * b_t**2), Fy)
+
+
+def pno_wall_slender(*, Fn, As, fc, Ac) -> float:
+    """Commentary I1.6a, C-I1-2."""
+    return Fn * As + 0.7 * fc * Ac
 
 
 def pno_wall(*, Fy, As, fc, Ac) -> float:

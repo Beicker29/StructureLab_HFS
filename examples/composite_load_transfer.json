@@ -1,0 +1,13 @@
+{
+  "section_name": "PTE200X200X7MM",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+  "composite": {
+    "kind": "filled",
+    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "load_transfer": {"Pr": 800, "applied_to": "steel", "bearing_area": 9000, "bond_length": 300, "bond_slip_controlled": true}
+  },
+  "cases": [
+    {"name": "I6, force applied to the steel", "Pu": 800}
+  ]
+}

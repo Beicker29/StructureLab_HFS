@@ -82,6 +82,14 @@ python -m steel_design.run examples/composite_beam.json --output results/composi
 python -m steel_design.run examples/composite_method2.json --output results/composite_method2.json --report --pdf
 python -m steel_design.run examples/composite_wall.json --output results/composite_wall.json --report --pdf
 python -m steel_design.run examples/composite_anchor.json --output results/composite_anchor.json --report --pdf
+python -m steel_design.run examples/composite_filled_bars.json --output results/composite_filled_bars.json --report --pdf
+python -m steel_design.run examples/composite_high_strength.json --output results/composite_high_strength.json --report --pdf
+python -m steel_design.run examples/composite_second_order.json --output results/composite_second_order.json --report --pdf
+python -m steel_design.run examples/composite_load_transfer.json --output results/composite_load_transfer.json --report --pdf
+python -m steel_design.run examples/composite_box.json --output results/composite_box.json --report --pdf
+python -m steel_design.run examples/composite_c_wall.json --output results/composite_c_wall.json --report --pdf
+python -m steel_design.run examples/composite_coupling_beam.json --output results/composite_coupling_beam.json --report --pdf
+python -m steel_design.run examples/composite_wall_fire.json --output results/composite_wall_fire.json --report --pdf
 ```
 
 Quite `--output ...` si solo necesita las memorias; sin ningún argumento adicional el resultado se
@@ -129,7 +137,7 @@ símbolos escritos en letras.
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
-| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`, `wall`), `concrete` (`fc`, `wc`, `lightweight`), `interaction` (`H1`, `I5`, `M2`, `M2S`), `encased`, `beam` o `wall` según el tipo, y `anchor` para un anclaje I8.3 ([detalle](docs/chapter-i.md)) |
+| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`, `wall`, `c_wall`, `coupling_beam`), `concrete` (`fc`, `wc`, `lightweight`), `interaction` (`H1`, `I5`, `M2`, `M2S`), `filled`, `box`, `encased`, `beam`, `wall`, `c_wall` o `coupling_beam` según el tipo, `anchor` (I8.3), `load_transfer` (I6), `second_order` (Apéndice 8.1), y `fire`, `biaxial_shape_factor` y `flexural_member` de las Design Guides ([detalle](docs/chapter-i.md), [guías](docs/design-guides.md)) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
 material, longitudes, `tension`, E5/E6) y `cases` lista sus combinaciones de

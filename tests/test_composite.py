@@ -37,6 +37,9 @@ def anchor_case(spec, member=None, **overrides):
 
 
 WALL = {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
+GUIDE_KINDS = {"second_order", "load_transfer_filled", "load_transfer_encased", "tension_control", "box_compression", "box_flexure",
+               "box_shear", "biaxial", "service_filled", "service_round", "wall_slender", "wall_stiffnesses", "c_wall_case",
+               "coupling_flexure", "coupling_shear", "wall_fire_oracle"}
 
 
 def wall_member(fc=35, wall=None, **demands):
@@ -60,6 +63,27 @@ def wall_case(spec):
             "interaction", "ratio", "ratio")
 
 
+NEW_FILLED = {"round_with_bars_compression", "round_with_bars_flexure", "rect_with_bars_flexure", "appendix_2_compression",
+              "appendix_2_flexure", "appendix_2_interaction"}
+
+
+def filled_extension_case(spec, data):
+    """Filled members with internal bars, and rectangular filled members under Appendix 2."""
+    kind = spec["kind"]
+    composite = {"kind": "filled", "concrete": concrete(spec)}
+    if "bars" in spec:
+        composite["filled"] = {"Fysr": spec["Fysr"], "transverse": TIES,
+                               "bars": [{"area": a, "db": db, "x": x, "y": y} for a, db, x, y in spec["bars"]]}
+    data = {**data, "composite": composite}
+    if "L" in spec:
+        data["lengths"] = {"Lx": spec["L"], "Ly": spec["L"], "Lz": spec["L"]}
+    if kind.endswith("compression"):
+        return SteelCase(**data, Pu=1), "axial", "Pn_kN", "Pn_kN"
+    if kind.endswith("flexure"):
+        return SteelCase(**data, Mux=1), "flexure_x", "Mn_kNm", "Mn_kNm"
+    return SteelCase(**data, Pu=spec["Pu"], Mux=spec["Mu"]), "interaction", "ratio", "ratio"
+
+
 def build(spec):
     """(case, check id, field of the result, expected key) from one oracle spec."""
     kind = spec["kind"]
@@ -69,6 +93,8 @@ def build(spec):
         return wall_case(spec)
     fy = spec["fy"]
     data = {"section_name": spec["name"], "material": {"Fy": fy}}
+    if kind in NEW_FILLED:
+        return filled_extension_case(spec, data)
     lengths = {"Lx": spec.get("L", 1), "Ly": spec.get("L", 1), "Lz": spec.get("L", 1)}
     if "bars" in spec:
         bars = [{"area": a, "db": float(db), "x": x, "y": y} for a, db, x, y in spec["bars"]]
@@ -99,7 +125,7 @@ def build(spec):
     return SteelCase(**data, Mux=1), "flexure_x", "available_kNm", "phiMn_kNm"
 
 
-@pytest.mark.parametrize("case_id", sorted(REFERENCE))
+@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] not in GUIDE_KINDS))
 def test_profiles_match_independent_calculation(engine, case_id):
     ref = REFERENCE[case_id]
     case, check_id, field, expected = build(ref["spec"])
@@ -139,19 +165,40 @@ def test_i5_needs_flexure_about_one_axis(engine):
     assert result.check("interaction").errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
 
 
-@pytest.mark.parametrize("fc, Fy", [(15, 345), (80, 345), (35, 550)])
-def test_materials_outside_i13_are_blocked(engine, fc, Fy):
+@pytest.mark.parametrize("fc, Fy", [(15, 345), (110, 345), (35, 700)])
+def test_materials_outside_i13_and_appendix_2_are_blocked(engine, fc, Fy):
     result = engine.run(filled(Fy=Fy, fc=fc, Vux=1))
     assert result.status.value == "INCOMPLETE" and result.errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+
+
+@pytest.mark.parametrize("fc, Fy", [(80, 345), (35, 550)])
+def test_materials_above_i13_use_appendix_2_in_rectangular_filled_members(engine, fc, Fy):
+    check = engine.run(filled(Fy=Fy, fc=fc, Mux=1)).check("flexure_x")
+    assert check.status.value == "PASS" and check.result["provisions"] == ["Apéndice 2"]
 
 
 def test_declared_kind_must_match_the_family(engine):
     assert engine.run(filled("W14X90", Vux=1)).errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
 
 
-def test_noncompact_round_filled_flexure_is_blocked(engine):
-    result = engine.run(filled('PTER24"X12.70MM', Fy=500, Mux=1))
-    assert result.check("flexure_x").errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+def test_noncompact_round_filled_flexure_uses_the_guide_and_says_so(engine):
+    check = engine.run(filled('PTER24"X12.70MM', Fy=500, Mux=1)).check("flexure_x")
+    assert check.result["modes"]["Y"]["provision"] == "I3.4b(b)" and any("Design Guide 6" in n for n in check.result["notes"])
+
+
+def test_rectangular_noncompact_filled_with_bars_is_blocked(engine):
+    bars = {"Fysr": 420, "transverse": TIES, "bars": [{"area": 100, "db": 11, "x": 0, "y": 0}]}
+    case = SteelCase(section_name="PTE300X100X5MM", material={"Fy": 345}, Muy=1,
+                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False}, "filled": bars})
+    assert engine.run(case).check("flexure_y").errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+
+
+def test_bars_of_a_filled_member_meet_i22_and_i34(engine):
+    bars = {"Fysr": 420, "transverse": TIES, "bars": [{"area": 10, "db": 4, "x": 0, "y": 40}]}
+    case = SteelCase(section_name="PTE200X200X7MM", material={"Fy": 345}, Mux=1,
+                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False}, "filled": bars})
+    errors = engine.run(case).check("flexure_x").errors
+    assert {e.get("id") for e in errors} == {"rho_sr"}
 
 
 def encased(method="steel", anchors=False, bars=None, ties=TIES, **demands):

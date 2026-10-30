@@ -1,0 +1,15 @@
+{
+  "section_name": "MURO-C",
+  "material": {"Fy": 345},
+  "composite": {
+    "kind": "c_wall",
+    "concrete": {"fc": 40, "wc": 2320, "lightweight": false},
+    "c_wall": {
+      "L": 9144, "W": 4267, "tsc_w": 356, "tsc_f": 610, "tp": 12.7,
+      "b": 305, "st": 305, "dtie": 25, "minor_axis_compression": "flange_tips"
+    }
+  },
+  "cases": [
+    {"name": "Design Guide 38, A.2.3: tension and minor axis flexure", "Pu": -54700, "Muy": 80000, "Vuy": 6000}
+  ]
+}

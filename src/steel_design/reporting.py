@@ -63,7 +63,8 @@ def _fmt(value) -> str:
 CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y",
                 "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z",
                 "shear_x": "Cortante paralelo a y (con Mux)", "shear_y": "Cortante paralelo a x (con Muy)",
-                "interaction": "Interacción de fuerzas combinadas", "anchor": "Anclaje de componente"}
+                "interaction": "Interacción de fuerzas combinadas", "anchor": "Anclaje de componente",
+                "load_transfer": "Transferencia de carga", "fire": "Incendio (Guía 38)"}
 FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
                   "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
                   "LLB": "pandeo local del ala del ángulo"}
