@@ -57,13 +57,11 @@ def _fmt(value) -> str:
 def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = None) -> list[dict]:
     """Neutral document model of the report of one member (Spanish), Chapter D or E."""
     c = result.compression if result.chapter == "E" else result.tension
-    method = case.design_method.value
-    sub = "c" if result.chapter == "E" else "t"
-    capacity_label = f"φ{sub}·Pn" if method == "LRFD" else f"Pn/Ω{sub}"
+    capacity_label = "φc·Pn" if result.chapter == "E" else "φt·Pn"
     action = "compresión" if result.chapter == "E" else "tracción"
     blocks = [{"kind": "title", "member": result.section, "case": title, "status": result.status.value,
                "action": action,
-               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo {result.chapter}"), ("Método", method),
+               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo {result.chapter}"), ("Método", "LRFD"),
                         ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
                "ratio": result.ratio}]
@@ -106,7 +104,7 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     if result.chapter == "E":
         material += f"; E = {_fmt(mat.E)} MPa"
     items = [("Perfil", f"{result.section} ({result.family})"), ("Origen", origin), ("Material", material),
-             ("Método y demanda", f"{case.design_method.value}; Pu = {_fmt(case.Pu)} kN "
+             ("Demanda (LRFD)", f"Pu = {_fmt(case.Pu)} kN "
                                   f"({'compresión' if case.Pu > 0 else 'tracción'})")]
     if result.chapter == "D" and case.tension:
         t = case.tension
@@ -138,7 +136,6 @@ def _data_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
 
 
 def _tension_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_label: str) -> list[dict]:
-    method = case.design_method.value
     blocks = [{"kind": "h1", "text": "2. Área neta efectiva (D3)"},
               {"kind": "p", "text": f"Ae = An·U = {_fmt(c['inputs']['An_mm2'])} · {_fmt(c['inputs']['U'])} = "
                                     f"{_fmt(c['modes']['TR']['area_mm2'])} mm² (D3-1)"},
@@ -147,22 +144,19 @@ def _tension_blocks(case: SteelCase, result: DesignResult, c: dict, capacity_lab
               {"kind": "h1", "text": "4. Estados límite (D2)"}]
     rows = []
     for name, m in c["modes"].items():
-        a = m["available_kN"]
         rows.append([name, LIMIT_STATES.get(m["limit_state"], m["limit_state"]), m["Pn_equation"],
                      f"{'Fy' if name == 'TY' else 'Fu'} = {_fmt(m['stress_mpa'])}", f"{m['area_basis']} = {_fmt(m['area_mm2'])}",
-                     m["Pn_kN"], f"{a['phi']:.2f}", a["LRFD"], f"{a['omega']:.2f}", a["ASD"]])
+                     m["Pn_kN"], f"{m['phi_t']:.2f}", m["available_kN"]])
     blocks.append({"kind": "table", "headers": ["Modo", "Estado límite", "Ec.", "Tensión (MPa)", "Área (mm²)",
-                                                "Pn (kN)", "φt", "φt·Pn (kN)", "Ωt", "Pn/Ωt (kN)"],
+                                                "Pn (kN)", "φt", "φt·Pn (kN)"],
                    "rows": rows, "highlight": list(c["modes"]).index(c["governing_mode"])})
     blocks.append({"kind": "p", "text": "Cada estado límite tiene su propio factor (D2), por lo que gobierna la menor "
-                                        "resistencia disponible, no la menor Pn."})
+                                        "resistencia de diseño φt·Pn, no la menor Pn."})
     gov = c["modes"][c["governing_mode"]]
     blocks += [{"kind": "h1", "text": "5. Resistencia"},
                {"kind": "kv", "items": [
-                   ("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])} "
-                                       f"({method})"),
-                   ("LRFD", f"min(φt·Pn) = {_fmt(c['available']['LRFD'])} kN ({c['governing_by_method']['LRFD']})"),
-                   ("ASD", f"min(Pn/Ωt) = {_fmt(c['available']['ASD'])} kN ({c['governing_by_method']['ASD']})"),
+                   ("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
+                   ("Resistencia de diseño", f"min(φt·Pn) = {_fmt(c['available_kN'])} kN ({c['governing_mode']})"),
                    ("Verificación", f"|Pu| / {capacity_label} = {_fmt(result.demand_kN)} / {_fmt(result.capacity_kN)} "
                                     f"= {_fmt(result.ratio)}")]}]
     return blocks
@@ -218,8 +212,7 @@ def _compression_blocks(case: SteelCase, result: DesignResult, c: dict, capacity
     gov = c["modes"][c["governing_mode"]]
     items = [("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
              ("Pn", f"{_fmt(c['Pn_kN'])} kN ({c['governing_equation']})"),
-             ("LRFD", f"φc·Pn = 0.90 · Pn = {_fmt(c['available']['LRFD'])} kN"),
-             ("ASD", f"Pn/Ωc = Pn / 1.67 = {_fmt(c['available']['ASD'])} kN"),
+             ("Resistencia de diseño", f"φc·Pn = 0.90 · Pn = {_fmt(c['available_kN'])} kN"),
              ("Verificación", f"Pu / {capacity_label} = {_fmt(result.demand_kN)} / {_fmt(result.capacity_kN)} "
                               f"= {_fmt(result.ratio)}")]
     for req in c["requirements"]:
@@ -283,7 +276,7 @@ _FONT_CANDIDATES = [  # (regular, bold); first pair found on this machine is emb
     ("C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/arialbd.ttf"),
     ("/Library/Fonts/Arial.ttf", "/Library/Fonts/Arial Bold.ttf"),
 ]
-_LATIN1 = {"φ": "phi", "Ω": "Omega", "λ": "lambda", "Σ": "sum", "≤": "<=", "→": "->", "—": "-", "–": "-",
+_LATIN1 = {"φ": "phi", "λ": "lambda", "Σ": "sum", "≤": "<=", "→": "->", "—": "-", "–": "-",
            "−": "-", "²": "2", "⁴": "4", "⁶": "6", "r̄o": "ro", "α": "alpha"}
 
 

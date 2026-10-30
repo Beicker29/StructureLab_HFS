@@ -13,8 +13,8 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 
 | Archivo | Garantía |
 | --- | --- |
-| `tests/test_compression.py` | Perfiles reales contra cálculos independientes (todas las familias soportadas, LRFD y ASD); selección; bloqueos; propiedades de fórmulas (continuidad E3/E5, c2, E4-4 → E4-3, E6, E7-7) |
-| `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes (LRFD y ASD), modo gobernante por resistencia disponible, datos faltantes, nota D1, memoria |
+| `tests/test_compression.py` | Perfiles reales contra cálculos independientes (todas las familias soportadas); selección; bloqueos; propiedades de fórmulas (continuidad E3/E5, c2, E4-4 → E4-3, E6, E7-7) |
+| `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes, modo gobernante por resistencia de diseño φt·Pn, datos faltantes, nota D1, memoria |
 | `tests/test_engine.py` | Obligaciones independientes; frontera PASS/FAIL; INCOMPLETE ante dominios bloqueados; barra maciza a mano |
 | `tests/test_inputs.py` | Rechazo de entradas inválidas o incompletas |
 | `tests/test_catalog.py` | Importación del Excel: familias, unidades, relaciones B4 |

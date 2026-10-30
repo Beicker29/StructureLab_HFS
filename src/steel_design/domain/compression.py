@@ -336,7 +336,6 @@ def compression_strength(case: SteelCase, section: Section,
     single-angle component (J, rz). Contact vs separators comes from the
     AISC_Manual_Label: no separation suffix means continuous contact (D-11).
     """
-    factor = eq.design_factor(case.design_method)
     family = section.type.upper()
     E, Fy = case.material.E, case.material.Fy
     if abs(E - eq.E_STEEL) > 1e-6:
@@ -377,7 +376,6 @@ def compression_strength(case: SteelCase, section: Section,
 
     governing = min(modes, key=lambda key: modes[key]["Pn_kN"])
     pn_kn = modes[governing]["Pn_kN"]
-    available = eq.available_strength(pn_kn * 1000.0)
     provisions = sorted({m["provision"] for m in modes.values()} | ({"E7"} if slender else set()))
     pending = []
     worst = max(m["Lc_over_r"] for m in modes.values() if "Lc_over_r" in m)
@@ -390,7 +388,6 @@ def compression_strength(case: SteelCase, section: Section,
     return {
         "chapter": "E", "code": "ANSI/AISC 360-22",
         "section": section.name, "family": family,
-        "design_method": case.design_method.value,
         "inputs": {"Fy_mpa": Fy, "E_mpa": E, "G_mpa": eq.G_STEEL, "Ag_mm2": section.area,
                    "Kx": case.factors.Kx, "Ky": case.factors.Ky, "Kz": case.factors.Kz,
                    "Lx_mm": case.lengths.Lx, "Ly_mm": case.lengths.Ly, "Lz_mm": case.lengths.Lz},
@@ -401,9 +398,8 @@ def compression_strength(case: SteelCase, section: Section,
         "governing_equation": modes[governing]["Pn_equation"],
         "Fn_mpa": modes[governing]["Fn_mpa"],
         "Pn_kN": pn_kn,
-        "available": available,
-        "available_kN": available[case.design_method.value],
-        "design_factor": factor,
+        "phi_c": eq.PHI_C,
+        "available_kN": modes[governing]["available_kN"],
         "built_up": built_up,
         "requirements": built_up["requirements"] if built_up else [],
         "notes": notes,

@@ -28,6 +28,6 @@ def engine(catalog):
     return SteelDesignEngine(repository)
 
 
-def steel_case(name="W14X90", *, Pu=100, L=3000, Ly=None, Lz=None, Fy=345, method="LRFD", **extra):
-    return SteelCase(section_name=name, design_method=method, material={"Fy": Fy}, Pu=Pu,
+def steel_case(name="W14X90", *, Pu=100, L=3000, Ly=None, Lz=None, Fy=345, **extra):
+    return SteelCase(section_name=name, material={"Fy": Fy}, Pu=Pu,
                      lengths={"Lx": L, "Ly": Ly or L, "Lz": Lz or L}, **extra)

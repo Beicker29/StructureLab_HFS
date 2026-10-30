@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-El repositorio contiene los capítulos D y E de ANSI/AISC 360-22. Los capítulos
+El repositorio contiene los capítulos D y E de ANSI/AISC 360-22, solo por LRFD. Los capítulos
 F, G, H e I se retiraron (recuperables en el historial de Git, commit `d3a1b02`) y
 se reincorporan, uno por vez, con la misma estructura y oráculos independientes.
 

@@ -18,9 +18,8 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_e/reference.json").read_t
 REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 
 
-def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, method="LRFD", xa=0, ya=0, e5=None, e6=None,
-              E=200000, Pu=100):
-    return SteelCase(section_name=name, design_method=method, material={"Fy": Fy, "E": E}, Pu=Pu,
+def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100):
+    return SteelCase(section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu,
                      lengths={"Lx": Lx, "Ly": Ly or Lx, "Lz": Lz or Lx}, factors={"xa": xa, "ya": ya},
                      single_angle_e5=e5, double_angle_e6=e6)
 
@@ -36,19 +35,18 @@ def e5_basis(configuration, leg, L, **overrides):
     return {**basis, **overrides}
 
 
-def reference_case(ref, method):
+def reference_case(ref):
     e5, e6 = ref["e5"], ref["e6"]
     return make_case(ref["section"], Fy=float(ref["Fy"]), Lx=float(ref["Lx"]), Ly=float(ref["Ly"]),
-                     Lz=float(ref["Lz"]), ya=float(ref["ya"]), method=method,
+                     Lz=float(ref["Lz"]), ya=float(ref["ya"]),
                      e5=e5_basis(e5[0], e5[1], float(e5[2])) if e5 else None,
                      e6=e6_basis(e6[0], float(e6[1])) if e6 else None)
 
 
-@pytest.mark.parametrize("method", ["LRFD", "ASD"])
 @pytest.mark.parametrize("case_id", sorted(REFERENCE))
-def test_catalog_profiles_match_independent_calculation(engine, case_id, method):
+def test_catalog_profiles_match_independent_calculation(engine, case_id):
     ref = REFERENCE[case_id]
-    result = engine.run(reference_case(ref, method)).compression
+    result = engine.run(reference_case(ref)).compression
     assert result["family"] == ref["family"]
     assert result["classification"]["slender"] is ref["slender"]
     assert set(result["modes"]) == set(ref["modes"])
@@ -58,9 +56,8 @@ def test_catalog_profiles_match_independent_calculation(engine, case_id, method)
             assert actual[product_key] == pytest.approx(float(expected[key]), rel=REL), (mode, key)
     assert result["governing_mode"] == ref["governing_mode"]
     assert result["Pn_kN"] == pytest.approx(float(ref["Pn_kN"]), rel=REL)
-    assert result["available"]["LRFD"] == pytest.approx(float(ref["LRFD_kN"]), rel=REL)
-    assert result["available"]["ASD"] == pytest.approx(float(ref["ASD_kN"]), rel=REL)
-    assert result["available_kN"] == result["available"][method]
+    assert result["available_kN"] == pytest.approx(float(ref["LRFD_kN"]), rel=REL)
+    assert result["available_kN"] == pytest.approx(0.90 * result["Pn_kN"], rel=1e-15)   # E1, phi_c
 
 
 def test_reference_bank_covers_every_supported_catalog_family():

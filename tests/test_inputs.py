@@ -17,7 +17,7 @@ def case(**changes):
 
 def test_valid_case_defaults():
     c = case()
-    assert (c.design_method.value, c.factors.Kx, c.material.E) == ("LRFD", 1.0, 200000.0)
+    assert (c.factors.Kx, c.material.E) == (1.0, 200000.0)
 
 
 @pytest.mark.parametrize("changes", [
@@ -27,7 +27,7 @@ def test_valid_case_defaults():
     {"Pu": -10, "tension": {"An": 1000, "U": 1.2}},                       # U <= 1
     {"material": {"Fy": 0}}, {"lengths": {"Lx": 1000, "Ly": 1000}},
     {"factors": {"Kx": 0}}, {"factors": {"ya": -1}},
-    {"design_method": "LFRD"}, {"Mux": 1}, {"loads": {"Pu": 1}},          # unknown fields
+    {"design_method": "ASD"}, {"Mux": 1}, {"loads": {"Pu": 1}},           # unknown fields (LRFD only)
     {"custom_section": {"type": "SOLID_CIRCULAR", "H": 10, "B": 10}},
     {"single_angle_e5": {**E5, "configuration": "c"}},
 ])
