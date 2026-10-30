@@ -17,6 +17,7 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 | `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes, modo gobernante por resistencia de diseño φt·Pn, datos faltantes, nota D1, memoria |
 | `tests/test_flexure.py` | Capítulo F: perfiles reales contra cálculos independientes (F2, F3, F6, F7 incl. Se, F8, F11, F13.1), estados límite reportados, datos faltantes, bloqueos, interacción pendiente, memoria |
 | `tests/test_composite.py` | Capítulo I: rellenos, embebidos y vigas contra cálculos independientes; requisitos, bloqueos y memoria |
+| `tests/test_design_guides.py` | Contraste con los ejemplos de AISC Design Guide 6 y Design Guide 38 ([detalle](docs/design-guides.md)) |
 | `tests/test_engine.py` | Obligaciones independientes; frontera PASS/FAIL; INCOMPLETE ante dominios bloqueados; barra maciza a mano |
 | `tests/test_inputs.py` | Rechazo de entradas inválidas o incompletas |
 | `tests/test_catalog.py` | Importación del Excel: familias, unidades, relaciones B4 |

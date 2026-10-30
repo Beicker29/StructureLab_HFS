@@ -28,6 +28,7 @@ ANSI/AISC 360-22, solo por LRFD. El Capítulo I anterior sigue en el historial d
   con cálculos independientes ([detalle](chapter-i.md)).
 - Capítulo I, etapa 2: Método 2 de I5 (Commentary), anclajes de componentes (I8.3) y muros de placas planos (I1.6, I2.3,
   I3.5, I4.4, I5(c)), verificado con cálculos independientes.
+- Contraste con 23 casos de AISC Design Guide 6 y 38 ([detalle](design-guides.md)).
 - Contraste con 66 casos de los AISC Design Examples v16.0 (D, E, F, G, H, I): coincidencia
   dentro de ±1 % salvo dos diferencias explicadas ([detalle](design-examples.md)).
 
@@ -37,3 +38,4 @@ ANSI/AISC 360-22, solo por LRFD. El Capítulo I anterior sigue en el historial d
    corregir en el catálogo la fila IPE 80 y completar los datos de IPE/HEA/HEB.
 2. Aplicación web sobre `steel_design.execution.execute_payload`.
 3. Capítulo I, etapa 3: transferencia de carga (I6).
+4. Contenidos candidatos de AISC Design Guide 6 y 38, en el orden de [design-guides.md](design-guides.md).
