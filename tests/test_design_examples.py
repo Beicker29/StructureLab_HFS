@@ -20,12 +20,13 @@ FY50, FY35 = 50 * KSI, 35 * KSI
 TOL = 0.015         # rounding of the examples, metric catalog, E = 29000 ksi vs 200000 MPa
 
 
-def rect_hss(name, *, A, t, B, H, b_t, h_t, rx=None, ry=None, Sx=None, Zx=None, J=None):
+def rect_hss(name, *, A, t, B, H, b_t, h_t, rx=None, ry=None, Sx=None, Zx=None, J=None, Iy=None, Zy=None):
     """HSS from the example's Manual Table 1-11/1-12 values (inches)."""
     data = dict(name=name, type="RECTANGULAR_HSS", A=A * IN**2, tdes=t * IN, Ht=H * IN, B=B * IN,
                 b=b_t * t * IN, h=h_t * t * IN, **{"b/tdes": b_t, "h/tdes": h_t})
     data.update({k: v for k, v in dict(rx=rx and rx * IN, ry=ry and ry * IN, Sx=Sx and Sx * IN**3,
-                                       Zx=Zx and Zx * IN**3, J=J and J * IN**4).items() if v})
+                                       Zx=Zx and Zx * IN**3, J=J and J * IN**4, Iy=Iy and Iy * IN**4,
+                                       Zy=Zy and Zy * IN**3).items() if v})
     if Sx:
         data["Ix"] = Sx * H / 2 * IN**4                     # I = S·c, consistent with the printed S
     return Section(**data)
@@ -51,6 +52,11 @@ def pipe(name, *, OD, t, A=None, r=None):
 
 EXTRA = [
     rect_hss("HSS6X4X3/8", A=6.18, t=0.349, B=4, H=6, b_t=8.46, h_t=14.2, ry=1.55),
+    rect_hss("HSS10X6X3/8", A=10.4, t=0.349, B=6, H=10, b_t=14.2, h_t=25.7, Sx=137 / 5, Zx=33.8, Iy=61.8),
+    rect_hss("BOX30X30X1/2", A=59.0, t=0.5, B=30, H=30, b_t=58, h_t=58, Sx=8600 / 15, Zx=(30**3 - 29**3) / 4, Iy=8600,
+             Zy=(30**3 - 29**3) / 4),
+    rect_hss("BOX30X30X1/4", A=29.8, t=0.25, B=30, H=30, b_t=118, h_t=118, Sx=4400 / 15, Zx=(30**3 - 29.5**3) / 4, Iy=4400,
+             Zy=(30**3 - 29.5**3) / 4),
     rect_hss("HSS12X10X3/8", A=14.6, t=0.349, B=10, H=12, b_t=25.7, h_t=31.4, rx=4.61, ry=4.01),
     rect_hss("HSS12X8X3/16", A=6.76, t=0.174, B=8, H=12, b_t=43.0, h_t=66.0, rx=4.56, ry=3.35),
     rect_hss("HSS10X6X3/16", A=5.37, t=0.174, B=6, H=10, b_t=31.5, h_t=54.5, ry=2.52, Sx=14.9, Zx=18.0, J=73.8),
@@ -94,6 +100,42 @@ def combined(name, Fy, L, Pu, Mux, Muy, Cb=1.0, **extra):
 
 
 CONTINUOUS = 0.5   # ft: continuously braced (Lb below Lp)
+WC = 2323.0        # 145 lb/ft3
+F5 = 5 * KSI
+
+
+def filled_member(name, fc_ksi, L=None, **demands):
+    data = dict(section_name=name, material={"Fy": FY50}, **demands,
+                composite={"kind": "filled", "concrete": {"fc": fc_ksi * KSI, "wc": WC, "lightweight": False}})
+    if L:
+        data["lengths"] = {"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}
+    return data
+
+
+def encased_member(L=None, method="steel", **demands):
+    """Examples I.9 to I.11: eight No. 8 bars at 9.5 in; ties No. 3 at 12 in (10 mm at 300 mm, the metric limit)."""
+    e = 9.5 * IN
+    positions = [(e, e), (e, 0.0), (e, -e), (0.0, e), (0.0, -e), (-e, e), (-e, 0.0), (-e, -e)]
+    bars = [{"area": 0.79 * IN**2, "db": 1.0 * IN, "x": x, "y": y} for x, y in positions]
+    data = dict(section_name="W10X45", material={"Fy": FY50}, **demands,
+                composite={"kind": "encased", "concrete": {"fc": F5, "wc": WC, "lightweight": False},
+                           "encased": {"H": 24 * IN, "B": 24 * IN, "Fysr": 60 * KSI, "bars": bars,
+                                       "transverse": {"db": 10, "spacing": 300}, "flexure_method": method,
+                                       "anchors_provided": method == "composite"}})
+    if L:
+        data["lengths"] = {"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}
+    return data
+
+
+def composite_beam(name):
+    """Example I.1: 22 studs give ΣQn = 381 kips; the example selects PNA 5 with 386 kips (no integer stud count)."""
+    beam = {"moment": "positive", "span": 45 * FT, "left_beam_spacing": 10 * FT, "right_beam_spacing": 10 * FT,
+            "tc": 4.5 * IN, "shored": True,
+            "deck": {"orientation": "perpendicular", "hr": 3 * IN, "wr": 6 * IN, "emid_ht_at_least_50": False},
+            "studs": {"count": 22, "d": 0.75 * IN, "Fu": 65 * KSI, "length": 4.5 * IN, "over_web": True}}
+    return dict(section_name=name, material={"Fy": FY50}, Mux=1.0,
+                composite={"kind": "beam", "concrete": {"fc": 4 * KSI, "wc": WC, "lightweight": False}, "beam": beam})
+
 
 # Example E.14B at the strength it prints, Pu = 85.9 kips: Mr = Pu*e*B1, with B1 from its Pe1w and Pe1z (kip-in).
 E14B_PU = 85.9
@@ -168,6 +210,28 @@ EXAMPLES = {
                      material={"Fu": 65 * KSI}, tension={"An": 24.0 * IN**2, "U": 1.0}), "interaction", 0.873, "ratio"),
     "H.4": ("W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft",
             combined("W10X33", FY50, 14, 30, 91.8, 13.1, Cb=1.14), "interaction", 0.979, "ratio"),
+    "I.1": ("W21X50, deck de 3 in perpendicular, 22 pernos de 3/4 in, tc = 4.5 in, f'c = 4 ksi (ejemplo: ΣQn = 386 kips)",
+            composite_beam("W21X50"), "flexure_x", 769, "kip-ft"),
+    "I.4": ("HSS10X6X3/8 relleno, f'c = 5 ksi, Lc = 14 ft", filled_member("HSS10X6X3/8", 5, Pu=1.0, L=14),
+            "axial", 368, "kip"),
+    "I.5": ("HSS10X6X3/8 relleno, tracción", filled_member("HSS10X6X3/8", 5, Pu=-1.0), "axial", 468, "kip"),
+    "I.6-Mc": ("HSS10X6X3/8 relleno, flexión compacta (Tabla 4-B)", filled_member("HSS10X6X3/8", 5, Mux=1.0),
+               "flexure_x", 141, "kip-ft"),
+    "I.6-Vc": ("HSS10X6X3/8 relleno, cortante I4-1, Kc = 1", filled_member("HSS10X6X3/8", 5, Vux=1.0), "shear_x", 176, "kip"),
+    "I.6-H1": ("HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, H1-1a",
+               filled_member("HSS10X6X3/8", 5, Pu=129 * KIP, Mux=120 * KIPFT, L=14), "interaction", 1.11, "ratio"),
+    "I.7-noncompact": ("Cajón 30 x 30 x 1/2 in relleno, no compacto (I3-5b)", filled_member("BOX30X30X1/2", 7, Mux=1.0),
+                       "flexure_x", 2910, "kip-ft"),
+    "I.7-slender": ("Cajón 30 x 30 x 1/4 in relleno, esbelto (Fig. C-I3.8(c))", filled_member("BOX30X30X1/4", 7, Mux=1.0),
+                    "flexure_x", 1220, "kip-ft"),
+    "I.7-slender-Pc": ("Cajón 30 x 30 x 1/4 in relleno, esbelto, Lc = 30 ft (I2-9e)",
+                       filled_member("BOX30X30X1/4", 7, Pu=1.0, L=30), "axial", 3300, "kip"),
+    "I.9": ("W10X45 embebido en 24 x 24 in, 8 barras No. 8, Lc = 14 ft", encased_member(Pu=1.0, L=14), "axial", 2360, "kip"),
+    "I.10": ("W10X45 embebido, tracción (I2-8)", encased_member(Pu=-1.0), "axial", 936, "kip"),
+    "I.11-Mc": ("W10X45 embebido, plástico compuesto I3.3a(3)", encased_member(Mux=1.0, method="composite"),
+                "flexure_x", 673, "kip-ft"),
+    "I.11-H1": ("W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, H1-1a",
+                encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite"), "interaction", 1.38, "ratio"),
     "E.14B-Pc": ("L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7)", E14B, "axial", 168, "kip"),
     "E.14B-Mcw": ("L8X4X1/2 eje w, punta del ala larga comprimida, βw = −5.48 in", E14B, "flexure_w", 375 / 12, "kip-ft"),
     "E.14B-Mcz": ("L8X4X1/2 eje z, punteras traccionadas, fluencia en A", E14B, "flexure_z", 123 / 12, "kip-ft"),

@@ -1,0 +1,10 @@
+{
+  "section_name": "PTE100X50X3MM",
+  "material": {"Fy": 345},
+  "lengths": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
+  "composite": {"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": false}},
+  "cases": [
+    {"name": "Compression and flexure", "Pu": 60, "Mux": 3},
+    {"name": "Shear", "Vux": 40}
+  ]
+}

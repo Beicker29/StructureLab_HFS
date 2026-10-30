@@ -1,0 +1,23 @@
+{
+  "section_name": "W21X50",
+  "material": {"Fy": 345},
+  "flexure": {"Lb": 900, "tension_flange_holes": false},
+  "composite": {
+    "kind": "beam",
+    "concrete": {"fc": 28, "wc": 2320, "lightweight": false},
+    "beam": {
+      "moment": "positive",
+      "span": 13716,
+      "left_beam_spacing": 3048,
+      "right_beam_spacing": 3048,
+      "tc": 114,
+      "deck": {"orientation": "perpendicular", "hr": 75, "wr": 150, "emid_ht_at_least_50": false},
+      "studs": {"count": 22, "d": 19, "Fu": 450, "length": 115, "over_web": true},
+      "shored": false,
+      "Mu_construction": 460
+    }
+  },
+  "cases": [
+    {"name": "Flexure and shear", "Mux": 900, "Vux": 300}
+  ]
+}

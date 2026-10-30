@@ -3,17 +3,19 @@
 Pu > 0: compression (Chapter E); Pu < 0: tension (Chapter D); Mux, Muy (and Mw, Mz for single
 angles about their principal axes): flexure (Chapter F); Vux, Vuy: shear (Chapter G). Axial force
 and flexure acting together, or flexure about two axes, add the interaction check (Chapter H).
+case.composite sends each demand to Chapter I, which uses Chapters E, F and G where it refers to them.
 """
+from .domain.composite import composite_compression, composite_flexure, composite_i5, composite_shear, composite_tension
 from .domain.compression import compression_strength
-from .domain.coverage import (discharge, flexure_obligations, interaction_obligations, required_obligations,
-                              shear_obligations)
+from .domain.coverage import (composite_obligations, discharge, flexure_obligations, interaction_obligations,
+                              required_obligations, shear_obligations)
 from .domain.flexure import flexure_strength
 from .domain.interaction import COMBINED, amplified_cb_case, combined_strength, tension_cb_factor
 from .domain.shear import shear_strength
 from .domain.tension import tension_strength
 from .domain.validation import section_inconsistencies, validate_case, validate_section
 from .errors import IncompleteSectionDataError, RuleNotImplementedError, SectionNotFoundError
-from .models import Check, DesignResult, SteelCase, Status
+from .models import Check, DesignResult, Obligation, SteelCase, Status
 from .sections.geometry import build_custom_section
 from .sections.models import Section
 from .sections.repository import SectionRepository
@@ -73,6 +75,8 @@ class SteelDesignEngine:
         section = self.section_for(case)
         inconsistent = section_inconsistencies(section)
         checks = []
+        if case.composite:
+            return self._result(section, self._composite_checks(case, section, inconsistent))
         if case.Pu:
             chapter = "E" if case.Pu > 0 else "D"
             compute = ((lambda: compression_strength(case, section, catalog=self._catalog)) if chapter == "E"
@@ -99,6 +103,46 @@ class SteelDesignEngine:
         if len(combined) > 1:
             checks.append(self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
                                       lambda: combined_strength(case, section, combined), section, []))
+        return self._result(section, checks)
+
+    def _composite_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
+        """Chapter I: negative flexure of a beam is Chapter F (I3.2b); steel-only shear is Chapter G (I4.1(a), I4.3)."""
+        checks = []
+        kind = case.composite.kind
+        if case.Pu:
+            compute = ((lambda: composite_compression(case, section, lambda: compression_strength(
+                case, section, catalog=self._catalog))) if case.Pu > 0 else (lambda: composite_tension(case, section)))
+            checks.append(self._check("axial", "I", abs(case.Pu), "kN", composite_obligations(case, "axial"), compute,
+                                      section, inconsistent))
+        flexure_case, _ = self._flexure_case(case, section)
+        for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
+            if moment:
+                steel = lambda axis=axis: flexure_strength(flexure_case, section, axis, catalog=self._catalog)  # noqa: E731
+                negative = kind == "beam" and case.composite.beam.moment == "negative" and axis == "x"
+                obligations = flexure_obligations(section, axis) if negative else composite_obligations(case, "flexure")
+                checks.append(self._check(
+                    f"flexure_{axis}", "F" if negative else "I", abs(moment), "kN·m", obligations,
+                    lambda axis=axis, steel=steel: composite_flexure(flexure_case, section, axis, steel),
+                    section, inconsistent))
+        for axis, shear in (("x", case.Vux), ("y", case.Vuy)):
+            if shear:
+                steel = lambda axis=axis: shear_strength(case, section, axis)  # noqa: E731
+                obligations = composite_obligations(case, "shear") if kind == "filled" else shear_obligations(section, axis)
+                checks.append(self._check(
+                    f"shear_{axis}", "I" if kind == "filled" else "G", abs(shear), "kN", obligations,
+                    lambda axis=axis, steel=steel: composite_shear(case, section, axis, steel), section, inconsistent))
+        combined = [c for c in checks if c.id in COMBINED]
+        if len(combined) > 1:
+            if case.composite.interaction == "I5":
+                obligations = [Obligation(id="I5", provision="I5(b)", reason="Ecuaciones I5-1a/b.")]
+                checks.append(self._check("interaction", "I", 0.0, "–", obligations,
+                                          lambda: composite_i5(case, section, combined), section, []))
+            else:
+                checks.append(self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
+                                          lambda: combined_strength(case, section, combined), section, []))
+        return checks
+
+    def _result(self, section: Section, checks: list[Check]) -> DesignResult:
         statuses = {c.status for c in checks}
         if Status.FAIL in statuses:
             status = Status.FAIL                      # a known failure is never hidden by incompleteness

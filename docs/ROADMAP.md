@@ -1,8 +1,7 @@
 # Hoja de ruta
 
-El repositorio contiene los capítulos D, E, F, G y H (H1, H2 en ángulos simples, H4) de ANSI/AISC 360-22, solo por LRFD. El capítulo
-I se retiró (recuperable en el historial de Git, commit `d3a1b02`) y
-se reincorporará con la misma estructura y oráculo independiente.
+El repositorio contiene los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapa 1) de
+ANSI/AISC 360-22, solo por LRFD. El Capítulo I anterior sigue en el historial de Git (commit `d3a1b02`).
 
 ## Hecho
 
@@ -25,15 +24,14 @@ se reincorporará con la misma estructura y oráculo independiente.
   con cálculos independientes ([detalle](chapter-h.md)).
 - Capítulo H, etapa 2: H2 para ángulos simples en los puntos A, B y C, con compresión fuera de E5,
   verificado con cálculos independientes y los ejemplos E.14B y F.11C.
-- Contraste con 48 casos de los AISC Design Examples v16.0 (D, E, F, G, H): coincidencia
+- Capítulo I, etapa 1: PTE rellenos, W embebidos y vigas compuestas (I2, I3, I4, I5 con H1.1 e I5-1, I8.2), verificado
+  con cálculos independientes ([detalle](chapter-i.md)).
+- Contraste con 61 casos de los AISC Design Examples v16.0 (D, E, F, G, H, I): coincidencia
   dentro de ±1 % salvo dos diferencias explicadas ([detalle](design-examples.md)).
 
 ## Siguiente
 
-1. Revisión ingenieril de las decisiones de [D](chapter-d.md), [E](chapter-e.md), [F](chapter-f.md), [G](chapter-g.md) y [H](chapter-h.md);
+1. Revisión ingenieril de las decisiones de [D](chapter-d.md), [E](chapter-e.md), [F](chapter-f.md), [G](chapter-g.md), [H](chapter-h.md) e [I](chapter-i.md);
    corregir en el catálogo la fila IPE 80 y completar los datos de IPE/HEA/HEB.
 2. Aplicación web sobre `steel_design.execution.execute_payload`.
-3. Incorporación del Capítulo I (miembros compuestos), con su oráculo independiente
-   (`tests/oracles/chapter_i.py`) y su documento de alcance y decisiones (`docs/chapter-i.md`).
-   Fuente en `a360-22w.pdf`: Specification, pp. 16.1-89 a 16.1-120, y Commentary del Capítulo I,
-   pp. 16.1-418 a 16.1-472, como apoyo para interpretarla; revisar también las erratas del repositorio.
+3. Capítulo I, etapa 2: transferencia de carga (I6), anclajes de componentes (I8.3), Método 2 de I5 y muros de placas.
