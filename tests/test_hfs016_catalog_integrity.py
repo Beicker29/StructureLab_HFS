@@ -201,7 +201,9 @@ def test_cli_ambiguous_error_and_valid_profile_recovery(tmp_path, name):
     path.write_text(case("W12X26").model_dump_json(), encoding="utf-8")
     run = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
     assert run.returncode == 0
-    assert json.loads(run.stdout)["checks"]
+    recovered = json.loads(run.stdout)
+    assert recovered["status"] == "INCOMPLETE"
+    assert recovered["coverage"]["evaluation_errors"]  # HFS-031R0: W12X26 web is slender; catalog lookup still succeeds
 
 
 @pytest.mark.parametrize("update", [{"row": 0}, {"row": True}, {"sha256": "bad"}, {"sheet": ""}, {"extra": 1}])

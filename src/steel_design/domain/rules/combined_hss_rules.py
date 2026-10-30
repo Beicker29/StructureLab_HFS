@@ -3,9 +3,10 @@ from __future__ import annotations
 import math
 from ...tracing import traced_rule, emit_step, quantity
 from ..design_methods import require_case_method
+from ..evaluators.compression_evaluator import evaluate_compression
 from typing import Dict, Optional
 
-from ...codes.aisc_360_22 import axial_calc, combined_hss_calc, flexure_calc
+from ...codes.aisc_360_22 import combined_hss_calc, flexure_calc
 from ...models import CheckResult, CheckStatus, SteelCase
 from ...sections.models import Section
 from ..errors import ValidationError, IncompleteSectionDataError, RuleNotImplementedError
@@ -43,17 +44,6 @@ def _safe_ratio(*, demand: float, capacity: float, ratio_name: str) -> float:
             details={"ratio": ratio_name, "demand": demand_abs, "capacity": capacity},
         )
     return demand_abs / capacity
-
-
-def _slenderness_values(section: Section) -> dict:
-    return {
-        "bf_2tf_ratio": section.bf_2tf_ratio,
-        "b_t_ratio": section.b_t_ratio,
-        "b_tdes_ratio": section.b_tdes_ratio,
-        "h_tw_ratio": section.h_tw_ratio,
-        "h_tdes_ratio": section.h_tdes_ratio,
-        "d_t_ratio": section.d_t_ratio,
-    }
 
 
 def _torsion_capacity_h3(case: SteelCase, section: Section) -> Dict[str, object]:
@@ -155,60 +145,20 @@ def _available_axial_strength(case: SteelCase, section: Section) -> Dict[str, ob
             },
         }
 
-    fe_x = axial_calc.calculate_Fe_flexural(case.material.E, case.factors.Kx, case.lengths.Lx, section.rx or 0.0)
-    fe_y = axial_calc.calculate_Fe_flexural(case.material.E, case.factors.Ky, case.lengths.Ly, section.ry or 0.0)
-    fe_candidates = [value for value in (fe_x, fe_y) if value > 0.0]
-    fe_e3 = min(fe_candidates) if fe_candidates else 0.0
-    fcr_e3 = axial_calc.calculate_Fcr(case.material.Fy, fe_e3)
-    pn_e3 = axial_calc.calculate_Pn(fcr_e3, section.area)
-    p_available_e3 = axial_calc.calculate_available_compressive_strength(pn_e3, case.design_method.value)
-
-    ro = section.ro
-    if ro is None or ro <= 0.0:
-        ro = axial_calc.calculate_ro_for_double_symmetric(section.area, section.ix or 0.0, section.iy or 0.0)
-    fe_e4 = axial_calc.calculate_Fe_torsional(
-        case.material.E,
-        axial_calc.NORMATIVE_G_MPA,
-        section.j or 0.0,
-        section.cw or 0.0,
-        case.factors.Kz,
-        case.lengths.Lz,
-        section.area,
-        ro,
-    )
-    fcr_e4 = axial_calc.calculate_Fcr(case.material.Fy, fe_e4)
-    pn_e4 = axial_calc.calculate_Pn(fcr_e4, section.area)
-    p_available_e4 = axial_calc.calculate_available_compressive_strength(pn_e4, case.design_method.value)
-
-    classification = axial_calc.classify_compression_elements(
-        profile_type=section.type,
-        slenderness=_slenderness_values(section),
-        E=case.material.E,
-        Fy=case.material.Fy,
-    )
-
-    p_available_e7 = None
-    if classification.get("is_slender"):
-        q = axial_calc.calculate_q_factor(section.type, _slenderness_values(section), case.material.E, case.material.Fy)
-        fe_for_e7_candidates = [value for value in (fe_e3, fe_e4) if value > 0.0]
-        fe_for_e7 = min(fe_for_e7_candidates) if fe_for_e7_candidates else 0.0
-        fcr_e7 = axial_calc.calculate_Fcr_slender(case.material.Fy, fe_for_e7, q)
-        pn_e7 = axial_calc.calculate_Pn(fcr_e7, section.area)
-        p_available_e7 = axial_calc.calculate_available_compressive_strength(pn_e7, case.design_method.value)
-
-    candidates = [value for value in (p_available_e3, p_available_e4, p_available_e7) if isinstance(value, (int, float)) and value > 0.0]
-    available = min(candidates) if candidates else 0.0
+    evaluation = evaluate_compression(case, section)
+    modes = evaluation['modes']
+    e3, e4 = modes['E3'], modes.get('E4')
+    slender = evaluation['provision'] == 'E7'
     return {
-        "available_kN": available,
-        "mode": "compression",
-        "components": {
-            "E3_capacity_kN": p_available_e3,
-            "E4_capacity_kN": p_available_e4,
-            "E7_capacity_kN": p_available_e7,
-            "Fex_mpa": fe_x,
-            "Fey_mpa": fe_y,
-            "Fe4_mpa": fe_e4,
-            "element_classification": classification,
+        'available_kN': evaluation['available_kN'], 'mode': 'compression',
+        'components': {
+            'E3_capacity_kN': None if slender else e3['available_kN'],
+            'E4_capacity_kN': None if slender or e4 is None else e4['available_kN'],
+            'E7_capacity_kN': evaluation['available_kN'] if slender else None,
+            'Fex_mpa': e3['elastic']['fe_x_mpa'], 'Fey_mpa': e3['elastic']['fe_y_mpa'],
+            'Fe4_mpa': None if e4 is None else e4['elastic']['fe_governing_mpa'],
+            'element_classification': evaluation['classification'],
+            'compression_evaluation': evaluation,
         },
     }
 

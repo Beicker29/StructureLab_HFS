@@ -1,0 +1,450 @@
+{
+  "meta": {
+    "generated_at_utc": "20261029T234315655312Z",
+    "profile_type": "W",
+    "section_name": "W14X90",
+    "case_tag": null,
+    "input_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\.tmp_tests\\cli_3cd0e83a951c4e75a04e979f7bb3df13\\case.json",
+    "sections_file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\tests\\.tmp_tests\\cli_3cd0e83a951c4e75a04e979f7bb3df13\\sections.xlsx"
+  },
+  "memory": {
+    "global_summary": {
+      "version": "HFS-015-v2",
+      "overall_status": "INCOMPLETE",
+      "scope": "executed_checks_only",
+      "description": "Observed governing checks among executed checks; not a definitive governing limit state for the structure.",
+      "ranking_basis": "original_unrounded_dcr; exact raw ties retained; published numbers are raw",
+      "eligibility_basis": "executed_resistance_obligations",
+      "max_dcr_published": 0.08387010198604401,
+      "observed_governing_checks": [
+        {
+          "check_index": 0,
+          "clause": "G2-1",
+          "name": "Shear G2-1 - Web Shear (Major Axis Vy)",
+          "dcr_published": 0.08387010198604401,
+          "status": "PASS"
+        }
+      ],
+      "failed_checks": [],
+      "excluded_checks": [],
+      "admissibility": {
+        "version": "HFS-015-advice-v1",
+        "resistance": false,
+        "short": "D1: NOT_APPLICABLE | E2: NOT_APPLICABLE (recommendations only)",
+        "D1": {
+          "source_type": "User Note",
+          "resistance": false,
+          "applicable": false,
+          "assessment": "NOT_APPLICABLE",
+          "ratio": null,
+          "recommended_max": 300.0,
+          "expression": "fabricated_length / least_radius",
+          "reason": "D1 has no maximum mandatory tension slenderness. Rods are excepted from this recommendation; unknown rod status or fabricated geometry is not inferred."
+        },
+        "E2": {
+          "source_type": "User Note",
+          "resistance": false,
+          "applicable": false,
+          "assessment": "NOT_APPLICABLE",
+          "ratio": 54.54545454545455,
+          "recommended_max": 200.0,
+          "expression": "max(Kx*Lx/rx, Ky*Ly/ry), supplied local axes only",
+          "reason": "E2 recommendation only. Both local axes must be available; principal/torsional stability and E5 applicability are separate requirements.",
+          "fabricated_member": {
+            "source_type": "User Note",
+            "resistance": false,
+            "applicable": false,
+            "assessment": "NOT_APPLICABLE",
+            "ratio": null,
+            "recommended_max": 300.0,
+            "expression": "fabricated_length / least_radius",
+            "reason": "Second E2 User Note recommendation; not a resistance limit."
+          }
+        },
+        "inputs": {
+          "KL_over_r_x": 33.333333333333336,
+          "KL_over_r_y": 54.54545454545455,
+          "KL_over_r_governing_observed": 54.54545454545455,
+          "governing_axes": [
+            "y"
+          ],
+          "fabricated_length_over_least_radius": null
+        },
+        "limits": {
+          "D1_recommended_max": 300.0,
+          "E2_effective_recommended_max": 200.0,
+          "E2_fabricated_recommended_max": 300.0
+        },
+        "mandatory_conditions": []
+      }
+    },
+    "shared_context": {},
+    "clause_results": [
+      {
+        "clause": "G2-1",
+        "name": "Shear G2-1 - Web Shear (Major Axis Vy)",
+        "calculations": {
+          "clause": "G2",
+          "inputs": {
+            "Fy_mpa": 345.0,
+            "E_mpa": 200000.0,
+            "Vux_kn": 50.0,
+            "input_component": "Vu",
+            "signed_demand_kN": 50.0,
+            "bending_axis": "x",
+            "force_direction": "local_y",
+            "axis_convention": "HFS-013-bending-plane-suffix",
+            "demand_unit": "kN",
+            "tw_mm": 8.0,
+            "d_mm": 360.0,
+            "h_over_tw": 20.0,
+            "Aw_mm2": 2880.0,
+            "kv": 5.34
+          },
+          "intermediate": {
+            "Cv1": 1.0,
+            "Cv1_branch": "G2-3",
+            "Cv1_limit_g2_3": 61.20244382730794,
+            "g2_1a_limit_2_24_sqrtE_over_Fy": 53.93286218242461,
+            "design_branch": "G2-2",
+            "Vn_N": 596160.0,
+            "Vn_kN": 596.16
+          },
+          "design_factor": {
+            "design_method": "LRFD",
+            "phi_v": 1.0,
+            "omega_v": 1.5,
+            "capacity_expression": "phi_v*Vn (LRFD) or Vn/omega_v (ASD)"
+          },
+          "capacity_kn": 596.16
+        },
+        "check_summary": {
+          "demand": 50.0,
+          "capacity": 596.16,
+          "dcr": 0.08387010198604401,
+          "status": "PASS"
+        },
+        "check_trace": {
+          "version": "HFS-015-raw-v1",
+          "units": {
+            "demand": "kN",
+            "capacity": "kN"
+          },
+          "source": "CheckResult original values; not reconstructed from memory/display",
+          "unit_diagnostic": null,
+          "numeric_issue": null,
+          "steps": [
+            {
+              "id": 1,
+              "name": "Demand",
+              "value": 50.0,
+              "unit": "kN"
+            },
+            {
+              "id": 2,
+              "name": "Available Capacity",
+              "value_used_for_dcr": 596.16,
+              "value_reported_in_check": 596.16,
+              "unit": "kN"
+            },
+            {
+              "id": 3,
+              "name": "Demand-Capacity Ratio",
+              "value_raw": 0.08387010198604401,
+              "value_reported_in_check": 0.08387010198604401,
+              "display": "0.084 (PASS; raw=0.08387010198604401)"
+            },
+            {
+              "id": 4,
+              "name": "Status",
+              "result": "PASS",
+              "threshold": 1.0,
+              "expression": "Producer decision using original DCR, no tolerance or display rounding"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "admissibility": {
+    "version": "HFS-015-advice-v1",
+    "resistance": false,
+    "short": "D1: NOT_APPLICABLE | E2: NOT_APPLICABLE (recommendations only)",
+    "D1": {
+      "source_type": "User Note",
+      "resistance": false,
+      "applicable": false,
+      "assessment": "NOT_APPLICABLE",
+      "ratio": null,
+      "recommended_max": 300.0,
+      "expression": "fabricated_length / least_radius",
+      "reason": "D1 has no maximum mandatory tension slenderness. Rods are excepted from this recommendation; unknown rod status or fabricated geometry is not inferred."
+    },
+    "E2": {
+      "source_type": "User Note",
+      "resistance": false,
+      "applicable": false,
+      "assessment": "NOT_APPLICABLE",
+      "ratio": 54.54545454545455,
+      "recommended_max": 200.0,
+      "expression": "max(Kx*Lx/rx, Ky*Ly/ry), supplied local axes only",
+      "reason": "E2 recommendation only. Both local axes must be available; principal/torsional stability and E5 applicability are separate requirements.",
+      "fabricated_member": {
+        "source_type": "User Note",
+        "resistance": false,
+        "applicable": false,
+        "assessment": "NOT_APPLICABLE",
+        "ratio": null,
+        "recommended_max": 300.0,
+        "expression": "fabricated_length / least_radius",
+        "reason": "Second E2 User Note recommendation; not a resistance limit."
+      }
+    },
+    "inputs": {
+      "KL_over_r_x": 33.333333333333336,
+      "KL_over_r_y": 54.54545454545455,
+      "KL_over_r_governing_observed": 54.54545454545455,
+      "governing_axes": [
+        "y"
+      ],
+      "fabricated_length_over_least_radius": null
+    },
+    "limits": {
+      "D1_recommended_max": 300.0,
+      "E2_effective_recommended_max": 200.0,
+      "E2_fabricated_recommended_max": 300.0
+    },
+    "mandatory_conditions": []
+  },
+  "input": {
+    "section_name": "W14X90",
+    "design_method": "LRFD",
+    "material": {
+      "Fy": 345.0,
+      "Fu": 450.0,
+      "E": 200000.0
+    },
+    "loads": {
+      "Pu": 0.0,
+      "Mux": 0.0,
+      "Muy": 0.0,
+      "Vu": 50.0
+    },
+    "lengths": {
+      "Lx": 3000.0,
+      "Ly": 3000.0,
+      "Lz": 3000.0,
+      "Lb": 3000.0
+    },
+    "factors": {
+      "Kx": 1.0,
+      "Ky": 1.0,
+      "Kz": 1.0,
+      "Cb": 1.0
+    },
+    "connection": {}
+  },
+  "output": {
+    "checks": [
+      {
+        "name": "Shear G2-1 - Web Shear (Major Axis Vy)",
+        "code": "AISC 360-22",
+        "clause": "G2-1",
+        "demand": 50.0,
+        "capacity": 596.16,
+        "dcr": 0.08387010198604401,
+        "unit": "kN",
+        "numeric_issue": null,
+        "status": "PASS",
+        "display": {
+          "demand": "50.000",
+          "capacity": "596.160",
+          "dcr": "0.084",
+          "dcr_label": "0.084 (PASS; raw=0.08387010198604401)"
+        }
+      }
+    ],
+    "status": "INCOMPLETE",
+    "coverage": {
+      "version": "HFS-010-v1",
+      "source": "docs/normative/hfs002-applicability.md (S22 local; errata reconciliation pending)",
+      "declared_scope": "Member resistance for every supplied demand component; no global AISC certification",
+      "supported_complete_domain": "Ordinary prismatic custom solid in concentric axial tension, with explicit external evidence",
+      "method": "LRFD",
+      "section_name": "W14X90",
+      "profile_type": "W",
+      "scope_evidence": {},
+      "evaluation_context": "One supplied member/load case; no position, combination or construction-stage envelope is inferred",
+      "demand_components": {
+        "Pu": 0.0,
+        "Mux": 0.0,
+        "Muy": 0.0,
+        "Tu": 0.0,
+        "Vux": 0.0,
+        "Vuy": 0.0,
+        "Vu": 50.0
+      },
+      "obligations": [
+        {
+          "id": "scope.basis",
+          "normative_ids": [
+            "N01",
+            "N02",
+            "N03",
+            "N34",
+            "N35"
+          ],
+          "limit_state": "applicability_basis",
+          "component": "member",
+          "condition": "Ordinary member, qualified properties/material, demand/connection basis and external responsibilities",
+          "applicability": "UNKNOWN",
+          "status": "PENDING",
+          "reason": "Applicability evidence is absent or outside the independently bounded domain.",
+          "required": [
+            "Reviewed applicability and numerical evidence for this family/combination; tension_scope cannot qualify it"
+          ],
+          "alternatives": [],
+          "selected_alternative": null,
+          "executed_checks": [],
+          "accepted_checks": [],
+          "resistance": false
+        },
+        {
+          "id": "G.shear.Vu",
+          "normative_ids": [
+            "N23",
+            "N27"
+          ],
+          "limit_state": "shear_yielding_buckling",
+          "component": "Vu",
+          "condition": "Nonzero Vu; physical direction must be established without transforming axes",
+          "applicability": "TRUE",
+          "status": "PENDING",
+          "reason": "HFS-013 establishes bending-plane shear suffixes; full domain, load location and section validity remain unaccredited (F-08/F-11).",
+          "required": [
+            "Physical direction, resisting elements, Lv if applicable and one validated shear route"
+          ],
+          "alternatives": [
+            "G2.1 base route",
+            "G2.2/3 tension-field route with all prerequisites"
+          ],
+          "selected_alternative": null,
+          "executed_checks": [
+            0
+          ],
+          "accepted_checks": [],
+          "resistance": true
+        },
+        {
+          "id": "N28.openings.Vu",
+          "normative_ids": [
+            "N28"
+          ],
+          "limit_state": "web_openings",
+          "component": "Vu",
+          "condition": "Web openings if present",
+          "applicability": "UNKNOWN",
+          "status": "PENDING",
+          "reason": "No opening declaration/assessment is available.",
+          "required": [
+            "Opening geometry or justified absence"
+          ],
+          "alternatives": [],
+          "selected_alternative": null,
+          "executed_checks": [],
+          "accepted_checks": [],
+          "resistance": true
+        }
+      ],
+      "executions": [
+        {
+          "check_index": 0,
+          "implementation": "src.steel_design.domain.rules.shear_rules.ShearG2VxRule",
+          "obligation_ids": [
+            "G.shear.Vu",
+            "G.shear.Vux"
+          ]
+        }
+      ],
+      "evaluation_errors": [],
+      "external_responsibilities": [
+        "N01/N03: global analysis, combinations, material qualification and stability are supplied externally",
+        "N35: connections including block shear, serviceability, fatigue, fire, fabrication and other regulations are not certified",
+        "N33: D1/E2 User Note slenderness recommendations are not resistance obligations",
+        "F-28: January 2025 / September 2026 AISC errata remain unreconciled with S22 local"
+      ],
+      "complete": false
+    },
+    "known_failures": [],
+    "admissibility": {
+      "version": "HFS-015-advice-v1",
+      "resistance": false,
+      "short": "D1: NOT_APPLICABLE | E2: NOT_APPLICABLE (recommendations only)",
+      "D1": {
+        "source_type": "User Note",
+        "resistance": false,
+        "applicable": false,
+        "assessment": "NOT_APPLICABLE",
+        "ratio": null,
+        "recommended_max": 300.0,
+        "expression": "fabricated_length / least_radius",
+        "reason": "D1 has no maximum mandatory tension slenderness. Rods are excepted from this recommendation; unknown rod status or fabricated geometry is not inferred."
+      },
+      "E2": {
+        "source_type": "User Note",
+        "resistance": false,
+        "applicable": false,
+        "assessment": "NOT_APPLICABLE",
+        "ratio": 54.54545454545455,
+        "recommended_max": 200.0,
+        "expression": "max(Kx*Lx/rx, Ky*Ly/ry), supplied local axes only",
+        "reason": "E2 recommendation only. Both local axes must be available; principal/torsional stability and E5 applicability are separate requirements.",
+        "fabricated_member": {
+          "source_type": "User Note",
+          "resistance": false,
+          "applicable": false,
+          "assessment": "NOT_APPLICABLE",
+          "ratio": null,
+          "recommended_max": 300.0,
+          "expression": "fabricated_length / least_radius",
+          "reason": "Second E2 User Note recommendation; not a resistance limit."
+        }
+      },
+      "inputs": {
+        "KL_over_r_x": 33.333333333333336,
+        "KL_over_r_y": 54.54545454545455,
+        "KL_over_r_governing_observed": 54.54545454545455,
+        "governing_axes": [
+          "y"
+        ],
+        "fabricated_length_over_least_radius": null
+      },
+      "limits": {
+        "D1_recommended_max": 300.0,
+        "E2_effective_recommended_max": 200.0,
+        "E2_fabricated_recommended_max": 300.0
+      },
+      "mandatory_conditions": []
+    },
+    "global_summary": {
+      "version": "HFS-015-v2",
+      "overall_status": "INCOMPLETE",
+      "scope": "executed_checks_only",
+      "description": "Observed governing checks among executed checks; not a definitive governing limit state for the structure.",
+      "ranking_basis": "original_unrounded_dcr; exact raw ties retained; published numbers are raw",
+      "eligibility_basis": "executed_resistance_obligations",
+      "max_dcr_published": 0.08387010198604401,
+      "observed_governing_checks": [
+        {
+          "check_index": 0,
+          "clause": "G2-1",
+          "name": "Shear G2-1 - Web Shear (Major Axis Vy)",
+          "dcr_published": 0.08387010198604401,
+          "status": "PASS"
+        }
+      ],
+      "failed_checks": [],
+      "excluded_checks": []
+    }
+  }
+}

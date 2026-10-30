@@ -3,12 +3,12 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Tuple, Type
 
 from .registry_metadata import RuleMetadata, attach_metadata, pending_groups
-from ...codes.aisc_360_22 import axial_calc
 from ..design_methods import require_case_method, validate_method_scope
 from ...models import SteelCase
 from ...sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..actions import shear_demand
+from ..evaluators.compression_domain import compression_classification, requires_torsional_mode
 from ..rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
 from ..rules.combined_hss_rules import CombinedH1HssRule, HssCombinedH3_2Rule, HssTorsionH3_1Rule
 from ..rules.composite_rules import (
@@ -616,17 +616,6 @@ def _required_fields_for_h3(profile_type: str) -> Tuple[str, ...]:
     return tuple()
 
 
-def _section_slenderness_values(section: Section) -> Dict[str, Optional[float]]:
-    return {
-        "bf_2tf_ratio": section.bf_2tf_ratio,
-        "b_t_ratio": section.b_t_ratio,
-        "b_tdes_ratio": section.b_tdes_ratio,
-        "h_tw_ratio": section.h_tw_ratio,
-        "h_tdes_ratio": section.h_tdes_ratio,
-        "d_t_ratio": section.d_t_ratio,
-    }
-
-
 class ProfileRouter:
     """
     Strict router for applicable checks.
@@ -683,12 +672,7 @@ class ProfileRouter:
         required = _required_fields_for_e7(profile_type)
         cls._validate_section_fields(section, "E7", required)
 
-        classification = axial_calc.classify_compression_elements(
-            profile_type=profile_type,
-            slenderness=_section_slenderness_values(section),
-            E=case.material.E,
-            Fy=case.material.Fy,
-        )
+        classification = compression_classification(case, section)
         return bool(classification.get("is_slender"))
 
     @classmethod
@@ -889,6 +873,10 @@ class ProfileRouter:
                 cls._raise_not_implemented(rule_id, section)
 
             if rule_id == "E7" and not e7_applicable:
+                continue
+            if rule_id in {"E3", "E4"} and e7_applicable:
+                continue  # E7 owns the global modes paired with their effective areas.
+            if rule_id == "E4" and not requires_torsional_mode(case, section):
                 continue
 
             if profile_type in {"W", "CHANNEL"} and rule_id.split("-")[0] in {"F2", "F3", "F4", "F5"}:

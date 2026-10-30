@@ -105,17 +105,18 @@ def metadata_groups():
             equation_note="Internal ID coincides with the cited D2 equation; D3 supplies Ae=U*An for rupture.",
             limitations="Only the pre-existing HFS-010 solid-tie gate can grant conditional credit; this metadata grants none.")
     for rid, n, provision, equations, condition, findings in (
-        ("E3", "N06", "E1; E3", ("E3-1", "E3-2", "E3-3", "E3-4"), "Compression; non-slender elements and appropriate effective lengths/modes.", ("F-23", "F-30")),
-        ("E4", "N07", "E4", ("E4-1 to E4-12",), "Compression with torsional/flexural-torsional modes justified by symmetry, offsets and restraints.", ("F-23", "F-36")),
+        ("E3", "N06", "E1; E3", ("E3-1", "E3-2", "E3-3", "E3-4"), "Non-slender compression with complete principal axes; single/double angles blocked in HFS-031R0.", ("F-23", "F-30", "F-35", "F-36", "F-48")),
+        ("E4", "N07", "E4", ("E4-1 to E4-12",), "HFS-031R0 permits only complete non-slender doubly symmetric W/HSS without bracing offsets; coupling is blocked.", ("F-23", "F-36", "F-46", "F-47", "F-48")),
         ("E5", "N08", "E5(a)/(b)", ("E5-1 to E5-4",), "Single angles; all five conditions and effective-slenderness branches require justification.", ("F-07", "F-36")),
         ("E7", "N10", "E7; Table E7.1", ("E7-1 to E7-7",), "Slender compression elements; normative effective-area treatment differs from current Q implementation.", ("F-35",)),
     ):
         yield (rid,), annotation((n,), "Steel compression families; see independent N-row", condition,
-            (citation(provision, "106-117", *equations),), tests=(tests+"test_chapter_e_rules.py", tests+"test_hfs017_design_method.py"),
-            calculations=(calc+"axial_calc",), findings=findings,
+            (citation(provision, "106-117", *equations),), tests=(tests+"test_chapter_e_rules.py", tests+"test_hfs017_design_method.py", tests+"test_hfs031r0_containment.py"),
+            calculations=(calc+"axial_calc", "steel_design.domain.evaluators.compression_domain:require_compression_domain"), findings=findings,
+            state="BLOCKED" if rid in {"E5", "E7"} else "PARTIAL",
             independent=(tests+"test_hfs017_design_method.py::test_d2_e3_independent_rule_capacities_and_trace",) if rid == "E3" else (),
             independent_scope="E3 stipulated flexural-buckling arithmetic, both methods; not all modes/families." if rid == "E3" else "No complete independent oracle for this domain; method tests are not nominal-strength validation.",
-            limitations="E7 Q versus effective area discrepancy remains open (F-35)." if rid == "E7" else "Applicability and full numerical validation remain pending; positive capacities are not evidence of correctness.")
+            limitations="HFS-031R0 contains unverified domains; no E5/E7 active check is returned. F-35/36/46/47/48 remain open; containment is not a numerical correction or accreditation.")
     flexure = (
         (("F2-1", "F2-2"), "N12", "F2.1/2", "118-121", ("F2-1 to F2-8",), "Doubly symmetric I / compact channel, major axis", "Compact flange/web; Lb/Lp/Lr branches and Cb with provenance.", "evaluate_f2", ("F-03", "F-22", "F-31")),
         (("F3-1", "F3-2", "F3-3"), "N13", "F3.1/2; F2.2", "121-122", ("F3-1", "F3-2"), "Doubly symmetric I; not channels", "Compact web with noncompact/slender flanges; internal F3-3 is not a Specification equation.", "evaluate_f3", ("F-37",)),

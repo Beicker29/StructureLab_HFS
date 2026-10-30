@@ -1,0 +1,344 @@
+{
+  "catalog_sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+  "record_count": 1228,
+  "changed_records": 21,
+  "changes": [
+    {
+      "section": "PTER1-1/2\"X2.50MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 2,
+        "original_name": "PTER1-1/2\"X2.50mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 18.756989247311825,
+          "after": 20.756989247311825
+        }
+      }
+    },
+    {
+      "section": "PTER1-1/2\"X3.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 3,
+        "original_name": "PTER1-1/2\"X3.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 15.297491039426523,
+          "after": 17.29749103942652
+        }
+      }
+    },
+    {
+      "section": "PTER2\"X2.50MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 4,
+        "original_name": "PTER2\"X2.50mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 23.892473118279568,
+          "after": 25.892473118279568
+        }
+      }
+    },
+    {
+      "section": "PTER2\"X3.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 5,
+        "original_name": "PTER2\"X3.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 19.57706093189964,
+          "after": 21.57706093189964
+        }
+      }
+    },
+    {
+      "section": "PTER2\"X4.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 6,
+        "original_name": "PTER2\"X4.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 14.182795698924732,
+          "after": 16.182795698924732
+        }
+      }
+    },
+    {
+      "section": "PTER2-1/2\"X2.50MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 7,
+        "original_name": "PTER2-1/2\"X2.50mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 29.135483870967736,
+          "after": 31.13548387096774
+        }
+      }
+    },
+    {
+      "section": "PTER2-1/2\"X3.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 8,
+        "original_name": "PTER2-1/2\"X3.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 23.946236559139784,
+          "after": 25.946236559139784
+        }
+      }
+    },
+    {
+      "section": "PTER3\"X2.50MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 9,
+        "original_name": "PTER3\"X2.50mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 36.236559139784944,
+          "after": 38.236559139784944
+        }
+      }
+    },
+    {
+      "section": "PTER3\"X3.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 10,
+        "original_name": "PTER3\"X3.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 29.863799283154123,
+          "after": 31.863799283154123
+        }
+      }
+    },
+    {
+      "section": "PTER4\"X3.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 11,
+        "original_name": "PTER4\"X3.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 38.96774193548387,
+          "after": 40.96774193548387
+        }
+      }
+    },
+    {
+      "section": "PTER4\"X4.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 12,
+        "original_name": "PTER4\"X4.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 28.7258064516129,
+          "after": 30.7258064516129
+        }
+      }
+    },
+    {
+      "section": "PTER4\"X6.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 13,
+        "original_name": "PTER4\"X6.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 18.483870967741936,
+          "after": 20.483870967741936
+        }
+      }
+    },
+    {
+      "section": "PTER6\"X4.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 14,
+        "original_name": "PTER6\"X4.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 43.236559139784944,
+          "after": 45.236559139784944
+        }
+      }
+    },
+    {
+      "section": "PTER6\"X6.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 15,
+        "original_name": "PTER6\"X6.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 28.157706093189965,
+          "after": 30.157706093189965
+        }
+      }
+    },
+    {
+      "section": "PTER8\"X5.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 16,
+        "original_name": "PTER8\"X5.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 45.118279569892465,
+          "after": 47.118279569892465
+        }
+      }
+    },
+    {
+      "section": "PTER8\"X8.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 17,
+        "original_name": "PTER8\"X8.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 27.448924731182792,
+          "after": 29.448924731182792
+        }
+      }
+    },
+    {
+      "section": "PTER10\"X9.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 18,
+        "original_name": "PTER10\"X9.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 30.622461170848265,
+          "after": 32.62246117084827
+        }
+      }
+    },
+    {
+      "section": "PTER12\"X10.00MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 19,
+        "original_name": "PTER12\"X10.00mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 32.82258064516129,
+          "after": 34.82258064516129
+        }
+      }
+    },
+    {
+      "section": "PTER16\"X12.70MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 20,
+        "original_name": "PTER16\"X12.70mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 30.258064516129032,
+          "after": 32.25806451612903
+        }
+      }
+    },
+    {
+      "section": "PTER20\"X12.70MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 21,
+        "original_name": "PTER20\"X12.70mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 41.01075268817204,
+          "after": 43.01075268817204
+        }
+      }
+    },
+    {
+      "section": "PTER24\"X12.70MM",
+      "source": {
+        "file": "C:\\Users\\LENOVO\\Documents\\Proyectos python\\StructureLab_HFS\\data\\sections.xlsx",
+        "sha256": "5aaaf953a32e77e6d9985e9f91db82702d70b3ee0930a2eb6e695e297a5f1359",
+        "sheet": "PTE_RED",
+        "row": 22,
+        "original_name": "PTER24\"X12.70mm"
+      },
+      "changes": {
+        "d_t_ratio": {
+          "before": 49.612903225806456,
+          "after": 51.612903225806456
+        }
+      }
+    }
+  ],
+  "expected_change": "D/t derives only from OD/tdes; no catalog mutation"
+}

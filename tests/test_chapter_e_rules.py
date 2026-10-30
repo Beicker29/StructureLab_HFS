@@ -1,6 +1,6 @@
 import unittest
 
-from steel_design.domain.errors import IncompleteSectionDataError, ValidationError
+from steel_design.domain.errors import RuleNotImplementedError, IncompleteSectionDataError, ValidationError
 from steel_design.domain.rules.axial_rules import AxialE3Rule, AxialE4Rule, AxialE5Rule, AxialE7Rule
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import Connection, Factors, Lengths, Loads, Material, SteelCase
@@ -21,7 +21,7 @@ def _compression_case(section_name: str, pu: float, *, e: float = 200000.0, mode
 
 
 class ChapterERulesTests(unittest.TestCase):
-    def test_e4_channel_rule_returns_capacity(self):
+    def test_e4_channel_rule_is_contained(self):
         case = _compression_case("C15X50", pu=300.0, xa=25.0, ya=0.0)
         section = Section(
             name="C15X50",
@@ -42,23 +42,12 @@ class ChapterERulesTests(unittest.TestCase):
             **{"b/t": 5.72, "h/tw": 17.3},
         )
 
-        result = AxialE4Rule().check(case, section)
-        self.assertEqual("E4-1", result.clause)
-        self.assertGreater(result.capacity, 0.0)
-        self.assertIn("element_classification", result.details)
-        self.assertEqual("non_slender", result.details["element_classification"]["elements"]["web"]["classification"])
-        self.assertEqual(25.0, result.details["memory"]["inputs"]["xa_mm"])
-        self.assertEqual(0.0, result.details["memory"]["inputs"]["ya_mm"])
-        self.assertIn("Fex_mpa", result.details["memory"]["intermediate"])
-        self.assertIn("Fey_mpa", result.details["memory"]["intermediate"])
-        self.assertIn("Fez_mpa", result.details["memory"]["intermediate"])
-        self.assertIn("Fe_mpa", result.details["memory"]["intermediate"])
-        self.assertIn("be_mm", result.details["memory"]["intermediate"])
-        self.assertIn("warping_term_n", result.details["memory"]["intermediate"])
-        self.assertIn("stvenant_term_n", result.details["memory"]["intermediate"])
-        self.assertIn("torsional_stiffness_n", result.details["memory"]["intermediate"])
+        # HFS-031R0: neither an offset nor channel coupling may be ignored.
+        with self.assertRaises(RuleNotImplementedError) as raised:
+            AxialE4Rule().check(case, section)
+        self.assertEqual("COMPRESSION_DOMAIN_BLOCKED", raised.exception.code)
 
-    def test_e5_mode_one_leg_is_more_conservative_than_both_legs(self):
+    def test_e5_modes_require_unrepresented_conditions(self):
         section = Section(
             name="L12X12X1-3/8",
             type="SINGLE_ANGLE",
@@ -78,14 +67,12 @@ class ChapterERulesTests(unittest.TestCase):
         case_one = _compression_case("L12X12X1-3/8", pu=220.0, mode="one_leg")
         case_both = _compression_case("L12X12X1-3/8", pu=220.0, mode="both_legs")
 
-        result_one = AxialE5Rule().check(case_one, section)
-        result_both = AxialE5Rule().check(case_both, section)
+        for case in (case_one, case_both):
+            with self.assertRaises(RuleNotImplementedError) as raised:
+                AxialE5Rule().check(case, section)
+            self.assertIn("F-36", raised.exception.details["findings"])
 
-        self.assertLess(result_one.capacity, result_both.capacity)
-        self.assertEqual("E5-1a", result_one.clause)
-        self.assertEqual("E5-1b", result_both.clause)
-
-    def test_e7_reduction_decreases_capacity_vs_e3(self):
+    def test_e7_slender_domain_blocks_e3_and_e7(self):
         case = _compression_case("W44X262", pu=500.0)
         section = Section(
             name="W44X262",
@@ -104,14 +91,12 @@ class ChapterERulesTests(unittest.TestCase):
             **{"bf/2tf": 20.0, "h/tw": 120.0},
         )
 
-        e3 = AxialE3Rule().check(case, section)
-        e7 = AxialE7Rule().check(case, section)
+        for rule in (AxialE3Rule(), AxialE7Rule()):
+            with self.assertRaises(RuleNotImplementedError) as raised:
+                rule.check(case, section)
+            self.assertIn("F-35", raised.exception.details["findings"])
 
-        self.assertLess(e7.capacity, e3.capacity)
-        self.assertEqual("E7-1", e7.clause)
-        self.assertEqual("slender", e7.details["element_classification"]["overall"])
-
-    def test_e4_for_w_shape_uses_torsional_mode_and_can_differ_from_e3(self):
+    def test_e4_for_slender_w_shape_cannot_use_gross_area(self):
         case = _compression_case("W12X26", pu=300.0)
         section = Section(
             name="W12X26",
@@ -130,11 +115,11 @@ class ChapterERulesTests(unittest.TestCase):
             **{"bf/2tf": 8.54, "h/tw": 47.2},
         )
 
-        e3 = AxialE3Rule().check(case, section)
-        e4 = AxialE4Rule().check(case, section)
-
-        self.assertNotEqual(e3.capacity, e4.capacity)
-        self.assertGreater(e4.capacity, e3.capacity)
+        # h/tw=47.2 exceeds 1.49*sqrt(200000/345); this is not an E3/E4 domain.
+        for rule in (AxialE3Rule(), AxialE4Rule()):
+            with self.assertRaises(RuleNotImplementedError) as raised:
+                rule.check(case, section)
+            self.assertIn("F-35", raised.exception.details["findings"])
 
     def test_engine_validates_fixed_elastic_modulus(self):
         repo = SectionRepository()
