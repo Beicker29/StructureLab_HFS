@@ -26,7 +26,7 @@ def requirement(result, group, words):
 
 
 def filled(name="PTE200X200X7MM", fc=35, fy=345, **demands):
-    return SteelCase(section_name=name, material={"Fy": fy}, composite={"kind": "filled", "concrete": {**CONCRETE, "fc": fc}}, **demands)
+    return SteelCase(section_name=name, material={"Fy": fy}, composite={"kind": "filled", "pour_height": 3000, "concrete": {**CONCRETE, "fc": fc}}, **demands)
 
 
 def declared(**demands):
@@ -185,7 +185,7 @@ def test_unmet_binding_requirement_is_never_a_pass(engine):
 
 def test_composite_tension_does_not_ask_for_fu(engine):
     # I2.2c: Pn = Fy*As + Fysr*Asr
-    result = engine.run(declared(Pu=-10, tension={"An": 5000, "U": 1.0}))
+    result = engine.run(declared(Pu=-10, tension={"An": 5000, "U": 1.0}, lengths=LENGTHS))
     assert not [r for r in result.requirements["materials"] if "Fu" in r["description"]]
     assert result.status.value == "PASS"
 
@@ -211,7 +211,7 @@ def test_chapters_of_the_report(engine):
     text = calculation_report(case, engine.run(case))
     for heading in ("### 2.4 Rigideces para método directo", "## 4. Revisión de requerimientos técnicos",
                     "### 4.1 Propiedades mecánicas de los materiales", "### 4.2 Propiedades geométricas",
-                    "## 5. Revisión de capacidad a carga de compresión"):
+                    "## 5. Revisión de condiciones de funcionalidad y/o servicio", "## 6. Revisión de capacidad a carga de compresión"):
         assert heading in text
-    assert text.index("## 4. Revisión de requerimientos") < text.index("## 5. Revisión de capacidad a carga de compresión")
+    assert text.index("## 4. Revisión de requerimientos") < text.index("## 6. Revisión de capacidad a carga de compresión")
     assert "I1.3(a)" in text and "CUMPLE" in text and "Parámetro de reducción de rigidez (τb)" in text

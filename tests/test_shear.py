@@ -109,7 +109,7 @@ def test_round_bar_report_states_the_user_decision(engine):
 
 def test_shear_alone_or_with_flexure_needs_no_interaction(engine):
     result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Mux=200, Vux=300,
-                                  flexure={"Lb": 3000, "tension_flange_holes": False}))
+                                  lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000}, flexure={"tension_flange_holes": False}))
     assert [c.id for c in result.checks] == ["flexure_x", "shear_x"] and result.status.value == "PASS"
 
 

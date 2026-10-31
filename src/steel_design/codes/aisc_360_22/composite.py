@@ -276,30 +276,6 @@ def method2_ratio(*, Pr, Mr, points) -> float:
     raise ValueError("The demand does not cross the interaction curve.")
 
 
-def transfer_force(*, Pr, Fs_As, Pno, applied_to, steel_fraction=None) -> dict:
-    """I6-1, I6-2a/b; concurrent force per Commentary I6.2: difference with the share of I6-1 (Fs_As is FyAs or FnAs)."""
-    if applied_to == "steel":
-        return {"Vr": Pr * (1 - Fs_As / Pno), "equation": "I6-1"}
-    if applied_to == "concrete":
-        return {"Vr": Pr * (Fs_As / Pno), "equation": "I6-2"}
-    return {"Vr": Pr * abs(steel_fraction - Fs_As / Pno), "equation": "I6.2c (Commentary)"}
-
-
-def bearing_transfer(*, fc, A1) -> float:
-    """I6-3, nominal."""
-    return 1.7 * fc * A1
-
-
-def bond_stress(*, t, H, rectangular) -> float:
-    """Fin of I6-5, MPa."""
-    return min(2100 * t / H**2, 0.72) if rectangular else min(5300 * t / H**2, 1.4)
-
-
-def bond_transfer(*, pb, Lin, Fin) -> float:
-    """I6-5, nominal."""
-    return pb * Lin * Fin
-
-
 def wall_stiffness(*, Is, Ec, Ic) -> float:
     """I1-1."""
     return E_STEEL * Is + 0.35 * Ec * Ic

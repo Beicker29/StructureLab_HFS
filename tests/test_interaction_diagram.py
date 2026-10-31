@@ -179,9 +179,9 @@ def test_report_shows_the_table_and_the_figure_is_in_the_pdf(engine):
     case = filled(Pu=100, Mux=10, lengths=LENGTHS)
     result = engine.run(case)
     text = calculation_report(case, result)
-    section = text[text.index("### 10.2"):text.index("### 10.3")]
+    section = text[text.index("### 11.2"):text.index("### 11.3")]
     assert "Tabla 6-3" in section and "Punto" in section and "no decide el estado" in section
-    blocks = report_blocks(case, result)
+    blocks = report_blocks([(None, case, result)])
     assert any(b["kind"] == "chart" for b in blocks)
     assert pdf_bytes([blocks]).startswith(b"%PDF")
 

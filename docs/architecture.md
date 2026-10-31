@@ -11,7 +11,7 @@ src/steel_design/
 │   ├── flexure.py               fórmulas puras F2–F13.1, Se de F7 y límites λp/λr de B4.1b
 │   ├── shear.py                 fórmulas puras G2-1…G6-1, Cv1/Cv2 y factores φv
 │   ├── interaction.py           fórmulas puras H1-1a/b, H1-2, H2-1 y H4-1
-│   ├── composite.py             fórmulas puras I1.6, I2, I3, I4, I5, I6, I8.2, I8.3; Fig. C-I3.8 y Método 2 del Commentary
+│   ├── composite.py             fórmulas puras I1.6, I2, I3, I4, I5, I8.2, I8.3; Fig. C-I3.8 y Método 2 del Commentary
 │   ├── appendix_2.py            fórmulas puras del Apéndice 2
 │   ├── appendix_4.py            retenciones de las Tablas A-4.2.1 y A-4.2.2
 │   ├── appendix_8.py            fórmulas puras del Apéndice 8.1
@@ -71,7 +71,7 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Ecuaciones H1-1a/b, H1-2, H2-1, H4-1 | `codes/aisc_360_22/interaction.py` |
 | Qué chequeos interactúan y con qué resistencias | `domain/interaction.py` |
 | Fórmulas que solo aparecen en una Design Guide | `codes/aisc_dg06/`, `codes/aisc_dg38/` |
-| Ecuaciones I2 a I6, I8.2, φ del Capítulo I, bloques de tensiones | `codes/aisc_360_22/composite.py` |
+| Ecuaciones I2 a I5, I8.2, φ del Capítulo I, bloques de tensiones | `codes/aisc_360_22/composite.py` |
 | Ecuaciones de los Apéndices 2, 4 y 8.1 | `codes/aisc_360_22/appendix_<n>.py` |
 | Selección por tipo de miembro compuesto, geometría y requisitos del Capítulo I | `domain/composite.py` |
 | Muros en C, vigas de acoplamiento e incendio | `domain/speedcore.py` |

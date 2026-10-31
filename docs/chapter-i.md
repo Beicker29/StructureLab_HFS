@@ -1,4 +1,4 @@
-# Capítulo I — alcance implementado (etapas 1 a 3 y contenidos de las Design Guides)
+# Capítulo I — alcance implementado (etapas 1 y 2 y contenidos de las Design Guides)
 
 Fuente: ANSI/AISC 360-22, `a360-22w.pdf`: Specification pp. 16.1-89 a 16.1-120 y Commentary pp. 16.1-418 a
 16.1-472 (Fig. C-I3.8 para los bloques de tensiones). Errata de septiembre 2026: I5-2 usa Fysr. Solo LRFD.
@@ -34,13 +34,6 @@ con ese apéndice, incluida I5-1a con A-2-3 y A-2-4, sin barras.
 `composite.second_order`: `axis`, `Mnt`, `Mlt`, `Pnt`, `Plt`, `M1_M2` (omitir con carga transversal: Cm = 1), `Lc1`, `Pstory`, `Pmf`,
 `H`, `L`, `drift`. Sustituye a `Pu` y `Mux` o `Muy`, que no se indican. EI* = 0,8·τb·(EI)eff (I1.5(d), (f)), con τb = 0,8 en rellenos y
 embebidos y 1,0 en muros; se usa Pr = Pnt + Plt en B1, como permite 8.1.2. El resultado guarda B1, B2, Pe1 y Pestory en `second_order`.
-
-## Transferencia de carga (I6)
-
-`composite.load_transfer`: `Pr`, `applied_to` (`steel`, `concrete`, `both` con `steel_fraction`), `bearing_area`, `anchor_count` (con
-`composite.anchor`), `bond_length` y `bond_slip_controlled`. V'r con I6-1 e I6-2a/b; en concurrencia, la diferencia con la fracción de
-I6-1 (Commentary I6.2). Gobierna el mayor mecanismo, sin superponer. Relleno esbelto: la fuerza solo puede ir al concreto.
-Adherencia: solo en rellenos no esbeltos y con la declaración de I6.3.
 
 ## Contenidos de las Design Guides
 
@@ -81,15 +74,19 @@ cortante con tracción en concreto liviano.
 ## Entrada
 
 - `composite.concrete`: `fc` (MPa), `wc` (kg/m³) y `lightweight`, obligatorio porque define el límite de I1.3(a).
+- `composite.pour_height`: altura de colado del concreto fresco (mm), obligatoria en rellenos rectangulares y muros (DI-25).
 - `composite.interaction`: opcional (DI-22). Sin indicarlo rige I5: H1.1 en embebidos y rellenos compactos; I5-1 en rellenos no compactos o
   esbeltos con compresión y flexión en un eje, y H1.1 si no; Apéndice 2 en alta resistencia. Se puede pedir `H1`, `I5`, `M2` o `M2S`; en rellenos con barras, `M2` y `M2S` se reemplazan por H1.1. Los muros no lo usan.
 - `composite.encased`: `H`, `B`, `Fysr`, `bars` (`area`, `db`, `x`, `y` desde el centroide), `transverse` (`db`,
   `spacing`), `flexure_method` (`steel` por defecto, o `composite`) y `anchors_provided`.
 - `composite.beam`: `moment` (`positive`, `negative`), `span`, un límite por lado (`left_beam_spacing` o
-  `left_edge_distance`; igual a la derecha), `tc`, `deck`, `studs`, `channels`, `shored` y `Mu_construction`.
+  `left_edge_distance`; igual a la derecha), `tc`, `deck`, `studs`, `channels` y `shored`. Sin apuntalar exige un case con `condition = construction` (I3.1b): si falta, INCOMPLETO.
+- `composite.beam.studs.detailing` y `composite.beam.channels.detailing` (I8.2d, obligatorio con momento positivo; DI-24):
+  `longitudinal_spacing`, `free_edge`, `distribution` (`uniform` o `design_documents`) y, según el caso, `transverse_spacing`
+  (más de un perno por nervio), `lateral_cover` (sin deck) y `free_edge_distance` (con borde libre). Si falta un dato: INCOMPLETO.
 
 Se comprueban como requisitos, con `FAIL` si no se cumplen: As/Ag ≥ 1 %, cuantía ≥ 0,004, refuerzo transversal,
-separación entre barras y núcleo (encased); límites de deck y pernos (I3.2c, I8.1, I8.2), y sección de acero en
+separación entre barras y núcleo (encased); límites de deck y pernos (I3.2c, I8.1, I8.2), detallado de conectores (I8.2d) y sección de acero en
 construcción cuando la viga no está apuntalada (I3.1b). Materiales fuera de I1.3: INCOMPLETO.
 
 ## Flexión de rellenos rectangulares
@@ -212,12 +209,25 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
   Apéndice 2 según la Guía 6, 2.6 (A-2-3 y A-2-4), en alta resistencia; I5(c) en muros, que no tienen interacción biaxial definida. Alta resistencia en dos ejes: I5-1a o b con Mrx/Mcx + Mry/Mcy (extensión indicada por el usuario, no es del Apéndice 2), evaluada con cp y cm de cada eje; gobierna el mayor. Alta resistencia sin compresión: H1.1, con nota. Un método pedido se reemplaza por el Apéndice 2 y la memoria lo avisa. M2 y M2S siguen como opción, salvo en rellenos con barras: si se piden, se usa H1.1 y la memoria lo indica. Diagrama informativo en 10.2, que no decide el estado: Tablas 6-3 y 6-4 del Manual en
   rellenos compactos con Asr = 0, y 6-2a y 6-2b en embebidos con sus barras (siempre tienen Asr, I2.1a(c)). 6-2a exige barras extremas y a la línea central; 6-2b, como el Ejemplo 2.4 de la Guía 6, toma en Zr solo las extremas.
   Fuera de esas disposiciones, o con Asr ≠ 0 en rellenos, sin diagrama. Cada punto se transforma con λ = Pn/Pno, φc y φb (Commentary I5). La Tabla 6-4 usa pared delgada: su punto B difiere cerca de 1 % de Mp de I3.4b.
+- **DI-23** Transferencia de carga (I6) retirada (indicación del usuario, 2026-10-31): corresponde al diseño de conexiones, fuera del alcance. Sigue en el historial de Git.
+- **DI-24** Conectores de vigas (indicación del usuario, 2026-10-31): toda viga compuesta con momento positivo revisa I8.1 e I8.2, con I8.2d
+  obligatorio y la separación declarada, no derivada de `count`. Por I8.1, I8.3 no aplica a vigas: sigue disponible en `composite.anchor` para
+  rellenos, embebidos y muros, y el ejemplo `composite_anchor.json` se retiró (lo muestra `composite_encased.json`).
+- **DI-27** Ejemplos (indicación del usuario, 2026-10-31): perfiles de acero, viga compuesta, rellenos, cajón y embebido llevan deflexiones y un case de construcción; la viga de
+  acoplamiento, solo deflexiones; los muros y `multi_member`, ninguno. Sus valores son ilustrativos. La construcción de módulos de muro vacíos da INCOMPLETO: el Capítulo F no cubre esas secciones.
+- **DI-26** Casos por condición (indicación del usuario, 2026-10-31): cada case declara `condition` (`ultimate`, `construction`, `fire`). Construcción: acero solo, con sus
+  longitudes, Mu y Vu únicamente. Incendio: solo Pu con `composite.fire`; flexión y cortante en incendio figuran como falta de implementación. Deflexiones (`serviceability`): datos del
+  usuario frente a L/n con la luz efectiva; exceder un límite se reporta y no cambia el estado. Una sola memoria por sección, con el case de mayor DCR en cada revisión.
+- **DI-25** Colado del concreto (indicación del usuario, 2026-10-31; no es norma). Rellenos rectangulares: σmax ≤ 0,5 Fy y δmax ≤ L/2000 con
+  L = min(Lx, Ly) (DG6 4.3; Commentary C-I2-1, C-I2-2). Redondos: no aplica. Muros planos: altura ≤ 9144 mm con placas que cumplen I1-4
+  (DG38 2.2.1.2), porque las ecuaciones de DG6 no consideran los tirantes. La altura es obligatoria (sin ella, INCOMPLETO), pero un límite
+  incumplido se reporta en 4.2 como recomendación y no cambia el estado. Los agujeros de ventilación usan la misma `composite.pour_height`.
 
 ## Limitaciones
 
 - Pr y Mr son datos del usuario, con las rigideces de I1.5 (DH-3), salvo con `composite.second_order`.
 - ACI 318 no se verifica: cuantía máxima, recubrimientos, separación entre barras ni desarrollo del refuerzo.
 - Ec usa la fórmula métrica de la Specification; difiere cerca de 5 % de la fórmula en ksi de los ejemplos.
-- Longitud de los pernos, recubrimiento y separación se comprueban solo con los datos que se declaran; la separación entre
-  conectores (I8.2d) y su distribución no se comprueban.
+- I8.2d se comprueba con los datos declarados; el programa no los contrasta con `count` ni con la luz. Tampoco calcula conectores para
+  cargas concentradas (I8.2c), la soldadura del canal (I8.2b) ni la alternativa de ACI 318, Capítulo 17, para el borde libre (I8.2d(c)).
 - `Mux`, `Muy` y sus signos no definen el sentido del momento en vigas: se declara en `composite.beam.moment`.

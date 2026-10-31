@@ -31,7 +31,34 @@ def prepare_cases(payload: dict) -> list[tuple[str | None, SteelCase]]:
 
 def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str | None, SteelCase, DesignResult]]:
     """Run every case; returns (name or None, validated input case, result)."""
-    return [(tag, case, engine.run(case)) for tag, case in prepare_cases(payload)]
+    executions = [(tag, case, engine.run(case)) for tag, case in prepare_cases(payload)]
+    for group in member_groups(executions):
+        _require_construction_case(group)
+    return executions
+
+
+def member_groups(executions: list) -> list[list]:
+    """The cases of each member: one calculation report per section, however many load cases it has."""
+    groups = {}
+    for execution in executions:
+        groups.setdefault(execution[1].section_name, []).append(execution)
+    return list(groups.values())
+
+
+def _require_construction_case(group: list) -> None:
+    """I3.1b: an unshored composite beam needs a construction case; a single load case cannot know, so the member decides."""
+    if any(case.condition == "construction" for _, case, _ in group):
+        return
+    for _, case, result in group:
+        unshored = case.composite and case.composite.kind == "beam" and not case.composite.beam.shored
+        check = result.check("flexure_x")
+        if unshored and case.composite.beam.moment == "positive" and check:
+            check.errors.append({"code": "COMPOSITE_DATA_INCOMPLETE", "provision": "I3.1b",
+                                 "message": "Viga sin apuntalar: agregue un case con condition = construction (I3.1b)."})
+            if check.status != Status.FAIL:
+                check.status = Status.INCOMPLETE
+            if result.status != Status.FAIL:
+                result.status = Status.INCOMPLETE
 
 
 def governing(executions: list[tuple[str | None, SteelCase, DesignResult]]) -> dict | None:

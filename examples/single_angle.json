@@ -5,9 +5,14 @@
     "Fu": 400
   },
   "lengths": {
-    "Lx": 2000,
-    "Ly": 2000,
-    "Lz": 2000
+    "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
+    "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}
+  },
+  "serviceability": {
+    "actual_span": 2000,
+    "effective_span": 2000,
+    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
   },
   "single_angle_e5": {
     "configuration": "a",
@@ -23,7 +28,6 @@
     "fabricated_length": 2000
   },
   "flexure": {
-    "Lb": 2000,
     "lateral_torsional_restraint": "none"
   },
   "cases": [
@@ -48,6 +52,7 @@
       "angle_flexure": {
         "leg_in_compression": "long"
       }
-    }
+    },
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 1.2, "Vux": 8.7, "angle_flexure": {"toe": "compression"}}
   ]
 }

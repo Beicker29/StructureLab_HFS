@@ -584,45 +584,58 @@ def second_order(name, fy, fc, wc, L, Pnt, Plt, Mnt, Mlt, M1_M2, Pstory, Pmf, H,
     return {"B1": b1, "B2": b2, "Pr_kN": D(Pnt) + b2 * D(Plt), "Mr_kNm": b1 * D(Mnt) + b2 * D(Mlt)}
 
 
-def _transfer_force(pr, share, applied_to, fraction):
-    if applied_to == "steel":
-        return pr * (1 - share)
-    if applied_to == "concrete":
-        return pr * share
-    return pr * abs(D(str(fraction)) - share)
+def beam_detailing(d, tc, hr, perpendicular, lightweight, **_):
+    """I8.2d(c), (d), (e): limits of the anchors of a composite beam."""
+    total = D(tc) + D(hr)
+    return {"s_min_mm": (4 if perpendicular else 6) * D(d), "s_max_mm": min(8 * total, D(900)),
+            "edge_min_mm": D(250 if lightweight else 200)}
 
 
-def load_transfer_filled(name, fy, fc, wc, L, applied_to, Pr, A1=None, Lin=None, steel_fraction=None, round_=False):
-    """I6-1 to I6-5 for filled members; I6-2b with Fn on slender sections."""
-    fy, fc = D(fy), D(fc)
-    axial = filled_compression(name, fy, fc, wc, L, round_=round_)
-    p = row("CIRCULAR_HSS" if round_ else "RECTANGULAR_HSS", name)
-    fs = fy
-    if axial["class"] == "slender":
-        lam = max(p["b"], p["h"]) / p["tdes"]
-        fs = 9 * E / lam**2                                                      # I2-10
-    out = {"Vr_kN": _transfer_force(D(Pr), fs * p["A"] / (axial["Pno_kN"] * 1000), applied_to, steel_fraction)}
-    if A1:
-        out["bearing_kN"] = D("0.65") * D("1.7") * fc * D(A1) / 1000             # I6-3
-    if Lin:
-        t = p["tdes"]
-        if round_:
-            ri = p["OD"] / 2 - t
-            pb, fin = 2 * PI * ri, min(5300 * t / p["OD"] ** 2, D("1.4"))
-        else:
-            bi, hi = p["B"] - 2 * t, p["Ht"] - 2 * t
-            pb = 2 * (bi + hi) - 8 * t + 2 * PI * t
-            fin = min(2100 * t / max(p["Ht"], p["B"]) ** 2, D("0.72"))
-        out["bond_kN"] = D("0.50") * pb * D(Lin) * fin / 1000                    # I6-5
-    return out
+def filled_placement(name, Lp, wc):
+    """Design Guide 6, 4.3, in the kip-inch form that the guide prints; the results return to MPa and mm."""
+    lb, inch = D("0.45359237"), D("25.4")
+    ksi = 1000 * lb * D("9.80665") / inch**2
+    p_row = row("RECTANGULAR_HSS", name)
+    t = p_row["tdes"] / inch
+    bc, hc = sorted((p_row["B"] / inch - 2 * t, p_row["Ht"] / inch - 2 * t))
+    p = (D(Lp) / D("304.8")) * (D(wc) * D("0.3048") ** 3 / lb) / 144000                 # Eq. 4-1
+    first = 2 * hc / (bc + 4 * hc) * p * hc**2 / t**2
+    second = (3 * bc + 4 * hc) / (bc + 4 * hc) * p * hc**2 / t**2 / 3
+    delta = (5 * bc + 4 * hc) / (bc + 4 * hc) * p * hc**4 / (D(200000) / ksi * t**3) / 32   # C-I2-2
+    return {"p_mpa": p * ksi, "sigma_mpa": max(first, second) * ksi, "delta_mm": delta * inch}    # C-I2-1
 
 
-def load_transfer_encased(name, fy, fc, H, B, Fysr, bars, applied_to, Pr, A1):
-    fy, fc = D(fy), D(fc)
-    p, _, _, _, asr, ac = encased_data(name, H, B, bars)
-    pno = fy * p["A"] + D(Fysr) * asr + D("0.85") * fc * ac
-    return {"Vr_kN": _transfer_force(D(Pr), fy * p["A"] / pno, applied_to, None),
-            "bearing_kN": D("0.65") * D("1.7") * fc * D(A1) / 1000}
+def deflection_limit(span, n, value):
+    """Chapter L gives no numeric limit: L/n with the effective span and the divisor that the user declares."""
+    limit = D(span) / D(n)
+    return {"limit_mm": limit, "satisfied": D(value) <= limit}
+
+
+def box_steel_flexure(B, H, t, fy, axis, Lb):
+    """Steel of a compact welded box alone (construction): F7-1 and F7-8 to F7-11 about the axis of the demand."""
+    B, H, t, fy, Lb = D(B), D(H), D(t), D(fy), D(Lb)
+    width, depth = (B, H) if axis == "x" else (H, B)            # depth is along the plane of bending
+    bi, hi = width - 2 * t, depth - 2 * t
+    assert hi / t <= D("2.42") * sqrt(200000 / fy)              # compact web: F7.3(a)
+    area = width * depth - bi * hi
+    z = (width * depth**2 - bi * hi**2) / 4
+    s = (width * depth**3 - bi * hi**3) / 6 / depth
+    mp = fy * z
+    mn = mp
+    root_e = sqrt(200000 / fy)
+    if bi / t > D("1.12") * root_e:                             # noncompact flange, F7-2, written between the limits of Table B4.1b
+        assert bi / t <= D("1.40") * root_e
+        mn = mp - (mp - fy * s) * (bi / t - D("1.12") * root_e) / (D("0.28") * root_e)
+    if depth > width:
+        j = 2 * t * (B - t) ** 2 * (H - t) ** 2 / (B + H - 2 * t)  # Bredt
+        r_minor = sqrt((depth * width**3 - hi * bi**3) / 12 / area)
+        root = sqrt(j * area)
+        lp, lr = D("0.13") * 200000 * r_minor * root / mp, 2 * 200000 * r_minor * root / (D("0.7") * fy * s)
+        if lp < Lb <= lr:
+            mn = min(mn, mp - (mp - D("0.7") * fy * s) * (Lb - lp) / (lr - lp))
+        elif Lb > lr:
+            mn = min(mn, 2 * 200000 * root / (Lb / r_minor))
+    return {"phiMn_kNm": D("0.9") * mn / 10**6}
 
 
 def tension_control(name, fy, fc, H, B, Fysr, bars):
@@ -1021,18 +1034,6 @@ CASES = {
                     M1_M2=-0.5, Pstory=20000, Pmf=8000, H=500, story=4000, drift=10),
     "so-transverse": dict(kind="second_order", name="PTE200X200X7MM", fy=345, fc=35, wc=2320, L=4000, Pnt=1200, Plt=0, Mnt=40, Mlt=0,
                           M1_M2=None, Pstory=20000, Pmf=0, H=500, story=4000, drift=4),
-    "lt-steel": dict(kind="load_transfer_filled", name="PTE200X200X7MM", fy=345, fc=35, wc=2320, L=3000, applied_to="steel", Pr=800,
-                     A1=9000, Lin=300),
-    "lt-concrete": dict(kind="load_transfer_filled", name="PTE200X200X7MM", fy=345, fc=35, wc=2320, L=3000, applied_to="concrete", Pr=800,
-                        A1=9000),
-    "lt-both": dict(kind="load_transfer_filled", name="PTE200X200X7MM", fy=345, fc=35, wc=2320, L=3000, applied_to="both", Pr=800,
-                    A1=9000, steel_fraction=0.4),
-    "lt-round": dict(kind="load_transfer_filled", name='PTER6"X6.00MM', fy=345, fc=35, wc=2320, L=3000, applied_to="steel", Pr=300,
-                     Lin=200, round_=True),
-    "lt-slender": dict(kind="load_transfer_filled", name="PTE100X40X1.5MM", fy=500, fc=35, wc=2320, L=1500, applied_to="concrete", Pr=100,
-                       A1=2000),
-    "lt-encased": dict(kind="load_transfer_encased", name="W10X45", fy=345, fc=35, H=610, B=610, Fysr=420, bars=BARS_8, applied_to="steel",
-                       Pr=5000, A1=80000),
     "tc-encased": dict(kind="tension_control", name="W10X45", fy=345, fc=35, H=610, B=610, Fysr=420, bars=BARS_8),
     "box-C": dict(kind="box_compression", B=400, H=300, t=12, fy=345, fc=35, wc=2320, L=4000),
     "box-M": dict(kind="box_flexure", B=400, H=300, t=12, fy=345, fc=35),
@@ -1065,20 +1066,32 @@ CASES = {
     "cwall-comp-web": dict(kind="c_wall_case", fy=345, fc=35, wc=2320, L=9144, W=4267, tsc_w=356, tsc_f=610, tp=12.7, mode="web", P=54700),
     "cb-M": dict(kind="coupling_flexure", b=450, h=600, tf=20, tw=12, fy=345, fc=40),
     "cb-V": dict(kind="coupling_shear", b=450, h=600, tf=20, tw=12, fy=345, fc=40),
+    "detail-solid": dict(kind="beam_detailing", d=19, tc=150, hr=0, perpendicular=False, lightweight=False, length=100),
+    "detail-perpendicular": dict(kind="beam_detailing", d=19, tc=114, hr=75, perpendicular=True, lightweight=False, length=115),
+    "detail-parallel-lightweight": dict(kind="beam_detailing", d=19, tc=100, hr=50, perpendicular=False, lightweight=True, length=100),
+    "detail-thin-slab": dict(kind="beam_detailing", d=19, tc=60, hr=40, perpendicular=True, lightweight=False, length=80),
+    "placement-small": dict(kind="filled_placement", name="PTE100X50X3MM", Lp=2000, wc=2320),
+    "placement-rectangular": dict(kind="filled_placement", name="PTE200X100X6MM", Lp=6000, wc=2320),
+    "placement-square": dict(kind="filled_placement", name="PTE200X200X7MM", Lp=12000, wc=1800),
+    "deflection-within": dict(kind="deflection_limit", span=13716, n=360, value=30),
+    "deflection-beyond": dict(kind="deflection_limit", span=9000, n=240, value=40),
+    "box-steel-minor": dict(kind="box_steel_flexure", B=400, H=300, t=12, fy=345, axis="x", Lb=4000),
+    "box-steel-major-x": dict(kind="box_steel_flexure", B=200, H=500, t=12, fy=345, axis="x", Lb=30000),
+    "box-steel-major-y": dict(kind="box_steel_flexure", B=500, H=200, t=12, fy=345, axis="y", Lb=30000),
+    "box-steel-major-y-elastic": dict(kind="box_steel_flexure", B=500, H=120, t=12, fy=345, axis="y", Lb=400000),
     "fire-wall": dict(kind="wall_fire_oracle", fy=345, fc=40, wc=2320, height=5000, wall_length=3300, tsc=600, t=14, st=300, Pu=16000,
                       plate_T=1000, thicknesses=[40, 40, 40, 40, 42, 42, 42],temperatures=[780, 500, 370, 280, 200, 120, 60], required=3),
 }
 FUNCTIONS = {"filled_compression": filled_compression, "filled_rect_flexure": filled_rect_flexure,
              "filled_round_flexure": filled_round_flexure, "filled_shear": filled_shear,
              "encased_compression": encased_compression, "encased_tension": encased_tension,
-             "encased_flexure": encased_flexure, "beam_flexure": beam_flexure, "i5": i5,
+             "encased_flexure": encased_flexure, "beam_flexure": beam_flexure, "beam_detailing": beam_detailing, "filled_placement": filled_placement, "deflection_limit": deflection_limit, "box_steel_flexure": box_steel_flexure, "i5": i5,
              "wall_compression": wall_compression, "wall_tension": wall_tension, "wall_moment": wall_moment,
              "wall_shear": wall_shear_oracle, "wall_interaction": wall_interaction, "anchor": anchor_oracle,
              "round_with_bars_compression": round_with_bars_compression, "round_with_bars_flexure": round_with_bars_flexure,
              "rect_with_bars_flexure": rect_with_bars_flexure, "appendix_2_compression": appendix_2_compression,
              "appendix_2_flexure": appendix_2_flexure, "appendix_2_interaction": appendix_2_interaction,
-             "second_order": second_order, "load_transfer_filled": load_transfer_filled,
-             "load_transfer_encased": load_transfer_encased, "tension_control": tension_control, "box_compression": box_compression,
+             "second_order": second_order, "tension_control": tension_control, "box_compression": box_compression,
              "box_flexure": box_flexure, "box_shear": box_shear, "biaxial": biaxial, "service_filled": service_filled,
              "service_round": service_round, "service_encased": service_encased, "service_box": service_box, "appendix_2_biaxial": appendix_2_biaxial, "diagram_rect": diagram_rect, "diagram_round": diagram_round,
              "diagram_encased": diagram_encased, "wall_slender": wall_slender, "wall_stiffnesses": wall_stiffnesses,

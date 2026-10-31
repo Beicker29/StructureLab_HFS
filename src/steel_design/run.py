@@ -11,7 +11,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from .errors import SteelDesignError
 from .engine import SteelDesignEngine
-from .execution import execute_payload, governing, overall_status
+from .execution import execute_payload, governing, member_groups, overall_status
 from .models import unique_json_object
 from .reporting import pdf_bytes, render_text, report_blocks
 from .sections.loader import load_sections_from_excel
@@ -66,7 +66,7 @@ def main(argv=None):
     text = json.dumps(output, indent=2, allow_nan=False)
     if args.output:
         Path(args.output).write_text(text + "\n", encoding="utf-8")
-    documents = [report_blocks(case, result, title=tag) for tag, case, result in executions]
+    documents = [report_blocks(group) for group in member_groups(executions)]
     try:
         if args.report:
             text_reports = "\n\f\n".join(render_text(blocks) for blocks in documents)

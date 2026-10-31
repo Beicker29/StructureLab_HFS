@@ -9,6 +9,7 @@ from ..codes.aisc_360_22.flexure import PHI_B
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import Check, SteelCase
 from ..sections.models import Section
+from .flexure import unbraced_length
 
 COMBINED = ("axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z")
 DOUBLY_SYMMETRIC = {"W", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SOLID_RECTANGULAR", "SOLID_CIRCULAR"}
@@ -30,10 +31,10 @@ def tension_cb_factor(case: SteelCase, section: Section) -> dict:
     if family not in DOUBLY_SYMMETRIC:
         return {"applies": False, "reason": "H1.2 solo permite amplificar Cb en miembros doblemente simétricos; "
                                             "se usa Cb sin amplificar."}
-    lb = case.flexure.Lb
+    lb = unbraced_length(case, "x")
     if lb is None or not section.iy:
-        _incomplete("La amplificación de Cb (H1-2) requiere flexure.Lb e Iy.", section, "INTERACTION_DATA_INCOMPLETE",
-                    fields=["flexure.Lb", "section.iy"])
+        _incomplete("La amplificación de Cb (H1-2) requiere lengths e Iy.", section, "INTERACTION_DATA_INCOMPLETE",
+                    fields=["lengths", "section.iy"])
     out = eq.tension_cb_factor(Pr_N=-case.Pu * 1000.0, E=case.material.E, Iy=section.iy, Lb=lb)
     return {"applies": True, **out, "Cb_user": case.flexure.Cb, "Cb": case.flexure.Cb * out["factor"]}
 

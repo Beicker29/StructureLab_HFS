@@ -56,9 +56,7 @@ Contenidos añadidos, contrastados con los mismos ejemplos:
 | | Muy (kip-ft) | 3160 | 3160 | -0.01 % |
 | | Razón C-I5-1a con esas demandas | 0.949 | 0.950 | +0.09 % |
 | DG6 2.4, sección controlada por tracción | εt | 0.00695 | 0.00690 | -0.74 % |
-| Design Examples I.3, I6 | V'r (kip), acero, concreto, ambos | 49.7, 123, 17.6 | dentro de ±1,5 % | prueba |
 | | φRn apoyo, adherencia (kip) | 138, 7.19 | dentro de ±1,5 % | prueba |
-| Design Examples I.8, I6 | V'r, φRn apoyo (kip) | 1260, 741 | dentro de ±1,5 % | prueba |
 | DG38 2.1, I1-1 a I1-3 | EIeff, EAeff, GAeff | 1.36e11, 1.95e7, 1.25e7 | dentro de ±1,5 % | prueba |
 | DG38 2.2, viga de acoplamiento | φMn (kip-in), φVn (kip) | 22 500, 698 | 22 464, 698.6 | -0.16 %, +0.09 % |
 | DG38 2.3, viga de acoplamiento | φMn (kip-in), φVn (kip) | 27 630, 716 | 27 602, 716.5 | -0.10 %, +0.06 % |
@@ -104,16 +102,16 @@ Sin ejemplo en las guías, solo con oráculo independiente: factor de forma α (
 | 1 | Rellenos con barras internas; My de redondos no compactos | `composite.filled` | I2.2, I3.4; DG6 2.7 | `aisc_360_22`, `aisc_dg06/filled.py` | Rectangular no compacto o esbelto con barras: bloqueado |
 | 2 | Materiales de alta resistencia | automática por Fy y f'c | Apéndice 2; DG6 2.6 | `aisc_360_22/appendix_2.py` | Solo rectangulares rellenos de concreto normal |
 | 3 | Segundo orden B1, B2 | `composite.second_order` | Apéndice 8.1; DG6 2.4 | `aisc_360_22/appendix_8.py` | Rellenos, embebidos y muros planos, en un eje |
-| 4 | Transferencia de carga | `composite.load_transfer` | I6; DG6 3.1 | `aisc_360_22/composite.py` | No superpone mecanismos; adherencia solo con declaración de I6.3 |
-| 5 | Sección controlada por tracción | `composite.flexural_member` | I3.3a(e), I3.4a(d); DG6 2.4 | `aisc_dg06/members.py` | Obliga si se declara viga; si no, se informa y se advierte |
-| 6 | Cajones soldados | `composite.box` | DG6 2.5 | `sections/geometry.py` | Una sola placa de espesor t |
-| 7 | Factor de forma α biaxial | `composite.biaxial_shape_factor` | DG6 2.3.2 | `aisc_dg06/members.py` | Solo `M2S`, con flexión en dos ejes |
-| 8 | Rigideces de servicio | `stiffness.elastic` del resultado | DG6 2.8 | `aisc_dg06/members.py` | Jc de rectangulares (2-14) y Js de cajones no vienen de la guía (DI-16); donde no da expresión, acero solo y concreto solo (DI-20) |
-| 9 | Muros en C | `composite.kind = c_wall` | DG38 A.2 | `aisc_dg38/walls.py` | Sin Mux con axial, sin Vux; una sola combinación de lado comprimido por signo de Pu |
-| 10 | Vigas de acoplamiento | `composite.kind = coupling_beam` | DG38 2.3.3, A.3 | `aisc_dg38/walls.py` | Compactas; sin fuerza axial |
-| 11 | Placas esbeltas | `wall.allow_slender_plates` | Commentary I1.6a; DG38 2.2.1 | `aisc_360_22/composite.py` | Solo compresión; flexión y cortante siguen exigiendo I1-4 |
-| 12 | Rigideces efectivas de muros | `stiffness.effective` del resultado | I1-1 a I1-3 | `aisc_360_22/composite.py` | |
-| 13 | Muros a fuego | `composite.fire` | DG38 cap. 6; Apéndice 4 | `aisc_dg38/fire.py`, `aisc_360_22/appendix_4.py` | Las temperaturas son dato de un análisis térmico del usuario; muros planos |
+| 4 | Sección controlada por tracción | `composite.flexural_member` | I3.3a(e), I3.4a(d); DG6 2.4 | `aisc_dg06/members.py` | Obliga si se declara viga; si no, se informa y se advierte |
+| 5 | Cajones soldados | `composite.box` | DG6 2.5 | `sections/geometry.py` | Una sola placa de espesor t |
+| 6 | Factor de forma α biaxial | `composite.biaxial_shape_factor` | DG6 2.3.2 | `aisc_dg06/members.py` | Solo `M2S`, con flexión en dos ejes |
+| 7 | Rigideces de servicio | `stiffness.elastic` del resultado | DG6 2.8 | `aisc_dg06/members.py` | Jc de rectangulares (2-14) y Js de cajones no vienen de la guía (DI-16); donde no da expresión, acero solo y concreto solo (DI-20) |
+| 8 | Muros en C | `composite.kind = c_wall` | DG38 A.2 | `aisc_dg38/walls.py` | Sin Mux con axial, sin Vux; una sola combinación de lado comprimido por signo de Pu |
+| 9 | Vigas de acoplamiento | `composite.kind = coupling_beam` | DG38 2.3.3, A.3 | `aisc_dg38/walls.py` | Compactas; sin fuerza axial |
+| 10 | Placas esbeltas | `wall.allow_slender_plates` | Commentary I1.6a; DG38 2.2.1 | `aisc_360_22/composite.py` | Solo compresión; flexión y cortante siguen exigiendo I1-4 |
+| 11 | Rigideces efectivas de muros | `stiffness.effective` del resultado | I1-1 a I1-3 | `aisc_360_22/composite.py` | |
+| 12 | Muros a fuego | `composite.fire` | DG38 cap. 6; Apéndice 4 | `aisc_dg38/fire.py`, `aisc_360_22/appendix_4.py` | Las temperaturas son dato de un análisis térmico del usuario; muros planos |
+| 13 | Colado del concreto | `composite.pour_height` | DG6 4.3; Commentary C-I2-1, C-I2-2; DG38 2.2.1.2 | `aisc_dg06/filled.py`, `aisc_dg38/walls.py` | Recomendación: se reporta en 4.2 y no cambia el estado; validada en HSS |
 
 Todo lo que sale de una guía lo declara la memoria de cálculo como fuera de la norma.
 

@@ -7,15 +7,18 @@ import math
 
 from ..codes.aisc_360_22 import appendix_2 as a2
 from ..codes.aisc_360_22 import composite as eq
+from ..codes.aisc_dg06 import filled as dg6
+from ..codes.aisc_dg38 import walls as dg38
 from ..errors import SteelDesignError
 from ..models import Check, SteelCase
 from ..sections.models import Section
 from .composite import (_beam_requirements, _encased_geometry, _encased_requirements, _filled_geometry, _filled_requirements,
-                        _wall_geometry, _wall_requirements, uses_appendix_2)
+                        _wall_geometry, _wall_is_slender, _wall_requirements, missing_anchor_detailing, uses_appendix_2)
 from .speedcore import _c_wall_data, _c_wall_requirements
 from .tension import least_radius
 
 CUMPLE, NO_CUMPLE, NO_APLICA, FALTA, SIN_DATO = "cumple", "no_cumple", "no_aplica", "falta_implementacion", "sin_dato"
+GUIDE_RECOMMENDATION = "recomendación de la guía, no es norma"
 
 
 def _limit(description, value, limit, provision, satisfied, *, binding=True, qualifier="recomendación"):
@@ -94,6 +97,40 @@ def _filled_ratio_row(case, section, geometry):
                   "Apéndice 2, 2.1.1(d)" if uses_appendix_2(case, section) else "I1.4, Tabla I1.1a", ratio <= maximum)
 
 
+def _pour_height_missing(provision):
+    return _absent("Altura de colado del concreto fresco", provision, SIN_DATO, "Indique composite.pour_height: es un dato obligatorio.")
+
+
+def _filled_placement(case, section, geometry):
+    """Design Guide 6, 4.3: the walls under the wet concrete. A recommendation, so it does not decide the status."""
+    if geometry["shape"] == "round":
+        return [_absent("Concreto fresco en el tubo", "Guía 6, 4.3", NO_APLICA, "La presión hidrostática no es crítica en tubos redondos.")]
+    composite, Lp = case.composite, case.composite.pour_height
+    if Lp is None:
+        return [_pour_height_missing("Guía 6, 4.3")]
+    wet = dg6.wet_concrete_effects(Lp=Lp, wc=composite.concrete.wc, B=section.b_out, H=section.h_out, t=geometry["t"])
+    qualifier = GUIDE_RECOMMENDATION + ("; validada en HSS, revise las esquinas soldadas del cajón" if composite.box else "")
+    stress_limit = 0.5 * case.material.Fy
+    rows = [_limit(f"Esfuerzo en el acero por el concreto fresco (σmax; Lp = {Lp:g} mm, p = {wet['p']:.4f} MPa)", wet["sigma_max"],
+                   f"≤ 0.5·Fy = {stress_limit:.1f} MPa", "Guía 6, 4.3; Commentary C-I2-1", wet["sigma_max"] <= stress_limit,
+                   binding=False, qualifier=qualifier)]
+    description, provision = "Deformación de la pared por el concreto fresco (δmax)", "Guía 6, 4.3; Commentary C-I2-2"
+    if case.lengths is None:
+        return rows + [_absent(description, provision, SIN_DATO, "Indique lengths: L = min(Lx, Ly).")]
+    L = min(case.lengths.Lx, case.lengths.Ly)
+    return rows + [_limit(description, wet["delta_max"], f"≤ L/2000 = {L / 2000:.2f} mm (L = min(Lx, Ly) = {L:g} mm)", provision,
+                          wet["delta_max"] <= L / 2000, binding=False, qualifier=qualifier)]
+
+
+def _wall_placement(case):
+    """Design Guide 38, 2.2.1.2: pour height of the modules that meet the plate slenderness requirement."""
+    Lp, provision = case.composite.pour_height, "Guía 38, 2.2.1.2"
+    if Lp is None:
+        return [_pour_height_missing(provision)]
+    return [_limit("Altura de colado con placas que cumplen I1-4", Lp, f"≤ {dg38.WET_CONCRETE_POUR_HEIGHT:g} mm", provision,
+                   Lp <= dg38.WET_CONCRETE_POUR_HEIGHT and not _wall_is_slender(case), binding=False, qualifier=GUIDE_RECOMMENDATION)]
+
+
 def _composite_geometry(case, section):
     kind = case.composite.kind
     moments = bool(case.Mux or case.Muy)
@@ -108,7 +145,7 @@ def _composite_geometry(case, section):
         if moments:
             groups.append(_filled_requirements(case, section, geometry, flexure=True))
         rows = _from_section(_merged(*groups)) if demand else [_absent("Cuantías y separaciones de I2.2a e I3.4a", "I2.2a, I3.4a", NO_APLICA, only_shear)]
-        return [_filled_ratio_row(case, section, geometry)] + rows + [aci]
+        return [_filled_ratio_row(case, section, geometry)] + rows + _filled_placement(case, section, geometry) + [aci]
     if kind == "encased":
         geometry = _encased_geometry(case, section)
         rows = _from_section(_encased_requirements(case, section, geometry)) if demand else [
@@ -116,11 +153,16 @@ def _composite_geometry(case, section):
         return rows + [aci]
     if kind == "wall":
         geometry = _wall_geometry(case)
-        return _from_section(_wall_requirements(case, section, geometry, compression=case.Pu > 0)) + [aci]
+        return _from_section(_wall_requirements(case, section, geometry, compression=case.Pu > 0)) + _wall_placement(case) + [aci]
     if kind == "c_wall":
         return _from_section(_c_wall_requirements(case, _c_wall_data(case)[2])) + [aci]
     if kind == "beam":
-        return _from_section(_beam_requirements(case.composite.beam, section, case.material.Fy)) + [aci]
+        beam = case.composite.beam
+        rows = _from_section(_beam_requirements(beam, section, case.composite.concrete))
+        missing_fields = missing_anchor_detailing(beam) if beam.moment == "positive" else []
+        if missing_fields:
+            rows.append(_absent("Detallado de los conectores", "I8.2d", SIN_DATO, f"Indique {', '.join(missing_fields)}."))
+        return rows + [aci]
     return [_absent("Requisitos de la sección de la viga de acoplamiento", "AISC Design Guide 38", FALTA, "Sin requisitos implementados para este miembro."), aci]
 
 

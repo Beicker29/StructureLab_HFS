@@ -5,9 +5,14 @@
     "Fu": 450
   },
   "lengths": {
-    "Lx": 2000,
-    "Ly": 2000,
-    "Lz": 2000
+    "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
+    "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}
+  },
+  "serviceability": {
+    "actual_span": 2000,
+    "effective_span": 2000,
+    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
   },
   "double_angle_e6": {
     "connectors": "welded",
@@ -18,9 +23,6 @@
     "An": 2490,
     "U": 0.87,
     "fabricated_length": 2000
-  },
-  "flexure": {
-    "Lb": 2000
   },
   "cases": [
     {
@@ -44,6 +46,7 @@
       "angle_flexure": {
         "web_legs": "compression"
       }
-    }
+    },
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 5, "Vux": 24, "angle_flexure": {"web_legs": "tension"}}
   ]
 }

@@ -84,8 +84,10 @@ def column(name, Fy, Lx, Ly, Lz, K=1.0, **extra):
 
 
 def beam(name, Fy, Lb=None, Cb=1.0, axis="Mux", holes=False, **extra):
-    flexure = {"Cb": Cb, **({"Lb": Lb * FT} if Lb else {}), **({"tension_flange_holes": False} if holes is False else {})}
+    flexure = {"Cb": Cb, **({"tension_flange_holes": False} if holes is False else {})}
     flexure.update(extra.pop("flexure", {}))
+    if Lb:
+        extra.setdefault("lengths", {"Lx": Lb * FT, "Ly": Lb * FT, "Lz": Lb * FT})
     return dict(section_name=name, material={"Fy": Fy}, flexure=flexure, **{axis: 1.0}, **extra)
 
 
@@ -94,7 +96,7 @@ def shear(name, Fy, axis="Vux", **extra):
 
 
 def combined(name, Fy, L, Pu, Mux, Muy, Cb=1.0, **extra):
-    flexure = {"Lb": L * FT, "Cb": Cb, "tension_flange_holes": False, **extra.pop("flexure", {})}
+    flexure = {"Cb": Cb, "tension_flange_holes": False, **extra.pop("flexure", {})}
     return dict(section_name=name, material={"Fy": Fy, **extra.pop("material", {})}, Pu=Pu * KIP, Mux=Mux * KIPFT,
                 Muy=Muy * KIPFT, lengths={"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}, flexure=flexure, **extra)
 
@@ -134,7 +136,8 @@ def composite_beam(name):
     beam = {"moment": "positive", "span": 45 * FT, "left_beam_spacing": 10 * FT, "right_beam_spacing": 10 * FT,
             "tc": 4.5 * IN, "shored": True,
             "deck": {"orientation": "perpendicular", "hr": 3 * IN, "wr": 6 * IN, "emid_ht_at_least_50": False},
-            "studs": {"count": 22, "d": 0.75 * IN, "Fu": 65 * KSI, "length": 4.5 * IN, "over_web": True}}
+            "studs": {"count": 22, "d": 0.75 * IN, "Fu": 65 * KSI, "length": 4.5 * IN, "over_web": True,
+                      "detailing": {"longitudinal_spacing": 12 * IN, "free_edge": False, "distribution": "uniform"}}}
     return dict(section_name=name, material={"Fy": FY50}, Mux=1.0,
                 composite={"kind": "beam", "concrete": {"fc": 4 * KSI, "wc": WC, "lightweight": False}, "beam": beam})
 
@@ -143,7 +146,7 @@ def composite_beam(name):
 E14B_PU = 85.9
 E14B = dict(section_name="L8X4X1/2", material={"Fy": FY50}, Pu=E14B_PU * KIP,
             Mw=1.44 * E14B_PU / (1 - E14B_PU / 3260) * KIPFT / 12, Mz=0.889 * E14B_PU / (1 - E14B_PU / 343) * KIPFT / 12,
-            lengths={"Lx": 5 * FT, "Ly": 5 * FT, "Lz": 5 * FT}, flexure={"Lb": 5 * FT},
+            lengths={"Lx": 5 * FT, "Ly": 5 * FT, "Lz": 5 * FT},
             angle_flexure={"leg_in_compression": "long", "toe": "tension"})
 
 # id: (example, page, case data, check id, LRFD design strength printed in the example, unit, note)
@@ -257,7 +260,7 @@ EXAMPLES = {
     "E.14B": ("L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados: H2-1 en B ≈ 1.0", E14B, "interaction", 1.0, "ratio"),
     "F.11C": ("L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14: H2-1 en la punta comprimida",
               dict(section_name="L4X4X1/4", material={"Fy": FY50}, Mw=0.286 * KIPFT, Mz=1.05 * KIPFT,
-                   flexure={"Lb": 6 * FT, "Cb": 1.14}, angle_flexure={"toe": "compression"}),
+                   lengths={"Lx": 6 * FT, "Ly": 6 * FT, "Lz": 6 * FT}, flexure={"Cb": 1.14}, angle_flexure={"toe": "compression"}),
               "interaction", 0.292, "ratio"),
 }
 

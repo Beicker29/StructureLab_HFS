@@ -67,3 +67,14 @@ def round_yield_moment(*, Fy, fc, Ec, D, t, Fysr=0.0, bars=()) -> dict:
             high = middle
     yn = (low + high) / 2
     return {"My": forces(yn)[1], "yn_mm": yn}
+
+
+def wet_concrete_effects(*, Lp, wc, B, H, t) -> dict:
+    """Rectangular section under the wet concrete (Section 4.3): Equation 4-1 in SI (wc in kg/m3, Lp in mm), and
+    Specification Commentary Equations C-I2-1 and C-I2-2. Returns p, sigma_max (MPa) and delta_max (mm).
+    """
+    p = wc * 9.80665 * Lp * 1e-9
+    bc, hc = min(B, H) - 2 * t, max(B, H) - 2 * t
+    sigma = max(2 * hc / (bc + 4 * hc), (3 * bc + 4 * hc) / (3 * (bc + 4 * hc))) * p * hc**2 / t**2
+    delta = (5 * bc + 4 * hc) / (32 * (bc + 4 * hc)) * p * hc**4 / (E_STEEL * t**3)
+    return {"p": p, "sigma_max": sigma, "delta_max": delta}

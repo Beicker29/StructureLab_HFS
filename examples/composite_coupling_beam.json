@@ -1,6 +1,12 @@
 {
   "section_name": "VIGA-ACOPLE",
   "material": {"Fy": 345},
+  "serviceability": {
+    "actual_span": 2000,
+    "effective_span": 2000,
+    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+  },
   "composite": {
     "kind": "coupling_beam",
     "concrete": {"fc": 40, "wc": 2320, "lightweight": false},

@@ -20,7 +20,7 @@ LIMIT_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-tors
                 "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada (F13.1)",
                 "LLB": "pandeo local del ala del ángulo"}
 _LIMITATIONS = (
-    "Lb y Cb son datos del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone que los apoyos "
+    "Lb sale de las longitudes (DF-13) y Cb es dato del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone que los apoyos "
     "restringen la rotación respecto del eje longitudinal (F1(b)).",
     "Flexión respecto de un eje: la flexión biaxial y la combinación con carga axial se verifican en el chequeo de "
     "interacción (Capítulo H).",
@@ -60,10 +60,18 @@ def _ltb_mode(result, provision):
     return _evaluated("LTB", provision, {k: v for k, v in result.items() if k != "applies"})
 
 
-def _lb(basis, section):
-    if basis.Lb is None:
-        _incomplete("El pandeo lateral-torsional requiere Lb (flexure.Lb).", section, ["flexure.Lb"])
-    return basis.Lb
+def unbraced_length(case, axis):
+    """Lb (DF-13): about x (and the major principal axis w), min(Ly, Lz); about y (and the minor principal axis z), min(Lx, Lz)."""
+    if case.lengths is None:
+        return None
+    return min(case.lengths.Ly if axis in {"x", "w"} else case.lengths.Lx, case.lengths.Lz)
+
+
+def _lb(case, section, axis):
+    lb = unbraced_length(case, axis)
+    if lb is None:
+        _incomplete("El pandeo lateral-torsional requiere lengths (Lb sale de Lx, Ly y Lz).", section, ["lengths"])
+    return lb
 
 
 def _row(element, case, ratio, lim):
@@ -96,7 +104,7 @@ def _i_major(case, section, basis, E, Fy):
         modes["FLB"] = _evaluated("FLB", "F3.2", eq.f3_flb(E=E, Fy=Fy, Sx=section.sx, Zx=section.zx, bf_2tf=flange,
                                                            h_tw=web, lim=lf))
     ltb = eq.f2_ltb(E=E, Fy=Fy, Sx=section.sx, Zx=section.zx, ry=section.ry, Iy=section.iy, Cw=section.cw,
-                    J=section.j, ho=section.ho, Lb=_lb(basis, section), Cb=basis.Cb, channel=channel)
+                    J=section.j, ho=section.ho, Lb=_lb(case, section, "x"), Cb=basis.Cb, channel=channel)
     modes["LTB"] = _ltb_mode(ltb, "F2.2")
     modes["TFR"] = _tension_flange(case, section, basis, Fy)
     return provision, rows, modes
@@ -164,13 +172,14 @@ def _rect_hss(case, section, basis, E, Fy, axis):
         modes["WLB"] = _evaluated("WLB", "F7.3(b)", eq.f7_wlb(Fy=Fy, S=S, Z=Z, h_t=hw_t, lim=lw))
     else:
         _blocked("Alma esbelta en PTE (F7-7): no implementada; ningún PTE estándar tiene alma esbelta.", section)
-    if axis == "y" or section.h_out <= section.b_out:
+    if depth <= (section.b_out if axis == "x" else section.h_out):
         modes["LTB"] = _not_applicable("LTB", "F7.4", "Flexión respecto del eje menor o sección cuadrada: el pandeo "
                                                       "lateral-torsional no ocurre (Nota de F7.4).")
-    else:
-        _require(section, "ry", "j", "sx", "zx")
-        modes["LTB"] = _ltb_mode(eq.f7_ltb(E=E, Fy=Fy, Sx=section.sx, Zx=section.zx, ry=section.ry, J=section.j,
-                                           Ag=section.area, Lb=_lb(basis, section), Cb=basis.Cb), "F7.4")
+    else:                                           # the major axis is y in a box wider than deep (DF-14)
+        minor_radius = "ry" if axis == "x" else "rx"
+        _require(section, minor_radius, "j")
+        modes["LTB"] = _ltb_mode(eq.f7_ltb(E=E, Fy=Fy, Sx=S, Zx=Z, ry=getattr(section, minor_radius), J=section.j,
+                                           Ag=section.area, Lb=_lb(case, section, axis), Cb=basis.Cb), "F7.4")
     return "F7", rows, modes
 
 
@@ -207,7 +216,7 @@ def _solid(case, section, basis, E, Fy, axis):
         modes["LTB"] = _not_applicable("LTB", "F11.2(a)", "Barra rectangular en su eje menor: el pandeo "
                                                           "lateral-torsional no aplica.")
     else:
-        modes["LTB"] = _ltb_mode(eq.f11_ltb(E=E, Fy=Fy, S=S, Z=Z, d=depth, t=width, Lb=_lb(basis, section),
+        modes["LTB"] = _ltb_mode(eq.f11_ltb(E=E, Fy=Fy, S=S, Z=Z, d=depth, t=width, Lb=_lb(case, section, axis),
                                             Cb=basis.Cb), "F11.2")
     return "F11", [], modes
 
@@ -251,7 +260,7 @@ def _double_angle(case, section, basis, E, Fy, axis, catalog):
     s_flange = section.ix / section.y                                        # to the back of the flange legs
     modes = {"Y": _evaluated("Y", "F9.1", eq.f9_plastic(Fy=Fy, Zx=section.zx, Sx=section.sx, web_legs=web_legs))}
     ltb = eq.f9_ltb(E=E, Fy=Fy, Zx=section.zx, Sx=section.sx, ry=section.ry, Iy=section.iy, J=j, d=web,
-                    Lb=_lb(basis, section), web_legs=web_legs)
+                    Lb=_lb(case, section, axis), web_legs=web_legs)
     modes["LTB"] = _ltb_mode({**ltb, "J_mm4": j, "d_web_leg_mm": web}, "F9.2")
     flange_row, flb = _leg_local("flange_legs", "F9.3(b) → F10.3", flange, t, s_flange, E, Fy, lim)
     web_row, wlb = _leg_local("web_legs", "F9.4(b) → F10.3", web, t, section.sx, E, Fy, lim)
@@ -297,12 +306,12 @@ def _single_angle(case, section, basis, E, Fy, axis):
             modes["LTB"] = _not_applicable("LTB", "F10.2", "Restricción lateral-torsional continua: el pandeo "
                                                            "lateral-torsional no aplica.")
         else:
-            mcr = eq.f10_mcr_geometric(E=E, b=long_leg, t=t, Lb=_lb(basis, section), Cb=basis.Cb, toe=toe)
+            mcr = eq.f10_mcr_geometric(E=E, b=long_leg, t=t, Lb=_lb(case, section, axis), Cb=basis.Cb, toe=toe)
             scale = 1.25 if restraint == "at_max_moment" else 1.0    # F10.2(2)(ii)
             out = eq.f10_from_mcr(My=my, Mcr=scale * mcr["Mcr"])
             modes["LTB"] = _evaluated("LTB", "F10.2(2)", {**out, "Mcr": scale * mcr["Mcr"], "Mcr_factor": scale,
                                                           "Mcr_equation": mcr["Mcr_equation"], "My": my, "My_factor": factor,
-                                                          "Lb_mm": basis.Lb, "Cb": basis.Cb})
+                                                          "Lb_mm": unbraced_length(case, axis), "Cb": basis.Cb})
         if toe == "compression":
             _, modes["LLB"] = _leg_local("perp_leg", "F10.3", perp, t, factor * s_toe, E, Fy, lim)
         else:
@@ -325,10 +334,10 @@ def _single_angle(case, section, basis, E, Fy, axis):
                 _incomplete("Ángulo de alas desiguales: F10-4 requiere βw del catálogo.", section, ["section.beta_w"])
             else:
                 beta = section.beta_w if leg == "short" else -section.beta_w   # + short legs in compression
-            mcr = eq.f10_mcr_principal(E=E, Ag=section.area, rz=section.rz, t=t, Lb=_lb(basis, section),
+            mcr = eq.f10_mcr_principal(E=E, Ag=section.area, rz=section.rz, t=t, Lb=_lb(case, section, axis),
                                        Cb=basis.Cb, beta_w=beta)
             out = eq.f10_from_mcr(My=my, Mcr=mcr["Mcr"])
-            modes["LTB"] = _evaluated("LTB", "F10.2(1)", {**out, **mcr, "My": my, "Lb_mm": basis.Lb})
+            modes["LTB"] = _evaluated("LTB", "F10.2(1)", {**out, **mcr, "My": my, "Lb_mm": unbraced_length(case, axis)})
         width = long_leg if leg == "long" else short_leg
         _, modes["LLB"] = _leg_local("long_leg" if leg == "long" else "short_leg", "F10.3", width, t, sc, E, Fy, lim)
         return "F10 (eje principal mayor w)", rows, modes
@@ -383,7 +392,7 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
     return {
         "chapter": "F", "code": "ANSI/AISC 360-22", "axis": axis,
         "section": section.name, "family": family,
-        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lb_mm": basis.Lb, "Cb": basis.Cb,
+        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lb_mm": unbraced_length(case, axis), "Cb": basis.Cb,
                    "tension_flange_holes": basis.tension_flange_holes, "Afn_mm2": basis.Afn,
                    "lateral_torsional_restraint": basis.lateral_torsional_restraint,
                    "angle_flexure": case.angle_flexure.model_dump() if case.angle_flexure else None},

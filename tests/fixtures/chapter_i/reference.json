@@ -1094,151 +1094,6 @@
    "Pr_kN": "1200.0000000000000000000000000000000000000000000000",
    "Mr_kNm": "62.463561479636044901858637975994428386759992460420"
   },
-  "lt-steel": {
-   "spec": {
-    "kind": "load_transfer_filled",
-    "name": "PTE200X200X7MM",
-    "fy": 345,
-    "fc": 35,
-    "wc": 2320,
-    "L": 3000,
-    "applied_to": "steel",
-    "Pr": 800,
-    "A1": 9000,
-    "Lin": 300
-   },
-   "Vr_kN": "303.40359125384489673059434166025122805937775162530",
-   "bearing_kN": "348.075",
-   "bond_kN": "37.770078320389817847410285605742521573301649658538"
-  },
-  "lt-concrete": {
-   "spec": {
-    "kind": "load_transfer_filled",
-    "name": "PTE200X200X7MM",
-    "fy": 345,
-    "fc": 35,
-    "wc": 2320,
-    "L": 3000,
-    "applied_to": "concrete",
-    "Pr": 800,
-    "A1": 9000
-   },
-   "Vr_kN": "496.59640874615510326940565833974877194062224837470",
-   "bearing_kN": "348.075"
-  },
-  "lt-both": {
-   "spec": {
-    "kind": "load_transfer_filled",
-    "name": "PTE200X200X7MM",
-    "fy": 345,
-    "fc": 35,
-    "wc": 2320,
-    "L": 3000,
-    "applied_to": "both",
-    "Pr": 800,
-    "A1": 9000,
-    "steel_fraction": 0.4
-   },
-   "Vr_kN": "176.59640874615510326940565833974877194062224837470",
-   "bearing_kN": "348.075"
-  },
-  "lt-round": {
-   "spec": {
-    "kind": "load_transfer_filled",
-    "name": "PTER6\"X6.00MM",
-    "fy": 345,
-    "fc": 35,
-    "wc": 2320,
-    "L": 3000,
-    "applied_to": "steel",
-    "Pr": 300,
-    "Lin": 200,
-    "round_": true
-   },
-   "Vr_kN": "118.74969425000228940221629777774510149434134649686",
-   "bond_kN": "51.549731192572908792021966818068267585025806048976"
-  },
-  "lt-slender": {
-   "spec": {
-    "kind": "load_transfer_filled",
-    "name": "PTE100X40X1.5MM",
-    "fy": 500,
-    "fc": 35,
-    "wc": 2320,
-    "L": 1500,
-    "applied_to": "concrete",
-    "Pr": 100,
-    "A1": 2000
-   },
-   "Vr_kN": "61.939049106531652881978631191667693565792256553512",
-   "bearing_kN": "77.350"
-  },
-  "lt-encased": {
-   "spec": {
-    "kind": "load_transfer_encased",
-    "name": "W10X45",
-    "fy": 345,
-    "fc": 35,
-    "H": 610,
-    "B": 610,
-    "Fysr": 420,
-    "bars": [
-     [
-      510,
-      "25.4",
-      241.3,
-      241.3
-     ],
-     [
-      510,
-      "25.4",
-      241.3,
-      0
-     ],
-     [
-      510,
-      "25.4",
-      241.3,
-      -241.3
-     ],
-     [
-      510,
-      "25.4",
-      0,
-      241.3
-     ],
-     [
-      510,
-      "25.4",
-      0,
-      -241.3
-     ],
-     [
-      510,
-      "25.4",
-      -241.3,
-      241.3
-     ],
-     [
-      510,
-      "25.4",
-      -241.3,
-      0
-     ],
-     [
-      510,
-      "25.4",
-      -241.3,
-      -241.3
-     ]
-    ],
-    "applied_to": "steel",
-    "Pr": 5000,
-    "A1": 80000
-   },
-   "Vr_kN": "4036.8672171088251218191662154845695722793719545208",
-   "bearing_kN": "3094.000"
-  },
   "tc-encased": {
    "spec": {
     "kind": "tension_control",
@@ -2007,6 +1862,163 @@
     "fc": 40
    },
    "phiVn_kN": "2896.6545229675806072952011703147416661261430829938"
+  },
+  "detail-solid": {
+   "spec": {
+    "kind": "beam_detailing",
+    "d": 19,
+    "tc": 150,
+    "hr": 0,
+    "perpendicular": false,
+    "lightweight": false,
+    "length": 100
+   },
+   "s_min_mm": "114",
+   "s_max_mm": "900",
+   "edge_min_mm": "200"
+  },
+  "detail-perpendicular": {
+   "spec": {
+    "kind": "beam_detailing",
+    "d": 19,
+    "tc": 114,
+    "hr": 75,
+    "perpendicular": true,
+    "lightweight": false,
+    "length": 115
+   },
+   "s_min_mm": "76",
+   "s_max_mm": "900",
+   "edge_min_mm": "200"
+  },
+  "detail-parallel-lightweight": {
+   "spec": {
+    "kind": "beam_detailing",
+    "d": 19,
+    "tc": 100,
+    "hr": 50,
+    "perpendicular": false,
+    "lightweight": true,
+    "length": 100
+   },
+   "s_min_mm": "114",
+   "s_max_mm": "900",
+   "edge_min_mm": "250"
+  },
+  "detail-thin-slab": {
+   "spec": {
+    "kind": "beam_detailing",
+    "d": 19,
+    "tc": 60,
+    "hr": 40,
+    "perpendicular": true,
+    "lightweight": false,
+    "length": 80
+   },
+   "s_min_mm": "76",
+   "s_max_mm": "800",
+   "edge_min_mm": "200"
+  },
+  "placement-small": {
+   "spec": {
+    "kind": "filled_placement",
+    "name": "PTE100X50X3MM",
+    "Lp": 2000,
+    "wc": 2320
+   },
+   "p_mpa": "0.045502856000000000000000000000000000000000000000000",
+   "sigma_mpa": "23.315078465242363031857920692738395184656190874952",
+   "delta_mm": "0.036972488661430302139868166375818148660422512690091"
+  },
+  "placement-rectangular": {
+   "spec": {
+    "kind": "filled_placement",
+    "name": "PTE200X100X6MM",
+    "Lp": 6000,
+    "wc": 2320
+   },
+   "p_mpa": "0.13650856799999999999999999999999999999999999999999",
+   "sigma_mpa": "69.945235395727089095573762078215185553968572624849",
+   "delta_mm": "0.22183493196858181283920899825490889196253507614051"
+  },
+  "placement-square": {
+   "spec": {
+    "kind": "filled_placement",
+    "name": "PTE200X200X7MM",
+    "Lp": 12000,
+    "wc": 1800
+   },
+   "p_mpa": "0.21182363999999999999999999999999999999999999999999",
+   "sigma_mpa": "81.547291578572293702034676500259670166447492911181",
+   "delta_mm": "0.26393963630267678727606638960756389932596311540075"
+  },
+  "deflection-within": {
+   "spec": {
+    "kind": "deflection_limit",
+    "span": 13716,
+    "n": 360,
+    "value": 30
+   },
+   "limit_mm": "38.1",
+   "satisfied": true
+  },
+  "deflection-beyond": {
+   "spec": {
+    "kind": "deflection_limit",
+    "span": 9000,
+    "n": 240,
+    "value": 40
+   },
+   "limit_mm": "37.5",
+   "satisfied": false
+  },
+  "box-steel-minor": {
+   "spec": {
+    "kind": "box_steel_flexure",
+    "B": 400,
+    "H": 300,
+    "t": 12,
+    "fy": 345,
+    "axis": "x",
+    "Lb": 4000
+   },
+   "phiMn_kNm": "524.63906778828366217020108233945279322712345919611"
+  },
+  "box-steel-major-x": {
+   "spec": {
+    "kind": "box_steel_flexure",
+    "B": 200,
+    "H": 500,
+    "t": 12,
+    "fy": 345,
+    "axis": "x",
+    "Lb": 30000
+   },
+   "phiMn_kNm": "728.37280873169101511117154303051808898302314961756"
+  },
+  "box-steel-major-y": {
+   "spec": {
+    "kind": "box_steel_flexure",
+    "B": 500,
+    "H": 200,
+    "t": 12,
+    "fy": 345,
+    "axis": "y",
+    "Lb": 30000
+   },
+   "phiMn_kNm": "728.37280873169101511117154303051808898302314961756"
+  },
+  "box-steel-major-y-elastic": {
+   "spec": {
+    "kind": "box_steel_flexure",
+    "B": 500,
+    "H": 120,
+    "t": 12,
+    "fy": 345,
+    "axis": "y",
+    "Lb": 400000
+   },
+   "phiMn_kNm": "57.82477611526182288597529575688330233898270870442"
   },
   "fire-wall": {
    "spec": {

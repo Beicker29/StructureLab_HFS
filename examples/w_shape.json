@@ -5,9 +5,14 @@
     "Fu": 450
   },
   "lengths": {
-    "Lx": 4000,
-    "Ly": 4000,
-    "Lz": 4000
+    "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+    "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}
+  },
+  "serviceability": {
+    "actual_span": 4000,
+    "effective_span": 4000,
+    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
   },
   "tension": {
     "An": 15000,
@@ -15,7 +20,6 @@
     "fabricated_length": 4000
   },
   "flexure": {
-    "Lb": 4000,
     "Cb": 1.0,
     "tension_flange_holes": false
   },
@@ -48,6 +52,7 @@
       "Pu": -1000,
       "Mux": 350,
       "Vux": 250
-    }
+    },
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 230, "Vux": 83}
   ]
 }

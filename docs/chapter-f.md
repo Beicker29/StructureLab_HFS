@@ -62,8 +62,8 @@ Puntos del catálogo: A = punta del ala corta, B = talón, C = punta del ala lar
 - `Mux`, `Muy` por combinación (kN·m). Una combinación con más de una demanda
   (Pu, Mux, Muy) se calcula por componente y se combina en el chequeo de interacción
   del Capítulo H ([chapter-h.md](chapter-h.md)); un FAIL conocido se informa siempre (DF-4).
-- `flexure` del miembro: `Lb` (mm, obligatorio cuando aplica el pandeo
-  lateral-torsional), `Cb` (1,0 si no se indica: límite inferior de F1-1, DF-2) y
+- `lengths` del miembro, de las que sale Lb (DF-13; obligatorias cuando aplica el pandeo
+  lateral-torsional), y `flexure`: `Cb` (1,0 si no se indica: límite inferior de F1-1, DF-2) y
   `tension_flange_holes` (obligatorio en I y canales sobre el eje x, F13.1) con
   `Afn` (mm²) cuando hay agujeros; F13.1 requiere además `material.Fu` (DF-3).
 - Ángulos: `Mw`, `Mz` (kN·m, solo ángulos simples), `flexure.lateral_torsional_restraint`,
@@ -140,6 +140,9 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
   lateral-torsional (F10-2/F10-3) y Sc del pandeo local del ala (F10.3); la fluencia F10-1
   usa My sin reducir (indicación del usuario, 2026-10-30). Coincide con el ejemplo F.11A de
   los AISC Design Examples v16.0 (Mn = 1,5·Fy·Sx = 6,44 kip-ft).
+- **DF-14** F7.4 se revisa respecto del eje mayor de la sección, sea x o y: en un cajón con B > H ese eje es y, con Sy, Zy y rx. El pandeo lateral-torsional no se revisaba respecto de y; ningún resultado de perfiles del catálogo cambió.
+- **DF-13** Lb no es un dato (indicación del usuario, 2026-10-31): flexión respecto de x, Lb = min(Ly, Lz); respecto de y, Lb = min(Lx, Lz), con las
+  longitudes de la condición del case. En ángulos simples, el eje principal w sigue la regla de x y z la de y.
 - **DF-12** |βw| (F10-4) se lee de la columna `βw` de la hoja L del catálogo, en mm (indicación del usuario,
   2026-10-31): sustituye al dato `flexure.beta_w`, que se retiró. Positivo con el ala corta comprimida y negativo con la
   larga (Commentary F10); 0 en alas iguales. Se contrastó con la Tabla C-F10.1 (promedios, diferencia máxima 1,8 %) y con

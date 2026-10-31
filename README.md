@@ -36,9 +36,10 @@ python -m steel_design.run examples/w_shape.json                 # imprime JSON
 python -m steel_design.run examples/multi_member.json --output r.json
 ```
 
-La memoria tiene siempre diez capítulos: propiedades de los materiales, propiedades geométricas (geometría y rigideces elásticas,
-efectivas y para método directo), solicitaciones, revisión de requerimientos técnicos (materiales y geometría), revisiones a compresión,
-tracción, cortante, flexión y torsión, e índices DCR, con la interacción de I5 y el diagrama de interacción de miembros compuestos. Un requerimiento obligatorio incumplido impide el PASS. Lo que no corresponde al
+Hay una memoria por miembro, no por combinación: cada revisión muestra el case de mayor DCR y dice cuál es. Tiene siempre once capítulos: propiedades de los
+materiales, propiedades geométricas (geometría y rigideces elásticas, efectivas y para método directo), solicitaciones (últimas, construcción, incendio y deflexiones),
+requerimientos técnicos (materiales y geometría), funcionalidad y/o servicio (deflexiones y construcción), compresión, tracción, cortante y flexión (cada una de estas dos en
+condiciones de construcción, últimas e incendio, respecto de los ejes X e Y), torsión e índices DCR, con la interacción de I5 y el diagrama de interacción de miembros compuestos. Un requerimiento obligatorio incumplido impide el PASS. Lo que no corresponde al
 miembro dice «No aplica» y lo que el programa no calcula dice «Falta implementación». Cada símbolo va con su nombre en palabras y
 cada valor calculado con su literal del documento de referencia.
 
@@ -85,12 +86,9 @@ python -m steel_design.run examples/multi_member.json --output results/multi_mem
 python -m steel_design.run examples/composite_filled.json --output results/composite_filled.json --report --pdf
 python -m steel_design.run examples/composite_encased.json --output results/composite_encased.json --report --pdf
 python -m steel_design.run examples/composite_beam.json --output results/composite_beam.json --report --pdf
-python -m steel_design.run examples/composite_method2.json --output results/composite_method2.json --report --pdf
 python -m steel_design.run examples/composite_wall.json --output results/composite_wall.json --report --pdf
-python -m steel_design.run examples/composite_anchor.json --output results/composite_anchor.json --report --pdf
 python -m steel_design.run examples/composite_filled_bars.json --output results/composite_filled_bars.json --report --pdf
 python -m steel_design.run examples/composite_high_strength.json --output results/composite_high_strength.json --report --pdf
-python -m steel_design.run examples/composite_load_transfer.json --output results/composite_load_transfer.json --report --pdf
 python -m steel_design.run examples/composite_box.json --output results/composite_box.json --report --pdf
 python -m steel_design.run examples/composite_c_wall.json --output results/composite_c_wall.json --report --pdf
 python -m steel_design.run examples/composite_coupling_beam.json --output results/composite_coupling_beam.json --report --pdf
@@ -116,7 +114,7 @@ print(result.status, result.capacity_kN, result.compression["governing_mode"])  
 ```
 
 La memoria se obtiene del mismo resultado, sin recalcular:
-`blocks = report_blocks(case, result)` (modelo del documento), `render_text(blocks)`
+`blocks = report_blocks([(nombre, case, result), ...])` con los cases de un miembro (modelo del documento), `render_text(blocks)`
 (texto) y `pdf_bytes([blocks, ...])` (PDF en memoria, p. ej. para una respuesta web),
 todos en `steel_design.reporting`. El PDF usa una fuente Unicode del sistema
 (DejaVu Sans, Segoe UI o Arial) para φ, λ y Σ; sin ella recurre a Helvetica con
@@ -137,15 +135,17 @@ símbolos escritos en letras.
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
 | `single_angle_e5` | Ángulos simples comprimidos sin `Mw` ni `Mz`: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3). Fuera de E5 se omite y la excentricidad se da como `Mw` y `Mz` (H2) |
 | `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
-| `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos); `tension_cb_amplification` (H1.2, opcional) |
+| `condition` | Condición del case: `ultimate` (por defecto), `construction` (acero solo; solo Mu y Vu) o `fire` (solo Pu, con `composite.fire`) |
+| `serviceability` | Deflexiones: `actual_span`, `effective_span` (L de los límites), `deflections` y `limit_divisors` con `live_short`, `dead_short`, `total_long`. Exceder L/n se reporta y no cambia el estado |
+| `flexure` | Flexión: `Cb` (1.0 si se omite; Lb sale de `lengths`: eje x, min(Ly, Lz); eje y, min(Lx, Lz)), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos); `tension_cb_amplification` (H1.2, opcional) |
 | `tau_b` | Solo miembros compuestos: τb para las rigideces de método directo (0 < τb ≤ 1), dato obligatorio que el programa no calcula; sin él, el estado es INCOMPLETO. El capítulo 4 de la memoria lo compara con I1.5(d) y (f) (0.8 en rellenos y embebidos, 1.0 en muros); una diferencia se informa y no cambia el estado. En miembros no compuestos τb es siempre 1.0 (C2.3(c)) y otro valor se rechaza |
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
-| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`, `wall`, `c_wall`, `coupling_beam`), `concrete` (`fc`, `wc`, `lightweight`), `interaction` (`H1`, `I5`, `M2`, `M2S`), `filled`, `box`, `encased`, `beam`, `wall`, `c_wall` o `coupling_beam` según el tipo, `anchor` (I8.3), `load_transfer` (I6), `second_order` (Apéndice 8.1), y `fire`, `biaxial_shape_factor` y `flexural_member` de las Design Guides ([detalle](docs/chapter-i.md), [guías](docs/design-guides.md)) |
+| `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`, `wall`, `c_wall`, `coupling_beam`), `concrete` (`fc`, `wc`, `lightweight`), `pour_height` (rellenos y muros), `interaction` (`H1`, `I5`, `M2`, `M2S`), `filled`, `box`, `encased`, `beam`, `wall`, `c_wall` o `coupling_beam` según el tipo, `anchor` (I8.3), `second_order` (Apéndice 8.1), y `fire`, `biaxial_shape_factor` y `flexural_member` de las Design Guides ([detalle](docs/chapter-i.md), [guías](docs/design-guides.md)) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
-material, longitudes, `tension`, E5/E6) y `cases` lista sus combinaciones de
+material, longitudes `lengths: {ultimate: {Lx, Ly, Lz}, construction: {Lx, Ly, Lz}}`, `tension`, E5/E6) y `cases` lista sus combinaciones de
 carga; cada combinación aporta su demanda y puede sobrescribir cualquier dato. La salida
 trae un resultado por combinación, el estado global y la combinación `governing` (mayor
 relación demanda/capacidad). Cada combinación lleva sus demandas simultáneas (Pu, Mu, Vu);

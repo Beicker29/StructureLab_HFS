@@ -5,6 +5,8 @@ out for these shapes. Units N, mm. C is measured from the outer face of the web 
 (A.2.6) or from the compression face (A.3). Each function reports whether C lies in the zone its equations assume.
 """
 
+WET_CONCRETE_POUR_HEIGHT = 9144.0   # Section 2.2.1.2: 30 ft, for modules that meet the plate slenderness requirement (mm)
+
 
 def c_wall_properties(*, L, W, tsc_w, tsc_f, tp, n) -> dict:
     """Areas, elastic centroid (from the web outer face) and inertias; n = Ec/Es, as in Example 2.3."""

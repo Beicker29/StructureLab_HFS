@@ -143,7 +143,7 @@ CASES = {
     "W-H1.2-Cb-amplified": dict(family="W", name="W14X90", fy=345, Pu=-800, Mux=400, Muy=50, Lb=8000, Cb="1.14",
                                 tension=TENSION, cb_amplification=True),
     "W-H4-holes": dict(family="W", name="W14X90", fy=345, Pu=-1500, Mux=300, Lb=3000, tension=TENSION, holes=4500),
-    "C-H1-1a": dict(family="CHANNEL", name="C15X50", fy=345, Pu=800, Mux=100, L=3000, Lb=2000),
+    "C-H1-1a": dict(family="CHANNEL", name="C15X50", fy=345, Pu=800, Mux=100, L=3000, Lb=3000),
     "RHSS-H1-1a": dict(family="RECTANGULAR_HSS", name="PTE100X100X4MM", fy=345, Pu=200, Mux=5, Muy=3, L=3000,
                        Lb=3000),
     "2L-H1-1b": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Pu=40, Mux=5, L=2000, Lb=2000,

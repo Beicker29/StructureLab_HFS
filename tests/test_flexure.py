@@ -23,22 +23,23 @@ REL = 1e-9
 def flexure_case(spec, moment=1.0):
     kind, axis = spec["kind"], spec.get("axis", "x")
     if kind in {"2l", "lg", "lp"}:
-        flexure = {k: v for k, v in (("Lb", spec.get("Lb")), ("Cb", float(spec["Cb"]) if spec.get("Cb") else None),
+        flexure = {k: v for k, v in (("Cb", float(spec["Cb"]) if spec.get("Cb") else None),
                                      ("lateral_torsional_restraint", spec.get("restraint"))) if v is not None}
+        lengths = {"Lx": spec["Lb"], "Ly": spec["Lb"], "Lz": spec["Lb"]} if spec.get("Lb") else None
         angle = {k: v for k, v in (("web_legs", spec.get("web_legs")), ("toe", spec.get("toe")),
                                    ("leg_in_compression", spec.get("leg"))) if v}
         moment_key = {"x": "Mux", "y": "Muy", "w": "Mw", "z": "Mz"}[axis]
-        return SteelCase(tau_b=1.0, section_name=spec["name"], material={"Fy": spec["fy"]}, flexure=flexure,
+        return SteelCase(tau_b=1.0, section_name=spec["name"], material={"Fy": spec["fy"]}, flexure=flexure, lengths=lengths,
                          angle_flexure=angle, **{moment_key: moment})
     flexure = {"tension_flange_holes": False}
-    if spec.get("Lb"):
-        flexure["Lb"] = spec["Lb"]
     if spec.get("Cb"):
         flexure["Cb"] = float(spec["Cb"])
     if spec.get("holes"):
         flexure.update(tension_flange_holes=True, Afn=spec["holes"])
     data = {"material": {"Fy": spec["fy"], **({"Fu": spec["Fu"]} if spec.get("Fu") else {})},
             "Mux" if axis == "x" else "Muy": moment, "flexure": flexure}
+    if spec.get("Lb"):
+        data["lengths"] = {"Lx": spec["Lb"], "Ly": spec["Lb"], "Lz": spec["Lb"]}
     if kind == "bar":
         data.update(section_name="BAR", custom_section={"type": "SOLID_RECTANGULAR", "H": spec["H"], "B": spec["B"]})
     elif kind == "round":
@@ -78,13 +79,16 @@ def test_every_limit_state_is_reported_and_obligations_discharged(engine):
     assert not check.result["modes"]["Y"]["applies"] and check.result["modes"]["Y"]["reason"]
 
 
-@pytest.mark.parametrize("name, flexure, field", [
-    ("W14X90", {"Lb": 3000}, "flexure.tension_flange_holes"),          # F13.1 must be declared
-    ("W14X90", {"tension_flange_holes": False}, "flexure.Lb"),          # LTB needs Lb
-    ("IPE 100", {"Lb": 3000, "tension_flange_holes": False}, None),      # catalog without Zx/Sx/J/Cw
+L3000 = {"Lx": 3000, "Ly": 3000, "Lz": 3000}
+
+
+@pytest.mark.parametrize("name, flexure, lengths, field", [
+    ("W14X90", {}, L3000, "flexure.tension_flange_holes"),                   # F13.1 must be declared
+    ("W14X90", {"tension_flange_holes": False}, None, "lengths"),            # LTB needs Lb, from the lengths
+    ("IPE 100", {"tension_flange_holes": False}, L3000, None),               # catalog without Zx/Sx/J/Cw
 ])
-def test_missing_flexure_data_is_incomplete(engine, name, flexure, field):
-    check = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": 345}, Mux=10, flexure=flexure)).checks[0]
+def test_missing_flexure_data_is_incomplete(engine, name, flexure, lengths, field):
+    check = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": 345}, Mux=10, flexure=flexure, lengths=lengths)).checks[0]
     assert check.status.value == "INCOMPLETE" and check.capacity is None
     if field:
         assert field in check.errors[0]["details"]["fields"]
@@ -98,7 +102,7 @@ def test_missing_flexure_data_is_incomplete(engine, name, flexure, field):
 ])
 def test_blocked_or_inconsistent_domains_never_pass(engine, name, kwargs, code):
     result = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": 345},
-                                  flexure={"Lb": 1000, "tension_flange_holes": False,
+                                  lengths={"Lx": 1000, "Ly": 1000, "Lz": 1000}, flexure={"tension_flange_holes": False,
                                            "lateral_torsional_restraint": "none"}, **kwargs))
     assert result.status.value == "INCOMPLETE" and result.errors[0]["code"] == code
 
@@ -106,11 +110,11 @@ def test_blocked_or_inconsistent_domains_never_pass(engine, name, kwargs, code):
 @pytest.mark.parametrize("name, kwargs, field", [
     ("2L4X4X1/4", {"Mux": 1}, "angle_flexure.web_legs"),
     ("L4X4X1/4", {"Mux": 1, "angle_flexure": {"toe": "tension"}}, "flexure.lateral_torsional_restraint"),
-    ("L4X4X1/4", {"Mux": 1, "flexure": {"lateral_torsional_restraint": "none", "Lb": 1000}}, "angle_flexure.toe"),
-    ("L6X4X3/8", {"Mw": 1, "flexure": {"Lb": 1000}}, "angle_flexure.leg_in_compression"),
+    ("L4X4X1/4", {"Mux": 1, "flexure": {"lateral_torsional_restraint": "none"}, "lengths": {"Lx": 1000, "Ly": 1000, "Lz": 1000}}, "angle_flexure.toe"),
+    ("L6X4X3/8", {"Mw": 1, "lengths": {"Lx": 1000, "Ly": 1000, "Lz": 1000}}, "angle_flexure.leg_in_compression"),
 ])
 def test_angle_data_must_be_explicit(engine, name, kwargs, field):
-    kwargs.setdefault("flexure", {"Lb": 2000})
+    kwargs.setdefault("lengths", {"Lx": 2000, "Ly": 2000, "Lz": 2000})
     check = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": 345}, **kwargs)).checks[0]
     assert check.status.value == "INCOMPLETE" and field in check.errors[0]["details"]["fields"]
 
@@ -119,7 +123,7 @@ def test_beta_w_comes_from_the_catalog_with_the_sign_of_the_compressed_leg(secti
     section = sections["L6X4X3/8"]
     beta = {}
     for leg in ("short", "long"):
-        case = SteelCase(tau_b=1.0, section_name=section.name, material={"Fy": 345}, Mw=1, flexure={"Lb": 2000},
+        case = SteelCase(tau_b=1.0, section_name=section.name, material={"Fy": 345}, Mw=1, lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000},
                          angle_flexure={"leg_in_compression": leg})
         beta[leg] = flexure_strength(case, section, "w")["modes"]["LTB"]["beta_w_mm"]
     assert beta["short"] == section.beta_w > 0 and beta["long"] == -section.beta_w        # Commentary F10
@@ -135,7 +139,7 @@ def test_geometric_axis_f10_rejects_axial_compression(engine):
                                                    "loaded_at_ends_through_same_leg": True,
                                                    "welded_or_two_bolts_min": True,
                                                    "no_intermediate_transverse_loads": True},
-                                  flexure={"Lb": 1000, "lateral_torsional_restraint": "none"},
+                                  flexure={"lateral_torsional_restraint": "none"},
                                   angle_flexure={"toe": "compression"}))
     assert result.check("flexure_x").errors[0]["code"] == "FLEXURE_DOMAIN_BLOCKED"
 
@@ -143,13 +147,13 @@ def test_geometric_axis_f10_rejects_axial_compression(engine):
 def test_a_known_failure_is_not_hidden_by_the_interaction(engine):
     result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Pu=500, Mux=5000,
                                   lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000},
-                                  flexure={"Lb": 3000, "tension_flange_holes": False}))
+                                  flexure={"tension_flange_holes": False}))
     assert result.status.value == "FAIL"
 
 
 def test_cb_default_is_reported(engine):
     check = engine.run(SteelCase(tau_b=1.0, section_name="W18X50", material={"Fy": 345}, Mux=100,
-                                 flexure={"Lb": 4000, "tension_flange_holes": False})).checks[0]
+                                 lengths={"Lx": 4000, "Ly": 4000, "Lz": 4000}, flexure={"tension_flange_holes": False})).checks[0]
     assert check.result["inputs"]["Cb"] == 1.0 and "valor por defecto" in check.result["notes"][0]
 
 
@@ -169,5 +173,28 @@ def test_formula_properties():
 def test_flexure_report(engine):
     case = flexure_case(REFERENCE["RHSS-F7-3-slender-flange"]["spec"])
     text = calculation_report(case, engine.run(case))
-    assert "### 8.1 Flexión respecto de y (Capítulo F)" in text and "F7-3" in text and "be" in text
+    assert "#### 9.2.2 Respecto del eje Y (Muy, Mz)" in text and "Flexión respecto de y (Capítulo F); case gobernante: única." in text and "F7-3" in text and "be" in text
     assert "φb·Mn = 0.90 · Mn" in text and "Obligaciones del Capítulo F" in text
+
+
+@pytest.mark.parametrize("lengths, axis, moment, expected", [
+    ({"Lx": 9000, "Ly": 4000, "Lz": 6000}, "x", "Mux", 4000),   # min(Ly, Lz)
+    ({"Lx": 9000, "Ly": 6000, "Lz": 4000}, "x", "Mux", 4000),
+    ({"Lx": 4000, "Ly": 9000, "Lz": 6000}, "y", "Muy", 4000),   # min(Lx, Lz)
+    ({"Lx": 6000, "Ly": 9000, "Lz": 4000}, "y", "Muy", 4000),
+])
+def test_lb_comes_from_the_lengths(engine, lengths, axis, moment, expected):
+    case = SteelCase(tau_b=1.0, section_name="W18X50", material={"Fy": 345}, flexure={"tension_flange_holes": False}, lengths=lengths, **{moment: 10})
+    assert engine.run(case).check(f"flexure_{axis}").result["inputs"]["Lb_mm"] == expected
+
+
+def test_lb_is_no_longer_an_input():
+    with pytest.raises(ValueError):
+        SteelCase(tau_b=1.0, section_name="W18X50", material={"Fy": 345}, Mux=10, flexure={"Lb": 3000})
+
+
+def test_ltb_with_lb_from_the_lengths_matches_independent_calculation(engine):
+    ref = REFERENCE["W-F2-inelastic-LTB"]                       # W18X50, Lb = 4000
+    case = SteelCase(tau_b=1.0, section_name="W18X50", material={"Fy": 345}, Mux=1, flexure={"tension_flange_holes": False},
+                     lengths={"Lx": 12000, "Ly": 4000, "Lz": 9000})
+    assert engine.run(case).check("flexure_x").capacity == pytest.approx(float(ref["phiMn_kNm"]), rel=REL)

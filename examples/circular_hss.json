@@ -5,9 +5,14 @@
     "Fu": 450
   },
   "lengths": {
-    "Lx": 2500,
-    "Ly": 2500,
-    "Lz": 2500
+    "ultimate": {"Lx": 2500, "Ly": 2500, "Lz": 2500},
+    "construction": {"Lx": 2500, "Ly": 1250, "Lz": 1250}
+  },
+  "serviceability": {
+    "actual_span": 2500,
+    "effective_span": 2500,
+    "deflections": {"live_short": 5.0, "dead_short": 6.2, "total_long": 8.3},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
   },
   "tension": {
     "An": 950,
@@ -27,6 +32,7 @@
     {
       "name": "Combinación 3 — flexión",
       "Mux": 8
-    }
+    },
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 3.2, "Vux": 9.1}
   ]
 }

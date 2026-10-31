@@ -7,7 +7,7 @@ case.composite sends each demand to Chapter I, which uses Chapters E, F and G wh
 Section stiffnesses (domain/stiffness.py) are reported whatever the demands.
 """
 from .domain.composite import (default_interaction, requested_interaction_replaced, composite_anchor, composite_appendix_2_interaction, composite_compression, composite_flexure,
-                               composite_i5, composite_load_transfer, composite_method2, composite_shear,
+                               composite_i5, composite_method2, composite_shear,
                                composite_tension, composite_wall_interaction, second_order_demands, uses_appendix_2)
 from .domain.speedcore import (c_wall_compression, c_wall_flexure, c_wall_interaction, c_wall_shear, c_wall_tension,
                                coupling_beam_axial, coupling_beam_flexure, coupling_beam_shear, wall_fire)
@@ -18,6 +18,7 @@ from .domain.flexure import flexure_strength
 from .domain.interaction_diagram import interaction_diagrams
 from .domain.interaction import COMBINED, amplified_cb_case, combined_strength, tension_cb_factor
 from .domain.requirements import member_requirements, missing, unmet
+from .domain.serviceability import deflection_checks
 from .domain.shear import shear_strength
 from .domain.stiffness import member_stiffness
 from .domain.tension import tension_strength
@@ -91,7 +92,16 @@ class SteelDesignEngine:
         case = validate_case(case)
         section = self.section_for(case)
         inconsistent = section_inconsistencies(section)
-        checks = []
+        if case.condition == "construction":
+            # I3.1b: before the concrete works, the steel section alone resists (Chapters F, G and H), whatever the member.
+            steel = case.model_copy(update={"composite": None, "tau_b": None})
+            checks = self._steel_checks(steel, section, inconsistent)
+            return DesignResult(section=section.name, family=section.type, status=self._status(checks), condition=case.condition,
+                                checks=checks, requirements={"materials": [], "geometry": []},
+                                serviceability=deflection_checks(case.serviceability),
+                                section_data=section.model_dump(mode="json", exclude_none=True))
+        if case.condition == "fire":
+            return self._result(case, section, [self._fire_check(case, section)], inconsistent)
         if case.composite and case.composite.second_order:
             try:
                 case, info = second_order_demands(case, section)
@@ -108,6 +118,10 @@ class SteelDesignEngine:
             return self._result(case, section, composite_checks, inconsistent)
         if case.composite:
             return self._result(case, section, self._composite_checks(case, section, inconsistent), inconsistent)
+        return self._result(case, section, self._steel_checks(case, section, inconsistent), inconsistent)
+
+    def _steel_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
+        checks = []
         if case.Pu:
             chapter = "E" if case.Pu > 0 else "D"
             compute = ((lambda: compression_strength(case, section, catalog=self._catalog)) if chapter == "E"
@@ -134,7 +148,7 @@ class SteelDesignEngine:
         if len(combined) > 1:
             checks.append(self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
                                       lambda: combined_strength(case, section, combined), section, []))
-        return self._result(case, section, checks, inconsistent)
+        return checks
 
     def _composite_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
         """Chapter I: negative flexure of a beam is Chapter F (I3.2b); steel-only shear is Chapter G (I4.1(a), I4.3)."""
@@ -199,14 +213,11 @@ class SteelDesignEngine:
                                       reason="Resistencia de un anclaje de componente.")]
             checks.append(self._check("anchor", "I", 0.0, "–", obligations, lambda: composite_anchor(case, section),
                                       section, []))
-        if case.composite.load_transfer:
-            obligations = [Obligation(id="LT", provision="I6", reason="Transferencia de la fuerza longitudinal.")]
-            checks.append(self._check("load_transfer", "I", 0.0, "–", obligations, lambda: composite_load_transfer(case, section),
-                                      section, []))
-        if case.composite.fire:
-            obligations = [Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Muro bajo incendio.")]
-            checks.append(self._check("fire", "I", 0.0, "–", obligations, lambda: wall_fire(case, section), section, []))
         return checks
+
+    def _fire_check(self, case: SteelCase, section: Section) -> Check:
+        obligations = [Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Muro bajo incendio.")]
+        return self._check("fire", "I", 0.0, "–", obligations, lambda: wall_fire(case, section), section, [])
 
     def _guide_member_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
         """C-shaped walls and coupling beams, by the plastic distribution that Design Guide 38 writes out."""
@@ -234,14 +245,15 @@ class SteelDesignEngine:
                                       section, []))
         return checks
 
-    def _result(self, case: SteelCase, section: Section, checks: list[Check], inconsistent) -> DesignResult:
+    @staticmethod
+    def _status(checks: list[Check]) -> Status:
         statuses = {c.status for c in checks}
         if Status.FAIL in statuses:
-            status = Status.FAIL                      # a known failure is never hidden by incompleteness
-        elif Status.INCOMPLETE in statuses:
-            status = Status.INCOMPLETE
-        else:
-            status = Status.PASS
+            return Status.FAIL                        # a known failure is never hidden by incompleteness
+        return Status.INCOMPLETE if Status.INCOMPLETE in statuses else Status.PASS
+
+    def _result(self, case: SteelCase, section: Section, checks: list[Check], inconsistent) -> DesignResult:
+        status = self._status(checks)
         requirements = member_requirements(case, section, checks)
         if status == Status.PASS and unmet(requirements):
             status = Status.FAIL                      # PASS only with every requirement met
@@ -249,7 +261,8 @@ class SteelDesignEngine:
             status = Status.INCOMPLETE
         stiffness = ({"error": "Datos del catálogo incoherentes con su definición; revise el perfil."} if inconsistent
                      else member_stiffness(case, section, catalog=self._catalog))
-        return DesignResult(section=section.name, family=section.type, status=status, checks=checks, stiffness=stiffness, requirements=requirements,
+        return DesignResult(section=section.name, family=section.type, status=status, condition=case.condition, checks=checks, stiffness=stiffness,
+                            requirements=requirements, serviceability=deflection_checks(case.serviceability),
                             interaction_diagrams=interaction_diagrams(case, section, checks),
                             section_data=section.model_dump(mode="json", exclude_none=True))
 

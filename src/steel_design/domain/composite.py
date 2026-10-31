@@ -17,7 +17,7 @@ from ..models import SteelCase
 from ..sections.models import Section
 
 _LIMITATIONS = (
-    "Diafragmas (I7) y conexión ensayada (I8.4) no se comprueban; I6 solo si se indica composite.load_transfer.",
+    "Diafragmas (I7) y conexión ensayada (I8.4) no se comprueban. La transferencia de carga (I6) corresponde al diseño de conexiones y queda fuera.",
     "El diseño del concreto y del refuerzo según ACI 318 (I1.1) queda fuera de este cálculo.",
     "Pr y Mr son datos del usuario, salvo con composite.second_order (Apéndice 8.1): se supone que provienen de un análisis "
     "según el Capítulo C con las rigideces de I1.5 (decisión DH-3).",
@@ -505,7 +505,55 @@ def _anchor_factors(beam, section):
     return (1.0 if per_rib == 1 else 0.85 if per_rib == 2 else 0.7), (0.75 if deck.emid_ht_at_least_50 else 0.6)
 
 
-def _beam_requirements(beam, section, Fy):
+def _beam_anchors(beam):
+    return [(name, anchors) for name, anchors in (("studs", beam.studs), ("channels", beam.channels)) if anchors]
+
+
+def missing_anchor_detailing(beam) -> list[str]:
+    """Fields that I8.2d needs and the input does not give."""
+    out = []
+    for name, anchors in _beam_anchors(beam):
+        field, detail = f"composite.beam.{name}.detailing", anchors.detailing
+        if detail is None:
+            out.append(field)
+            continue
+        if getattr(anchors, "per_rib", 1) > 1 and detail.transverse_spacing is None:
+            out.append(f"{field}.transverse_spacing")
+        if beam.deck is None and detail.lateral_cover is None:
+            out.append(f"{field}.lateral_cover")
+        if detail.free_edge and detail.free_edge_distance is None:
+            out.append(f"{field}.free_edge_distance")
+    return out
+
+
+def _anchor_detailing_requirements(name, anchors, beam, concrete):
+    """I8.2d for one type of anchor, in the sense of the moment that uses it."""
+    detail, deck = anchors.detailing, beam.deck
+    s, label = detail.longitudinal_spacing, "pernos" if name == "studs" else "canales"
+    out = []
+    if name == "studs":
+        perpendicular = deck is not None and deck.orientation == "perpendicular"
+        s_min = (4.0 if perpendicular else 6.0) * anchors.d
+        out.append(_requirement(f"{name}_s_min", "I8.2d(d)", s >= s_min, "Separación longitudinal mínima de pernos.", s, f"≥ {s_min:g} mm"))
+        if detail.transverse_spacing is not None:
+            s_t = 4.0 * anchors.d
+            out.append(_requirement(f"{name}_s_transverse", "I8.2d(d)", detail.transverse_spacing >= s_t,
+                                    "Separación transversal mínima de pernos.", detail.transverse_spacing, f"≥ {s_t:g} mm"))
+    s_max = min(8.0 * (beam.tc + (deck.hr if deck else 0.0)), 900.0)
+    out.append(_requirement(f"{name}_s_max", "I8.2d(e)", s <= s_max, f"Separación máxima de {label} (8 veces la losa total o 900 mm).", s, f"≤ {s_max:g} mm"))
+    if deck is None:
+        out.append(_requirement(f"{name}_cover", "I8.2d(b)", detail.lateral_cover >= 25.0, f"Recubrimiento lateral de {label}.",
+                                detail.lateral_cover, "≥ 25 mm"))
+    if detail.free_edge:
+        edge = 250.0 if concrete.lightweight else 200.0
+        out.append(_requirement(f"{name}_free_edge", "I8.2d(c)", detail.free_edge_distance >= edge,
+                                f"Distancia de {label} al borde libre en la dirección del cortante.", detail.free_edge_distance, f"≥ {edge:g} mm"))
+    out.append(_requirement(f"{name}_distribution", "I8.2d(a)", True, f"Distribución de {label}.",
+                            "uniforme" if detail.distribution == "uniform" else "según documentos de diseño", "uniforme o según documentos de diseño"))
+    return out
+
+
+def _beam_requirements(beam, section, concrete):
     """I3.2c and I8.1 to I8.2: the geometric limits that the input declares."""
     out = []
     deck, studs = beam.deck, beam.studs
@@ -524,10 +572,13 @@ def _beam_requirements(beam, section, Fy):
                                  "El perno debe sobresalir al menos 38 mm del deck."),
                     _requirement("stud_cover", "I3.2c.1(b)", deck.hr + beam.tc - studs.length >= 13.0,
                                  "Recubrimiento sobre el perno ≥ 13 mm.")]
+    if beam.moment == "positive" and not missing_anchor_detailing(beam):
+        for name, anchors in _beam_anchors(beam):
+            out += _anchor_detailing_requirements(name, anchors, beam, concrete)
     return out
 
 
-def _beam_flexure(case, section, flexure_strength):
+def _beam_flexure(case, section):
     """I3.2a(a) positive flexure; I3.2b steel section alone for negative flexure (Chapter F)."""
     beam, Fy = case.composite.beam, case.material.Fy
     if beam.moment == "negative":
@@ -541,6 +592,9 @@ def _beam_flexure(case, section, flexure_strength):
                     ["composite.beam.studs", "composite.beam.channels"])
     if beam.channels is not None and beam.deck is not None:
         _blocked("I8.2b cubre conectores de canal en losa maciza, no sobre deck.", section)
+    missing = missing_anchor_detailing(beam)
+    if missing:
+        _incomplete("La viga compuesta debe declarar el detallado de sus conectores (I8.2d).", section, missing)
     concrete = case.composite.concrete
     Ec = eq.concrete_modulus(wc=concrete.wc, fc=concrete.fc)
     left = beam.left_beam_spacing / 2 if beam.left_beam_spacing else beam.left_edge_distance
@@ -569,20 +623,12 @@ def _beam_flexure(case, section, flexure_strength):
             "Vp_crushing_kN": crushing / 1000.0, "Vp_steel_kN": steel / 1000.0, "SumQn_kN": sum_qn / 1000.0,
             "C_kN": C / 1000.0, "a_mm": a, "PNA": out["pna"], "x_mm": out["x_mm"], "degree_of_composite_action": degree,
             **anchors, "Mn_kNm": out["Mn"] / 1e6}
-    requirements = _beam_requirements(beam, section, Fy)
+    requirements = _beam_requirements(beam, section, concrete)
     notes = []
     # Commentary I3.2d: conditions under which slip capacity is not a concern.
     if not (beam.span <= 9100.0 or degree >= 0.5 or sum_qn / (beam.span / 2) >= 230.0):
         notes.append("I3.2d: revise la ductilidad de la conexión; no se cumple ninguna condición del Commentary "
                      "(luz ≤ 9.1 m, acción compuesta ≥ 50 %, o conectores ≥ 230 kN/m).")
-    if not beam.shored:
-        if beam.Mu_construction is None:
-            _incomplete("Viga sin apuntalar: indique composite.beam.Mu_construction (I3.1b).", section,
-                        ["composite.beam.Mu_construction"])
-        bare = flexure_strength()
-        mode["construction_available_kNm"] = bare["available_kNm"]
-        requirements.append(_requirement("construction", "I3.1b", beam.Mu_construction <= bare["available_kNm"],
-                                         "La sección de acero sola debe resistir las cargas de construcción."))
     return _flexure_output(case, section, mn_mode=mode, requirements=requirements, notes=notes, provisions=["I1", "I3.2", "I8.2"])
 
 
@@ -614,7 +660,7 @@ def composite_flexure(case: SteelCase, section: Section, axis: str, flexure_stre
     if kind == "beam":
         if axis != "x":
             _blocked("La viga compuesta se calcula en su eje mayor (I3.2).", section, axis=axis)
-        result = _beam_flexure(case, section, flexure_strength)
+        result = _beam_flexure(case, section)
         return flexure_strength() if result is None else result
     return _filled_flexure(case, section, axis) if kind == "filled" else _encased_flexure(case, section, axis)
 
@@ -757,65 +803,6 @@ def second_order_demands(case: SteelCase, section: Section) -> tuple[SteelCase, 
     update = {"Pu": out["Pr"], "Mux" if basis.axis == "x" else "Muy": out["Mr"]}
     info = {"Cm": cm, "Pe1_kN": pe1 / 1000.0, "B1": b1, "Pe_story_kN": pe_story, "B2": b2, "Pr_kN": out["Pr"], "Mr_kNm": out["Mr"]}
     return case.model_copy(update=update), info
-
-
-def composite_load_transfer(case: SteelCase, section: Section) -> dict:
-    """I6: required longitudinal shear and the largest available transfer mechanism; they are not superimposed."""
-    _check_family(case, section)
-    composite, transfer = case.composite, case.composite.load_transfer
-    if composite.kind not in {"filled", "encased"}:
-        _blocked("I6 se aplica a miembros embebidos y rellenos.", section, kind=composite.kind)
-    Fy, fc = case.material.Fy, composite.concrete.fc
-    slender = False
-    if composite.kind == "encased":
-        geometry = _encased_geometry(case, section)
-        pno = eq.pno_encased(Fy=Fy, As=section.area, Fysr=composite.encased.Fysr, Asr=geometry["Asr"], fc=fc, Ac=geometry["Ac"])
-        fs_as = Fy * section.area
-    else:
-        geometry = _filled_geometry(case, section)
-        pno = _filled_compression(case, section, geometry)[0]["Pno"]
-        slender = pno and _axial_class(section, geometry, Fy)["class"] == "slender" and not uses_appendix_2(case, section)
-        Fn = _filled_compression(case, section, geometry)[0].get("Fn")
-        fs_as = (Fn if slender else Fy) * section.area
-        if slender and transfer.applied_to != "concrete":
-            _blocked("Relleno esbelto: la fuerza no puede aplicarse al acero (Nota de I6.2a y Commentary I6.2).", section)
-    force = eq.transfer_force(Pr=transfer.Pr * 1000.0, Fs_As=fs_as, Pno=pno, applied_to=transfer.applied_to,
-                              steel_fraction=transfer.steel_fraction)
-    available, requirements = {}, []
-    if transfer.bearing_area:
-        available["bearing"] = 0.65 * eq.bearing_transfer(fc=fc, A1=transfer.bearing_area)
-    if transfer.anchor_count:
-        if composite.anchor is None:
-            _incomplete("I6.3b: indique composite.anchor para calcular la resistencia de los anclajes.", section, ["composite.anchor"])
-        result = composite_anchor(case.model_copy(update={"composite": composite.model_copy(update={"anchor": composite.anchor.model_copy(
-            update={"Qrv": 1.0, "Qrt": 0.0})})}), section)
-        mode = next(iter(result["modes"].values()))
-        available["anchors"] = transfer.anchor_count * mode.get("Qcv_kN", 0.0) * 1000.0
-    if transfer.bond_length:
-        if composite.kind != "filled" or slender:
-            _blocked("I6.3: la adherencia directa no se usa en embebidos ni en rellenos esbeltos (Commentary I6.3).", section)
-        if transfer.bond_slip_controlled is not True:
-            _incomplete("I6.3: declare composite.load_transfer.bond_slip_controlled = true para usar adherencia directa.", section,
-                        ["composite.load_transfer.bond_slip_controlled"])
-        t = geometry["t"]
-        if geometry["shape"] == "rect":
-            r = geometry["r"]
-            pb = 2 * (geometry["bi"] + geometry["hi"]) - 8 * r + 2 * math.pi * r
-            depth, limit = max(section.h_out, section.b_out), 2 * min(section.h_out, section.b_out)
-        else:
-            pb, depth, limit = 2 * math.pi * geometry["ri"], geometry["D"], 2 * geometry["D"]
-        fin = eq.bond_stress(t=t, H=depth, rectangular=geometry["shape"] == "rect")
-        available["bond"] = 0.50 * eq.bond_transfer(pb=pb, Lin=transfer.bond_length, Fin=fin)
-        requirements.append(_requirement("Lin", "I6.4b", transfer.bond_length <= limit, "Longitud de introducción ≤ 2 veces la menor dimensión."))
-    if not available:
-        _incomplete("I6.3: indique al menos un mecanismo de transferencia.", section,
-                    ["composite.load_transfer.bearing_area", "composite.load_transfer.anchor_count", "composite.load_transfer.bond_length"])
-    mechanism = max(available, key=available.get)
-    ratio = force["Vr"] / available[mechanism]
-    mode = {"limit_state": "load_transfer", "provision": "I6", "applies": True, "equation": force["equation"], "Pno_kN": pno / 1000.0,
-            "Vr_kN": force["Vr"] / 1000.0, **{f"{k}_kN": v / 1000.0 for k, v in available.items()}, "mechanism": mechanism,
-            "ratio": ratio}
-    return _result(case, section, modes={"LT": mode}, governing="LT", provisions=["I6"], requirements=requirements, ratio=ratio)
 
 
 def composite_anchor(case: SteelCase, section: Section) -> dict:

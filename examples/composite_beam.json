@@ -1,7 +1,17 @@
 {
   "section_name": "W21X50",
   "material": {"Fy": 345},
-  "flexure": {"Lb": 900, "tension_flange_holes": false},
+  "lengths": {
+    "ultimate": {"Lx": 13716, "Ly": 900, "Lz": 900},
+    "construction": {"Lx": 13716, "Ly": 900, "Lz": 900}
+  },
+  "flexure": {"tension_flange_holes": false},
+  "serviceability": {
+    "actual_span": 13716,
+    "effective_span": 13716,
+    "deflections": {"live_short": 25, "dead_short": 30, "total_long": 45},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+  },
   "composite": {
     "kind": "beam",
     "concrete": {"fc": 28, "wc": 2320, "lightweight": false},
@@ -12,12 +22,15 @@
       "right_beam_spacing": 3048,
       "tc": 114,
       "deck": {"orientation": "perpendicular", "hr": 75, "wr": 150, "emid_ht_at_least_50": false},
-      "studs": {"count": 22, "d": 19, "Fu": 450, "length": 115, "over_web": true},
-      "shored": false,
-      "Mu_construction": 460
+      "studs": {
+        "count": 22, "d": 19, "Fu": 450, "length": 115, "over_web": true,
+        "detailing": {"longitudinal_spacing": 305, "free_edge": true, "free_edge_distance": 300, "distribution": "uniform"}
+      },
+      "shored": false
     }
   },
   "cases": [
-    {"name": "Flexure and shear", "Mux": 900, "Vux": 300}
+    {"name": "Flexure and shear", "Mux": 900, "Vux": 300},
+    {"name": "Concrete pour", "condition": "construction", "Mux": 460, "Vux": 150}
   ]
 }

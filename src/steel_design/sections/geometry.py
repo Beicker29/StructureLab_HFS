@@ -1,4 +1,5 @@
 """Solid custom sections (mm): area, moments of inertia, radii of gyration, elastic and plastic moduli."""
+from ..codes.aisc_dg06.members import box_torsional_constant
 import math
 
 from ..errors import ValidationError
@@ -12,8 +13,10 @@ def build_box_section(case: SteelCase) -> Section:
     if 2 * box.t >= min(box.B, box.H):
         raise ValidationError("Las placas deben dejar un núcleo de concreto positivo.", details={"section": case.section_name})
     bi, hi = box.B - 2 * box.t, box.H - 2 * box.t
-    return Section(name=case.section_name, type="RECTANGULAR_HSS", A=box.B * box.H - bi * hi, tdes=box.t, Ht=box.H, B=box.B,
-                   b=bi, h=hi, Ix=(box.B * box.H**3 - bi * hi**3) / 12.0, Iy=(box.H * box.B**3 - hi * bi**3) / 12.0,
+    area, ix, iy = box.B * box.H - bi * hi, (box.B * box.H**3 - bi * hi**3) / 12.0, (box.H * box.B**3 - hi * bi**3) / 12.0
+    return Section(name=case.section_name, type="RECTANGULAR_HSS", A=area, tdes=box.t, Ht=box.H, B=box.B,
+                   b=bi, h=hi, Ix=ix, Iy=iy, Sx=2 * ix / box.H, Sy=2 * iy / box.B, rx=math.sqrt(ix / area), ry=math.sqrt(iy / area),
+                   J=box_torsional_constant(B=box.B, H=box.H, t=box.t),
                    Zx=(box.B * box.H**2 - bi * hi**2) / 4.0, Zy=(box.H * box.B**2 - hi * bi**2) / 4.0,
                    **{"b/tdes": bi / box.t, "h/tdes": hi / box.t})
 

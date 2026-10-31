@@ -2,9 +2,18 @@
   "tau_b": 0.8,
   "section_name": "PTER8\"X5.00MM",
   "material": {"Fy": 345},
-  "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+  "lengths": {
+    "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+    "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}
+  },
+  "serviceability": {
+    "actual_span": 4000,
+    "effective_span": 4000,
+    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+  },
   "composite": {
-    "kind": "filled", "interaction": null, "second_order": null,
+    "kind": "filled", "pour_height": 4000, "interaction": null, "second_order": null,
     "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
     "filled": {
       "Fysr": 420,
@@ -18,6 +27,7 @@
     }
   },
   "cases": [
-    {"name": "Compression, flexure and shear", "Pu": 600, "Mux": 40, "Vux": 100}
+    {"name": "Compression, flexure and shear", "Pu": 600, "Mux": 40, "Vux": 100},
+    {"name": "Concrete pour", "condition": "construction", "Mux": 19, "Vux": 29}
   ]
 }

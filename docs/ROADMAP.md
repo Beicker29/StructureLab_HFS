@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-El repositorio contiene los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 a 3), con los Apéndices 2 y 8.1, de
+El repositorio contiene los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 y 2), con los Apéndices 2 y 8.1, de
 ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no son norma. El Capítulo I anterior sigue en el historial de Git (commit `d3a1b02`).
 
 ## Hecho
@@ -28,10 +28,10 @@ ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no
   con cálculos independientes ([detalle](chapter-i.md)).
 - Capítulo I, etapa 2: Método 2 de I5 (Commentary), anclajes de componentes (I8.3) y muros de placas planos (I1.6, I2.3,
   I3.5, I4.4, I5(c)), verificado con cálculos independientes.
-- Capítulo I, etapa 3: transferencia de carga (I6), verificado con cálculos independientes y los ejemplos I.3 e I.8.
 - Contenidos de AISC Design Guide 6 y 38: barras en rellenos, Apéndice 2, Apéndice 8.1, cajones, factor de forma, sección controlada por
   tracción, rigideces de servicio y de muros, muros en C, vigas de acoplamiento, placas esbeltas e incendio.
-- Memoria con nueve capítulos fijos, símbolos en palabras y literal del documento de referencia en cada valor calculado.
+- Pendiente: construcción de muros, muros en C y vigas de acoplamiento (módulo de placas vacío, DG38) y flexión y cortante en incendio.
+- Una memoria por miembro con once capítulos fijos y el case de mayor DCR en cada revisión, símbolos en palabras y literal del documento de referencia en cada valor calculado.
 - Contraste con los ejemplos de AISC Design Guide 6 y 38 ([detalle](design-guides.md)).
 - Contraste con 66 casos de los AISC Design Examples v16.0 (D, E, F, G, H, I): coincidencia
   dentro de ±1 % salvo dos diferencias explicadas ([detalle](design-examples.md)).

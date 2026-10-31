@@ -95,7 +95,6 @@ class TensionBasis(InputModel):
 
 class FlexureBasis(InputModel):
     """Member data for Chapter F (supplied by the user)."""
-    Lb: Optional[PositiveNumber] = Field(None, description="Unbraced length for lateral-torsional buckling (mm)")
     Cb: PositiveNumber = Field(1.0, description="LTB modification factor (F1); 1.0 when not given (lower bound of F1-1)")
     tension_flange_holes: Optional[StrictBool] = Field(
         None, description="F13.1: bolt holes in the tension flange (I-shapes and channels, major axis); must be declared")
@@ -170,6 +169,20 @@ class FilledBars(InputModel):
     transverse: TransverseReinforcement
 
 
+class AnchorDetailing(InputModel):
+    """Detailing of the anchors of a composite beam (I8.2d)."""
+    longitudinal_spacing: PositiveNumber = Field(..., description="I8.2d(d), (e): center-to-center spacing along the beam (mm)")
+    transverse_spacing: Optional[PositiveNumber] = Field(
+        None, description="I8.2d(d): center-to-center spacing across the beam; required with more than one stud per rib (mm)")
+    lateral_cover: Optional[PositiveNumber] = Field(
+        None, description="I8.2d(b): lateral concrete cover perpendicular to the shear; required without a formed steel deck (mm)")
+    free_edge: StrictBool = Field(..., description="I8.2d(c): the slab has a free edge in the direction of the shear")
+    free_edge_distance: Optional[PositiveNumber] = Field(
+        None, description="I8.2d(c): anchor center to that free edge; required with free_edge (mm)")
+    distribution: Literal["uniform", "design_documents"] = Field(
+        ..., description="I8.2d(a): uniform between maximum and zero moment, or as specified on the design documents")
+
+
 class StudAnchors(InputModel):
     count: PositiveCount = Field(..., description="Studs between the point of maximum moment and the point of zero moment")
     d: PositiveNumber = Field(..., description="Shank diameter dsa (mm)")
@@ -177,6 +190,7 @@ class StudAnchors(InputModel):
     length: PositiveNumber = Field(..., description="Length after installation, base to top of the head (mm)")
     per_rib: PositiveCount = Field(1, description="Studs in one deck rib (deck perpendicular to the beam)")
     over_web: StrictBool = Field(..., description="I8.1: welded to the flange directly over the web")
+    detailing: Optional[AnchorDetailing] = None
 
 
 class ChannelAnchors(InputModel):
@@ -184,6 +198,7 @@ class ChannelAnchors(InputModel):
     la: PositiveNumber = Field(..., description="Channel length (mm)")
     tf: PositiveNumber = Field(..., description="Channel flange thickness (mm)")
     tw: PositiveNumber = Field(..., description="Channel web thickness (mm)")
+    detailing: Optional[AnchorDetailing] = None
 
 
 class FormedDeck(InputModel):
@@ -206,9 +221,7 @@ class CompositeBeamBasis(InputModel):
     deck: Optional[FormedDeck] = None
     studs: Optional[StudAnchors] = None
     channels: Optional[ChannelAnchors] = None
-    shored: StrictBool = Field(..., description="I3.1b: temporary shores used during construction")
-    Mu_construction: Optional[PositiveNumber] = Field(
-        None, description="I3.1b: required strength before the concrete reaches 75% of f'c (kN*m), when unshored")
+    shored: StrictBool = Field(..., description="I3.1b: temporary shores; without them a case with condition = construction is required")
 
     @model_validator(mode="after")
     def one_limit_per_side(self):
@@ -291,24 +304,6 @@ class SecondOrderBasis(InputModel):
     drift: PositiveNumber = Field(..., description="First-order interstory drift with the stiffness of the analysis (mm)")
 
 
-class LoadTransfer(InputModel):
-    """I6: external force introduced to an encased or filled member, and the transfer mechanisms available."""
-    Pr: PositiveNumber = Field(..., description="Required external compressive force applied at the region (kN)")
-    applied_to: Literal["steel", "concrete", "both"]
-    steel_fraction: Optional[FiniteNumber] = Field(None, ge=0, le=1, description="I6.2c: share of Pr applied to the steel")
-    bearing_area: Optional[PositiveNumber] = Field(None, description="I6.3a: loaded concrete area A1 (mm2)")
-    anchor_count: Optional[PositiveCount] = Field(None, description="I6.3b: anchors of composite.anchor in the introduction length")
-    bond_length: Optional[PositiveNumber] = Field(None, description="I6.3c: load introduction length Lin (mm)")
-    bond_slip_controlled: Optional[StrictBool] = Field(
-        None, description="I6.3: bond failure would not cause uncontrolled slip; must be true to use direct bond")
-
-    @model_validator(mode="after")
-    def concurrent_needs_share(self):
-        if (self.applied_to == "both") != (self.steel_fraction is not None):
-            raise ValueError("steel_fraction corresponde solo a applied_to = both, y es obligatorio en ese caso.")
-        return self
-
-
 class CShapedWall(InputModel):
     """C-shaped SpeedCore wall of one plate thickness (Design Guide 38, A.2). Not a standard."""
     L: PositiveNumber = Field(..., description="Web wall length, outside to outside of the flange walls (mm)")
@@ -339,7 +334,6 @@ class VentHoles(InputModel):
     heating_time: PositiveNumber = Field(..., description="Heating duration tdc for that thickness (s)")
     water_content: PositiveNumber = Field(..., le=1, description="Concrete water content by volume, as a fraction")
     water_density: PositiveNumber = Field(..., description="Water density (kg/m3)")
-    pour_height: PositiveNumber = Field(..., description="Concrete pouring height (mm)")
 
 
 class WallFire(InputModel):
@@ -379,14 +373,18 @@ class CompositeBasis(InputModel):
     coupling_beam: Optional[CouplingBeam] = None
     fire: Optional[WallFire] = None
     second_order: Optional[SecondOrderBasis] = None
-    load_transfer: Optional[LoadTransfer] = None
     biaxial_shape_factor: StrictBool = Field(
         False, description="M2S with flexure about two axes: Design Guide 6 Equations 2-2a/b instead of C-I5-1")
     flexural_member: Optional[StrictBool] = Field(
         None, description="I3.3a(e), I3.4a(d): the member is a beam, so it must be tension controlled when Pu < 0.10Pn")
 
+    pour_height: Optional[PositiveNumber] = Field(
+        None, description="Height of the wet concrete pour (mm): Design Guide 6, 4.3 and Design Guide 38, 2.2.1.2 and Chapter 6")
+
     @model_validator(mode="after")
     def data_of_the_declared_kind(self):
+        if self.pour_height is not None and self.kind not in {"filled", "wall"}:
+            raise ValueError("composite.pour_height corresponde solo a kind = filled o wall.")
         if self.box is not None and self.kind != "filled":
             raise ValueError("composite.box corresponde solo a kind = filled.")
         if (self.kind == "c_wall") != (self.c_wall is not None):
@@ -397,8 +395,6 @@ class CompositeBasis(InputModel):
             raise ValueError("composite.fire corresponde solo a kind = wall (Guía 38, Capítulo 6).")
         if self.second_order is not None and self.kind not in {"filled", "encased", "wall"}:
             raise ValueError("composite.second_order se aplica a rellenos, embebidos y muros planos.")
-        if self.load_transfer is not None and self.kind not in {"filled", "encased"}:
-            raise ValueError("composite.load_transfer (I6) se aplica a rellenos y embebidos.")
         if self.anchor is not None and self.kind in {"c_wall", "coupling_beam"}:
             raise ValueError("composite.anchor (I8.3) no está disponible para muros en C ni vigas de acoplamiento.")
         if self.biaxial_shape_factor and self.interaction != "M2S":
@@ -439,9 +435,34 @@ class CustomSection(InputModel):
         return self
 
 
+class Deflections(InputModel):
+    """Deflections from the user's analysis (mm); the program does not calculate them."""
+    live_short: NonNegativeNumber = Field(..., description="Live load, short term (mm)")
+    dead_short: NonNegativeNumber = Field(..., description="Dead load, short term (mm)")
+    total_long: NonNegativeNumber = Field(..., description="Live + dead load, long term (mm)")
+
+
+class DeflectionDivisors(InputModel):
+    """n of each limit L/n, with L the effective span for deflections."""
+    live_short: PositiveNumber
+    dead_short: PositiveNumber
+    total_long: PositiveNumber
+
+
+class Serviceability(InputModel):
+    """Deflection review of the member. AISC 360-22 Chapter L gives no numeric limits: they are the user's criteria."""
+    actual_span: PositiveNumber = Field(..., description="Actual span (mm); reported only")
+    effective_span: PositiveNumber = Field(..., description="Effective span for deflections (mm): the L of the limits L/n")
+    deflections: Deflections
+    limit_divisors: DeflectionDivisors
+
+
 class SteelCase(InputModel):
     section_name: NonBlankString
     material: Material
+    condition: Literal["ultimate", "construction", "fire"] = Field(
+        "ultimate", description="Condition of this load case: ultimate, construction (steel section alone, Mu and Vu) or fire")
+    serviceability: Optional[Serviceability] = None
     Pu: FiniteNumber = Field(0.0, description="Required axial strength (kN): > 0 compression (Chapter E), "
                                                "< 0 tension (Chapter D); LRFD load combination")
     Mux: FiniteNumber = Field(0.0, description="Required flexural strength about x (kN*m), Chapter F")
@@ -452,7 +473,8 @@ class SteelCase(InputModel):
                                                 "(web of I-shapes, H walls of HSS) (kN), Chapter G")
     Vuy: FiniteNumber = Field(0.0, description="Required shear strength that accompanies Muy, parallel to x (kN), Chapter G")
     angle_flexure: Optional[AngleFlexure] = None
-    lengths: Optional[Lengths] = Field(None, description="Unbraced lengths; required for compression")
+    lengths: Optional[Lengths] = Field(
+        None, description="Unbraced lengths of this case, or {ultimate, construction}: the one of its condition is taken (fire uses ultimate)")
     factors: Factors = Field(default_factory=Factors)
     single_angle_e5: Optional[SingleAngleE5Basis] = None
     double_angle_e6: Optional[DoubleAngleE6Basis] = None
@@ -465,18 +487,34 @@ class SteelCase(InputModel):
     custom_section: Optional[CustomSection] = None
     composite: Optional[CompositeBasis] = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def lengths_of_the_condition(cls, data):
+        lengths = data.get("lengths") if isinstance(data, dict) else None
+        if not isinstance(lengths, dict) or not {"ultimate", "construction"} & set(lengths):
+            return data
+        if set(lengths) - {"ultimate", "construction"}:
+            raise ValueError("lengths: indique Lx, Ly, Lz o bien ultimate y construction, no ambos.")
+        return {**data, "lengths": lengths.get("construction" if data.get("condition") == "construction" else "ultimate")}
+
     @model_validator(mode="after")
     def demand(self):
         if self.composite is not None and self.custom_section is not None:
             raise ValueError("Un miembro compuesto usa un perfil del catálogo, no custom_section.")
         composite = self.composite
+        if self.condition == "construction" and (self.Pu or (composite is not None and (composite.second_order or composite.fire))):
+            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique Pu, second_order ni fire.")
+        if (self.condition == "fire") != (composite is not None and composite.fire is not None):
+            raise ValueError("condition = fire y composite.fire van juntos.")
+        if self.condition == "fire" and any((self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy)):
+            raise ValueError("Flexión y cortante en incendio no están implementados: un case de incendio solo admite Pu.")
         if composite is not None and composite.second_order is not None:
             if self.Pu or self.Mux or self.Muy:
                 raise ValueError("Con composite.second_order, Pu, Mux y Muy salen de A-8-1 y A-8-2; no los indique.")
             if self.lengths is None:
                 raise ValueError("composite.second_order requiere lengths.")
         if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy,
-                    composite and (composite.anchor or composite.second_order or composite.load_transfer))):
+                    composite and (composite.anchor or composite.second_order))):
             raise ValueError("La combinación debe tener al menos una demanda distinta de cero "
                              "(Pu, Mux, Muy, Mw, Mz, Vux, Vuy).")
         if self.composite is None and self.tau_b not in (None, 1.0):
@@ -503,7 +541,7 @@ class Obligation(BaseModel):
 class Check(BaseModel):
     """One required strength of a load combination (axial, flexure or shear) or their interaction (H)."""
     id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z", "shear_x", "shear_y", "interaction", "anchor",
-                "load_transfer", "fire"]
+                "fire"]
     chapter: Literal["D", "E", "F", "G", "H", "I"]
     demand: float = Field(..., description="|Pu| or |Vu| (kN), |Mu| (kN*m); interaction value for Chapter H")
     unit: Literal["kN", "kN·m", "–"]
@@ -519,6 +557,8 @@ class DesignResult(BaseModel):
     section: str
     family: str
     status: Status
+    condition: str = "ultimate"
+    serviceability: list = Field(default_factory=list, description="Deflections against their limits; informative, they do not decide the status")
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
     stiffness: dict = Field(default_factory=dict, description="Elastic, effective and direct-analysis stiffnesses (N, mm), whatever the demands")
@@ -526,7 +566,7 @@ class DesignResult(BaseModel):
     interaction_diagrams: list = Field(default_factory=list, description="Interaction diagrams of Manual Tables 6-2a to 6-4; informative")
     scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
                   "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
-                  "I5, I6, I8.2 e I8.3; Apéndices 2 y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica cada chequeo: no "
+                  "I5, I8.2 e I8.3; Apéndices 2 y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica cada chequeo: no "
                   "es norma. Longitudes efectivas, análisis estructural, combinaciones de carga, conexiones, torsión y demás "
                   "capítulos quedan fuera de este resultado.")
 

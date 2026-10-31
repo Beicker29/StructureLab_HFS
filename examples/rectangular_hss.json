@@ -5,17 +5,19 @@
     "Fu": 450
   },
   "lengths": {
-    "Lx": 3000,
-    "Ly": 3000,
-    "Lz": 3000
+    "ultimate": {"Lx": 3000, "Ly": 3000, "Lz": 3000},
+    "construction": {"Lx": 3000, "Ly": 1500, "Lz": 1500}
+  },
+  "serviceability": {
+    "actual_span": 3000,
+    "effective_span": 3000,
+    "deflections": {"live_short": 6.0, "dead_short": 7.5, "total_long": 10.0},
+    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
   },
   "tension": {
     "An": 1350,
     "U": 0.8,
     "fabricated_length": 3000
-  },
-  "flexure": {
-    "Lb": 3000
   },
   "cases": [
     {
@@ -33,6 +35,7 @@
     {
       "name": "Combinación 4 — flexión y",
       "Muy": 8
-    }
+    },
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 4.7, "Vux": 12}
   ]
 }

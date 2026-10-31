@@ -10,11 +10,13 @@ import pytest
 from steel_design.codes.aisc_360_22 import composite as eq
 from steel_design.domain.compression import compression_strength
 from steel_design.models import SteelCase
+from steel_design.execution import execute_payload, overall_status
 from steel_design.reporting import calculation_report
 
 from conftest import ROOT
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_i/reference.json").read_text(encoding="utf-8"))["cases"]
+REFERENCE_F = json.loads((ROOT / "tests/fixtures/chapter_f/reference.json").read_text(encoding="utf-8"))["cases"]
 TIES = {"db": 10, "spacing": 300}
 LENGTHS = {"Lx": 2000, "Ly": 2000, "Lz": 2000}
 
@@ -36,15 +38,16 @@ def anchor_case(spec, member=None, **overrides):
                                 "anchor": anchor})
 
 
+DETAILING = {"longitudinal_spacing": 300, "lateral_cover": 50, "free_edge": True, "free_edge_distance": 300, "distribution": "uniform"}
 WALL = {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
-GUIDE_KINDS = {"appendix_2_biaxial", "service_encased", "service_box", "diagram_rect", "diagram_round", "diagram_encased", "second_order", "load_transfer_filled", "load_transfer_encased", "tension_control", "box_compression", "box_flexure",
+GUIDE_KINDS = {"appendix_2_biaxial", "service_encased", "service_box", "diagram_rect", "diagram_round", "diagram_encased", "second_order", "tension_control", "box_compression", "box_flexure",
                "box_shear", "biaxial", "service_filled", "service_round", "wall_slender", "wall_stiffnesses", "c_wall_case",
                "coupling_flexure", "coupling_shear", "wall_fire_oracle"}
 
 
 def wall_member(fc=35, wall=None, **demands):
     return SteelCase(tau_b=1.0, section_name="MURO", material={"Fy": 345}, **demands,
-                     composite={"kind": "wall", "concrete": {"fc": fc, "wc": 2320, "lightweight": False},
+                     composite={"kind": "wall", "pour_height": 3000, "concrete": {"fc": fc, "wc": 2320, "lightweight": False},
                                 "wall": {**WALL, **(wall or {})}})
 
 
@@ -120,12 +123,12 @@ def build(spec):
         deck = {"orientation": "perpendicular", "hr": spec["hr"], "wr": 150, "emid_ht_at_least_50": float(spec["Rp"]) == 0.75}
     beam_data = {"moment": "positive", "span": spec["span"], "left_beam_spacing": spec["spacing"],
                  "right_beam_spacing": spec["spacing"], "tc": spec["tc"], "deck": deck, "shored": True,
-                 "studs": {"count": spec["n"], "d": spec["d"], "Fu": spec["Fu"], "length": 120, "over_web": True}}
+                 "studs": {"count": spec["n"], "d": spec["d"], "Fu": spec["Fu"], "length": 120, "over_web": True, "detailing": DETAILING}}
     data["composite"] = {"kind": "beam", "concrete": concrete(spec), "beam": beam_data}
     return SteelCase(tau_b=1.0, **data, Mux=1), "flexure_x", "available_kNm", "phiMn_kNm"
 
 
-@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] not in GUIDE_KINDS))
+@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] not in GUIDE_KINDS | {"beam_detailing", "filled_placement", "deflection_limit", "box_steel_flexure"}))
 def test_profiles_match_independent_calculation(engine, case_id):
     ref = REFERENCE[case_id]
     case, check_id, field, expected = build(ref["spec"])
@@ -249,8 +252,8 @@ def test_bare_steel_is_a_lower_bound_of_the_compressive_strength(engine, section
 
 def beam(**overrides):
     data = {"moment": "positive", "span": 9000, "left_beam_spacing": 3000, "right_beam_spacing": 3000, "tc": 120,
-            "shored": True, "studs": {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True}, **overrides}
-    return SteelCase(tau_b=1.0, section_name="W14X30", material={"Fy": 345}, Mux=100, flexure={"Lb": 2000, "tension_flange_holes": False},
+            "shored": True, "studs": {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True, "detailing": DETAILING}, **overrides}
+    return SteelCase(tau_b=1.0, section_name="W14X30", material={"Fy": 345}, Mux=100, lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000}, flexure={"tension_flange_holes": False},
                      composite={"kind": "beam", "concrete": {"fc": 28, "wc": 2320, "lightweight": False}, "beam": data})
 
 
@@ -268,13 +271,128 @@ def test_beam_without_connectors_is_incomplete(engine):
     assert check.status.value == "INCOMPLETE" and check.errors[0]["code"] == "COMPOSITE_DATA_INCOMPLETE"
 
 
-def test_unshored_beam_needs_the_construction_moment(engine):
-    assert engine.run(beam(shored=False)).check("flexure_x").status.value == "INCOMPLETE"
+def studs(**detailing):
+    return {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True, "detailing": {**DETAILING, **detailing}}
+
+
+@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] == "beam_detailing"))
+def test_anchor_detailing_limits_match_independent_calculation(engine, case_id):
+    ref = REFERENCE[case_id]
+    spec = ref["spec"]
+    deck = None
+    if spec["hr"]:
+        deck = {"orientation": "perpendicular" if spec["perpendicular"] else "parallel", "hr": spec["hr"], "wr": 150,
+                "emid_ht_at_least_50": False}
+    case = SteelCase(tau_b=1.0, section_name="W14X30", material={"Fy": 345}, Mux=1, composite={
+        "kind": "beam", "concrete": {"fc": 28, "wc": 1800 if spec["lightweight"] else 2320, "lightweight": spec["lightweight"]},
+        "beam": {"moment": "positive", "span": 9000, "left_beam_spacing": 3000, "right_beam_spacing": 3000, "tc": spec["tc"], "deck": deck,
+                 "shored": True, "studs": {**studs(), "length": spec["length"]}}})
+    check = engine.run(case).check("flexure_x")
+    assert check.status.value == "PASS", check.errors
+    limits = {r["id"]: r["limit"] for r in check.result["requirements"]}
+    assert float(limits["studs_s_min"].split()[1]) == pytest.approx(float(ref["s_min_mm"]))
+    assert float(limits["studs_s_max"].split()[1]) == pytest.approx(float(ref["s_max_mm"]))
+    assert float(limits["studs_free_edge"].split()[1]) == pytest.approx(float(ref["edge_min_mm"]))
+
+
+@pytest.mark.parametrize("studs_data, field", [
+    ({"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True}, "composite.beam.studs.detailing"),
+    (studs(lateral_cover=None), "composite.beam.studs.detailing.lateral_cover"),
+    (studs(free_edge_distance=None), "composite.beam.studs.detailing.free_edge_distance"),
+    ({**studs(), "per_rib": 2}, "composite.beam.studs.detailing.transverse_spacing"),
+])
+def test_beam_without_anchor_detailing_is_incomplete(engine, studs_data, field):
+    result = engine.run(beam(studs=studs_data))
+    check = result.check("flexure_x")
+    assert check.status.value == "INCOMPLETE" and field in check.errors[0]["details"]["fields"]
+    assert any(r["provision"] == "I8.2d" and r["status"] == "sin_dato" for r in result.requirements["geometry"])
+
+
+@pytest.mark.parametrize("detailing, row", [
+    ({"longitudinal_spacing": 100}, "studs_s_min"),
+    ({"longitudinal_spacing": 901}, "studs_s_max"),
+    ({"lateral_cover": 24}, "studs_cover"),
+    ({"free_edge_distance": 199}, "studs_free_edge"),
+    ({"transverse_spacing": 75}, "studs_s_transverse"),
+])
+def test_beam_fails_when_anchor_detailing_is_out_of_limits(engine, detailing, row):
+    check = engine.run(beam(studs=studs(**detailing))).check("flexure_x")
+    assert check.status.value == "FAIL" and any(e.get("id") == row for e in check.errors)
+
+
+def test_negative_flexure_does_not_ask_for_anchor_detailing(engine):
+    data = {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True}
+    assert engine.run(beam(moment="negative", studs=data)).check("flexure_x").status.value != "INCOMPLETE"
+
+
+def test_unshored_beam_needs_a_construction_case(engine):
+    (_, _, result), = execute_payload(beam(shored=False).model_dump(exclude_none=True), engine)
+    assert result.check("flexure_x").status.value == "INCOMPLETE" and result.status.value == "INCOMPLETE"
+    assert "I3.1b" in result.check("flexure_x").errors[-1]["provision"]
+
+
+def construction_bundle(Mux, shored=False):
+    data = beam(shored=shored).model_dump(exclude_none=True)
+    for field in ("Mux", "condition"):
+        data.pop(field)
+    return {**data, "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": Mux, "Vux": 10}]}
 
 
 def test_unshored_beam_fails_when_the_steel_section_is_short(engine):
-    check = engine.run(beam(shored=False, Mu_construction=5000)).check("flexure_x")
-    assert check.status.value == "FAIL" and any(e.get("id") == "construction" for e in check.errors)
+    executions = execute_payload(construction_bundle(5000), engine)
+    assert overall_status([r for _, _, r in executions]).value == "FAIL"
+    assert executions[1][2].check("flexure_x").status.value == "FAIL"
+
+
+def test_construction_uses_the_steel_section_alone(engine):
+    ref = REFERENCE_F["W-F2-inelastic-LTB"]             # W18X50, Lb = 4000 mm, independent calculation of Chapter F
+    data = {"section_name": "W18X50", "material": {"Fy": 345}, "flexure": {"tension_flange_holes": False},
+            "composite": beam().model_dump(exclude_none=True)["composite"],
+            "lengths": {"ultimate": {"Lx": 9000, "Ly": 1000, "Lz": 1000}, "construction": {"Lx": 9000, "Ly": 4000, "Lz": 6000}},
+            "tau_b": 1.0, "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": 100, "Vux": 10}]}
+    (_, _, ultimate), (_, _, construction) = execute_payload(data, engine)
+    assert construction.check("flexure_x").chapter == "F" and construction.check("shear_x").chapter == "G"
+    assert construction.check("flexure_x").capacity == pytest.approx(float(ref["phiMn_kNm"]), rel=1e-9)
+    assert ultimate.check("flexure_x").chapter == "I"
+
+
+def test_construction_case_admits_only_flexure_and_shear():
+    with pytest.raises(ValueError):
+        SteelCase(section_name="W18X50", material={"Fy": 345}, condition="construction", Pu=10, lengths={"Lx": 1, "Ly": 1, "Lz": 1})
+
+
+def test_fire_condition_goes_with_the_fire_data():
+    with pytest.raises(ValueError):
+        SteelCase(section_name="W18X50", material={"Fy": 345}, condition="fire", Pu=10, lengths={"Lx": 1, "Ly": 1, "Lz": 1})
+
+
+def test_lengths_are_taken_by_condition():
+    nested = {"ultimate": {"Lx": 1000, "Ly": 1000, "Lz": 1000}, "construction": {"Lx": 2000, "Ly": 2000, "Lz": 2000}}
+    data = {"section_name": "W18X50", "material": {"Fy": 345}, "Mux": 1, "lengths": nested}
+    assert SteelCase(**data).lengths.Lx == 1000
+    assert SteelCase(**data, condition="construction").lengths.Lx == 2000
+    with pytest.raises(ValueError):
+        SteelCase(**{**data, "lengths": {**nested, "Lx": 1}})
+
+
+@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] == "deflection_limit"))
+def test_deflection_limits_match_independent_calculation(engine, case_id):
+    ref = REFERENCE[case_id]
+    spec = ref["spec"]
+    basis = {"actual_span": spec["span"] + 100, "effective_span": spec["span"],
+             "deflections": {"live_short": spec["value"], "dead_short": 0, "total_long": 0},
+             "limit_divisors": {"live_short": spec["n"], "dead_short": 240, "total_long": 240}}
+    case = SteelCase(section_name="W18X50", material={"Fy": 345}, Vux=1, serviceability=basis)
+    row = engine.run(case).serviceability[0]
+    assert row["limit_mm"] == pytest.approx(float(ref["limit_mm"]), rel=1e-9)
+    assert row["satisfied"] is ref["satisfied"]
+
+
+def test_exceeded_deflection_does_not_change_the_status(engine):
+    basis = {"actual_span": 6000, "effective_span": 6000, "deflections": {"live_short": 500, "dead_short": 0, "total_long": 0},
+             "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}}
+    result = engine.run(SteelCase(section_name="W18X50", material={"Fy": 345}, Vux=1, serviceability=basis))
+    assert not result.serviceability[0]["satisfied"] and result.status.value == "PASS"
 
 
 def test_beam_with_axial_force_is_blocked(engine):
@@ -410,3 +528,77 @@ def test_reports_are_built_for_every_member_type(engine, factory):
     case = factory()
     text = calculation_report(case, engine.run(case))
     assert "Miembro compuesto" in text and "Capítulo I" in text
+
+
+def placement_member(name="PTE200X100X6MM", **composite):
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": 345}, Vux=1, lengths=LENGTHS,
+                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False}, **composite})
+
+
+def placement_rows(result):
+    return [r for r in result.requirements["geometry"] if "Guía 6, 4.3" in r["provision"] or "Guía 38, 2.2.1.2" in r["provision"]]
+
+
+@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] == "filled_placement"))
+def test_concrete_placement_matches_independent_calculation(engine, case_id):
+    ref = REFERENCE[case_id]
+    spec = ref["spec"]
+    case = SteelCase(tau_b=1.0, section_name=spec["name"], material={"Fy": 345}, Vux=1, lengths=LENGTHS, composite={
+        "kind": "filled", "pour_height": spec["Lp"], "concrete": {"fc": 35, "wc": spec["wc"], "lightweight": False}})
+    sigma, delta = placement_rows(engine.run(case))
+    assert sigma["value"] == pytest.approx(float(ref["sigma_mpa"]), rel=1e-9)
+    assert delta["value"] == pytest.approx(float(ref["delta_mm"]), rel=1e-9)
+    assert f"p = {float(ref['p_mpa']):.4f} MPa" in sigma["description"]
+
+
+def test_concrete_placement_needs_the_pour_height(engine):
+    result = engine.run(placement_member())
+    assert [r["status"] for r in placement_rows(result)] == ["sin_dato"]
+    assert result.status.value == "INCOMPLETE"
+
+
+def test_concrete_placement_is_a_recommendation_that_does_not_fail_the_member(engine):
+    result = engine.run(placement_member(name="PTE120X60X2MM", pour_height=100000))
+    rows = placement_rows(result)
+    assert {r["status"] for r in rows} == {"no_cumple"} and not any(r["binding"] for r in rows)
+    assert result.status.value != "FAIL"
+
+
+def test_concrete_placement_deformation_needs_the_lengths(engine):
+    data = placement_member(pour_height=3000).model_dump(exclude_none=True)
+    del data["lengths"]
+    assert [r["status"] for r in placement_rows(engine.run(SteelCase(**data)))] == ["cumple", "sin_dato"]
+
+
+def test_concrete_placement_does_not_apply_to_round_tubes(engine):
+    assert [r["status"] for r in placement_rows(engine.run(placement_member(name='PTER6"X6.00MM')))] == ["no_aplica"]
+
+
+@pytest.mark.parametrize("height, wall, status", [
+    (None, {}, "sin_dato"), (9144, {}, "cumple"), (9145, {}, "no_cumple"),
+    (9144, {"b": 400, "st": 400, "allow_slender_plates": True}, "no_cumple"),
+])
+def test_wall_pour_height_of_design_guide_38(engine, height, wall, status):
+    data = wall_member(wall=wall, Pu=1, lengths=LENGTHS).model_dump(exclude_none=True)
+    data["composite"]["pour_height"] = height
+    assert placement_rows(engine.run(SteelCase(**data)))[0]["status"] == status
+
+
+def test_pour_height_is_only_for_filled_members_and_walls():
+    data = beam().model_dump(exclude_none=True)
+    data["composite"]["pour_height"] = 3000
+    with pytest.raises(ValueError):
+        SteelCase(**data)
+
+
+@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] == "box_steel_flexure"))
+def test_box_in_construction_matches_independent_calculation(engine, case_id):
+    ref = REFERENCE[case_id]
+    spec = ref["spec"]
+    lb = spec["Lb"]
+    case = SteelCase(tau_b=1.0, section_name="CAJON", material={"Fy": spec["fy"]}, condition="construction", lengths={"Lx": lb, "Ly": lb, "Lz": lb},
+                     **{"Mux" if spec["axis"] == "x" else "Muy": 1},
+                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False},
+                                "box": {"B": spec["B"], "H": spec["H"], "t": spec["t"]}})
+    check = engine.run(case).check(f"flexure_{spec['axis']}")
+    assert check.capacity == pytest.approx(float(ref["phiMn_kNm"]), rel=1e-9)

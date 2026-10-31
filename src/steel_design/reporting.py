@@ -1,13 +1,15 @@
-"""Calculation report (memoria de cálculo) from a DesignResult: plain text and PDF.
+"""Calculation report (memoria de cálculo) of one member, from the results of all its load cases: plain text and PDF.
 
-Presentation only: every value comes from the engine result; nothing is recomputed.
-report_blocks() builds one neutral document model (title, summary, headings,
-key-value lists, tables, notes); render_text() and pdf_bytes() draw that same model.
+Presentation only: every value comes from the engine result; nothing is recomputed. Each review shows the load case
+with the largest DCR. report_blocks() builds one neutral document model (title, summary, headings, key-value lists,
+tables, notes); render_text() and pdf_bytes() draw that same model.
 """
 from datetime import datetime, timezone
 import math
 from pathlib import Path
+from typing import NamedTuple
 
+from .execution import overall_status
 from .models import DesignResult, SteelCase
 from .report_glossary import (EQUATION_OF, FIXED_LITERALS, MODE_NAMES, PARAMETERS, SECTION_PROPERTIES, STIFFNESS_NAMES,
                               parameter_label)
@@ -43,7 +45,7 @@ CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y
                 "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z",
                 "shear_x": "Cortante paralelo a y (con Mux)", "shear_y": "Cortante paralelo a x (con Muy)",
                 "interaction": "Interacción de fuerzas combinadas", "anchor": "Anclaje de componente",
-                "load_transfer": "Transferencia de carga", "fire": "Incendio (Guía 38)"}
+                "fire": "Incendio (Guía 38)"}
 FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
                   "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
                   "LLB": "pandeo local del ala del ángulo"}
@@ -92,7 +94,7 @@ _ABSENT_TEXT = {"no_aplica": NO_APLICA, "falta_implementacion": FALTA, "sin_dato
 _STIFFNESS_UNITS = {"EA": (1e3, "kN"), "GA": (1e3, "kN"), "EI": (1e9, "kN·m²"), "GJ": (1e9, "kN·m²"), "ECw": (1e15, "kN·m⁴"),
                     "": (1.0, "–")}
 _REQUIREMENT_TEXT = {"cumple": "CUMPLE", "no_cumple": "NO CUMPLE", "no_aplica": NO_APLICA, "falta_implementacion": FALTA, "sin_dato": "Sin dato"}
-_COMPLEMENTARY = ("anchor", "load_transfer", "fire")
+_COMPLEMENTARY = ("anchor", "fire")
 
 
 def _nested(blocks: list[dict]) -> list[dict]:
@@ -129,60 +131,121 @@ def _check_blocks(case: SteelCase, check, notes: list, limitations: list) -> lis
     return blocks
 
 
-def _chapter(number, title, checks, case, data, absent, notes, limitations) -> list[dict]:
+class _Governing(NamedTuple):
+    tag: str | None
+    case: SteelCase
+    result: DesignResult
+    check: object
+
+
+_CONDITIONS = (("construction", "construcción"), ("ultimate", "últimas"), ("fire", "incendio"))
+_CONDITION_TITLE = {"construcción": "Condiciones de construcción", "últimas": "Condiciones últimas", "incendio": "Condiciones de incendio"}
+_CHECK_ORDER = ("flexure_x", "flexure_w", "flexure_y", "flexure_z", "shear_y", "shear_x", "interaction", "anchor", "fire")
+_REQUIREMENT_RANK = {"sin_dato": 0, "no_cumple": 1, "falta_implementacion": 2, "cumple": 3, "no_aplica": 4}
+
+
+def _governing(executions: list, check_id: str, *, condition: str, tension: bool | None = None) -> _Governing | None:
+    """The load case of one review with the largest DCR; one that could not be calculated, or that fails, is never hidden."""
+    found = []
+    for tag, case, result in executions:
+        check = result.check(check_id)
+        if check and case.condition == condition and (tension is None or (case.Pu < 0) == tension):
+            found.append(_Governing(tag, case, result, check))
+    return max(found, key=lambda g: (g.check.ratio is None, g.check.status.value == "FAIL", g.check.ratio or 0.0), default=None)
+
+
+def _all_governing(executions: list) -> list[tuple[str, _Governing]]:
+    """Every review of the member, by condition."""
+    out = []
+    for condition, label in _CONDITIONS:
+        found = [_governing(executions, "axial", condition=condition, tension=False), _governing(executions, "axial", condition=condition, tension=True)]
+        found += [_governing(executions, check_id, condition=condition) for check_id in _CHECK_ORDER]
+        out += [(label, g) for g in found if g]
+    return out
+
+
+def _case_name(tag: str | None) -> str:
+    return tag or "única"
+
+
+def _single_review(number, title, governing, data, absent, notes, limitations) -> list[dict]:
     blocks = [{"kind": "h1", "text": f"{number}. {title}"}]
-    if not checks:
+    if governing is None:
         return blocks + [{"kind": "p", "text": f"{NO_APLICA}: {absent}"}]
-    blocks += data
-    for index, check in enumerate(checks, start=1):
-        blocks.append({"kind": "h2", "text": f"{number}.{index} {_check_title(check)}"})
-        blocks += _nested(_check_blocks(case, check, notes, limitations))
+    blocks += data(governing.case)
+    blocks.append({"kind": "h2", "text": f"{number}.1 {_check_title(governing.check)}; case gobernante: {_case_name(governing.tag)}"})
+    return blocks + _nested(_check_blocks(governing.case, governing.check, notes, limitations))
+
+
+def _condition_chapter(number, title, axes, data, executions, notes, limitations) -> list[dict]:
+    """Construction, ultimate and fire conditions, each one about the X and Y axes."""
+    blocks = [{"kind": "h1", "text": f"{number}. {title}"}]
+    for index, (condition, label) in enumerate(_CONDITIONS, start=1):
+        blocks.append({"kind": "h2", "text": f"{number}.{index} {_CONDITION_TITLE[label]}"})
+        for axis_index, (axis_label, check_ids, demand) in enumerate(axes, start=1):
+            blocks.append({"kind": "h3", "text": f"{number}.{index}.{axis_index} {axis_label}"})
+            if condition == "fire":
+                blocks.append({"kind": "p", "text": f"{FALTA}: esta resistencia en incendio no está programada."})
+                continue
+            found = [g for g in (_governing(executions, i, condition=condition) for i in check_ids) if g]
+            if not found:
+                blocks.append({"kind": "p", "text": f"{NO_APLICA}: ningún case en {_CONDITION_TITLE[label].lower()} tiene {demand}."})
+            for governing in found:
+                blocks.append({"kind": "p", "text": f"{_check_title(governing.check)}; case gobernante: {_case_name(governing.tag)}."})
+                blocks += data(governing)
+                blocks += _nested(_check_blocks(governing.case, governing.check, notes, limitations))
     return blocks
 
 
-def report_blocks(case: SteelCase, result: DesignResult, *, title: str | None = None) -> list[dict]:
-    """Neutral document model of the report of one member and one load combination (Spanish)."""
-    chapters = sorted({c.chapter for c in result.checks})
-    action = " + ".join(_check_title(c).split(" (")[0].lower() for c in result.checks)
-    blocks = [{"kind": "title", "member": result.section, "case": title, "status": result.status.value,
+def report_blocks(executions: list) -> list[dict]:
+    """Neutral document model of the report of one member: executions are its (name, case, result), one per load case (Spanish)."""
+    tag, case, result = next((e for e in executions if e[1].condition != "construction"), executions[0])
+    results = [r for _, _, r in executions]
+    governing = _all_governing(executions)
+    chapters = sorted({g.check.chapter for _, g in governing})
+    action = " + ".join(dict.fromkeys(_check_title(g.check).split(" (")[0].lower() for _, g in governing))
+    ratios = [r.ratio for r in results if r.ratio is not None]
+    ratio = max(ratios) if ratios else None
+    blocks = [{"kind": "title", "member": result.section, "case": None, "status": overall_status(results).value,
                "action": action,
                "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo{'s' if len(chapters) > 1 else ''} {', '.join(chapters)}"),
                         ("Literales", "de ANSI/AISC 360-22, salvo indicación expresa de otro documento"),
-                        ("Método", "LRFD"), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
+                        ("Método", "LRFD"), ("Cases de carga", str(len(executions))), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
-               "ratio": result.ratio}]
+               "ratio": ratio}]
     cards = []
-    for c in result.checks:
+    for label, g in governing:
+        c = g.check
+        prefix = "" if label == "últimas" else f"{label.capitalize()}, "
         if c.unit == "–":
             name = "Interacción" if c.id == "interaction" else CHECK_TITLES[c.id]
-            label = f"{name} ({c.result['governing_equation'] if c.result else c.chapter}): razón"
+            card = f"{prefix}{name} ({c.result['governing_equation'] if c.result else c.chapter}): razón"
             value = f"{c.ratio:.3f}" if c.ratio is not None else "no calculada"
         else:
-            label = f"{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · {_DEMAND_SYMBOL[c.chapter]}/cap."
+            card = f"{prefix}{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · {_DEMAND_SYMBOL[c.chapter]}/cap."
             value = f"{_fmt(c.capacity)} {c.unit} · {c.ratio:.3f}" if c.capacity is not None else "no calculada"
-        cards.append((label, value))
+        cards.append((card, value))
     if cards:
         blocks.append({"kind": "summary", "items": cards[:6]})
     notes, limitations = [], []
-    axial = [c for c in result.checks if c.id == "axial"]
-    tension = case.Pu < 0
     blocks += _material_blocks(case, result)
-    blocks += _geometry_blocks(case, result)
-    blocks += _demand_blocks(case, result)
-    blocks += _requirement_blocks(result)
-    blocks += _chapter(5, "Revisión de capacidad a carga de compresión", [] if tension else axial, case, _compression_data(case),
-                       "la combinación no tiene carga de compresión (Pu > 0).", notes, limitations)
-    blocks += _chapter(6, "Revisión de capacidad a carga de tracción", axial if tension else [], case, _tension_data(case),
-                       "la combinación no tiene carga de tracción (Pu < 0).", notes, limitations)
-    shear = [c for c in result.checks if c.id in {"shear_x", "shear_y"}]
-    blocks += _chapter(7, "Revisión de capacidad a fuerza cortante", shear, case, _shear_data(case),
-                       "la combinación no tiene fuerza cortante (Vux, Vuy).", notes, limitations)
-    flexure = [c for c in result.checks if c.id.startswith("flexure_")]
-    blocks += _chapter(8, "Revisión de capacidad a momento flector", flexure, case, _flexure_data(case),
-                       "la combinación no tiene momento flector (Mux, Muy, Mw, Mz).", notes, limitations)
-    blocks += [{"kind": "h1", "text": "9. Revisión de capacidad a momento torsional"},
+    blocks += _geometry_blocks(case, result, tag, executions)
+    blocks += _demand_blocks(executions)
+    blocks += _requirement_blocks(executions)
+    blocks += _service_blocks(result, governing)
+    blocks += _single_review(6, "Revisión de capacidad a carga de compresión", _governing(executions, "axial", condition="ultimate", tension=False),
+                             _compression_data, "ningún case tiene carga de compresión (Pu > 0).", notes, limitations)
+    blocks += _single_review(7, "Revisión de capacidad a carga de tracción", _governing(executions, "axial", condition="ultimate", tension=True),
+                             _tension_data, "ningún case tiene carga de tracción (Pu < 0).", notes, limitations)
+    blocks += _condition_chapter(8, "Revisión de capacidad a fuerza cortante", (
+        ("Paralelo al eje X (Vuy)", ("shear_y",), "Vuy"), ("Paralelo al eje Y (Vux)", ("shear_x",), "Vux")),
+        lambda g: _shear_data(g.case), executions, notes, limitations)
+    blocks += _condition_chapter(9, "Revisión de capacidad a momento flector", (
+        ("Respecto del eje X (Mux, Mw)", ("flexure_x", "flexure_w"), "Mux ni Mw"), ("Respecto del eje Y (Muy, Mz)", ("flexure_y", "flexure_z"), "Muy ni Mz")),
+        lambda g: _flexure_data(g.case, g.check), executions, notes, limitations)
+    blocks += [{"kind": "h1", "text": "10. Revisión de capacidad a momento torsional"},
                {"kind": "p", "text": f"{FALTA}: la entrada no admite momento torsional y la sección H3 no está programada."}]
-    blocks += _dcr_blocks(case, result, notes, limitations)
+    blocks += _dcr_blocks(executions, governing, ratio, notes, limitations)
     return blocks
 
 
@@ -238,7 +301,17 @@ def _stiffness_table(rows: list[dict]) -> dict:
     return {"kind": "table", "headers": ["Rigidez", "Valor", "Unidad", "Literal u observación"], "rows": out}
 
 
-def _geometry_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
+def _lengths_table(executions: list) -> dict | None:
+    rows = {}
+    for _, case, _ in executions:
+        if case.lengths:
+            name = "construcción" if case.condition == "construction" else "últimas e incendio"
+            rows[(name, case.lengths.Lx, case.lengths.Ly, case.lengths.Lz)] = None
+    return {"kind": "table", "headers": ["Condición", "Lx: no arriostrada respecto de x (mm)", "Ly: no arriostrada respecto de y (mm)",
+                                         "Lz: no arriostrada para torsión (mm)"], "rows": [list(k) for k in rows]} if rows else None
+
+
+def _geometry_blocks(case: SteelCase, result: DesignResult, tag: str | None, executions: list) -> list[dict]:
     source = result.section_data.get("source") or {}
     origin = (f"catálogo {source.get('sheet')} fila {source.get('row')} (sha256 {source.get('sha256', '')[:12]})"
               if source else "sección definida en la entrada")
@@ -255,13 +328,16 @@ def _geometry_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
         provision = {"filled": "I2.2b", "encased": "I2.1b", "wall": "I1.5(e)", "c_wall": "I1.5(e)"}.get(case.composite.kind, "–")
         blocks.append({"kind": "table", "headers": ["Propiedad", "Valor", "Unidad", "Literal"], "rows": [
             [parameter_label(k), v, PARAMETERS[k][2], provision] for k, v in st["geometry"].items()]})
+    lengths = _lengths_table(executions)
+    if lengths:
+        blocks.append(lengths)
     blocks.append({"kind": "h2", "text": "2.2 Rigideces elásticas"})
     if "error" in st:
         blocks.append({"kind": "alert", "text": f"No calculadas: {st['error']}", "detail": None})
     else:
         if case.composite:
             blocks.append({"kind": "p", "text": "AISC Design Guide 6, sección 2.8 (deriva y servicio): no es norma y no interviene "
-                                                "en la resistencia. P = Pu de la combinación si es compresión; en otro caso P = 0."})
+                                                f"en la resistencia. P = Pu del case {_case_name(tag)} si es compresión; en otro caso P = 0."})
         blocks.append(_stiffness_table(st["elastic"]))
     blocks.append({"kind": "h2", "text": "2.3 Rigideces efectivas"})
     if "error" in st:
@@ -295,33 +371,82 @@ def _requirement_table(rows: list[dict]) -> dict:
     return {"kind": "table", "headers": ["Requisito", "Valor", "Límite u observación", "Literal", "Resultado"], "rows": out}
 
 
-def _requirement_blocks(result: DesignResult) -> list[dict]:
+def _merged_requirements(executions: list, group: str) -> list[dict]:
+    """Each requirement once, as its least favorable load case leaves it; construction cases have the steel section alone."""
+    rows = {}
+    for _, case, result in executions:
+        for row in result.requirements[group] if case.condition != "construction" else []:
+            key = (row["description"], row["provision"])
+            if key not in rows or _REQUIREMENT_RANK[row["status"]] < _REQUIREMENT_RANK[rows[key]["status"]]:
+                rows[key] = row
+    return list(rows.values())
+
+
+def _requirement_blocks(executions: list) -> list[dict]:
     return [{"kind": "h1", "text": "4. Revisión de requerimientos técnicos"},
-            {"kind": "h2", "text": "4.1 Propiedades mecánicas de los materiales"}, _requirement_table(result.requirements["materials"]),
-            {"kind": "h2", "text": "4.2 Propiedades geométricas"}, _requirement_table(result.requirements["geometry"])]
+            {"kind": "h2", "text": "4.1 Propiedades mecánicas de los materiales"}, _requirement_table(_merged_requirements(executions, "materials")),
+            {"kind": "h2", "text": "4.2 Propiedades geométricas"}, _requirement_table(_merged_requirements(executions, "geometry"))]
 
 
-def _demand_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
-    angle = result.family.upper() == "SINGLE_ANGLE"
-    sense = "compresión" if case.Pu > 0 else ("tracción" if case.Pu < 0 else "")
-    rows = [["Fuerza axial requerida (Pu)", case.Pu, "kN", sense or "sin fuerza axial"],
-            ["Momento flector requerido respecto de x (Mux)", case.Mux, "kN·m", "eje geométrico x"],
-            ["Momento flector requerido respecto de y (Muy)", case.Muy, "kN·m", "eje geométrico y"],
-            ["Momento flector requerido respecto del eje principal mayor (Mw)", case.Mw if angle else NO_APLICA, "kN·m", "solo ángulos simples"],
-            ["Momento flector requerido respecto del eje principal menor (Mz)", case.Mz if angle else NO_APLICA, "kN·m", "solo ángulos simples"],
-            ["Fuerza cortante requerida con Mux (Vux)", case.Vux, "kN", "paralela a y"],
-            ["Fuerza cortante requerida con Muy (Vuy)", case.Vuy, "kN", "paralela a x"],
-            ["Momento torsional requerido (Tu)", FALTA, "kN·m", "la entrada no admite momento torsional"]]
-    blocks = [{"kind": "h1", "text": "3. Solicitaciones"}, {"kind": "h2", "text": "3.1 Cargas últimas"},
-              {"kind": "table", "headers": ["Solicitación", "Valor", "Unidad", "Observación"], "rows": rows}]
-    for check in result.checks:
-        info = (check.result or {}).get("second_order")
+def _demand_table(executions: list, condition: str, label: str) -> list[dict]:
+    cases = [(tag, case, result) for tag, case, result in executions if case.condition == condition]
+    if not cases:
+        return [{"kind": "p", "text": f"{NO_APLICA}: ningún case de {label}."}]
+    angle = any(result.family.upper() == "SINGLE_ANGLE" for _, _, result in cases)
+    moments = ["Mw (kN·m)", "Mz (kN·m)"] if angle else []
+    rows = [[_case_name(tag), case.Pu, case.Mux, case.Muy] + ([case.Mw, case.Mz] if angle else []) + [case.Vux, case.Vuy] for tag, case, _ in cases]
+    blocks = [{"kind": "table", "headers": ["Case", "Pu (kN)", "Mux (kN·m)", "Muy (kN·m)"] + moments + ["Vux (kN)", "Vuy (kN)"], "rows": rows}]
+    for tag, _, result in cases:
+        info = next(((c.result or {}).get("second_order") for c in result.checks if (c.result or {}).get("second_order")), None)
         if info:
-            blocks.append({"kind": "p", "text": f"Apéndice 8.1: las revisiones usan Pr = {_fmt(info['Pr_kN'])} kN y Mr = {_fmt(info['Mr_kNm'])} kN·m "
+            blocks.append({"kind": "p", "text": f"Apéndice 8.1, case {_case_name(tag)}: las revisiones usan Pr = {_fmt(info['Pr_kN'])} kN y Mr = {_fmt(info['Mr_kNm'])} kN·m "
                                                 f"(B1 = {_fmt(info['B1'])}, B2 = {_fmt(info['B2'])})."})
-            break
-    return blocks + [{"kind": "h2", "text": "3.2 Desplazamientos"},
+    return blocks
+
+
+def _demand_blocks(executions: list) -> list[dict]:
+    blocks = [{"kind": "h1", "text": "3. Solicitaciones"},
+              {"kind": "p", "text": "Pu > 0: compresión; Pu < 0: tracción. Mux y Muy, respecto de los ejes geométricos; Mw y Mz, respecto de los ejes principales de ángulos simples. "
+                                    "Vux acompaña a Mux y es paralela a y; Vuy acompaña a Muy y es paralela a x. El momento torsional (Tu): " + f"{FALTA.lower()}, la entrada no lo admite."}]
+    for number, condition, title, label in ((1, "ultimate", "Cargas últimas", "cargas últimas"), (2, "construction", "Cargas de construcción", "construcción"),
+                                            (3, "fire", "Cargas en condición de incendio", "incendio")):
+        blocks.append({"kind": "h2", "text": f"3.{number} {title}"})
+        blocks += _demand_table(executions, condition, label)
+    blocks.append({"kind": "h2", "text": "3.4 Deflexiones"})
+    basis = executions[0][1].serviceability
+    if basis:
+        d = basis.deflections
+        blocks.append(_property_table([["Luz real", basis.actual_span, "mm", "Dato del usuario"],
+                                       ["Luz efectiva (deflexiones), L", basis.effective_span, "mm", "Dato del usuario"],
+                                       ["Deflexión por carga viva a corto plazo", d.live_short, "mm", "Dato del usuario"],
+                                       ["Deflexión por carga muerta a corto plazo", d.dead_short, "mm", "Dato del usuario"],
+                                       ["Deflexión por carga viva + muerta a largo plazo", d.total_long, "mm", "Dato del usuario"]]))
+    else:
+        blocks.append({"kind": "p", "text": f"{NO_APLICA}: la entrada no indica deflexiones (serviceability)."})
+    return blocks + [{"kind": "h2", "text": "3.5 Desplazamientos"},
                      {"kind": "p", "text": f"{FALTA}: la entrada no admite desplazamientos y el programa no los calcula."}]
+
+
+def _service_blocks(result: DesignResult, governing: list) -> list[dict]:
+    blocks = [{"kind": "h1", "text": "5. Revisión de condiciones de funcionalidad y/o servicio"}, {"kind": "h2", "text": "5.1 Revisión de deflexiones"}]
+    if result.serviceability:
+        blocks.append({"kind": "p", "text": "Capítulo L: la norma no fija límites numéricos; L/n son criterios del usuario, con L la luz efectiva. "
+                                            "Exceder un límite se reporta y no cambia el estado."})
+        blocks.append({"kind": "table", "headers": ["Deflexión", "Valor (mm)", "n", "Límite, L/n (mm)", "Literal", "Resultado"], "rows": [
+            [r["description"], r["value_mm"], r["divisor"], r["limit_mm"], "Capítulo L; límite del usuario", "CUMPLE" if r["satisfied"] else "NO CUMPLE (no cambia el estado)"]
+            for r in result.serviceability]})
+    else:
+        blocks.append({"kind": "p", "text": f"{NO_APLICA}: la entrada no indica deflexiones (serviceability)."})
+    blocks.append({"kind": "h2", "text": "5.2 Condición de construcción"})
+    rows = [g for label, g in governing if label == "construcción"]
+    if not rows:
+        return blocks + [{"kind": "p", "text": f"{NO_APLICA}: ningún case de construcción."}]
+    blocks.append({"kind": "p", "text": "Resistencia de la sección de acero sola (I3.1b en vigas compuestas), con las longitudes de construcción. El detalle está en 8.1 y 9.1."})
+    blocks.append({"kind": "table", "headers": ["Revisión", "Case", "Demanda", "Resistencia", "DCR", "Estado"], "rows": [
+        [_check_title(g.check), _case_name(g.tag), f"{_fmt(g.check.demand)} {g.check.unit}",
+         f"{_fmt(g.check.capacity)} {g.check.unit}" if g.check.capacity is not None else "no calculada",
+         g.check.ratio if g.check.ratio is not None else "no calculado", STATUS_TEXT[g.check.status.value]] for g in rows]})
+    return blocks
 
 
 def _compression_data(case: SteelCase) -> list[dict]:
@@ -364,10 +489,12 @@ def _shear_data(case: SteelCase) -> list[dict]:
     return [_property_table([["Distancia del cortante máximo al cortante nulo (Lv)", case.shear.Lv, "mm", "Dato del usuario; G5"]])]
 
 
-def _flexure_data(case: SteelCase) -> list[dict]:
+def _flexure_data(case: SteelCase, check) -> list[dict]:
     fl = case.flexure
     holes = "no declarado" if not fl or fl.tension_flange_holes is None else _fmt(fl.tension_flange_holes)
-    rows = [["Longitud no arriostrada lateralmente (Lb)", fl.Lb if fl and fl.Lb else "no indicado", "mm", "Dato del usuario; Capítulo F"],
+    lb = ((check.result or {}).get("inputs") or {}).get("Lb_mm")
+    rule = "min(Ly, Lz)" if check.id in {"flexure_x", "flexure_w"} else "min(Lx, Lz)"
+    rows = [["Longitud no arriostrada lateralmente (Lb)", lb if lb else NO_APLICA, "mm", f"{rule}, de las longitudes de la condición"],
             ["Factor de modificación por pandeo lateral-torsional (Cb)", fl.Cb if fl else 1.0, "–", "F1, Ec. F1-1"],
             ["Agujeros en el ala traccionada", holes, "–", "F13.1"]]
     if fl and fl.Afn:
@@ -415,39 +542,41 @@ def _diagram_blocks(result: DesignResult) -> list[dict]:
     return blocks
 
 
-def _dcr_blocks(case: SteelCase, result: DesignResult, notes: list, limitations: list) -> list[dict]:
-    rows = []
-    for c in result.checks:
-        name = _check_title(c)
+def _dcr_blocks(executions: list, governing: list, ratio, notes: list, limitations: list) -> list[dict]:
+    rows, ratios = [], []
+    for label, g in governing:
+        c = g.check
         if c.unit == "–":
             demand, capacity = "–", "1.000"
         else:
             demand, capacity = f"{_fmt(c.demand)} {c.unit}", f"{_fmt(c.capacity)} {c.unit}" if c.capacity is not None else "no calculada"
-        rows.append([name, demand, capacity, c.ratio if c.ratio is not None else "no calculado", STATUS_TEXT[c.status.value]])
-    ratios = [c.ratio if c.ratio is not None else -1.0 for c in result.checks]
-    table = {"kind": "table", "headers": ["Revisión", "Demanda", "Capacidad", "Índice demanda/capacidad (DCR)", "Estado"], "rows": rows}
+        rows.append([label.capitalize(), _check_title(c), _case_name(g.tag), demand, capacity, c.ratio if c.ratio is not None else "no calculado", STATUS_TEXT[c.status.value]])
+        ratios.append(c.ratio if c.ratio is not None else -1.0)
+    table = {"kind": "table", "headers": ["Condición", "Revisión", "Case gobernante", "Demanda", "Capacidad", "Índice demanda/capacidad (DCR)", "Estado"], "rows": rows}
     if ratios and max(ratios) >= 0:
         table["highlight"] = ratios.index(max(ratios))
-    blocks = [{"kind": "h1", "text": "10. Índices DCR"}, {"kind": "h2", "text": "10.1 Demanda/capacidad por revisión"}, table,
-              {"kind": "kv", "items": [("Índice demanda/capacidad máximo (DCR)", _fmt(result.ratio) if result.ratio is not None else "no calculado"),
-                                       ("Estado global", STATUS_TEXT[result.status.value])]},
-              {"kind": "h2", "text": "10.2 Interacción de fuerzas combinadas"}]
-    interaction = result.check("interaction")
-    if interaction:
-        blocks.append({"kind": "h3", "text": _check_title(interaction)})
-        blocks += _nested(_check_blocks(case, interaction, notes, limitations))
-        blocks += _diagram_blocks(result)
-    else:
-        blocks.append({"kind": "p", "text": f"{NO_APLICA}: la combinación no combina fuerza axial y flexión ni flexión en dos ejes."})
-    blocks.append({"kind": "h2", "text": "10.3 Revisiones complementarias"})
-    extra = [c for c in result.checks if c.id in _COMPLEMENTARY]
-    for check in extra:
-        blocks.append({"kind": "h3", "text": _check_title(check)})
-        blocks += _nested(_check_blocks(case, check, notes, limitations))
+    items = [("Índice demanda/capacidad máximo (DCR)", _fmt(ratio) if ratio is not None else "no calculado")]
+    if ratios and max(ratios) >= 0:
+        items.append(("Case del DCR máximo", rows[ratios.index(max(ratios))][2]))
+    items.append(("Estado global", STATUS_TEXT[overall_status([r for _, _, r in executions]).value]))
+    blocks = [{"kind": "h1", "text": "11. Índices DCR"}, {"kind": "h2", "text": "11.1 Demanda/capacidad por revisión, con el case de mayor DCR"}, table,
+              {"kind": "kv", "items": items}, {"kind": "h2", "text": "11.2 Interacción de fuerzas combinadas"}]
+    interactions = [(label, g) for label, g in governing if g.check.id == "interaction"]
+    for label, g in interactions:
+        blocks.append({"kind": "h3", "text": f"{_check_title(g.check)}; {_CONDITION_TITLE[label].lower()}; case gobernante: {_case_name(g.tag)}"})
+        blocks += _nested(_check_blocks(g.case, g.check, notes, limitations))
+        blocks += _diagram_blocks(g.result)
+    if not interactions:
+        blocks.append({"kind": "p", "text": f"{NO_APLICA}: ningún case combina fuerza axial y flexión ni flexión en dos ejes."})
+    blocks.append({"kind": "h2", "text": "11.3 Revisiones complementarias"})
+    extra = [g for _, g in governing if g.check.id in _COMPLEMENTARY]
+    for g in extra:
+        blocks.append({"kind": "h3", "text": f"{_check_title(g.check)}; case gobernante: {_case_name(g.tag)}"})
+        blocks += _nested(_check_blocks(g.case, g.check, notes, limitations))
     if not extra:
-        blocks.append({"kind": "p", "text": f"{NO_APLICA}: sin anclajes de componente, transferencia de carga ni incendio."})
-    blocks.append({"kind": "h2", "text": "10.4 Notas y limitaciones"})
-    return blocks + [{"kind": "note", "text": text} for text in notes + limitations + [result.scope]]
+        blocks.append({"kind": "p", "text": f"{NO_APLICA}: sin anclajes de componente ni incendio."})
+    blocks.append({"kind": "h2", "text": "11.4 Notas y limitaciones"})
+    return blocks + [{"kind": "note", "text": text} for text in notes + limitations + [executions[0][2].scope]]
 
 
 def _verification(check) -> tuple:
@@ -703,7 +832,7 @@ def render_text(blocks: list[dict]) -> str:
 
 def calculation_report(case: SteelCase, result: DesignResult, *, title: str | None = None) -> str:
     """Plain-text calculation report of one member."""
-    return render_text(report_blocks(case, result, title=title))
+    return render_text(report_blocks([(title, case, result)]))
 
 
 # --- PDF ---------------------------------------------------------------------------------------

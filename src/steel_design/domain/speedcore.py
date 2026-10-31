@@ -239,8 +239,10 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
                     section, ["composite.fire.element_thicknesses", "composite.fire.element_temperatures"])
     if fire.vent is not None:
         v = fire.vent
+        if case.composite.pour_height is None:
+            _incomplete("Agujeros de ventilación: indique composite.pour_height (Guía 38, Ec. 6-9).", section, ["composite.pour_height"])
         area = dg38_fire.vent_hole_area(s1=v.s1, s2=v.s2, Tdc=v.dry_thickness, tdc=v.heating_time, omega=v.water_content,
-                                        rho_w=v.water_density, rho_c=concrete.wc, hc=v.pour_height)
+                                        rho_w=v.water_density, rho_c=concrete.wc, hc=case.composite.pour_height)
         required = max(math.sqrt(4 * area / math.pi), dg38_fire.VENT_MIN_DIAMETER)
         mode.update(vent_area_mm2=area, vent_required_d_mm=required)
         requirements += [
