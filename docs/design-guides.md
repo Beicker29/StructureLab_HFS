@@ -72,7 +72,7 @@ Contenidos añadidos, contrastados con los mismos ejemplos:
 | | Área de ventilación (in²) | 0.539 | dentro de ±1,5 % | prueba |
 
 Sin ejemplo en las guías, solo con oráculo independiente: factor de forma α (Ec. 2-2), rigideces de servicio (Ec. 2-1, 2-7 a
-2-13), placas esbeltas (C-I1-1, C-I1-2), tracción y flexión en el eje mayor de muros en C (A.2.1, A.2.2, A.2.4, A.2.6).
+2-14), placas esbeltas (C-I1-1, C-I1-2), tracción y flexión en el eje mayor de muros en C (A.2.1, A.2.2, A.2.4, A.2.6).
 
 ## Notas del contraste
 
@@ -108,11 +108,11 @@ Sin ejemplo en las guías, solo con oráculo independiente: factor de forma α (
 | 5 | Sección controlada por tracción | `composite.flexural_member` | I3.3a(e), I3.4a(d); DG6 2.4 | `aisc_dg06/members.py` | Obliga si se declara viga; si no, se informa y se advierte |
 | 6 | Cajones soldados | `composite.box` | DG6 2.5 | `sections/geometry.py` | Una sola placa de espesor t |
 | 7 | Factor de forma α biaxial | `composite.biaxial_shape_factor` | DG6 2.3.2 | `aisc_dg06/members.py` | Solo `M2S`, con flexión en dos ejes |
-| 8 | Rigideces de servicio | en el resultado axial | DG6 2.8 | `aisc_dg06/members.py` | GJ de rectangulares (2-14) no calculado: la guía no define Jc |
+| 8 | Rigideces de servicio | `stiffness.elastic` del resultado | DG6 2.8 | `aisc_dg06/members.py` | Jc de rectangulares (2-14) y Js de cajones no vienen de la guía (DI-16); donde no da expresión, acero solo y concreto solo (DI-20) |
 | 9 | Muros en C | `composite.kind = c_wall` | DG38 A.2 | `aisc_dg38/walls.py` | Sin Mux con axial, sin Vux; una sola combinación de lado comprimido por signo de Pu |
 | 10 | Vigas de acoplamiento | `composite.kind = coupling_beam` | DG38 2.3.3, A.3 | `aisc_dg38/walls.py` | Compactas; sin fuerza axial |
 | 11 | Placas esbeltas | `wall.allow_slender_plates` | Commentary I1.6a; DG38 2.2.1 | `aisc_360_22/composite.py` | Solo compresión; flexión y cortante siguen exigiendo I1-4 |
-| 12 | Rigideces efectivas de muros | en el resultado axial | I1-1 a I1-3 | `aisc_360_22/composite.py` | |
+| 12 | Rigideces efectivas de muros | `stiffness.effective` del resultado | I1-1 a I1-3 | `aisc_360_22/composite.py` | |
 | 13 | Muros a fuego | `composite.fire` | DG38 cap. 6; Apéndice 4 | `aisc_dg38/fire.py`, `aisc_360_22/appendix_4.py` | Las temperaturas son dato de un análisis térmico del usuario; muros planos |
 
 Todo lo que sale de una guía lo declara la memoria de cálculo como fuera de la norma.

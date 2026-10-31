@@ -1,8 +1,9 @@
 {
+  "tau_b": 0.8,
   "section_name": "PTE100X50X3MM",
   "material": {"Fy": 345},
   "lengths": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
-  "composite": {"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": false}},
+  "composite": {"kind": "filled", "second_order": null, "concrete": {"fc": 35, "wc": 2320, "lightweight": false}},
   "cases": [
     {"name": "Method 2 simplified", "Pu": 60, "Mux": 6,
      "composite": {"kind": "filled", "interaction": "M2S", "concrete": {"fc": 35, "wc": 2320, "lightweight": false}}},

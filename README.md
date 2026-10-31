@@ -4,7 +4,7 @@ Motor de cálculo de la **resistencia de miembros de acero** según ANSI/AISC 36
 solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante), H
 (interacción de fuerza axial y flexión) e I (miembros compuestos: PTE rellenos, W embebidos, vigas,
 muros de placas y anclajes de componentes)
-(`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026 del repositorio). Perfiles del catálogo
+(`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026, copias locales que no se versionan). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
 
@@ -35,6 +35,12 @@ python -m venv .venv
 python -m steel_design.run examples/w_shape.json                 # imprime JSON
 python -m steel_design.run examples/multi_member.json --output r.json
 ```
+
+La memoria tiene siempre diez capítulos: propiedades de los materiales, propiedades geométricas (geometría y rigideces elásticas,
+efectivas y para método directo), solicitaciones, revisión de requerimientos técnicos (materiales y geometría), revisiones a compresión,
+tracción, cortante, flexión y torsión, e índices DCR, con la interacción de I5 y el diagrama de interacción de miembros compuestos. Un requerimiento obligatorio incumplido impide el PASS. Lo que no corresponde al
+miembro dice «No aplica» y lo que el programa no calcula dice «Falta implementación». Cada símbolo va con su nombre en palabras y
+cada valor calculado con su literal del documento de referencia.
 
 No se escribe nada en disco salvo que se pida. Memoria de cálculo en texto o PDF
 (el PDF requiere el extra `pdf`: `pip install -e ".[pdf]"`, incluido en `dev`):
@@ -84,12 +90,10 @@ python -m steel_design.run examples/composite_wall.json --output results/composi
 python -m steel_design.run examples/composite_anchor.json --output results/composite_anchor.json --report --pdf
 python -m steel_design.run examples/composite_filled_bars.json --output results/composite_filled_bars.json --report --pdf
 python -m steel_design.run examples/composite_high_strength.json --output results/composite_high_strength.json --report --pdf
-python -m steel_design.run examples/composite_second_order.json --output results/composite_second_order.json --report --pdf
 python -m steel_design.run examples/composite_load_transfer.json --output results/composite_load_transfer.json --report --pdf
 python -m steel_design.run examples/composite_box.json --output results/composite_box.json --report --pdf
 python -m steel_design.run examples/composite_c_wall.json --output results/composite_c_wall.json --report --pdf
 python -m steel_design.run examples/composite_coupling_beam.json --output results/composite_coupling_beam.json --report --pdf
-python -m steel_design.run examples/composite_wall_fire.json --output results/composite_wall_fire.json --report --pdf
 ```
 
 Quite `--output ...` si solo necesita las memorias; sin ningún argumento adicional el resultado se
@@ -133,7 +137,8 @@ símbolos escritos en letras.
 | `factors.Kx/Ky/Kz` | Factores K (por defecto 1); `xa`, `ya`: desplazamiento del arriostramiento respecto al centro de corte (E4(d)/(e)) |
 | `single_angle_e5` | Ángulos simples comprimidos sin `Mw` ni `Mz`: configuración E5(a)/(b), ala conectada, `L` entre puntos de trabajo y las condiciones E5(1)–(3). Fuera de E5 se omite y la excentricidad se da como `Mw` y `Mz` (H2) |
 | `double_angle_e6` | Requerido para ángulos dobles: `connectors` (`snug_tight`, `welded`, `pretensioned`), separación `a` entre conectores (mm) y `end_connection_welded_or_pretensioned` (E6.1). Contacto o separadores se leen del nombre AISC (`2L4X4X1/4` vs `2L4X4X1/4X3/4`) |
-| `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos) y `beta_w` (mm, F10-4, alas desiguales); `tension_cb_amplification` (H1.2, opcional) |
+| `flexure` | Flexión: `Lb` (mm), `Cb` (1.0 si se omite), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos); `tension_cb_amplification` (H1.2, opcional) |
+| `tau_b` | Solo miembros compuestos: τb para las rigideces de método directo (0 < τb ≤ 1), dato obligatorio que el programa no calcula; sin él, el estado es INCOMPLETO. El capítulo 4 de la memoria lo compara con I1.5(d) y (f) (0.8 en rellenos y embebidos, 1.0 en muros); una diferencia se informa y no cambia el estado. En miembros no compuestos τb es siempre 1.0 (C2.3(c)) y otro valor se rechaza |
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
 | `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |

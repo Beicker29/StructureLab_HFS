@@ -36,6 +36,7 @@ importar `steel_design`**. Las pruebas consumen el resultado congelado
 python tests/oracles/chapter_e.py   # regenera la referencia del capítulo E
 python tests/oracles/chapter_d.py   # regenera la referencia del capítulo D
 python tests/oracles/chapter_f.py   # regenera la referencia del capítulo F
+python tests/oracles/chapter_c.py   # regenera la referencia de C2.3 (rigideces para método directo)
 python tests/oracles/chapter_g.py   # regenera la referencia del capítulo G
 python tests/oracles/chapter_h.py   # regenera la referencia del capítulo H
 python tests/oracles/chapter_i.py   # regenera la referencia del capítulo I

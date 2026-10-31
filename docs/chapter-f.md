@@ -48,7 +48,7 @@ solo en LTB y LLB (F10.2(2)(i), DF-11); restricción en el punto de máximo mome
 (F10.2(2)(ii)). Mcr con F10-5a/F10-5b según la punta comprimida o traccionada.
 
 **Ángulo simple, ejes principales.** `Mw` (eje mayor): My = Fy·min(SwA, SwB, SwC);
-Mcr F10-4 con Cb ≤ 1,5 y βw dato del usuario (`flexure.beta_w`, mm, DF-12) con signo
+Mcr F10-4 con Cb ≤ 1,5 y |βw| de la columna `βw` de la hoja L del catálogo (mm, DF-12) con signo
 positivo cuando el ala corta está comprimida; el ala comprimida se declara en
 `angle_flexure.leg_in_compression` (`long`/`short`) y define Sc (SwC punta del ala
 larga, SwA punta del ala corta). En ángulos iguales βw = 0 y el ala es indistinta.
@@ -67,7 +67,7 @@ Puntos del catálogo: A = punta del ala corta, B = talón, C = punta del ala lar
   `tension_flange_holes` (obligatorio en I y canales sobre el eje x, F13.1) con
   `Afn` (mm²) cuando hay agujeros; F13.1 requiere además `material.Fu` (DF-3).
 - Ángulos: `Mw`, `Mz` (kN·m, solo ángulos simples), `flexure.lateral_torsional_restraint`,
-  `flexure.beta_w` y `angle_flexure` (`web_legs`, `toe`, `leg_in_compression`), todos
+  y `angle_flexure` (`web_legs`, `toe`, `leg_in_compression`), todos
   por combinación cuando dependen del signo del momento. Sin el dato necesario: INCOMPLETO
   con el campo que falta.
 
@@ -107,8 +107,8 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
 | L-F10-geom-none-toe-tens | L4X4X1/4, eje x, Lb=2000, sin restricción, punta traccionada | 345 | Y 8.67, LTB 6.94, LLB 16.15 | LTB | 6.243 |
 | L-F10-geom-at-max | L4X4X1/4, eje y, Lb=2000, Cb=1.2, restricción en Mmáx, punta comprimida | 345 | Y 8.67, LTB 6.98, LLB 7.41 | LTB | 6.279 |
 | L-F10-geom-continuous-unequal | L6X4X3/8, eje x, restricción continua, punta comprimida | 345 | Y 28.04, LLB 24.12 | LLB | 21.710 |
-| L-F10-w-short-comp | L6X4X3/8, eje w, Lb=2000, ala corta comprimida, βw=79.8 | 345 | Y 32.76, LTB 28.75 | LTB | 25.876 |
-| L-F10-w-long-comp | L6X4X3/8, eje w, Lb=2000, ala larga comprimida, βw=79.8 | 345 | Y 32.76, LTB 22.33, LLB 28.18 | LTB | 20.101 |
+| L-F10-w-short-comp | L6X4X3/8, eje w, Lb=2000, ala corta comprimida | 345 | Y 32.76, LTB 28.76 | LTB | 25.881 |
+| L-F10-w-long-comp | L6X4X3/8, eje w, Lb=2000, ala larga comprimida | 345 | Y 32.76, LTB 22.33, LLB 28.18 | LTB | 20.093 |
 | L-F10-w-equal-Cb-capped | L4X4X1/4, eje w, Lb=3000, Cb=1.8 (se usa 1.5) | 345 | Y 14.90, LTB 10.38, LLB 12.74 | LTB | 9.346 |
 | L-F10-z-toes-comp | L6X4X3/8, eje z, punteras comprimidas | 345 | Y 11.13, LLB 20.35 | Y | 10.014 |
 
@@ -140,8 +140,10 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
   lateral-torsional (F10-2/F10-3) y Sc del pandeo local del ala (F10.3); la fluencia F10-1
   usa My sin reducir (indicación del usuario, 2026-10-30). Coincide con el ejemplo F.11A de
   los AISC Design Examples v16.0 (Mn = 1,5·Fy·Sx = 6,44 kip-ft).
-- **DF-12** βw (F10-4) es dato del usuario en mm (indicación del usuario; Tabla
-  C-F10.1 del Commentary da valores de referencia), positivo con el ala corta comprimida.
+- **DF-12** |βw| (F10-4) se lee de la columna `βw` de la hoja L del catálogo, en mm (indicación del usuario,
+  2026-10-31): sustituye al dato `flexure.beta_w`, que se retiró. Positivo con el ala corta comprimida y negativo con la
+  larga (Commentary F10); 0 en alas iguales. Se contrastó con la Tabla C-F10.1 (promedios, diferencia máxima 1,8 %) y con
+  la integral de la definición del Commentary sin filetes (máxima 3,1 %). El catálogo varía con el espesor; la tabla no.
 
 ## Incidencias del catálogo detectadas
 

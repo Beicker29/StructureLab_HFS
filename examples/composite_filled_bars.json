@@ -1,11 +1,11 @@
 {
+  "tau_b": 0.8,
   "section_name": "PTER8\"X5.00MM",
   "material": {"Fy": 345},
   "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
   "composite": {
-    "kind": "filled",
+    "kind": "filled", "interaction": null, "second_order": null,
     "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
-    "interaction": "M2S",
     "filled": {
       "Fysr": 420,
       "transverse": {"db": 10, "spacing": 300},

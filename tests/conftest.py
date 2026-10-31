@@ -29,5 +29,5 @@ def engine(catalog):
 
 
 def steel_case(name="W14X90", *, Pu=100, L=3000, Ly=None, Lz=None, Fy=345, **extra):
-    return SteelCase(section_name=name, material={"Fy": Fy}, Pu=Pu,
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy}, Pu=Pu,
                      lengths={"Lx": L, "Ly": Ly or L, "Lz": Lz or L}, **extra)

@@ -26,7 +26,7 @@ def validate_section(section: Section) -> Section:
             include_url=False, include_context=False, include_input=False)}) from exc
     zero_fields = [name for name, value in section.model_dump().items()
                    if isinstance(value, (int, float)) and value == 0
-                   and name != "cw"]  # Cw = 0 is exact for round HSS
+                   and name not in {"cw", "beta_w"}]  # exact zeros: Cw of round HSS, beta_w of equal-leg angles
     if zero_fields:
         raise ValidationError("La sección seleccionada tiene propiedades físicas nulas.",
                               details={"section": section.name, "fields": zero_fields})

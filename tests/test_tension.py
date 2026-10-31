@@ -19,7 +19,7 @@ REL = 1e-12
 
 def tension_case(name, *, Pu=-100, Fy=345, Fu=450, An=None, U=1.0, **extra):
     tension = {"An": An, "U": U} if An is not None else None
-    return SteelCase(section_name=name, material={"Fy": Fy, "Fu": Fu}, Pu=Pu,
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "Fu": Fu}, Pu=Pu,
                      tension=tension, **extra)
 
 
@@ -92,5 +92,5 @@ def test_tension_does_not_require_lengths_nor_e(engine):
 def test_tension_report(engine):
     case = tension_case("W14X90", An=15000, U=0.9, Pu=-2000)
     text = calculation_report(case, engine.run(case))
-    assert "tracción W14X90" in text and "Ae = An·U" in text and "### Estados límite (D2)" in text
+    assert "tracción W14X90" in text and "Ae = An·U" in text and "#### Estados límite (D2)" in text
     assert "Obligaciones del Capítulo D" in text and "min(φt·Pn) = 4556.250 kN (TR)" in text

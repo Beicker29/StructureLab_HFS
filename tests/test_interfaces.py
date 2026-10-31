@@ -36,7 +36,7 @@ def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):
 
 def test_single_case_payload_prints_one_result(tmp_path):
     source = tmp_path / "one.json"
-    source.write_text(json.dumps({"section_name": "W14X90", "material": {"Fy": 345}, "Pu": 100,
+    source.write_text(json.dumps({"section_name": "W14X90", "material": {"Fy": 345}, "Pu": 100, "tau_b": 1.0,
                                   "lengths": {"Lx": 3000, "Ly": 3000, "Lz": 3000}}), encoding="utf-8")
     output = json.loads(cli(source, cwd=tmp_path).stdout)
     assert output["checks"][0]["chapter"] == "E" and output["status"] == "PASS"

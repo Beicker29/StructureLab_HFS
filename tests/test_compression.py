@@ -19,7 +19,7 @@ REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 
 
 def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100, Mw=0):
-    return SteelCase(section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu, Mw=Mw,
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu, Mw=Mw,
                      lengths={"Lx": Lx, "Ly": Ly or Lx, "Lz": Lz or Lx}, factors={"xa": xa, "ya": ya},
                      single_angle_e5=e5, double_angle_e6=e6)
 

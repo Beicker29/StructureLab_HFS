@@ -69,9 +69,9 @@ razón para el Método 2 completo: el valor esperado se calculó a mano con sus 
 | H.3 | W14X82 en tracción, Pu = 174 kips, Mux = 192, Muy = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2) | 0.873 | 0.8732 | +0.02 % | H1 |
 | H.4 | W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft | 0.979 | 0.9808 | +0.19 % | H1 |
 | E.14B-Pc | L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7) | 168 | 168.5 | +0.29 % | FB-z |
-| E.14B-Mcw | L8X4X1/2 eje w, punta del ala larga comprimida, βw = −5.48 in | 31.25 | 31.27 | +0.08 % | LTB |
+| E.14B-Mcw | L8X4X1/2 eje w, punta del ala larga comprimida, βw del catálogo | 31.25 | 31.22 | -0.11 % | LTB |
 | E.14B-Mcz | L8X4X1/2 eje z, punteras traccionadas, fluencia en A | 10.25 | 10.23 | -0.20 % | Y |
-| E.14B | L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados | 1.0 | 1.001 | +0.13 % | H2-B |
+| E.14B | L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados: H2-1 en B ≈ 1.0 | 1.0 | 1.001 | +0.07 % | H2-B |
 | F.11C | L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14 | 0.292 | 0.2936 | +0.56 % | H2-C |
 | I.1 | W21X50, deck de 3 in, 22 pernos de 3/4 in, tc = 4.5 in, f'c = 4 ksi | 769 | 765.4 | -0.46 % | Y |
 | I.4 | HSS10X6X3/8 relleno, f'c = 5 ksi, Lc = 14 ft | 368 | 368.9 | +0.24 % | FB-y |

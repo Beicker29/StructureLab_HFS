@@ -12,7 +12,7 @@ E5 = {"configuration": "a", "connected_leg": "long", "L": 2000, "loaded_at_ends_
 
 
 def case(**changes):
-    return SteelCase(**{**BASE, **changes})
+    return SteelCase(tau_b=1.0, **{**BASE, **changes})
 
 
 def test_valid_case_defaults():

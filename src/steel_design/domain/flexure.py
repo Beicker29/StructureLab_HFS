@@ -321,10 +321,10 @@ def _single_angle(case, section, basis, E, Fy, axis):
         else:
             if equal:
                 beta = 0.0
-            elif basis.beta_w is None:
-                _incomplete("Ángulo de alas desiguales: indique flexure.beta_w (F10-4).", section, ["flexure.beta_w"])
+            elif section.beta_w is None:
+                _incomplete("Ángulo de alas desiguales: F10-4 requiere βw del catálogo.", section, ["section.beta_w"])
             else:
-                beta = basis.beta_w if leg == "short" else -basis.beta_w   # + short legs in compression
+                beta = section.beta_w if leg == "short" else -section.beta_w   # + short legs in compression
             mcr = eq.f10_mcr_principal(E=E, Ag=section.area, rz=section.rz, t=t, Lb=_lb(basis, section),
                                        Cb=basis.Cb, beta_w=beta)
             out = eq.f10_from_mcr(My=my, Mcr=mcr["Mcr"])
@@ -385,7 +385,7 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
         "section": section.name, "family": family,
         "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lb_mm": basis.Lb, "Cb": basis.Cb,
                    "tension_flange_holes": basis.tension_flange_holes, "Afn_mm2": basis.Afn,
-                   "lateral_torsional_restraint": basis.lateral_torsional_restraint, "beta_w_mm": basis.beta_w,
+                   "lateral_torsional_restraint": basis.lateral_torsional_restraint,
                    "angle_flexure": case.angle_flexure.model_dump() if case.angle_flexure else None},
         "classification": {"elements": rows, "reference": "B4.1b (Tabla B4.1b)"},
         "provisions": ["F1", provision] + (["F13.1"] if "TFR" in modes else []),

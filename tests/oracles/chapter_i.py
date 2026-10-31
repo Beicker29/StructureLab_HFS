@@ -416,16 +416,32 @@ def appendix_2_compression(name, fy, fc, wc, L):
     return {"Pno_kN": pno / 1000, "Pn_kN": min(pns) / 1000, "phiPn_kN": D("0.75") * min(pns) / 1000}
 
 
-def appendix_2_flexure(name, fy, fc):
-    """Moments of the blocks about the top of the section, axis x; the axial force of the blocks is zero."""
+def appendix_2_flexure(name, fy, fc, axis="x"):
+    """Moments of the blocks about the top of the section; the axial force of the blocks is zero."""
     fy, fc = D(fy), D(fc)
     g, _, fn = a2_data(name, fy)
-    H, t, bi = g["p"]["Ht"], g["t"], g["bi"]
+    H, t, bi = (g["p"]["Ht"], g["t"], g["bi"]) if axis == "x" else (g["p"]["B"], g["t"], g["hi"])
     a = (2 * fy * H * t + (fy - fn) * bi * t + D("0.85") * fc * bi * t) / (2 * t * fy + 2 * t * fn + D("0.85") * fc * bi)
     compression = [(fn * bi * t, t / 2), (fn * 2 * t * a, a / 2), (D("0.85") * fc * bi * (a - t), (a + t) / 2)]
     tension = [(fy * 2 * t * (H - a), (H + a) / 2), (fy * bi * t, H - t / 2)]
     msd = sum(f * y for f, y in tension) - sum(f * y for f, y in compression)
     return {"Mn_kNm": D("0.9") * msd / 10**6}
+
+
+def appendix_2_biaxial(name, fy, fc, wc, L, Pu, Mux, Muy):
+    """I5-1a/b with Mrx/Mcx + Mry/Mcy (user's extension, DI-22), with the cp and cm of each axis; the greater value governs."""
+    pu, fy_, fc_ = D(Pu), D(fy), D(fc)
+    g, lam, _ = a2_data(name, fy)
+    axial = appendix_2_compression(name, fy, fc, wc, L)
+    ratio_p = axial["Pn_kN"] / axial["Pno_kN"]
+    m = D(Mux) / (D("0.90") * appendix_2_flexure(name, fy, fc, "x")["Mn_kNm"]) + D(Muy) / (D("0.90") * appendix_2_flexure(name, fy, fc, "y")["Mn_kNm"])
+    x = pu / axial["phiPn_kN"]
+    values = []
+    for bh in (g["p"]["B"] / g["p"]["Ht"], g["p"]["Ht"] / g["p"]["B"]):
+        cp = D("0.175") - D("0.075") / bh + lam * (D("0.3") / ratio_p) * (fc_ / fy_)
+        cm = D("0.6") + D("0.3") * ratio_p**2 + D("0.6") * lam * bh * (D(690) / fy_) * (fc_ / fy_)
+        values.append(x + (1 - cp) / cm * m if x >= cp else (1 - cm) / cp * x + m)
+    return {"ratio_x": values[0], "ratio_y": values[1], "ratio": max(values)}
 
 
 def appendix_2_interaction(name, fy, fc, wc, L, Pu, Mu):
@@ -675,15 +691,22 @@ def biaxial(member, Pu, Mux, Muy, **data):
 
 
 def service_filled(name, fy, fc, wc, L, Pu):
-    """Design Guide 6, Equations 2-1, 2-9, 2-10 and 2-11 on a rectangular member, about x."""
+    """Design Guide 6, Equations 2-1, 2-9 to 2-12 and 2-14 on a rectangular member, about x; Jc given by the user."""
     g = filled_rect(name)
     p = g["p"]
     c3 = min(D("0.45") + 3 * p["A"] / (p["A"] + g["Ac"]), D("0.9"))
     modulus = ec(wc, fc)
     pno = filled_compression(name, fy, fc, wc, L)["Pno_kN"]
     factor = D("0.4") * c3 if D(Pu) < D("0.1") * pno else D("0.6")
+    a, b = max(g["bi"], g["hi"]), min(g["bi"], g["hi"])
+    jc = a * b**3 * (D(1) / 3 - D("0.21") * (b / a) * (1 - b**4 / (12 * a**4)))
+    beta = min(D(2) / 3 * p["A"] / (p["A"] + g["Ac"]) + D(2) / 15, D(1) / 3)
     return {"EI_service": E * p["Ix"] + factor * modulus * g["Icx"], "EA_service": E * p["A"] + modulus * g["Ac"],
-            "GA_service": D("77200") * p["A"] / 2 + D("0.4") * modulus * g["Ac"] / D("1.2")}
+            "GA_service": D("77200") * p["A"] / 2 + D("0.4") * modulus * g["Ac"] / D("1.2"),
+            "GJ_service": D("77200") * p["J"] + beta * D("0.4") * modulus * jc,
+            "EA_star": D("0.8") * (E * p["A"] + modulus * g["Ac"]),                    # I1.5(b), User Note
+            "EI_star_x": D("0.64") * (E * p["Ix"] + c3 * modulus * g["Icx"]),          # I1.5(a), (d), User Note; I2-12; tau_b = 0.8
+            "GA_eff": D("0.4") * modulus * g["Ac"], "GA_star": D("0.8") * D("0.4") * modulus * g["Ac"]}   # DI-20
 
 
 def service_round(name, fy, fc, wc, L, Pu):
@@ -692,7 +715,119 @@ def service_round(name, fy, fc, wc, L, Pu):
     ri = p["OD"] / 2 - p["tdes"]
     ag = p["A"] + PI * ri**2
     beta = min(2 * p["A"] / ag + D(2) / 5, D(1))
-    return {"GJ_service": D("77200") * p["J"] + beta * D("0.4") * ec(wc, fc) * PI * ri**4 / 2}
+    gc = D("0.4") * ec(wc, fc)
+    return {"GJ_service": D("77200") * p["J"] + beta * gc * PI * ri**4 / 2,
+            "GAs": D("77200") * p["A"], "GAc": gc * PI * ri**2}                         # the components alone (DI-20)
+
+
+def jc_rect(width, depth):
+    """Saint-Venant approximation given by the user, a >= b (DI-16)."""
+    a, b = max(width, depth), min(width, depth)
+    return a * b**3 * (D(1) / 3 - D("0.21") * (b / a) * (1 - b**4 / (12 * a**4)))
+
+
+def service_encased(name, fc, wc, H, B, bars):
+    """Design Guide 6, Section 2.8: the steel or the concrete alone, for GA and GJ of encased members."""
+    p = row("W", name)
+    gc = D("0.4") * ec(wc, fc)
+    H, B = D(H), D(B)
+    ac = H * B - p["A"] - sum(D(b[0]) for b in bars)
+    return {"GAs": D("77200") * p["A"], "GAc": gc * ac, "GJs": D("77200") * p["J"], "GJc": gc * jc_rect(B, H),
+            "GJs_star": D("0.8") * D("77200") * p["J"], "GJc_star": D("0.8") * gc * jc_rect(B, H), "GA_star": D("0.8") * gc * ac}
+
+
+def _points(**values):
+    return {"points": {k: [P / 1000, M / 10**6] for k, (P, M) in values.items()}}
+
+
+def diagram_rect(name, fy, fc, axis="x"):
+    """Manual Table 6-3, Design Guide 6, Fig. 2-13."""
+    g = filled_rect(name)
+    p, t, fy, fc = g["p"], g["t"], D(fy), D(fc)
+    bi, hi, H, zs = (g["bi"], g["hi"], p["Ht"], p["Zx"]) if axis == "x" else (g["hi"], g["bi"], p["B"], p["Zy"])
+    ac = g["Ac"]
+    zc = bi * hi**2 / 4 - D("0.429") * t**2 * hi + D("0.192") * t**3
+    md = fy * zs + D("0.85") * fc * zc / 2
+    hn = min(D("0.85") * fc * ac / (2 * (D("0.85") * fc * bi + 4 * fy * t)), hi / 2)
+    mb = md - fy * 2 * t * hn**2 - D("0.85") * fc * bi * hn**2 / 2
+    he = hn / 2 + H / 4
+    pe = D("0.85") * fc * ac / 2 + D("0.85") * fc * bi * he + 4 * fy * t * he
+    me = md - fy * 2 * t * he**2 - D("0.85") * fc * bi * he**2 / 2
+    return _points(A=(fy * p["A"] + D("0.85") * fc * ac, D(0)), E=(pe, me), C=(D("0.85") * fc * ac, mb), D=(D("0.85") * fc * ac / 2, md), B=(D(0), mb))
+
+
+def diagram_round(name, fy, fc):
+    """Manual Table 6-4, Design Guide 6, Fig. 2-16, written with its thin-wall closed form for theta (float trigonometry)."""
+    import math
+    p = row("CIRCULAR_HSS", name)
+    fy_, fc_, d, t = float(fy), float(fc), float(p["OD"]), float(p["tdes"])
+    h = d - 2 * t
+    As, Ac = math.pi * (d - t) * t, math.pi * h * h / 4
+    kc, ks = fc_ * h * h, fy_ * (d - t) * t / 2
+    th = (0.026 * kc - 2 * ks) / (0.0848 * kc) + math.sqrt((0.026 * kc + 2 * ks) ** 2 + 0.857 * kc * ks) / (0.0848 * kc)
+    zc = h**3 / 6
+    md = fy_ * (d**3 / 6 - zc) + 0.95 * fc_ * zc / 2
+    mb = fy_ * (d**3 - h**3) / 6 * math.sin(th / 2) + 0.95 * fc_ * h**3 / 6 * math.sin(th / 2) ** 3 / 2
+    he = h / 2 * math.cos(th / 2) / 2 + h / 4
+    t2 = math.pi - 2 * math.asin(2 * he / h)
+    pa = fy_ * As + 0.95 * fc_ * Ac
+    pe = pa - fy_ * (d**2 - h**2) * (t2 - math.sin(t2)) / 4 - 0.95 * fc_ * h**2 * (t2 - math.sin(t2)) / 8
+    me = fy_ * (d**3 - h**3) / 6 * math.sin(t2 / 2) + 0.95 * fc_ * h**3 / 6 * math.sin(t2 / 2) ** 3 / 2
+    c = 0.95 * fc_ * Ac
+    return _points(A=(D(pa), D(0)), E=(D(pe), D(me)), C=(D(c), D(mb)), D=(D(c / 2), D(md)), B=(D(0), D(mb)))
+
+
+def diagram_encased(name, fy, fc, H, B, Fysr, bars, axis="x"):
+    """Manual Tables 6-2a and 6-2b, Design Guide 6, Figs. 2-7 and 2-8; bars = (area, db, x, y)."""
+    p = row("W", name)
+    fy, fc, fyr, H, B = D(fy), D(fc), D(Fysr), D(H), D(B)
+    asr = sum(D(b[0]) for b in bars)
+    a_s, d, bf, tf, tw = p["A"], p["d"], p["bf"], p["tf"], p["tw"]
+    coord = [abs(D(str(b[3] if axis == "x" else b[2]))) for b in bars]
+    outer = max(coord)
+    center = sum(D(b[0]) for b, v in zip(bars, coord) if v == 0)
+    k = D("0.85") * fc
+    if axis == "x":
+        h1, h2, zs = B, H, p["Zx"]
+        ac = h1 * h2 - a_s - asr
+        zr = (asr - center) * outer
+        zc = h1 * h2**2 / 4 - zs - zr
+        md = fy * zs + fyr * zr + k * zc / 2
+        hn = (k * (ac + center) - 2 * fyr * center) / (2 * (k * (h1 - tw) + 2 * fy * tw))
+        if hn <= d / 2 - tf:
+            zsn = tw * hn**2
+        else:
+            hn = (k * (ac + a_s - d * bf + center) - 2 * fy * (a_s - d * bf) - 2 * fyr * center) / (2 * (k * (h1 - bf) + 2 * fy * bf))
+            if hn <= d / 2:
+                zsn = zs - bf * (d / 2 - hn) * (d / 2 + hn)
+            else:
+                hn = (k * (ac + a_s + center) - 2 * fy * a_s - 2 * fyr * center) / (2 * k * h1)
+                zsn = zs
+        mb = md - fy * zsn - k * (h1 * hn**2 - zsn) / 2
+        return _points(A=(fy * a_s + fyr * asr + k * ac, D(0)), C=(k * ac, mb), D=(k * ac / 2, md), B=(D(0), mb))
+    h1, h2, zs = H, B, p["Zy"]
+    ac = h1 * h2 - a_s - asr
+    zr = (asr - center) * outer
+    zc = h1 * h2**2 / 4 - zs - zr
+    md = fy * zs + fyr * zr + k * zc / 2
+    pe = fy * a_s + k * (ac - h1 / 2 * (h2 - bf) + asr / 2)
+    me = md - zs * fy - k * (h1 * bf**2 / 4 - zs) / 2
+    hn = (k * (ac + a_s) - 2 * fy * a_s) / (2 * k * h1)
+    zsn = zs
+    if hn <= bf / 2:
+        hn = (k * (ac + a_s - 2 * tf * bf) - 2 * fy * (a_s - 2 * tf * bf)) / (2 * (4 * fy * tf + k * (h1 - 2 * tf)))
+        zsn = zs - 2 * tf * (bf / 2 + hn) * (bf / 2 - hn)
+    mb = md - fy * zsn - k * (h1 * hn**2 - zsn) / 2
+    return _points(A=(fy * a_s + fyr * asr + k * ac, D(0)), E=(pe, me), C=(k * ac, mb), D=(k * ac / 2, md), B=(D(0), mb))
+
+
+def service_box(B, H, t, fc, wc):
+    """Equations 2-12, 2-14 with J of a closed thin wall (Bredt) and Jc of the sharp core (DI-16)."""
+    B, H, t, bi, hi, a_s = box_geometry(B, H, t)
+    gc = D("0.4") * ec(wc, fc)
+    js = 2 * t * (B - t) ** 2 * (H - t) ** 2 / (B + H - 2 * t)
+    beta = min(D(2) / 3 * a_s / (a_s + bi * hi) + D(2) / 15, D(1) / 3)
+    return {"GJ_service": D("77200") * js + beta * gc * jc_rect(bi, hi)}
 
 
 def wall_slender(fy, fc, L, tsc, t, tf, b):
@@ -911,6 +1046,15 @@ CASES = {
     "service-low": dict(kind="service_filled", name="PTE200X200X7MM", fy=345, fc=35, wc=2320, L=3000, Pu=50),
     "service-high": dict(kind="service_filled", name="PTE200X200X7MM", fy=345, fc=35, wc=2320, L=3000, Pu=800),
     "service-round": dict(kind="service_round", name='PTER6"X6.00MM', fy=345, fc=35, wc=2320, L=3000, Pu=100),
+    "service-encased": dict(kind="service_encased", name="W10X45", fc=35, wc=2320, H=610, B=610, bars=BARS_8),
+    "service-box": dict(kind="service_box", B=400, H=300, t=12, fc=35, wc=2320),
+    "a2-biaxial-low-axial": dict(kind="appendix_2_biaxial", name="PTE200X100X6MM", fy=345, fc=80, wc=2320, L=3000, Pu=100, Mux=10, Muy=5),
+    "a2-biaxial-high-axial": dict(kind="appendix_2_biaxial", name="PTE200X100X6MM", fy=345, fc=80, wc=2320, L=3000, Pu=900, Mux=10, Muy=5),
+    "diagram-rect-x": dict(kind="diagram_rect", name="PTE200X200X7MM", fy=345, fc=35),
+    "diagram-rect-y": dict(kind="diagram_rect", name="PTE200X100X6MM", fy=345, fc=35, axis="y"),
+    "diagram-round": dict(kind="diagram_round", name='PTER6"X6.00MM', fy=345, fc=35),
+    "diagram-encased-x": dict(kind="diagram_encased", name="W10X45", fy=345, fc=35, H=610, B=610, Fysr=420, bars=BARS_8),
+    "diagram-encased-y": dict(kind="diagram_encased", name="W10X45", fy=345, fc=35, H=610, B=610, Fysr=420, bars=BARS_8, axis="y"),
     "wall-slender-C": dict(kind="wall_slender", fy=345, fc=35, L=3000, tsc=300, t=10, tf=20, b=500),
     "wall-stiffness": dict(kind="wall_stiffnesses", fc=35, wc=2320, L=3000, tsc=300, t=10, tf=20),
     "cwall-major": dict(kind="c_wall_case", fy=345, fc=35, wc=2320, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, mode="major"),
@@ -936,7 +1080,8 @@ FUNCTIONS = {"filled_compression": filled_compression, "filled_rect_flexure": fi
              "second_order": second_order, "load_transfer_filled": load_transfer_filled,
              "load_transfer_encased": load_transfer_encased, "tension_control": tension_control, "box_compression": box_compression,
              "box_flexure": box_flexure, "box_shear": box_shear, "biaxial": biaxial, "service_filled": service_filled,
-             "service_round": service_round, "wall_slender": wall_slender, "wall_stiffnesses": wall_stiffnesses,
+             "service_round": service_round, "service_encased": service_encased, "service_box": service_box, "appendix_2_biaxial": appendix_2_biaxial, "diagram_rect": diagram_rect, "diagram_round": diagram_round,
+             "diagram_encased": diagram_encased, "wall_slender": wall_slender, "wall_stiffnesses": wall_stiffnesses,
              "c_wall_case": c_wall_case, "coupling_flexure": coupling_flexure, "coupling_shear": coupling_shear,
              "wall_fire_oracle": wall_fire_oracle}
 
@@ -951,6 +1096,8 @@ def run_case(spec):
 def _plain(value):
     if isinstance(value, D):
         return str(value)
+    if isinstance(value, (list, tuple)):
+        return [_plain(v) for v in value]
     if isinstance(value, dict):
         return {k: _plain(v) for k, v in value.items()}
     return value

@@ -31,19 +31,19 @@ def anchor_case(spec, member=None, **overrides):
     else:
         anchor.update(la=spec["la"], tf=spec["tf"], tw=spec["tw"])
     anchor.update(overrides)
-    return SteelCase(section_name="PTE100X50X3MM", material={"Fy": 345},
+    return SteelCase(tau_b=1.0, section_name="PTE100X50X3MM", material={"Fy": 345},
                      composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": member == "lightweight"},
                                 "anchor": anchor})
 
 
 WALL = {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
-GUIDE_KINDS = {"second_order", "load_transfer_filled", "load_transfer_encased", "tension_control", "box_compression", "box_flexure",
+GUIDE_KINDS = {"appendix_2_biaxial", "service_encased", "service_box", "diagram_rect", "diagram_round", "diagram_encased", "second_order", "load_transfer_filled", "load_transfer_encased", "tension_control", "box_compression", "box_flexure",
                "box_shear", "biaxial", "service_filled", "service_round", "wall_slender", "wall_stiffnesses", "c_wall_case",
                "coupling_flexure", "coupling_shear", "wall_fire_oracle"}
 
 
 def wall_member(fc=35, wall=None, **demands):
-    return SteelCase(section_name="MURO", material={"Fy": 345}, **demands,
+    return SteelCase(tau_b=1.0, section_name="MURO", material={"Fy": 345}, **demands,
                      composite={"kind": "wall", "concrete": {"fc": fc, "wc": 2320, "lightweight": False},
                                 "wall": {**WALL, **(wall or {})}})
 
@@ -78,10 +78,10 @@ def filled_extension_case(spec, data):
     if "L" in spec:
         data["lengths"] = {"Lx": spec["L"], "Ly": spec["L"], "Lz": spec["L"]}
     if kind.endswith("compression"):
-        return SteelCase(**data, Pu=1), "axial", "Pn_kN", "Pn_kN"
+        return SteelCase(tau_b=1.0, **data, Pu=1), "axial", "Pn_kN", "Pn_kN"
     if kind.endswith("flexure"):
-        return SteelCase(**data, Mux=1), "flexure_x", "Mn_kNm", "Mn_kNm"
-    return SteelCase(**data, Pu=spec["Pu"], Mux=spec["Mu"]), "interaction", "ratio", "ratio"
+        return SteelCase(tau_b=1.0, **data, Mux=1), "flexure_x", "Mn_kNm", "Mn_kNm"
+    return SteelCase(tau_b=1.0, **data, Pu=spec["Pu"], Mux=spec["Mu"]), "interaction", "ratio", "ratio"
 
 
 def build(spec):
@@ -104,17 +104,17 @@ def build(spec):
     elif kind != "beam_flexure":
         data["composite"] = {"kind": "filled", "concrete": concrete(spec)}
     if kind in {"filled_compression", "encased_compression"}:
-        return SteelCase(**data, Pu=1, lengths=lengths), "axial", "Pn_kN", "Pn_kN"
+        return SteelCase(tau_b=1.0, **data, Pu=1, lengths=lengths), "axial", "Pn_kN", "Pn_kN"
     if kind == "encased_tension":
-        return SteelCase(**data, Pu=-1), "axial", "available_kN", "phiPn_kN"
+        return SteelCase(tau_b=1.0, **data, Pu=-1), "axial", "available_kN", "phiPn_kN"
     if kind in {"filled_rect_flexure", "filled_round_flexure", "encased_flexure"}:
         moment = "Muy" if spec.get("axis") == "y" else "Mux"
-        return SteelCase(**data, **{moment: 1}), "flexure_y" if moment == "Muy" else "flexure_x", "Mn_kNm", "Mn_kNm"
+        return SteelCase(tau_b=1.0, **data, **{moment: 1}), "flexure_y" if moment == "Muy" else "flexure_x", "Mn_kNm", "Mn_kNm"
     if kind == "filled_shear":
-        return SteelCase(**data, Vux=1), "shear_x", "available_kN", "phiVn_kN"
+        return SteelCase(tau_b=1.0, **data, Vux=1), "shear_x", "available_kN", "phiVn_kN"
     if kind in {"i5", "method2"}:
         data["composite"]["interaction"] = "I5" if kind == "i5" else ("M2S" if spec["simplified"] else "M2")
-        return SteelCase(**data, Pu=spec["Pu"], Mux=spec["Mu"], lengths=lengths), "interaction", "ratio", "ratio"
+        return SteelCase(tau_b=1.0, **data, Pu=spec["Pu"], Mux=spec["Mu"], lengths=lengths), "interaction", "ratio", "ratio"
     deck = None
     if spec["hr"]:
         deck = {"orientation": "perpendicular", "hr": spec["hr"], "wr": 150, "emid_ht_at_least_50": float(spec["Rp"]) == 0.75}
@@ -122,7 +122,7 @@ def build(spec):
                  "right_beam_spacing": spec["spacing"], "tc": spec["tc"], "deck": deck, "shored": True,
                  "studs": {"count": spec["n"], "d": spec["d"], "Fu": spec["Fu"], "length": 120, "over_web": True}}
     data["composite"] = {"kind": "beam", "concrete": concrete(spec), "beam": beam_data}
-    return SteelCase(**data, Mux=1), "flexure_x", "available_kNm", "phiMn_kNm"
+    return SteelCase(tau_b=1.0, **data, Mux=1), "flexure_x", "available_kNm", "phiMn_kNm"
 
 
 @pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] not in GUIDE_KINDS))
@@ -141,7 +141,7 @@ def test_reference_bank_covers_every_member_type_and_class():
 
 
 def filled(name="PTE100X50X3MM", Fy=345, fc=35, interaction="H1", **demands):
-    return SteelCase(section_name=name, material={"Fy": Fy}, **demands,
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy}, **demands,
                      composite={"kind": "filled", "interaction": interaction,
                                 "concrete": {"fc": fc, "wc": 2320, "lightweight": False}})
 
@@ -188,14 +188,14 @@ def test_noncompact_round_filled_flexure_uses_the_guide_and_says_so(engine):
 
 def test_rectangular_noncompact_filled_with_bars_is_blocked(engine):
     bars = {"Fysr": 420, "transverse": TIES, "bars": [{"area": 100, "db": 11, "x": 0, "y": 0}]}
-    case = SteelCase(section_name="PTE300X100X5MM", material={"Fy": 345}, Muy=1,
+    case = SteelCase(tau_b=1.0, section_name="PTE300X100X5MM", material={"Fy": 345}, Muy=1,
                      composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False}, "filled": bars})
     assert engine.run(case).check("flexure_y").errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
 
 
 def test_bars_of_a_filled_member_meet_i22_and_i34(engine):
     bars = {"Fysr": 420, "transverse": TIES, "bars": [{"area": 10, "db": 4, "x": 0, "y": 40}]}
-    case = SteelCase(section_name="PTE200X200X7MM", material={"Fy": 345}, Mux=1,
+    case = SteelCase(tau_b=1.0, section_name="PTE200X200X7MM", material={"Fy": 345}, Mux=1,
                      composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False}, "filled": bars})
     errors = engine.run(case).check("flexure_x").errors
     assert {e.get("id") for e in errors} == {"rho_sr"}
@@ -203,7 +203,7 @@ def test_bars_of_a_filled_member_meet_i22_and_i34(engine):
 
 def encased(method="steel", anchors=False, bars=None, ties=TIES, **demands):
     bars = bars or [{"area": 510, "db": 25.4, "x": x, "y": y} for x in (-241.3, 241.3) for y in (-241.3, 241.3)]
-    return SteelCase(section_name="W10X45", material={"Fy": 345}, **demands,
+    return SteelCase(tau_b=1.0, section_name="W10X45", material={"Fy": 345}, **demands,
                      composite={"kind": "encased", "concrete": {"fc": 35, "wc": 2320, "lightweight": False},
                                 "encased": {"H": 610, "B": 610, "Fysr": 420, "bars": bars, "transverse": ties,
                                             "flexure_method": method, "anchors_provided": anchors}})
@@ -250,7 +250,7 @@ def test_bare_steel_is_a_lower_bound_of_the_compressive_strength(engine, section
 def beam(**overrides):
     data = {"moment": "positive", "span": 9000, "left_beam_spacing": 3000, "right_beam_spacing": 3000, "tc": 120,
             "shored": True, "studs": {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True}, **overrides}
-    return SteelCase(section_name="W14X30", material={"Fy": 345}, Mux=100, flexure={"Lb": 2000, "tension_flange_holes": False},
+    return SteelCase(tau_b=1.0, section_name="W14X30", material={"Fy": 345}, Mux=100, flexure={"Lb": 2000, "tension_flange_holes": False},
                      composite={"kind": "beam", "concrete": {"fc": 28, "wc": 2320, "lightweight": False}, "beam": data})
 
 
@@ -338,7 +338,7 @@ def test_wall_covers_only_the_plane_of_the_wall(engine):
 
 def test_wall_rejects_another_interaction_method():
     with pytest.raises(ValueError):
-        SteelCase(section_name="MURO", material={"Fy": 345}, Mux=1,
+        SteelCase(tau_b=1.0, section_name="MURO", material={"Fy": 345}, Mux=1,
                   composite={"kind": "wall", "interaction": "M2", "concrete": {"fc": 35, "wc": 2320, "lightweight": False},
                              "wall": WALL})
 

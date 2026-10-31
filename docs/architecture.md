@@ -26,12 +26,16 @@ src/steel_design/
 │   ├── composite.py             capítulo I: rellenos, embebidos, vigas, muros y anclajes; remite a E, F y G donde la norma lo indica
 │   ├── speedcore.py             muros en C, vigas de acoplamiento e incendio, por Design Guide 38
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
+│   ├── stiffness.py             rigideces elásticas (E·I, Guía 6, 2.8), efectivas (I1.5) y para método directo (C2.3, I1.5), sea cual sea la demanda
+│   ├── interaction_diagram.py   diagramas P-M de I5 con las Tablas 6-2a a 6-4 del Manual; informativos
+│   ├── requirements.py          requerimientos técnicos de materiales y geometría; uno obligatorio incumplido impide el PASS
 │   ├── coverage.py              obligaciones de D, E, F, G y H derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección
 ├── engine.py                    una comprobación por demanda (D/E por Pu, F por Mux/Muy/Mw/Mz, G por Vux/Vuy),
 │                                interacción H si actúan juntas fuerza axial y flexión → estado
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
 ├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
+├── report_glossary.py           nombres en palabras, unidades y literales de lo que imprime la memoria
 └── run.py                       CLI (JSON en stdout; archivos solo con --output, --report, --pdf → results/ ignorado)
 ```
 
@@ -76,7 +80,10 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |
 | Hojas, cabeceras y unidades del catálogo; b/tdes, h/tdes, D/t de PTE | `sections/loader.py` |
 | Decisión PASS/FAIL/INCOMPLETE | `engine.py` |
+| Rigideces elásticas, efectivas y para método directo | `domain/stiffness.py` |
+| Requerimientos técnicos de materiales y geometría | `domain/requirements.py` |
 | Presentación de la memoria de cálculo | `reporting.py` |
+| Nombres en palabras y literales de la memoria | `report_glossary.py` |
 
 Ninguna interfaz (CLI, futura web) calcula capacidades: todas llaman a `engine`.
 

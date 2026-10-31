@@ -1,9 +1,10 @@
 {
+  "tau_b": 0.8,
   "section_name": "W10X45",
   "material": {"Fy": 345},
   "lengths": {"Lx": 4267, "Ly": 4267, "Lz": 4267},
   "composite": {
-    "kind": "encased",
+    "kind": "encased", "interaction": null, "second_order": null,
     "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
     "encased": {
       "H": 610, "B": 610, "Fysr": 420,
@@ -19,6 +20,7 @@
     }
   },
   "cases": [
-    {"name": "Compression and flexure", "Pu": 3000, "Mux": 300}
+    {"name": "Compression and flexure", "Pu": 3000, "Mux": 300},
+    {"name": "First-order loads, Appendix 8.1", "composite": {"second_order": {"axis": "x", "Mnt": 150, "Mlt": 100, "Pnt": 2000, "Plt": 300, "M1_M2": -0.5, "Pstory": 60000, "Pmf": 20000, "H": 2000, "L": 4000, "drift": 10}}}
   ]
 }

@@ -1,13 +1,31 @@
 {
-  "section_name": "MURO-3000X300",
+  "tau_b": 1.0,
+  "section_name": "MURO-3350X610",
   "material": {"Fy": 345},
-  "lengths": {"Lx": 6000, "Ly": 6000, "Lz": 6000},
+  "lengths": {"Lx": 5180, "Ly": 5180, "Lz": 5180},
   "composite": {
-    "kind": "wall",
-    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
-    "wall": {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
+    "kind": "wall", "second_order": null,
+    "concrete": {"fc": 40, "wc": 2320, "lightweight": false},
+    "wall": {"length": 3350, "tsc": 610, "t": 14.3, "tf": 14.3, "b": 305, "st": 305, "dtie": 25}
   },
   "cases": [
-    {"name": "Compression, flexure and shear", "Pu": 8000, "Mux": 20000, "Vux": 5000}
+    {"name": "Compression, flexure and shear", "Pu": 30000, "Mux": 40000, "Vux": 8000},
+    {
+      "name": "Fire, Design Guide 38, Chapter 6",
+      "Pu": 16000,
+      "composite": {
+        "fire": {
+          "required_rating_hours": 3,
+          "plate_temperature": 1004,
+          "element_thicknesses": [22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.3],
+          "element_temperatures": [788, 497, 368, 278, 208, 152, 109, 78, 57, 42, 33, 28, 26],
+          "vent": {
+            "s1": 3048, "s2": 3048, "diameter": 25.4, "dry_thickness": 38.1, "heating_time": 1790,
+            "water_content": 0.15, "water_density": 1000, "pour_height": 4267
+          }
+        }
+      }
+    },
+    {"name": "First-order loads, Appendix 8.1", "composite": {"second_order": {"axis": "x", "Mnt": 20000, "Mlt": 10000, "Pnt": 20000, "Plt": 5000, "M1_M2": -0.5, "Pstory": 200000, "Pmf": 100000, "H": 10000, "L": 5180, "drift": 10}}}
   ]
 }

@@ -242,7 +242,7 @@ def single_angle_geometric(name, fy, axis, restraint, toe, Lb=None, Cb=1):
     return modes
 
 
-def single_angle_principal(name, fy, axis, Lb=None, Cb=1, beta=0, leg=None, toe=None):
+def single_angle_principal(name, fy, axis, Lb=None, Cb=1, leg=None, toe=None):
     p, fy = row("SINGLE_ANGLE", name), D(fy)
     legs = sorted([p["d"], p["b"]])
     short, long_, t = legs[0], legs[1], p["t"]
@@ -250,7 +250,7 @@ def single_angle_principal(name, fy, axis, Lb=None, Cb=1, beta=0, leg=None, toe=
     if axis == "w":
         my = fy * min(v for k, v in p.items() if k in ("SwA", "SwB", "SwC"))
         modes["Y"] = D("1.5") * my
-        b_w = D(beta) if leg == "short" else -D(beta)                             # + short leg in compression
+        b_w = p["βw"] if leg == "short" else -p["βw"]                             # + short leg in compression
         Lb, cb = D(Lb), min(D(Cb), D("1.5"))
         kk = D("4.4") * b_w * p["rz"] / (Lb * t)
         mcr = 9 * E * p["A"] * p["rz"] * t * cb / (8 * Lb) * (sqrt(1 + kk**2) + kk)   # F10-4
@@ -307,8 +307,8 @@ CASES = {
                               toe="compression", Lb=2000, Cb="1.2"),
     "L-F10-geom-continuous-unequal": dict(kind="lg", name="L6X4X3/8", fy=345, axis="x", restraint="continuous",
                                           toe="compression"),
-    "L-F10-w-short-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, beta="79.8", leg="short"),
-    "L-F10-w-long-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, beta="79.8", leg="long"),
+    "L-F10-w-short-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="short"),
+    "L-F10-w-long-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="long"),
     "L-F10-w-equal-Cb-capped": dict(kind="lp", name="L4X4X1/4", fy=345, axis="w", Lb=3000, Cb="1.8", leg="long"),
     "L-F10-z-toes-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="z", toe="compression"),
 }

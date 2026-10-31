@@ -95,7 +95,7 @@ def _sign(value):
     return D(0) if abs(value) < D("1e-9") else D(1 if value > 0 else -1)
 
 
-def h2_case(name, fy, Pu=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, beta=0, leg="long", toe=None, tension=None):
+def h2_case(name, fy, Pu=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, leg="long", toe=None, tension=None):
     p, fy, pu, mw, mz = chapter_f.row("SINGLE_ANGLE", name), D(fy), D(Pu), D(Mw), D(Mz)
     pc = mcw = mcz = None
     if pu > 0:
@@ -103,7 +103,7 @@ def h2_case(name, fy, Pu=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, beta=0, leg="long
     elif pu < 0:
         pc = chapter_d.case("SINGLE_ANGLE", name, fy, tension["Fu"], tension["An"], tension["U"])["LRFD_kN"]
     if mw:
-        mcw = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "w", "Lb": Lb, "Cb": Cb, "beta": beta, "leg": leg})
+        mcw = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "w", "Lb": Lb, "Cb": Cb, "leg": leg})
     if mz:
         mcz = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "z", "toe": toe})
     points = angle_points(p)
@@ -123,14 +123,14 @@ def h2_case(name, fy, Pu=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, beta=0, leg="long
 
 TENSION = {"Fu": 450, "An": 15000, "U": "0.9"}
 H2_CASES = {
-    "L-H2-comp-long-toe": dict(name="L6X4X3/8", fy=345, Pu=100, Mw=5, Mz=2, L=2000, Lb=2000, beta="79.8", leg="long",
+    "L-H2-comp-long-toe": dict(name="L6X4X3/8", fy=345, Pu=100, Mw=5, Mz=2, L=2000, Lb=2000, leg="long",
                                toe="tension"),
-    "L-H2-comp-short-toe": dict(name="L6X4X3/8", fy=345, Pu=100, Mw=5, Mz=2, L=2000, Lb=2000, beta="79.8", leg="short",
+    "L-H2-comp-short-toe": dict(name="L6X4X3/8", fy=345, Pu=100, Mw=5, Mz=2, L=2000, Lb=2000, leg="short",
                                 toe="compression"),
-    "L-H2-comp-axial-Mw": dict(name="L8X4X1/2", fy=345, Pu=300, Mw=20, L=1524, Lb=1524, beta="139.2", leg="long"),
+    "L-H2-comp-axial-Mw": dict(name="L8X4X1/2", fy=345, Pu=300, Mw=20, L=1524, Lb=1524, leg="long"),
     "L-H2-comp-heel-governs": dict(name="L8X4X1/2", fy=345, Pu=150, Mz=5, L=1524, toe="tension"),
     "L-H2-comp-FAIL": dict(name="L4X4X1/4", fy=450, Pu=120, Mz=4, L=2000, toe="compression"),
-    "L-H2-tension": dict(name="L6X4X3/8", fy=345, Pu=-300, Mw=8, Mz=3, Lb=2000, beta="79.8", leg="short", toe="tension",
+    "L-H2-tension": dict(name="L6X4X3/8", fy=345, Pu=-300, Mw=8, Mz=3, Lb=2000, leg="short", toe="tension",
                          tension={"Fu": 450, "An": 1900, "U": "0.85"}),
     "L-H2-biaxial-equal": dict(name="L4X4X1/4", fy=345, Mw=3, Mz=3, Lb=3000, toe="compression"),
 }

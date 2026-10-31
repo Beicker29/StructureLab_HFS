@@ -1,0 +1,26 @@
+{
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) C2.3; catalog data/sections.xlsx",
+ "generator": "tests/oracles/chapter_c.py (Decimal; independent of steel_design)",
+ "cases": {
+  "W": {
+   "spec": {
+    "family": "W",
+    "name": "W14X90"
+   },
+   "EA_star": "2736000000.0",
+   "EI_star_x": "66560000000000.0",
+   "EI_star_y": "24160000000000.0",
+   "GJ_star": "104374400000.0"
+  },
+  "RHSS": {
+   "spec": {
+    "family": "RECTANGULAR_HSS",
+    "name": "PTE120X60X2MM"
+   },
+   "EA_star": "103496377.89329236800000",
+   "EI_star_x": "197529680773.04497600000000000",
+   "EI_star_y": "67967609139.738342400000000000",
+   "GJ_star": "62213781554.41056521600000"
+  }
+ }
+}

@@ -41,8 +41,8 @@ def _require(section, *names):
                     ["section." + n for n in missing])
 
 
-def _requirement(id_, provision, satisfied, message):
-    return {"id": id_, "provision": provision, "satisfied": bool(satisfied), "message": message}
+def _requirement(id_, provision, satisfied, message, value=None, limit=None):
+    return {"id": id_, "provision": provision, "satisfied": bool(satisfied), "message": message, "value": value, "limit": limit}
 
 
 def uses_appendix_2(case, section) -> bool:
@@ -127,7 +127,7 @@ def _filled_requirements(case, section, geometry, *, flexure):
     """I2.2a, I3.4a and the clearance of I2.2e, I3.4c."""
     ratio = section.area / (section.area + geometry["Afill"])
     out = [_requirement("As/Ag", "I3.4a(b)" if flexure else "I2.2a(a)", ratio >= 0.01,
-                        "El acero debe ser al menos 1 % de la sección compuesta.")]
+                        "El acero debe ser al menos 1 % de la sección compuesta.", ratio, "≥ 0.01")]
     filled = case.composite.filled
     if not filled:
         return out
@@ -142,7 +142,8 @@ def _filled_requirements(case, section, geometry, *, flexure):
                             "Separación libre entre el tubo y las barras: al menos 1.5 db y 38 mm."))
     if flexure:
         out.append(_requirement("rho_sr", "I3.4a(c)", geometry["Asr"] / (section.area + geometry["Afill"]) >= 0.004,
-                                "Con barras, la cuantía longitudinal mínima es 0.004."))
+                                "Con barras, la cuantía longitudinal mínima es 0.004.",
+                                geometry["Asr"] / (section.area + geometry["Afill"]), "≥ 0.004"))
     return out
 
 
@@ -215,8 +216,8 @@ def _encased_requirements(case, section, geometry):
         clear.append(gap - bar.db / 2 >= max(1.5 * bar.db, 38.0))
     inside = all(abs(b.x) + b.db / 2 < e.B / 2 and abs(b.y) + b.db / 2 < e.H / 2 for b in e.bars)
     return [
-        _requirement("As/Ag", "I2.1a(a)", section.area / Ag >= 0.01, "El núcleo de acero debe ser al menos 1 % de la sección."),
-        _requirement("rho_sr", "I2.1a(c)", geometry["Asr"] / Ag >= 0.004, "La cuantía longitudinal mínima es 0.004."),
+        _requirement("As/Ag", "I2.1a(a)", section.area / Ag >= 0.01, "El núcleo de acero debe ser al menos 1 % de la sección.", section.area / Ag, "≥ 0.01"),
+        _requirement("rho_sr", "I2.1a(c)", geometry["Asr"] / Ag >= 0.004, "La cuantía longitudinal mínima es 0.004.", geometry["Asr"] / Ag, "≥ 0.004"),
         _requirement("transverse", "I2.1a(b)", transverse and t.spacing <= 0.5 * min(e.B, e.H),
                      "Refuerzo transversal: 10 mm a 300 mm o 13 mm a 400 mm, y separación ≤ 0.5 de la menor dimensión."),
         _requirement("bar_clearance", "I2.1e(a)", all(clear),
@@ -243,39 +244,19 @@ def _wall_requirements(case, section, geometry, *, compression=False):
     ratio = section.area / geometry["Ag"]
     ties = eq.wall_tie_limit(t=wall.t, tsc=wall.tsc, dtie=wall.dtie)
     return [
-        _requirement("rho_s", "I1.6", 0.01 <= ratio <= 0.10, "Las placas de acero deben ser entre 1 % y 10 % de la sección."),
+        _requirement("rho_s", "I1.6", 0.01 <= ratio <= 0.10, "Las placas de acero deben ser entre 1 % y 10 % de la sección.", ratio, "0.01 a 0.10"),
         _requirement("b/t", "I1.6a (I1-4)", (compression and wall.allow_slender_plates) or not _wall_is_slender(case),
-                     "Esbeltez de la placa: b/t ≤ 1.2·√(E/Fy)."),
-        _requirement("st", "I1.6b", wall.st <= wall.tsc, "Separación de amarres ≤ tsc."),
-        _requirement("st/t", "I1.6b (I1-5M)", wall.st / wall.t <= ties["limit"], "Separación de amarres: st/t ≤ 0.38·√(Es/(2α+1))."),
+                     "Esbeltez de la placa: b/t ≤ 1.2·√(E/Fy).", wall.b / wall.t, f"≤ {1.2 * math.sqrt(eq.E_STEEL / case.material.Fy):.1f}"),
+        _requirement("st", "I1.6b", wall.st <= wall.tsc, "Separación de amarres ≤ tsc.", wall.st, f"≤ {wall.tsc:g} mm"),
+        _requirement("st/t", "I1.6b (I1-5M)", wall.st / wall.t <= ties["limit"], "Separación de amarres: st/t ≤ 0.38·√(Es/(2α+1)).",
+                     wall.st / wall.t, f"≤ {ties['limit']:.1f}"),
     ]
 
 
-def _service_stiffnesses(case, section, geometry, kind, Is, Isr, Ec, Ic, coefficient, Pno) -> dict:
-    """Design Guide 6, Section 2.8, for serviceability analyses; they take no part in the strength. Gc = 0.4Ec as in I1-3."""
-    As, Ac = section.area, geometry["Ac"]
-    out = {"EI_service": dg06_members.service_stiffness(kind=kind, EsIs=eq.E_STEEL * Is, EsIsr=eq.E_STEEL * Isr, EcIc=Ec * Ic,
-                                                        C=coefficient, P_over_Pno=abs(case.Pu) * 1000.0 / Pno),
-           "EA_service": dg06_members.axial_stiffness(EsAs=eq.E_STEEL * As, EsAsr=eq.E_STEEL * geometry["Asr"], EcAc=Ec * Ac)}
-    if kind == "filled" and geometry["shape"] == "rect":
-        out["GA_service"] = dg06_members.shear_stiffness_rect(GsAs=eq.G_STEEL * As, GcAc=0.4 * Ec * Ac)
-    if kind == "filled" and geometry["shape"] == "round" and section.j is not None:
-        out["GJ_service"] = dg06_members.torsional_stiffness_round(
-            GsJs=eq.G_STEEL * section.j, GcJc=0.4 * Ec * math.pi * geometry["ri"] ** 4 / 2,
-            As_over_Ag=As / (As + geometry["Afill"]))
-    return out
-
-
-def composite_compression(case: SteelCase, section: Section, bare_steel=None) -> dict:
-    """I2.1b, I2.2b and I2.3a: flexural buckling about both axes; not less than the bare steel of Chapter E."""
-    _check_family(case, section)
+def _compression_basis(case, section) -> dict:
+    """Pno, stiffness coefficient and section data of filled, encased and planar wall members."""
     kind = case.composite.kind
-    if kind == "beam":
-        _blocked("La viga compuesta con fuerza axial no está cubierta por I3.2.", section)
     Fy, fc = case.material.Fy, case.composite.concrete.fc
-    Ec = eq.concrete_modulus(wc=case.composite.concrete.wc, fc=fc)
-    f, ln = case.factors, case.lengths
-    phi = eq.PHI_C_WALL if kind == "wall" else eq.PHI_C
     point_c = 0.0
     if kind == "wall":
         geometry = _wall_geometry(case)
@@ -303,6 +284,22 @@ def composite_compression(case: SteelCase, section: Section, bare_steel=None) ->
         Isrx, Isry = geometry["Isrx"], geometry["Isry"]
         classification, requirements = None, _encased_requirements(case, section, geometry)
         c_name = "C1"
+    return {"geometry": geometry, "pno": pno, "coefficient": coefficient, "Isrx": Isrx, "Isry": Isry, "classification": classification,
+            "requirements": requirements, "c_name": c_name, "point_c": point_c}
+
+
+def composite_compression(case: SteelCase, section: Section, bare_steel=None) -> dict:
+    """I2.1b, I2.2b and I2.3a: flexural buckling about both axes; not less than the bare steel of Chapter E."""
+    _check_family(case, section)
+    kind = case.composite.kind
+    if kind == "beam":
+        _blocked("La viga compuesta con fuerza axial no está cubierta por I3.2.", section)
+    Ec = eq.concrete_modulus(wc=case.composite.concrete.wc, fc=case.composite.concrete.fc)
+    f, ln = case.factors, case.lengths
+    phi = eq.PHI_C_WALL if kind == "wall" else eq.PHI_C
+    basis = _compression_basis(case, section)
+    geometry, pno, coefficient, Isrx, Isry = basis["geometry"], basis["pno"], basis["coefficient"], basis["Isrx"], basis["Isry"]
+    classification, requirements, c_name, point_c = basis["classification"], basis["requirements"], basis["c_name"], basis["point_c"]
     modes = {}
     for axis, Is, Isr, Ic, K, L in (("x", section.ix, Isrx, geometry["Icx"], f.Kx, ln.Lx),
                                     ("y", section.iy, Isry, geometry["Icy"], f.Ky, ln.Ly)):
@@ -318,11 +315,6 @@ def composite_compression(case: SteelCase, section: Section, bare_steel=None) ->
                                "Pno_equation": pno["equation"], c_name: coefficient, "Ec_mpa": Ec, "PC_kN": point_c / 1000.0,
                                "EI_eff": ei, "Lc_mm": K * L, "Pe_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"],
                                "Pn_kN": out["Pn"] / 1000.0, "available_kN": phi * out["Pn"] / 1000.0}
-        if kind == "wall":
-            modes[f"FB-{axis}"].update(EA_eff=eq.wall_axial_stiffness(As=section.area, Ec=Ec, Ac=geometry["Ac"]),
-                                       GA_eff=eq.wall_shear_stiffness(Asw=geometry["Asw"], Ec=Ec, Ac=geometry["Ac"]))
-        else:
-            modes[f"FB-{axis}"].update(_service_stiffnesses(case, section, geometry, kind, Is, Isr, Ec, Ic, coefficient, pno["Pno"]))
     governing = min(modes, key=lambda k: modes[k]["Pn_kN"])
     available, notes = modes[governing]["available_kN"], []
     if bare_steel is not None and kind != "wall":
@@ -897,28 +889,61 @@ def composite_anchor(case: SteelCase, section: Section) -> dict:
 
 
 def composite_appendix_2_interaction(case: SteelCase, section: Section, checks: list) -> dict:
-    """Appendix 2, Section 2.1.4: Equations I5-1a/b with cp and cm of A-2-3 and A-2-4."""
+    """Appendix 2, Section 2.1.4: Equations I5-1a/b with cp and cm of A-2-3 and A-2-4.
+
+    Two axes (DI-22, not in the Appendix): Mr/Mc becomes Mrx/Mcx + Mry/Mcy. B/H depends on the axis, so the equation is evaluated with
+    the cp and cm of each axis and the greater value governs.
+    """
     by_id = {c.id: c for c in checks}
-    if case.Mux and case.Muy:
-        _blocked("Apéndice 2: las ecuaciones I5-1 cubren flexión en un eje.", section)
     missing = [c.id for c in checks if c.capacity is None]
     if missing:
         raise IncompleteSectionDataError("La interacción necesita la resistencia de diseño de cada componente.",
                                          code="INTERACTION_COMPONENT_MISSING",
                                          details={"section": section.name, "checks": missing})
     axial = by_id["axial"]
-    flexure = by_id.get("flexure_x") or by_id.get("flexure_y")
+    flexures = [by_id[i] for i in ("flexure_x", "flexure_y") if i in by_id]
     A = axial.result["modes"][axial.result["governing_mode"]]
     Fy, fc = case.material.Fy, case.composite.concrete.fc
     t = section.tdes
     lam = a2.slenderness(b_t=max(section.b, section.h) / t, Fy=Fy)
-    B, H = (section.b_out, section.h_out) if flexure.id == "flexure_x" else (section.h_out, section.b_out)
-    coefficients = a2.interaction_coefficients(B=B, H=H, lam=lam, Pn=A["Pn_kN"], Pno=A["Pno_kN"], fc=fc, Fy=Fy)
-    out = eq.i5_interaction(Pr_Pc=axial.demand / axial.capacity, Mr_Mc=flexure.demand / flexure.capacity, **coefficients)
-    mode = {"limit_state": "combined_flexure_axial", "provision": "Apéndice 2, 2.1.4", "applies": True, **coefficients,
-            "Pr_kN": axial.demand, "Pc_kN": axial.capacity, "Mr_kNm": flexure.demand, "Mc_kNm": flexure.capacity, **out}
-    return _result(case, section, modes={"A2": mode}, governing="A2", provisions=["Apéndice 2"], ratio=out["ratio"],
-                   notes=["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."])
+    Mr_Mc = sum(f.demand / f.capacity for f in flexures)
+    biaxial = len(flexures) > 1
+    terms = {"Pr_kN": axial.demand, "Pc_kN": axial.capacity}
+    if biaxial:
+        fx, fy = flexures
+        terms.update(Mrx_kNm=fx.demand, Mcx_kNm=fx.capacity, Mry_kNm=fy.demand, Mcy_kNm=fy.capacity, Mr_Mc_sum=Mr_Mc)
+    else:
+        terms.update(Mr_kNm=flexures[0].demand, Mc_kNm=flexures[0].capacity)
+    provision = "Apéndice 2, 2.1.4" + (", extendida a dos ejes (DI-22)" if biaxial else "")
+    candidates = []
+    for flexure in flexures:
+        B, H = (section.b_out, section.h_out) if flexure.id == "flexure_x" else (section.h_out, section.b_out)
+        coefficients = a2.interaction_coefficients(B=B, H=H, lam=lam, Pn=A["Pn_kN"], Pno=A["Pno_kN"], fc=fc, Fy=Fy)
+        out = eq.i5_interaction(Pr_Pc=axial.demand / axial.capacity, Mr_Mc=Mr_Mc, **coefficients)
+        candidates.append({"limit_state": "combined_flexure_axial", "provision": provision, "applies": True, **coefficients, **terms, **out,
+                           **({"coefficients_axis": flexure.id[-1]} if biaxial else {})})
+    candidates.sort(key=lambda mode: -mode["ratio"])
+    modes = {"A2": candidates[0], **({"A2-otro": candidates[1]} if biaxial else {})}
+    notes = ["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."]
+    if biaxial:
+        notes.append("Extensión a dos ejes de I5-1a y I5-1b (Mrx/Mcx + Mry/Mcy), indicada por el usuario: el Apéndice 2 y la Guía 6 solo tratan un eje. "
+                     "Se evalúa con cp y cm de cada eje y gobierna el mayor (DI-22).")
+    return _result(case, section, modes=modes, governing="A2", provisions=[provision], ratio=candidates[0]["ratio"], notes=notes)
+
+
+def default_interaction(case: SteelCase, checks: list) -> str:
+    """I5: H1.1 under I5(a); I5-1 under I5(b) where those equations apply (compression with flexure about one axis), otherwise H1.1."""
+    flexures = [c for c in checks if c.id in {"flexure_x", "flexure_y"}]
+    axial = next((c for c in checks if c.id == "axial"), None)
+    if case.composite.kind != "filled" or case.Pu <= 0 or len(flexures) != 1 or axial is None or axial.result is None or flexures[0].result is None:
+        return "H1"
+    classes = {row["class"] for c in (axial, flexures[0]) for row in c.result["classification"]["elements"]}
+    return "I5" if classes - {"compact"} else "H1"
+
+
+def requested_interaction_replaced(case: SteelCase) -> bool:
+    """Method 2 is optional, except in filled members with bars: Asr != 0 leaves H1.1 only (DI-22)."""
+    return case.composite.interaction in {"M2", "M2S"} and case.composite.filled is not None
 
 
 def composite_i5(case: SteelCase, section: Section, checks: list) -> dict:

@@ -102,8 +102,6 @@ class FlexureBasis(InputModel):
     Afn: Optional[PositiveNumber] = Field(None, description="Net area of the tension flange (mm2), when it has holes")
     lateral_torsional_restraint: Optional[Literal["none", "at_max_moment", "continuous"]] = Field(
         None, description="Single angles (F10): lateral-torsional restraint along the length")
-    beta_w: Optional[NonNegativeNumber] = Field(
-        None, description="Single angles (F10-4): |beta_w| (mm) of unequal-leg angles; sign from the leg in compression")
     tension_cb_amplification: StrictBool = Field(
         False, description="H1.2: multiply Cb by sqrt(1 + Pr/Pey) when axial tension acts with flexure "
                            "(doubly symmetric members only)")
@@ -367,9 +365,10 @@ class CompositeBasis(InputModel):
     """Chapter I: the member type is declared, never deduced from the section."""
     kind: Literal["filled", "encased", "beam", "wall", "c_wall", "coupling_beam"]
     concrete: Concrete
-    interaction: Literal["H1", "I5", "M2", "M2S"] = Field(
-        "H1", description="H1.1; Equations I5-1a/b (filled noncompact or slender); Commentary I5 Method 2 (M2) or "
-                          "Method 2 simplified (M2S), for encased and compact filled members. Walls use I5(c)")
+    interaction: Optional[Literal["H1", "I5", "M2", "M2S"]] = Field(
+        None, description="Omitted, the rule of I5: H1.1 for encased and compact filled members; I5-1a/b for noncompact or slender filled "
+                          "members in compression with flexure about one axis, otherwise H1.1. It may be set to H1.1, I5-1 or Commentary I5 "
+                          "Method 2 (M2, M2S). Walls use I5(c)")
     encased: Optional[EncasedBasis] = None
     filled: Optional[FilledBars] = None
     beam: Optional[CompositeBeamBasis] = None
@@ -404,7 +403,7 @@ class CompositeBasis(InputModel):
             raise ValueError("composite.anchor (I8.3) no está disponible para muros en C ni vigas de acoplamiento.")
         if self.biaxial_shape_factor and self.interaction != "M2S":
             raise ValueError("composite.biaxial_shape_factor solo se aplica con interaction = M2S.")
-        if self.kind in {"c_wall", "coupling_beam"} and self.interaction != "H1":
+        if self.kind in {"c_wall", "coupling_beam"} and self.interaction is not None:
             raise ValueError("Muros en C y vigas de acoplamiento usan la distribución plástica; no indique composite.interaction.")
         if (self.kind == "encased") != (self.encased is not None):
             raise ValueError("composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso.")
@@ -414,7 +413,7 @@ class CompositeBasis(InputModel):
             raise ValueError("composite.wall corresponde solo a kind = wall, y es obligatorio en ese caso.")
         if self.filled is not None and self.kind != "filled":
             raise ValueError("composite.filled corresponde solo a kind = filled.")
-        if self.kind == "wall" and self.interaction != "H1":
+        if self.kind == "wall" and self.interaction is not None:
             raise ValueError("Los muros usan la distribución plástica de I5(c); no indique composite.interaction.")
         return self
 
@@ -460,6 +459,9 @@ class SteelCase(InputModel):
     tension: Optional[TensionBasis] = None
     flexure: Optional[FlexureBasis] = None
     shear: Optional[ShearBasis] = None
+    tau_b: Optional[PositiveNumber] = Field(
+        None, le=1, description="Stiffness reduction parameter of composite members for the direct analysis method, entered by the user; "
+                                "required, or the status is INCOMPLETE. Noncomposite members always use 1.0 (C2.3(c)): no other value is accepted")
     custom_section: Optional[CustomSection] = None
     composite: Optional[CompositeBasis] = None
 
@@ -477,6 +479,8 @@ class SteelCase(InputModel):
                     composite and (composite.anchor or composite.second_order or composite.load_transfer))):
             raise ValueError("La combinación debe tener al menos una demanda distinta de cero "
                              "(Pu, Mux, Muy, Mw, Mz, Vux, Vuy).")
+        if self.composite is None and self.tau_b not in (None, 1.0):
+            raise ValueError("En miembros no compuestos τb es siempre 1.0 (C2.3(c)); no indique otro valor.")
         if self.Pu > 0 and self.lengths is None:
             raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
         return self
@@ -517,6 +521,9 @@ class DesignResult(BaseModel):
     status: Status
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
+    stiffness: dict = Field(default_factory=dict, description="Elastic, effective and direct-analysis stiffnesses (N, mm), whatever the demands")
+    requirements: dict = Field(default_factory=dict, description="Technical requirements by mechanical and geometric properties")
+    interaction_diagrams: list = Field(default_factory=list, description="Interaction diagrams of Manual Tables 6-2a to 6-4; informative")
     scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
                   "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
                   "I5, I6, I8.2 e I8.3; Apéndices 2 y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica cada chequeo: no "
@@ -533,7 +540,11 @@ class DesignResult(BaseModel):
     @computed_field
     @property
     def errors(self) -> list[dict]:
-        return [{**e, "check": c.id} for c in self.checks for e in c.errors]
+        out = [{**e, "check": c.id} for c in self.checks for e in c.errors]
+        return out + [{"code": "TECHNICAL_REQUIREMENT_NOT_MET", "message": r["description"], "provision": r["provision"]}
+                      for group in self.requirements.values() for r in group if r["status"] == "no_cumple" and r["binding"]] + [
+            {"code": "TECHNICAL_REQUIREMENT_MISSING", "message": r["reason"], "provision": r["provision"]}
+            for group in self.requirements.values() for r in group if r["status"] == "sin_dato"]
 
     # Convenience accessors for the axial check (Python API; not serialized).
     def check(self, check_id: str) -> Optional[Check]:

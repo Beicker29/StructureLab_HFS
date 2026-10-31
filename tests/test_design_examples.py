@@ -143,7 +143,7 @@ def composite_beam(name):
 E14B_PU = 85.9
 E14B = dict(section_name="L8X4X1/2", material={"Fy": FY50}, Pu=E14B_PU * KIP,
             Mw=1.44 * E14B_PU / (1 - E14B_PU / 3260) * KIPFT / 12, Mz=0.889 * E14B_PU / (1 - E14B_PU / 343) * KIPFT / 12,
-            lengths={"Lx": 5 * FT, "Ly": 5 * FT, "Lz": 5 * FT}, flexure={"Lb": 5 * FT, "beta_w": 5.48 * IN},
+            lengths={"Lx": 5 * FT, "Ly": 5 * FT, "Lz": 5 * FT}, flexure={"Lb": 5 * FT},
             angle_flexure={"leg_in_compression": "long", "toe": "tension"})
 
 # id: (example, page, case data, check id, LRFD design strength printed in the example, unit, note)
@@ -252,7 +252,7 @@ EXAMPLES = {
                                     "base_thickness": 1 * IN}),
              "anchor", 0.962, "ratio"),
     "E.14B-Pc": ("L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7)", E14B, "axial", 168, "kip"),
-    "E.14B-Mcw": ("L8X4X1/2 eje w, punta del ala larga comprimida, βw = −5.48 in", E14B, "flexure_w", 375 / 12, "kip-ft"),
+    "E.14B-Mcw": ("L8X4X1/2 eje w, punta del ala larga comprimida, βw del catálogo", E14B, "flexure_w", 375 / 12, "kip-ft"),
     "E.14B-Mcz": ("L8X4X1/2 eje z, punteras traccionadas, fluencia en A", E14B, "flexure_z", 123 / 12, "kip-ft"),
     "E.14B": ("L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados: H2-1 en B ≈ 1.0", E14B, "interaction", 1.0, "ratio"),
     "F.11C": ("L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14: H2-1 en la punta comprimida",
@@ -278,7 +278,7 @@ def examples_engine(catalog):
 
 
 def program_value(engine, data, check_id, unit):
-    check = engine.run(SteelCase(**data)).check(check_id)
+    check = engine.run(SteelCase(tau_b=1.0, **data)).check(check_id)
     assert check.capacity is not None, check.errors
     if unit == "ratio":
         return check.ratio, check

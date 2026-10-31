@@ -81,8 +81,8 @@ cortante con tracción en concreto liviano.
 ## Entrada
 
 - `composite.concrete`: `fc` (MPa), `wc` (kg/m³) y `lightweight`, obligatorio porque define el límite de I1.3(a).
-- `composite.interaction`: `H1` (por defecto); `I5`, solo en rellenos no compactos o esbeltos con flexión en un eje;
-  `M2` o `M2S` (Commentary I5). Los muros no lo usan.
+- `composite.interaction`: opcional (DI-22). Sin indicarlo rige I5: H1.1 en embebidos y rellenos compactos; I5-1 en rellenos no compactos o
+  esbeltos con compresión y flexión en un eje, y H1.1 si no; Apéndice 2 en alta resistencia. Se puede pedir `H1`, `I5`, `M2` o `M2S`; en rellenos con barras, `M2` y `M2S` se reemplazan por H1.1. Los muros no lo usan.
 - `composite.encased`: `H`, `B`, `Fysr`, `bars` (`area`, `db`, `x`, `y` desde el centroide), `transverse` (`db`,
   `spacing`), `flexure_method` (`steel` por defecto, o `composite`) y `anchors_provided`.
 - `composite.beam`: `moment` (`positive`, `negative`), `span`, un límite por lado (`left_beam_spacing` o
@@ -186,14 +186,32 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
 - **DI-15** C-I1-1 aparece impresa en el Commentary sin el exponente de (b/tp), lo que nunca reduciría Fy dentro de un rango realista.
   Se usa (b/tp)², como AISC Design Guide 38, Ec. 2-2, que deriva de la misma curva de Euler con K = 0,8. Las erratas del repositorio no
   lo mencionan (confirmado por el usuario, 2026-10-30).
-- **DI-16** Rigideces de servicio: Gc = 0,4·Ec, como I1-3, porque la Guía 6 no lo define. GJ de rectangulares (2-14) no se calcula: la
-  guía no define Jc.
+- **DI-16** Rigideces de servicio: Gc = 0,4·Ec, como I1-3, porque la Guía 6 no lo define. La guía tampoco define Jc de rectangulares
+  (2-14); se usa Jc ≈ a·b³·[1/3 − 0,21·(b/a)·(1 − b⁴/(12a⁴))], con a ≥ b las dimensiones del núcleo de concreto, sin descontar
+  esquinas redondeadas ni barras (indicación del usuario, 2026-10-31). Cajones: Js = 2t(B−t)²(H−t)²/(B+H−2t) (pared delgada cerrada), que la guía no imprime.
 - **DI-17** Cajones (Guía 6, 2.5): ri = 0 y Av = 2·H·t, frente a 2·h·t de los PTE. Es la única diferencia de cálculo por declarar
   `composite.box`.
 - **DI-18** Muros en C: st y α de I1-6 con el menor de los espesores tsc,w y tsc,f, porque la Guía 38 no resuelve cuál usar en una sección
   con dos; es el lado conservador. A.2.3 a A.2.5 definen el lado comprimido por el signo de Pu: otra combinación queda bloqueada.
 - **DI-19** Incendio: se aplica la Ec. 6-6a tal como la imprime la guía, sin la rama de I2-3, y la longitud L = Ly con Lc = Ky·Ly, porque el
   ejemplo toma pandeo del espesor. La Ec. 6-5 se usa solo dentro de sus límites; fuera de ellos, se exige el perfil de temperaturas.
+- **DI-20** Rigideces en la memoria (indicaciones del usuario, 2026-10-31).
+  - Muros: I1-1 a I1-3 solo se aplican a muros de placas. C2.3 con τb del usuario.
+  - Rellenos y embebidos, efectivas: (EI)eff por I2-12 e I2-5; (EA)eff = EA elástica; (GA)eff = Gc·Ac. GJ, si hay ecuación, Guía 6, 2-12 a 2-14.
+  - Sin ecuación en la Guía 6, se reporta cada componente solo, sin elegir entre ellos: GAs = Gs·As y GAc = Gc·Ac en redondos rellenos y embebidos; GJs = Gs·J y GJc = Gc·Jc en embebidos.
+    La elástica y la efectiva de cada componente son la misma.
+  - Método directo: EA* = 0,8·(EA)eff; EI* = 0,8·τb·(EI)eff; GA* = 0,8·(GA)eff; GJ* = 0,8·GJ; GJs* = 0,8·GJs; GJc* = 0,8·GJc. En tracción neta, acero solo con C2.3 (I1.5(c)).
+  - Miembros no compuestos: τb = 1,0 siempre, por C2.3(c) (indicación del usuario, 2026-10-31), con la carga ficticia a cargo del modelo; no es un dato y otro valor se rechaza.
+  - Miembros compuestos: τb es un dato obligatorio del usuario y no se calcula. El capítulo 4 lo compara con I1.5(d), (f), o con C2.3(c) en tracción neta; una diferencia solo se reporta.
+    Sin dato, el estado es INCOMPLETO. B1 del Apéndice 8.1 sigue usando τb de I1.5.
+  - Vigas compuestas y de acoplamiento no tienen rigideces de método directo: τb no aplica y no se exige. La Guía 6 pide P de servicio: el programa toma Pu de la combinación.
+- **DI-21** Requerimientos técnicos (indicación del usuario, 2026-10-31): memoria con materiales (I1.3, Apéndice 2, A3.1a, E3) y geometría (I1.4, I1.6, I2.1a, I2.2a, I3.4a, E5, E6.2,
+  F8, B4.3b). Uno obligatorio incumplido impide PASS aunque no intervenga en la demanda de la combinación; las Notas de D1 y E2 son recomendación y no lo impiden. ACI 318
+  (I1.1) y la designación ASTM (A3.1a) se reportan «Falta implementación». En rellenos y embebidos con solo cortante, las cuantías de I2 e I3 no aplican.
+- **DI-22** Interacción y diagramas, I5 (indicaciones del usuario, 2026-10-31). Sin `composite.interaction`: I5(a), H1.1; I5(b), I5-1a y b en compresión con flexión en un eje, y H1.1 en flexión biaxial o tracción;
+  Apéndice 2 según la Guía 6, 2.6 (A-2-3 y A-2-4), en alta resistencia; I5(c) en muros, que no tienen interacción biaxial definida. Alta resistencia en dos ejes: I5-1a o b con Mrx/Mcx + Mry/Mcy (extensión indicada por el usuario, no es del Apéndice 2), evaluada con cp y cm de cada eje; gobierna el mayor. Alta resistencia sin compresión: H1.1, con nota. Un método pedido se reemplaza por el Apéndice 2 y la memoria lo avisa. M2 y M2S siguen como opción, salvo en rellenos con barras: si se piden, se usa H1.1 y la memoria lo indica. Diagrama informativo en 10.2, que no decide el estado: Tablas 6-3 y 6-4 del Manual en
+  rellenos compactos con Asr = 0, y 6-2a y 6-2b en embebidos con sus barras (siempre tienen Asr, I2.1a(c)). 6-2a exige barras extremas y a la línea central; 6-2b, como el Ejemplo 2.4 de la Guía 6, toma en Zr solo las extremas.
+  Fuera de esas disposiciones, o con Asr ≠ 0 en rellenos, sin diagrama. Cada punto se transforma con λ = Pn/Pno, φc y φb (Commentary I5). La Tabla 6-4 usa pared delgada: su punto B difiere cerca de 1 % de Mp de I3.4b.
 
 ## Limitaciones
 

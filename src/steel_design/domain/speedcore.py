@@ -48,9 +48,7 @@ def c_wall_compression(case: SteelCase, section: Section) -> dict:
         out = eq.nominal_compression(Pno=pno, Pe=pe)
         modes[f"FB-{axis}"] = {"limit_state": "flexural_buckling", "provision": "I2.3a", "applies": True, "equation": out["equation"],
                                "Pno_kN": pno / 1000.0, "EI_eff": ei, "Lc_mm": K * L, "Pe_kN": pe / 1000.0,
-                               "Pn_kN": out["Pn"] / 1000.0, "available_kN": eq.PHI_C_WALL * out["Pn"] / 1000.0,
-                               "EA_eff": eq.wall_axial_stiffness(As=props["As"], Ec=Ec, Ac=props["Ac"]),
-                               "GA_eff": eq.wall_shear_stiffness(Asw=props["Asw"], Ec=Ec, Ac=props["Acw"])}
+                               "Pn_kN": out["Pn"] / 1000.0, "available_kN": eq.PHI_C_WALL * out["Pn"] / 1000.0}
     modes["LB"] = {"limit_state": "local_buckling", "provision": "I1.2", "applies": True, "equation": "No requerido en muros (I1.2)"}
     governing = min(("FB-x", "FB-y"), key=lambda k: modes[k]["Pn_kN"])
     return _result(case, section, modes=modes, governing=governing, provisions=["I1", "I2.3a"],

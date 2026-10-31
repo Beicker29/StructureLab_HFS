@@ -37,5 +37,24 @@ def shear_stiffness_rect(*, GsAs, GcAc) -> float:
 
 
 def torsional_stiffness_round(*, GsJs, GcJc, As_over_Ag) -> float:
-    """Equations 2-12 and 2-13: round filled members. Rectangular ones (2-14) need a Jc that the guide does not define."""
+    """Equations 2-12 and 2-13: round filled members."""
     return GsJs + min(2 * As_over_Ag + 2 / 5, 1.0) * GcJc
+
+
+def torsional_stiffness_rect(*, GsJs, GcJc, As_over_Ag) -> float:
+    """Equations 2-12 and 2-14: rectangular filled members."""
+    return GsJs + min(2 / 3 * As_over_Ag + 2 / 15, 1 / 3) * GcJc
+
+
+def box_torsional_constant(*, B, H, t) -> float:
+    """J of a welded box as a closed thin wall (Bredt), which Equation 2-12 needs; the guide does not print it (DI-16)."""
+    return 2 * t * (B - t) ** 2 * (H - t) ** 2 / (B + H - 2 * t)
+
+
+def concrete_torsional_constant_rect(*, width, depth) -> float:
+    """Jc of a rectangular core, a >= b: a*b^3*(1/3 - 0.21*(b/a)*(1 - b^4/(12*a^4))).
+
+    The guide does not define Jc; this Saint-Venant approximation was given by the user (decision DI-16).
+    """
+    a, b = max(width, depth), min(width, depth)
+    return a * b**3 * (1 / 3 - 0.21 * (b / a) * (1 - b**4 / (12 * a**4)))

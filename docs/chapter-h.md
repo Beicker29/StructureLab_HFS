@@ -66,12 +66,12 @@ principales (x, y, tan α del catálogo), no de la tabla anterior. Fy = 345 MPa 
 
 | Caso | Perfil y demandas (kN, kN·m) | Pc | Mcw | Mcz | A | B | C | Valor |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| L-H2-comp-long-toe | L6X4X3/8, Pu = 100, Mw = 5 (ala larga), Mz = 2 (punteras en tracción), L = Lb = 2000 | 385.95 | 20.10 | 10.01 | 0.1894 | 0.2101 | 0.3081 | 0.3081 (C) |
-| L-H2-comp-short-toe | igual, ala corta y punteras comprimidas | 385.95 | 25.88 | 10.01 | 0.6521 | 0.2526 | 0.2656 | 0.6521 (A) |
-| L-H2-comp-axial-Mw | L8X4X1/2, Pu = 300, Mw = 20 (ala larga), L = Lb = 1524 | 749.78 | 42.42 | – | 0.0714 | 0.0714 | 0.8716 | 0.8716 (C) |
+| L-H2-comp-long-toe | L6X4X3/8, Pu = 100, Mw = 5 (ala larga), Mz = 2 (punteras en tracción), L = Lb = 2000 | 385.95 | 20.09 | 10.01 | 0.1895 | 0.2100 | 0.3082 | 0.3082 (C) |
+| L-H2-comp-short-toe | igual, ala corta y punteras comprimidas | 385.95 | 25.88 | 10.01 | 0.6520 | 0.2526 | 0.2656 | 0.6520 (A) |
+| L-H2-comp-axial-Mw | L8X4X1/2, Pu = 300, Mw = 20 (ala larga), L = Lb = 1524 | 749.78 | 42.34 | – | 0.0722 | 0.0722 | 0.8724 | 0.8724 (C) |
 | L-H2-comp-heel-governs | L8X4X1/2, Pu = 150, Mz = 5 (punteras en tracción), L = 1524 | 749.78 | – | 13.88 | 0.1602 | 0.5603 | 0.1602 | 0.5603 (B) |
 | L-H2-comp-FAIL | L4X4X1/4, Fy = 450, Pu = 120, Mz = 4 (punteras comprimidas), L = 2000 | 188.21 | – | 6.35 | 1.2678 | 0.0074 | 1.2678 | 1.2678 (FAIL) |
-| L-H2-tension | L6X4X3/8, Pu = −300, Mw = 8 (ala corta), Mz = 3 (punteras en tracción), Lb = 2000 | 545.06 | 25.88 | 10.01 | 0.5408 | 0.0584 | 1.1592 | 1.1592 (FAIL) |
+| L-H2-tension | L6X4X3/8, Pu = −300, Mw = 8 (ala corta), Mz = 3 (punteras en tracción), Lb = 2000 | 545.06 | 25.88 | 10.01 | 0.5409 | 0.0583 | 1.1591 | 1.1591 (FAIL) |
 | L-H2-biaxial-equal | L4X4X1/4, Mw = 3, Mz = 3 (punteras comprimidas), Lb = 3000 | – | 7.59 | 5.58 | 0.1427 | 0.5381 | 0.9335 | 0.9335 (C) |
 
 Contraste con los AISC Design Examples H.1B, H.3, H.4, E.14B y F.11C en [design-examples.md](design-examples.md).
