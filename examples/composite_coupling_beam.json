@@ -1,6 +1,6 @@
 {
   "section_name": "VIGA-ACOPLE",
-  "material": {"Fy": 345},
+  "material": "ASTM A572 Gr 50",
   "serviceability": {
     "actual_span": 2000,
     "effective_span": 2000,

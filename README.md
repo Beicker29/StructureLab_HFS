@@ -125,7 +125,7 @@ símbolos escritos en letras.
 | Campo | Descripción |
 | --- | --- |
 | `section_name` | Nombre del catálogo, o nombre libre con `custom_section` |
-| `material.Fy`, `material.Fu`, `material.E` | Fu es obligatorio en tracción; `E` debe ser 200000 MPa en compresión (definición de E3) |
+| `material` | Nombre de un acero de `data/Materiales.xlsx`, por ejemplo `"ASTM A36"`, de donde salen Fy y Fu; un JSON no admite Fy ni Fu numéricos ni un nombre fuera del catálogo. Las barras (`Fysr`) y los pernos (`Fu`) se indican en su bloque |
 | `Pu` | Resistencia requerida de la combinación LRFD: > 0 compresión (capítulo E), < 0 tracción (capítulo D) |
 | `Mux`, `Muy` | Momentos requeridos de la combinación (kN·m) respecto de los ejes geométricos, capítulo F |
 | `Mw`, `Mz` | Solo ángulos simples: momentos respecto de los ejes principales mayor y menor (kN·m), F10 |

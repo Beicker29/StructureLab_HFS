@@ -1,7 +1,7 @@
 {
   "tau_b": 1.0,
   "section_name": "MURO-3350X610",
-  "material": {"Fy": 345},
+  "material": "ASTM A572 Gr 50",
   "lengths": {"ultimate": {"Lx": 5180, "Ly": 5180, "Lz": 5180}},
   "composite": {
     "kind": "wall", "pour_height": 4267, "second_order": null,

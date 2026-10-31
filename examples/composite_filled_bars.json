@@ -1,7 +1,7 @@
 {
   "tau_b": 0.8,
   "section_name": "PTER8\"X5.00MM",
-  "material": {"Fy": 345},
+  "material": "ASTM A500 Gr C (SRED)",
   "lengths": {
     "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
     "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}

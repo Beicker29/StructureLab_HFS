@@ -1,7 +1,7 @@
 {
   "tau_b": 1.0,
   "section_name": "MURO-C",
-  "material": {"Fy": 345},
+  "material": "ASTM A572 Gr 50",
   "composite": {
     "kind": "c_wall",
     "concrete": {"fc": 40, "wc": 2320, "lightweight": false},

@@ -36,7 +36,10 @@ def _absent(description, provision, status, reason):
 def _common_materials(case):
     E = case.material.E
     rows = [_limit("Módulo de elasticidad del acero (E)", E, "= 200000 MPa", "I2.1b" if case.composite else "E3", abs(E - 200000.0) <= 1e-6)]
-    return rows + [_absent("Acero estructural de una especificación ASTM aprobada", "A3.1a", FALTA, "La entrada no recibe la designación del material.")]
+    description = "Acero estructural de una especificación ASTM aprobada"
+    if case.material.name:
+        return rows + [_limit(description, case.material.name, "listado en la Tabla A3.1", "A3.1a", True)]   # every steel of Materiales.xlsx is listed there
+    return rows + [_absent(description, "A3.1a", FALTA, "La entrada indicó valores, no la designación del material.")]
 
 
 def _tensile_strength_row(case):

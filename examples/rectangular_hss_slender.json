@@ -1,9 +1,6 @@
 {
   "section_name": "PTE120X60X2MM",
-  "material": {
-    "Fy": 345,
-    "Fu": 450
-  },
+  "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
     "ultimate": {"Lx": 1500, "Ly": 1500, "Lz": 1500},
     "construction": {"Lx": 1500, "Ly": 750, "Lz": 750}

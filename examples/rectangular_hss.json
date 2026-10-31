@@ -1,9 +1,6 @@
 {
   "section_name": "PTE100X100X4MM",
-  "material": {
-    "Fy": 345,
-    "Fu": 450
-  },
+  "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
     "ultimate": {"Lx": 3000, "Ly": 3000, "Lz": 3000},
     "construction": {"Lx": 3000, "Ly": 1500, "Lz": 1500}

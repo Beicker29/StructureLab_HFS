@@ -1,9 +1,6 @@
 {
   "section_name": "PTER4\"X3.00MM",
-  "material": {
-    "Fy": 345,
-    "Fu": 450
-  },
+  "material": "ASTM A500 Gr C (SRED)",
   "lengths": {
     "ultimate": {"Lx": 2500, "Ly": 2500, "Lz": 2500},
     "construction": {"Lx": 2500, "Ly": 1250, "Lz": 1250}

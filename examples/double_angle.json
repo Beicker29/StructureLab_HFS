@@ -1,9 +1,6 @@
 {
   "section_name": "2L4X4X1/4",
-  "material": {
-    "Fy": 345,
-    "Fu": 450
-  },
+  "material": "ASTM A572 Gr 50",
   "lengths": {
     "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
     "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}

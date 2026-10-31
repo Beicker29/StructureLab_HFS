@@ -33,6 +33,7 @@ src/steel_design/
 │   └── validation.py            validación de caso y sección
 ├── engine.py                    una comprobación por demanda (D/E por Pu, F por Mux/Muy/Mw/Mz, G por Vux/Vuy),
 │                                interacción H si actúan juntas fuerza axial y flexión → estado
+├── materials.py                 catálogo de aceros data/Materiales.xlsx (nombre, Fy, Fu)
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
 ├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
 ├── report_glossary.py           nombres en palabras, unidades y literales de lo que imprime la memoria

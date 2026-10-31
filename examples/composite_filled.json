@@ -1,7 +1,7 @@
 {
   "tau_b": 0.8,
   "section_name": "PTE100X50X3MM",
-  "material": {"Fy": 345},
+  "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
     "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
     "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}

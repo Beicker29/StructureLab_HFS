@@ -31,6 +31,7 @@ ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no
 - Contenidos de AISC Design Guide 6 y 38: barras en rellenos, Apéndice 2, Apéndice 8.1, cajones, factor de forma, sección controlada por
   tracción, rigideces de servicio y de muros, muros en C, vigas de acoplamiento, placas esbeltas e incendio.
 - Pendiente: construcción de muros, muros en C y vigas de acoplamiento (módulo de placas vacío, DG38) y flexión y cortante en incendio.
+- Pendiente: cálculo de las rigideces de vigas compuestas.
 - Una memoria por miembro con once capítulos fijos y el case de mayor DCR en cada revisión, símbolos en palabras y literal del documento de referencia en cada valor calculado.
 - Contraste con los ejemplos de AISC Design Guide 6 y 38 ([detalle](design-guides.md)).
 - Contraste con 66 casos de los AISC Design Examples v16.0 (D, E, F, G, H, I): coincidencia

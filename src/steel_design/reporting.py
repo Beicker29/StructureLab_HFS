@@ -7,6 +7,7 @@ tables, notes); render_text() and pdf_bytes() draw that same model.
 from datetime import datetime, timezone
 import math
 from pathlib import Path
+import re
 from typing import NamedTuple
 
 from .execution import overall_status
@@ -209,8 +210,7 @@ def report_blocks(executions: list) -> list[dict]:
     blocks = [{"kind": "title", "member": result.section, "case": None, "status": overall_status(results).value,
                "action": action,
                "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo{'s' if len(chapters) > 1 else ''} {', '.join(chapters)}"),
-                        ("Literales", "de ANSI/AISC 360-22, salvo indicación expresa de otro documento"),
-                        ("Método", "LRFD"), ("Cases de carga", str(len(executions))), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
+                                                ("Método", "LRFD"), ("Cases de carga", str(len(executions))), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
                "ratio": ratio}]
     cards = []
@@ -246,7 +246,34 @@ def report_blocks(executions: list) -> list[dict]:
     blocks += [{"kind": "h1", "text": "10. Revisión de capacidad a momento torsional"},
                {"kind": "p", "text": f"{FALTA}: la entrada no admite momento torsional y la sección H3 no está programada."}]
     blocks += _dcr_blocks(executions, governing, ratio, notes, limitations)
-    return blocks
+    return [_with_references(block) for block in blocks]
+
+
+_REFERENCE_HEADERS = {"Literal": "Referencia literal", "Disposición": "Referencia literal", "Literal u observación": "Referencia literal u observación"}
+_GUIDES = (("Guía 38", "AISC Design Guide 38"), ("Guía 6", "AISC Design Guide 6"), ("DG38", "AISC Design Guide 38"), ("DG6", "AISC Design Guide 6"))
+_STANDARD_TOKEN = re.compile(r"(?<![\w.-])(Commentary\b|Apéndice\b|Capítulo [A-N]\b|Nota de\b|Tabla\b|[A-N]\d+(?:\.\d+)*(?:[a-z](?![a-z]))?(?:\([a-z0-9]+\))*(?![\w-]))")
+
+
+def _reference(text: str) -> str:
+    """Each literal with its document: AISC 360-22 unless the literal names another one."""
+    parts = []
+    for part in text.split("; "):
+        for short, full in _GUIDES:
+            part = part.replace(short, full)
+        if "AISC" not in part:
+            part = _STANDARD_TOKEN.sub(lambda m: f"AISC 360-22 {m[1]}", part, count=1)
+        parts.append(part)
+    return "; ".join(parts)
+
+
+def _with_references(block: dict) -> dict:
+    if block["kind"] != "table":
+        return block
+    columns = [i for i, header in enumerate(block["headers"]) if header in _REFERENCE_HEADERS]
+    if not columns:
+        return block
+    rows = [[_reference(cell) if i in columns and isinstance(cell, str) else cell for i, cell in enumerate(row)] for row in block["rows"]]
+    return {**block, "headers": [_REFERENCE_HEADERS.get(h, h) for h in block["headers"]], "rows": rows}
 
 
 def _property_table(rows: list) -> dict:
@@ -257,9 +284,11 @@ def _material_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     mat, st = case.material, result.stiffness
     composite = case.composite
     blocks = [{"kind": "h1", "text": "1. Propiedades mecánicas de los materiales"}, {"kind": "h2", "text": "1.1 Acero estructural"}]
-    rows = [["Esfuerzo de fluencia mínimo especificado (Fy)", mat.Fy, "MPa", "Dato del usuario"],
-            ["Resistencia a tracción mínima especificada (Fu)", mat.Fu if mat.Fu else "no indicado", "MPa", "Dato del usuario"],
-            ["Módulo de elasticidad del acero (Es)", st.get("Es_mpa", mat.E), "MPa", "I2.1b" if composite else "E3"]]
+    origin = "Catálogo Materiales.xlsx" if mat.name else "Dato del usuario"
+    rows = [["Material", mat.name, "–", origin]] if mat.name else []
+    rows += [["Esfuerzo de fluencia mínimo especificado (Fy)", mat.Fy, "MPa", origin],
+             ["Resistencia a tracción mínima especificada (Fu)", mat.Fu if mat.Fu else "no indicado", "MPa", origin],
+             ["Módulo de elasticidad del acero (Es)", st.get("Es_mpa", mat.E), "MPa", "I2.1b" if composite else "E3"]]
     if st.get("Gs_mpa"):
         rows.append(["Módulo de cortante del acero (Gs)", st["Gs_mpa"], "MPa", "I1.5(e)" if composite else "E4"])
     blocks.append(_property_table(rows))
@@ -850,6 +879,14 @@ _LATIN1 = {"φ": "phi", "λ": "lambda", "Σ": "sum", "≤": "<=", "→": "->", "
            "−": "-", "²": "2", "⁴": "4", "⁶": "6", "r̄o": "ro", "α": "alpha"}
 
 
+def _column_widths(minimums: list[float], weights: list[float], total: float) -> list[float]:
+    """Column widths (mm): each one holds its longest word; what remains is shared by weight. A word breaks only if they exceed the total."""
+    spare = total - sum(minimums)
+    if spare <= 0:
+        return [total * m / sum(minimums) for m in minimums]
+    return [m + spare * w / sum(weights) for m, w in zip(minimums, weights)]
+
+
 def pdf_bytes(documents: list[list[dict]]) -> bytes:
     """PDF in memory from report_blocks() documents (one page sequence each). Requires fpdf2 ([pdf] extra)."""
     try:
@@ -902,7 +939,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
     width = lambda: pdf.w - pdf.l_margin - pdf.r_margin  # noqa: E731
 
     def heading(text, size, space):
-        if pdf.get_y() > pdf.h - 60:   # keep a heading with its first lines
+        if pdf.get_y() > pdf.h - (85 if size >= 11 else 60):   # keep a heading with its first lines; a chapter also with its subheading
             pdf.add_page()
         pdf.ln(space)
         pdf.set_font(FONT, "B", size)
@@ -1016,7 +1053,12 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
         fill = _CARD if kv else _ZEBRA
         pdf.set_fill_color(*fill)  # never inherit a previous fill (status badge, cards)
         natural = sum(weights) * 2.1  # mm, about one character of 8.5 pt per weight unit
-        style = dict(width=min(width(), max(natural, 70)), col_widths=weights, line_height=5.2, padding=(1, 1.6),
+        pdf.set_font(FONT, "B", 8.5)  # headings and the highlighted row are bold, so the widest case
+        minimums = [max(pdf.get_string_width(word) for word in " ".join([clean(str(h))] + [r[i] for r in texts]).split() or [""]) + 3.2 + 0.6
+                    for i, h in enumerate(headers)]
+        pdf.set_font(FONT, "", 8.5 if not compact else 8)
+        total = min(width(), max(natural, 70, sum(minimums)))
+        style = dict(width=total, col_widths=_column_widths(minimums, weights, total), line_height=5.2, padding=(1, 1.6),
                      text_align=["RIGHT" if n else "LEFT" for n in numeric], align="LEFT",
                      cell_fill_color=fill)
         if kv:
@@ -1042,11 +1084,24 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                         r.cell(cell)
         pdf.ln(2)
 
+    def keep_headings_with_table(blocks, index):
+        """Headings go to the next page with the short table that they announce, which table() would move there alone."""
+        needed, following = 0.0, index
+        while following < len(blocks) and blocks[following]["kind"] in {"h1", "h2", "h3"}:
+            needed += {"h1": 16.0, "h2": 10.0, "h3": 8.0}[blocks[following]["kind"]]
+            following += 1
+        short_table = following < len(blocks) and blocks[following]["kind"] == "table" and len(blocks[following]["rows"]) <= 12
+        rows = (len(blocks[following]["rows"]) + 1) * 6.5 if short_table else 0.0
+        if pdf.get_y() + needed + rows > pdf.h - pdf.b_margin or pdf.get_y() + needed > pdf.h - 60:
+            pdf.add_page()
+
     for blocks in documents:
         pdf.member = None
         pdf.add_page()
-        for b in blocks:
+        for index, b in enumerate(blocks):
             kind = b["kind"]
+            if kind in {"h1", "h2", "h3"} and blocks[index - 1]["kind"] not in {"h1", "h2", "h3"}:
+                keep_headings_with_table(blocks, index)
             if kind == "title":
                 pdf.member = b["member"] + (f" · {b['case']}" if b.get("case") else "")
                 pdf.set_fill_color(*_NAVY)
@@ -1054,7 +1109,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                 pdf.set_y(14)
                 pdf.set_font(FONT, "", 9)
                 pdf.set_text_color(*_MUTED)
-                pdf.cell(0, 5, clean(f"MEMORIA DE CÁLCULO · {b['action'].upper()}"), new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(width() - 42, 4.2, clean(f"MEMORIA DE CÁLCULO · {b['action'].upper()}"), align="L", new_x="LMARGIN", new_y="NEXT")
                 pdf.set_font(FONT, "B", 18)
                 pdf.set_text_color(*_NAVY)
                 pdf.multi_cell(width() - 42, 9, clean(b["member"]), new_x="LMARGIN", new_y="NEXT")
@@ -1073,28 +1128,38 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                 pdf.set_xy(pdf.l_margin, max(pdf.get_y(), 31) + 2)
                 pdf.set_font(FONT, "", 8.5)
                 pdf.set_text_color(*_MUTED)
-                pdf.multi_cell(0, 4.5, clean("   ·   ".join(f"{k}: {v}" for k, v in b["meta"])), align="L", new_x="LMARGIN", new_y="NEXT")
+                for key, value in b["meta"]:
+                    pdf.multi_cell(0, 4.5, clean(f"{key}: {value}"), align="L", new_x="LMARGIN", new_y="NEXT")
                 pdf.set_draw_color(*_RULE)
                 pdf.line(pdf.l_margin, pdf.get_y() + 2, pdf.w - pdf.r_margin, pdf.get_y() + 2)
                 pdf.ln(6)
             elif kind == "summary":
                 gap, n = 3, min(len(b["items"]), 3)                  # at most three cards per row
                 card_w, y = (width() - gap * (n - 1)) / n, pdf.get_y()
-                for i, (label, value) in enumerate(b["items"]):
-                    if i and i % n == 0:
-                        y += 20
-                    x = pdf.l_margin + (i % n) * (card_w + gap)
-                    pdf.set_fill_color(*_CARD)
-                    pdf.rect(x, y, card_w, 17, style="F", round_corners=True, corner_radius=1.5)
-                    pdf.set_xy(x + 3, y + 2.5)
-                    pdf.set_font(FONT, "", 7.5)
-                    pdf.set_text_color(*_MUTED)
-                    pdf.cell(card_w - 6, 4, clean(label))
-                    pdf.set_xy(x + 3, y + 8)
-                    pdf.set_font(FONT, "B", 11.5)
-                    pdf.set_text_color(*_INK)
-                    pdf.cell(card_w - 6, 6, clean(value))
-                pdf.set_xy(pdf.l_margin, y + 21)
+                pdf.set_font(FONT, "", 7.5)
+                labels = [pdf.multi_cell(card_w - 6, 3.4, clean(label), dry_run=True, output="LINES") for label, _ in b["items"]]
+                for start in range(0, len(b["items"]), n):           # each row as tall as its longest label
+                    label_h = 3.4 * max(len(lines) for lines in labels[start:start + n])
+                    height = label_h + 10
+                    for i, (_, value) in enumerate(b["items"][start:start + n]):
+                        x = pdf.l_margin + i * (card_w + gap)
+                        pdf.set_fill_color(*_CARD)
+                        pdf.rect(x, y, card_w, height, style="F", round_corners=True, corner_radius=1.5)
+                        pdf.set_font(FONT, "", 7.5)
+                        pdf.set_text_color(*_MUTED)
+                        for row, line in enumerate(labels[start + i]):
+                            pdf.set_xy(x + 3, y + 2 + row * 3.4)
+                            pdf.cell(card_w - 6, 3.4, line)
+                        size = 11.5
+                        pdf.set_font(FONT, "B", size)
+                        while pdf.get_string_width(clean(value)) > card_w - 6 and size > 6:
+                            size -= 0.5
+                            pdf.set_font(FONT, "B", size)
+                        pdf.set_text_color(*_INK)
+                        pdf.set_xy(x + 3, y + 3 + label_h)
+                        pdf.cell(card_w - 6, 6, clean(value))
+                    y += height + 3
+                pdf.set_xy(pdf.l_margin, y + 1)
             elif kind == "h1":
                 heading(b["text"], 12, 4)
             elif kind == "h2":

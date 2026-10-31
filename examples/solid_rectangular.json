@@ -5,10 +5,7 @@
     "H": 100,
     "B": 20
   },
-  "material": {
-    "Fy": 250,
-    "Fu": 400
-  },
+  "material": "ASTM A36",
   "lengths": {
     "ultimate": {"Lx": 1000, "Ly": 1000, "Lz": 1000},
     "construction": {"Lx": 1000, "Ly": 500, "Lz": 500}

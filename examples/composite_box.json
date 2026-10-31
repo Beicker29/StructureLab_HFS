@@ -1,7 +1,7 @@
 {
   "tau_b": 0.8,
   "section_name": "CAJON-400X300X12",
-  "material": {"Fy": 345},
+  "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
     "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
     "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}

@@ -6,6 +6,7 @@ import copy
 
 from .errors import ValidationError
 from .engine import SteelDesignEngine
+from .materials import material_by_name
 from .models import DesignResult, SteelCase, Status
 
 
@@ -16,16 +17,23 @@ def _merge(base: dict, override: dict) -> dict:
     return merged
 
 
+def _case(data: dict) -> SteelCase:
+    """A JSON input names its material; Fy and Fu come from data/Materiales.xlsx."""
+    if "material" in data:
+        data = {**data, "material": material_by_name(data["material"])}
+    return SteelCase(**data)
+
+
 def prepare_cases(payload: dict) -> list[tuple[str | None, SteelCase]]:
     if not isinstance(payload, dict):
         raise ValidationError("La entrada debe ser un objeto JSON.", code="INVALID_INPUT")
     if "cases" not in payload:
-        return [(None, SteelCase(**payload))]
+        return [(None, _case(payload))]
     cases = payload["cases"]
     if not isinstance(cases, list) or not cases or not all(isinstance(c, dict) for c in cases):
         raise ValidationError("cases debe ser una lista no vacía de objetos.", code="INVALID_CASE_BUNDLE")
     base = {k: v for k, v in payload.items() if k != "cases"}
-    return [(str(c.get("name") or f"case_{i + 1}"), SteelCase(**_merge(base, {k: v for k, v in c.items() if k != "name"})))
+    return [(str(c.get("name") or f"case_{i + 1}"), _case(_merge(base, {k: v for k, v in c.items() if k != "name"})))
             for i, c in enumerate(cases)]
 
 

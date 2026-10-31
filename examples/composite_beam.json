@@ -1,6 +1,6 @@
 {
   "section_name": "W21X50",
-  "material": {"Fy": 345},
+  "material": "ASTM A572 Gr 50",
   "lengths": {
     "ultimate": {"Lx": 13716, "Ly": 900, "Lz": 900},
     "construction": {"Lx": 13716, "Ly": 900, "Lz": 900}

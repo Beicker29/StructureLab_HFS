@@ -1,9 +1,6 @@
 {
   "section_name": "C15X50",
-  "material": {
-    "Fy": 345,
-    "Fu": 450
-  },
+  "material": "ASTM A572 Gr 50",
   "lengths": {
     "ultimate": {"Lx": 4000, "Ly": 1000, "Lz": 4000},
     "construction": {"Lx": 4000, "Ly": 500, "Lz": 2000}

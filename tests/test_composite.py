@@ -326,7 +326,7 @@ def test_negative_flexure_does_not_ask_for_anchor_detailing(engine):
 
 
 def test_unshored_beam_needs_a_construction_case(engine):
-    (_, _, result), = execute_payload(beam(shored=False).model_dump(exclude_none=True), engine)
+    (_, _, result), = execute_payload({**beam(shored=False).model_dump(exclude_none=True), "material": "ASTM A572 Gr 50"}, engine)
     assert result.check("flexure_x").status.value == "INCOMPLETE" and result.status.value == "INCOMPLETE"
     assert "I3.1b" in result.check("flexure_x").errors[-1]["provision"]
 
@@ -335,7 +335,7 @@ def construction_bundle(Mux, shored=False):
     data = beam(shored=shored).model_dump(exclude_none=True)
     for field in ("Mux", "condition"):
         data.pop(field)
-    return {**data, "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": Mux, "Vux": 10}]}
+    return {**data, "material": "ASTM A572 Gr 50", "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": Mux, "Vux": 10}]}
 
 
 def test_unshored_beam_fails_when_the_steel_section_is_short(engine):
@@ -346,7 +346,7 @@ def test_unshored_beam_fails_when_the_steel_section_is_short(engine):
 
 def test_construction_uses_the_steel_section_alone(engine):
     ref = REFERENCE_F["W-F2-inelastic-LTB"]             # W18X50, Lb = 4000 mm, independent calculation of Chapter F
-    data = {"section_name": "W18X50", "material": {"Fy": 345}, "flexure": {"tension_flange_holes": False},
+    data = {"section_name": "W18X50", "material": "ASTM A572 Gr 50", "flexure": {"tension_flange_holes": False},
             "composite": beam().model_dump(exclude_none=True)["composite"],
             "lengths": {"ultimate": {"Lx": 9000, "Ly": 1000, "Lz": 1000}, "construction": {"Lx": 9000, "Ly": 4000, "Lz": 6000}},
             "tau_b": 1.0, "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": 100, "Vux": 10}]}

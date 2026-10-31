@@ -41,6 +41,7 @@ def unique_json_object(pairs):
 
 
 class Material(InputModel):
+    name: Optional[str] = Field(None, description="Name in data/Materiales.xlsx; a JSON input gives only the name")
     Fy: PositiveNumber = Field(..., description="Specified minimum yield stress (MPa)")
     Fu: Optional[PositiveNumber] = Field(None, description="Specified minimum tensile strength (MPa); required for tension (D2-2)")
     E: PositiveNumber = Field(200000.0, description="Modulus of elasticity (MPa); Chapter E defines 200000")
