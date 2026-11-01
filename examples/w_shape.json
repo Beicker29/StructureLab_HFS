@@ -50,6 +50,9 @@
       "Mux": 350,
       "Vux": 250
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 230, "Vux": 83}
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 230, "Vux": 83},
+    {"name": "Incendio a 550 °C — flexocompresión", "condition": "fire", "fire": {"steel_temperature": 550}, "Pu": 500, "Mux": 80, "Vux": 60},
+    {"name": "Incendio a 550 °C — tracción", "condition": "fire", "fire": {"steel_temperature": 550}, "Pu": -800},
+    {"name": "Incendio a 180 °C — sin efecto de temperatura", "condition": "fire", "fire": {"steel_temperature": 180}, "Pu": 1200, "Mux": 300, "Muy": 60, "Vux": 350}
   ]
 }

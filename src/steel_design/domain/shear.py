@@ -13,6 +13,7 @@ from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section
+from .fire import steel_at_temperature, with_fire
 
 _LIMITATIONS = (
     "Almas sin rigidizadores transversales (kv = 5.34); el campo de tracción (G2.2, G2.3) y los rigidizadores "
@@ -131,6 +132,13 @@ def _solid(section, E, Fy, axis):
         **out, "h_mm": d, "t_mm": t, "Aw_mm2": d * t, "Cv2": cv["Cv"], "Cv_equation": cv["equation"]}
 
 
+def _yielding_at_temperature(section, rows, out, ky):
+    """4.2.4d(g): shear yielding only; Cv and Fcr keep their ambient values (Commentary). The strength is then proportional to Fy."""
+    if any(row["Cv"] < 1.0 for row in rows) or out.get("Fcr_equation", "0.6Fy") != "0.6Fy":
+        _blocked("Apéndice 4, 4.2.4d(g): solo cubre la fluencia por cortante; aquí rige el pandeo por cortante, que exige un método alternativo.", section)
+    return {**out, **{key: ky * out[key] for key in ("Vn", "Vn_per_flange_N", "Fcr") if key in out}}
+
+
 def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
     """Nominal and design shear strength in one direction ("x": accompanies Mux; "y": accompanies Muy)."""
     family = section.type.upper()
@@ -152,6 +160,10 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
         provision, phi, rows, out = _solid(section, E, Fy, axis)
     else:
         _blocked("Familia sin disposición de cortante en este cálculo.", section)
+    hot = steel_at_temperature(case)
+    if hot:
+        out = _yielding_at_temperature(section, rows, out, hot["ky"])
+        provision = f"{provision}; Apéndice 4, 4.2.4d(g)"
 
     mode = {"limit_state": "shear", "provision": provision, "applies": True, **out, "Vn_kN": out["Vn"] / 1000.0,
             "phi_v": phi, "available_kN": eq.design_strength(out["Vn"], phi)}
@@ -161,7 +173,7 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
     if family == "SOLID_CIRCULAR":
         notes.append("Barra redonda: G4 define Aw = d·tw y esta sección no tiene espesor de alma; se usa "
                      "Aw = 0.5·Ag y Cv2 = 1, criterio del usuario (decisión DG-4).")
-    return {
+    return with_fire({
         "chapter": "G", "code": "ANSI/AISC 360-22", "axis": axis, "section": section.name, "family": family,
         "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lv_mm": case.shear.Lv if case.shear else None},
         "classification": {"elements": rows, "reference": "G2.1 / G2.2 (Cv)"},
@@ -175,4 +187,4 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
         "requirements": [],
         "notes": notes,
         "limitations": list(_LIMITATIONS),
-    }
+    }, hot, "4.2.4d(g)")

@@ -79,7 +79,7 @@ def test_number_format(value, expected):
 
 CHAPTERS = ("## 1. Propiedades mecánicas de los materiales", "### 1.1 Acero estructural", "### 1.2 Concreto estructural",
             "### 1.3 Acero de refuerzo", "## 2. Propiedades geométricas", "### 2.1 Geometría", "### 2.2 Rigideces elásticas",
-            "### 2.3 Rigideces efectivas", "### 2.4 Rigideces para método directo: rigideces efectivas (análisis de estabilidad, DAM)", "## 3. Solicitaciones", "### 3.1 Cargas últimas", "### 3.2 Cargas de construcción", "### 3.3 Cargas en condición de incendio", "### 3.4 Deflexiones", "### 3.5 Desplazamientos",
+            "### 2.3 Rigideces efectivas", "### 2.4 Rigideces para método directo: rigideces efectivas (análisis de estabilidad, DAM)", "## 3. Solicitaciones", "### 3.1 Cargas últimas", "### 3.2 Cargas de construcción", "### 3.3 Cargas en condición de incendio", "### 3.4 Deflexiones",
             "## 4. Revisión de requerimientos técnicos", "### 4.1 Propiedades mecánicas de los materiales", "### 4.2 Propiedades geométricas",
             "## 5. Revisión de condiciones de funcionalidad y/o servicio", "### 5.1 Revisión de deflexiones", "### 5.2 Condición de construcción",
             "## 6. Revisión de capacidad a carga de compresión", "## 7. Revisión de capacidad a carga de tracción",
@@ -104,6 +104,7 @@ def test_every_report_has_its_eleven_chapters_in_order():
         text = render_text(report_blocks(group))
         positions = [text.find(f"{heading}\n") for heading in CHAPTERS]
         assert -1 not in positions and positions == sorted(positions), name
+        assert "3.5" not in [line.split()[1] for line in text.splitlines() if line.startswith("### ")], name
 
 
 def test_what_does_not_apply_or_is_missing_is_said_explicitly(engine):
@@ -113,8 +114,8 @@ def test_what_does_not_apply_or_is_missing_is_said_explicitly(engine):
                      "No aplica: ningún case tiene carga de compresión", "No aplica: ningún case en condiciones últimas tiene Vux",
                      "No aplica: ningún case en condiciones últimas tiene Mux ni Mw", "No aplica: ningún case combina",
                      "No aplica: la entrada no indica deflexiones", "No aplica: ningún case de construcción",
-                     "Falta implementación: esta resistencia en incendio no está programada",
-                     "Falta implementación: la entrada no admite desplazamientos", "Falta implementación: la entrada no admite momento torsional"):
+                     "No aplica: ningún case en condiciones de incendio tiene Vux", "No aplica: ningún case de incendio.",
+                     "Falta implementación: la entrada no admite momento torsional"):
         assert sentence in text
     assert "### 7.1 Tracción (Capítulo D); case gobernante: única" in text
 
@@ -154,7 +155,18 @@ def test_elastic_stiffness_of_bare_steel_by_hand(engine):
     rows = {r["symbol"]: r for r in result.stiffness["elastic"]}
     assert rows["EIx"]["value"] == pytest.approx(83200e9) and rows["GJ"]["value"] == pytest.approx(130.468e9)
     assert rows["EA"]["value"] == pytest.approx(200000 * 17100) and rows["GA"]["status"] == "falta_implementacion"
-    assert result.stiffness["effective"][0]["status"] == "no_aplica"
+    assert result.stiffness["effective"] == result.stiffness["elastic"]
+
+
+def test_report_of_a_noncomposite_member_repeats_the_elastic_stiffness_as_effective(engine):
+    case = SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Vux=1)
+    blocks = report_blocks([(None, case, engine.run(case))])
+    start = next(i for i, b in enumerate(blocks) if b.get("text") == "2.2 Rigideces elásticas")
+    end = next(i for i, b in enumerate(blocks) if b.get("text") == "2.3 Rigideces efectivas")
+    elastic = next(b for b in blocks[start:end] if b["kind"] == "table")
+    following = blocks[end + 1:end + 3]
+    assert following[0]["text"] == "En miembros no compuestos, las rigideces efectivas son iguales a las elásticas (2.2)."
+    assert following[1]["rows"] == elastic["rows"] and len(elastic["rows"]) == 6
 
 
 def test_double_angle_stiffness_uses_both_angles(engine, sections):
@@ -200,7 +212,7 @@ def member_text(engine, example):
 
 
 def test_one_report_per_member_however_many_load_cases(engine):
-    assert [len(g) for g in member_text(engine, "w_shape.json")[0]] == [7]
+    assert [len(g) for g in member_text(engine, "w_shape.json")[0]] == [10]
     assert [len(g) for g in member_text(engine, "multi_member.json")[0]] == [1, 1]
 
 
@@ -347,3 +359,37 @@ def test_report_names_the_material_and_its_catalog(engine):
     _, (text,) = member_text(engine, "single_angle.json")
     for sentence in ("ASTM A36", "Catálogo Materiales.xlsx", "248.000", "410.000", "Referencia literal"):
         assert sentence in text
+
+
+def test_summary_cards_show_the_strength_and_the_dcr_on_their_own_lines(engine):
+    groups, _ = member_text(engine, "w_shape.json")
+    blocks = report_blocks(groups[0])
+    items = dict(next(b for b in blocks if b["kind"] == "summary")["items"])
+    check = next(r for _, c, r in groups[0] if c.condition == "construction").check("flexure_x")
+    assert items["Construcción, Flexión respecto de x:"] == [f"φb·Mn={check.capacity:.3f} kN·m", f"DCR={check.ratio:.3f}"]
+
+
+def test_summary_card_of_an_interaction_has_only_the_dcr(engine):
+    case = SteelCase(
+        tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345}, Mw=1, Mz=1, lengths={"Lx": 1500, "Ly": 1500, "Lz": 1500},
+        angle_flexure={"toe": "compression"})
+    result = engine.run(case)
+    items = next(b for b in report_blocks([(None, case, result)]) if b["kind"] == "summary")["items"]
+    title, lines = next(item for item in items if item[0].startswith("Interacción"))
+    assert lines == [f"DCR={result.check('interaction').ratio:.3f}"] and title.endswith(":")
+
+
+def test_summary_has_a_card_for_every_review_with_the_governing_interaction(engine):
+    groups, _ = member_text(engine, "w_shape.json")
+    blocks = report_blocks(groups[0])
+    items = next(b for b in blocks if b["kind"] == "summary")["items"]
+    table = next(b for b in blocks if b["kind"] == "table" and "Case gobernante" in b["headers"])
+    assert len(items) == len(table["rows"])
+    interaction = next(lines for title, lines in items if title.startswith("Interacción"))
+    assert interaction == ["DCR=0.745"]
+
+
+def test_summary_card_without_strength_has_only_the_dcr_line(engine):
+    case = steel_case("2L4X4X1/4")
+    items = next(b for b in report_blocks([(None, case, engine.run(case))]) if b["kind"] == "summary")["items"]
+    assert items[0][1] == ["DCR no calculado"]

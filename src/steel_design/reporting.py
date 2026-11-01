@@ -109,6 +109,9 @@ def _check_blocks(case: SteelCase, check, notes: list, limitations: list) -> lis
         blocks = [{"kind": "alert", "text": f"{error.get('code')}: {error.get('message')}",
                    "detail": str(error["details"]) if error.get("details") else None} for error in check.errors]
         return blocks + [{"kind": "p", "text": "Comprobación INCOMPLETA: no se informa ninguna resistencia supuesta."}]
+    fire = r.get("fire")
+    temperature = [{"kind": "kv", "items": [("Propiedades a temperatura elevada (Apéndice 4, 4.2.3b)", f"T = {_fmt(fire['T_C'])} °C; Fy(T) = {_fmt(fire['Fy_T_mpa'])} MPa; "
+                                                                                                    f"E(T) = {_fmt(fire['E_T_mpa'])} MPa")]}] if fire else []
     if check.chapter == "E":
         blocks = _compression_blocks(case, check, r)
     elif check.chapter == "D":
@@ -121,6 +124,7 @@ def _check_blocks(case: SteelCase, check, notes: list, limitations: list) -> lis
         blocks = _composite_blocks(check, r)
     else:
         blocks = _flexure_blocks(case, check, r)
+    blocks = temperature + blocks
     blocks.append({"kind": "h2", "text": f"Obligaciones del Capítulo {check.chapter} (comprobación independiente)"})
     blocks.append({"kind": "table", "headers": ["Obligación", "Disposición", "Atendida por"],
                    "rows": [[o.id, o.provision, o.satisfied_by or "NO ATENDIDA"] for o in check.obligations]})
@@ -169,13 +173,18 @@ def _case_name(tag: str | None) -> str:
     return tag or "única"
 
 
-def _single_review(number, title, governing, data, absent, notes, limitations) -> list[dict]:
+def _axial_review(number, title, tension, executions, data, absent, notes, limitations) -> list[dict]:
+    """The governing case of the axial force, in ultimate and in fire conditions."""
     blocks = [{"kind": "h1", "text": f"{number}. {title}"}]
-    if governing is None:
+    found = [(g, suffix) for g, suffix in ((_governing(executions, "axial", condition="ultimate", tension=tension), ""),
+                                           (_governing(executions, "axial", condition="fire", tension=tension), ", condiciones de incendio")) if g]
+    if not found:
         return blocks + [{"kind": "p", "text": f"{NO_APLICA}: {absent}"}]
-    blocks += data(governing.case)
-    blocks.append({"kind": "h2", "text": f"{number}.1 {_check_title(governing.check)}; case gobernante: {_case_name(governing.tag)}"})
-    return blocks + _nested(_check_blocks(governing.case, governing.check, notes, limitations))
+    for index, (governing, suffix) in enumerate(found, start=1):
+        blocks += data(governing.case)
+        blocks.append({"kind": "h2", "text": f"{number}.{index} {_check_title(governing.check)}{suffix}; case gobernante: {_case_name(governing.tag)}"})
+        blocks += _nested(_check_blocks(governing.case, governing.check, notes, limitations))
+    return blocks
 
 
 def _condition_chapter(number, title, axes, data, executions, notes, limitations) -> list[dict]:
@@ -185,9 +194,6 @@ def _condition_chapter(number, title, axes, data, executions, notes, limitations
         blocks.append({"kind": "h2", "text": f"{number}.{index} {_CONDITION_TITLE[label]}"})
         for axis_index, (axis_label, check_ids, demand) in enumerate(axes, start=1):
             blocks.append({"kind": "h3", "text": f"{number}.{index}.{axis_index} {axis_label}"})
-            if condition == "fire":
-                blocks.append({"kind": "p", "text": f"{FALTA}: esta resistencia en incendio no está programada."})
-                continue
             found = [g for g in (_governing(executions, i, condition=condition) for i in check_ids) if g]
             if not found:
                 blocks.append({"kind": "p", "text": f"{NO_APLICA}: ningún case en {_CONDITION_TITLE[label].lower()} tiene {demand}."})
@@ -207,9 +213,10 @@ def report_blocks(executions: list) -> list[dict]:
     action = " + ".join(dict.fromkeys(_check_title(g.check).split(" (")[0].lower() for _, g in governing))
     ratios = [r.ratio for r in results if r.ratio is not None]
     ratio = max(ratios) if ratios else None
+    simple_method = "; Apéndice 4, 4.2.4d" if any(r.fire and r.fire["simple_method"] for r in results) else ""
     blocks = [{"kind": "title", "member": result.section, "case": None, "status": overall_status(results).value,
                "action": action,
-               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo{'s' if len(chapters) > 1 else ''} {', '.join(chapters)}"),
+               "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo{'s' if len(chapters) > 1 else ''} {', '.join(chapters)}{simple_method}"),
                                                 ("Método", "LRFD"), ("Cases de carga", str(len(executions))), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
                "ratio": ratio}]
@@ -217,26 +224,26 @@ def report_blocks(executions: list) -> list[dict]:
     for label, g in governing:
         c = g.check
         prefix = "" if label == "últimas" else f"{label.capitalize()}, "
+        dcr = f"DCR={c.ratio:.3f}" if c.ratio is not None else "DCR no calculado"
         if c.unit == "–":
             name = "Interacción" if c.id == "interaction" else CHECK_TITLES[c.id]
-            card = f"{prefix}{name} ({c.result['governing_equation'] if c.result else c.chapter}): razón"
-            value = f"{c.ratio:.3f}" if c.ratio is not None else "no calculada"
+            cards.append((f"{prefix}{name} ({c.result['governing_equation'] if c.result else c.chapter}):", [dcr]))
         else:
-            card = f"{prefix}{_check_title(c).split(' (')[0]}: {_capacity_label(c)} · {_DEMAND_SYMBOL[c.chapter]}/cap."
-            value = f"{_fmt(c.capacity)} {c.unit} · {c.ratio:.3f}" if c.capacity is not None else "no calculada"
-        cards.append((card, value))
+            strength = [f"{_capacity_label(c)}={_fmt(c.capacity)} {c.unit}"] if c.capacity is not None else []
+            cards.append((f"{prefix}{_check_title(c).split(' (')[0]}:", strength + [dcr]))
     if cards:
-        blocks.append({"kind": "summary", "items": cards[:6]})
+        blocks.append({"kind": "summary", "items": cards})
     notes, limitations = [], []
     blocks += _material_blocks(case, result)
+    blocks += _temperature_blocks(executions)
     blocks += _geometry_blocks(case, result, tag, executions)
     blocks += _demand_blocks(executions)
     blocks += _requirement_blocks(executions)
     blocks += _service_blocks(result, governing)
-    blocks += _single_review(6, "Revisión de capacidad a carga de compresión", _governing(executions, "axial", condition="ultimate", tension=False),
-                             _compression_data, "ningún case tiene carga de compresión (Pu > 0).", notes, limitations)
-    blocks += _single_review(7, "Revisión de capacidad a carga de tracción", _governing(executions, "axial", condition="ultimate", tension=True),
-                             _tension_data, "ningún case tiene carga de tracción (Pu < 0).", notes, limitations)
+    blocks += _axial_review(6, "Revisión de capacidad a carga de compresión", False, executions, _compression_data,
+                            "ningún case tiene carga de compresión (Pu > 0).", notes, limitations)
+    blocks += _axial_review(7, "Revisión de capacidad a carga de tracción", True, executions, _tension_data,
+                            "ningún case tiene carga de tracción (Pu < 0).", notes, limitations)
     blocks += _condition_chapter(8, "Revisión de capacidad a fuerza cortante", (
         ("Paralelo al eje X (Vuy)", ("shear_y",), "Vuy"), ("Paralelo al eje Y (Vux)", ("shear_x",), "Vux")),
         lambda g: _shear_data(g.case), executions, notes, limitations)
@@ -319,6 +326,29 @@ def _material_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     return blocks
 
 
+def _temperature_blocks(executions: list) -> list[dict]:
+    """1.4: the temperatures of each fire case, data of the user, with their retention factors (Appendix 4, 4.2.3b)."""
+    blocks = [{"kind": "h2", "text": "1.4 Propiedades a temperatura elevada"}]
+    fires = [(tag, r.fire) for tag, _, r in executions if r.fire]
+    if not fires:
+        return blocks + [{"kind": "p", "text": f"{NO_APLICA}: ningún case de incendio."}]
+    steel, concrete, bars = [], [], []
+    for tag, fire in fires:
+        s = fire["steel"]
+        steel.append([_case_name(tag), fire["T_C"], s["kE"], s["kp"], s["ky"], s["Fy_T_mpa"], s["Fu_T_mpa"] if s["Fu_T_mpa"] else "no indicado", s["E_T_mpa"], s["G_T_mpa"], "Tabla A-4.2.1"] if s
+                     else [_case_name(tag), fire["T_C"]] + ["sin efecto"] * 7 + ["Apéndice 4, 4.2.4d"])
+        concrete += [[_case_name(tag), c["T_C"], c["kc"], c["kEc"], c["fc_T_mpa"], "Tabla A-4.2.2"] for c in fire["concrete"]]
+        if fire["bars"]:
+            bars.append([_case_name(tag), fire["bars"]["T_C"], fire["bars"]["kE"], fire["bars"]["ky"], "Tabla A-4.2.1"])
+    blocks.append({"kind": "p", "text": "Temperaturas del análisis térmico del usuario (Apéndice 4, 4.2.2). Con T del acero ≤ 200 °C las resistencias no consideran la temperatura (4.2.4d)."})
+    blocks.append({"kind": "table", "headers": ["Case", "T del acero (°C)", "kE", "kp", "ky", "Fy(T) (MPa)", "Fu(T) (MPa)", "E(T) (MPa)", "G(T) (MPa)", "Literal"], "rows": steel})
+    if concrete:
+        blocks.append({"kind": "table", "headers": ["Case", "T del concreto (°C)", "kc", "kEc", "f'c(T) (MPa)", "Literal"], "rows": concrete})
+    if bars:
+        blocks.append({"kind": "table", "headers": ["Case", "T de las barras (°C)", "kE", "ky", "Literal"], "rows": bars})
+    return blocks
+
+
 def _stiffness_table(rows: list[dict]) -> dict:
     out = []
     for row in rows:
@@ -372,8 +402,8 @@ def _geometry_blocks(case: SteelCase, result: DesignResult, tag: str | None, exe
     if "error" in st:
         blocks.append({"kind": "alert", "text": f"No calculadas: {st['error']}", "detail": None})
     else:
-        if case.composite:
-            blocks.append({"kind": "p", "text": "I1.5, rigideces nominales para el cálculo de resistencias requeridas."})
+        blocks.append({"kind": "p", "text": "I1.5, rigideces nominales para el cálculo de resistencias requeridas." if case.composite
+                                            else "En miembros no compuestos, las rigideces efectivas son iguales a las elásticas (2.2)."})
         blocks.append(_stiffness_table(st["effective"]))
     blocks.append({"kind": "h2", "text": "2.4 Rigideces para método directo: rigideces efectivas (análisis de estabilidad, DAM)"})
     if "error" in st:
@@ -425,6 +455,8 @@ def _demand_table(executions: list, condition: str, label: str) -> list[dict]:
     moments = ["Mw (kN·m)", "Mz (kN·m)"] if angle else []
     rows = [[_case_name(tag), case.Pu, case.Mux, case.Muy] + ([case.Mw, case.Mz] if angle else []) + [case.Vux, case.Vuy] for tag, case, _ in cases]
     blocks = [{"kind": "table", "headers": ["Case", "Pu (kN)", "Mux (kN·m)", "Muy (kN·m)"] + moments + ["Vux (kN)", "Vuy (kN)"], "rows": rows}]
+    if condition == "fire":
+        blocks.insert(0, {"kind": "p", "text": "Del análisis del usuario con la combinación A-4-1 (Apéndice 4, 4.1.4). Temperaturas: 1.4."})
     for tag, _, result in cases:
         info = next(((c.result or {}).get("second_order") for c in result.checks if (c.result or {}).get("second_order")), None)
         if info:
@@ -452,8 +484,7 @@ def _demand_blocks(executions: list) -> list[dict]:
                                        ["Deflexión por carga viva + muerta a largo plazo", d.total_long, "mm", "Dato del usuario"]]))
     else:
         blocks.append({"kind": "p", "text": f"{NO_APLICA}: la entrada no indica deflexiones (serviceability)."})
-    return blocks + [{"kind": "h2", "text": "3.5 Desplazamientos"},
-                     {"kind": "p", "text": f"{FALTA}: la entrada no admite desplazamientos y el programa no los calcula."}]
+    return blocks
 
 
 def _service_blocks(result: DesignResult, governing: list) -> list[dict]:
@@ -624,7 +655,7 @@ def _tension_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     rows = []
     for name, m in c["modes"].items():
         rows.append([name, LIMIT_STATES.get(m["limit_state"], m["limit_state"]), f"{m['provision']}, Ec. {m['Pn_equation']}",
-                     f"{'Fy' if name == 'TY' else 'Fu'} = {_fmt(m['stress_mpa'])}", f"{m['area_basis']} = {_fmt(m['area_mm2'])}",
+                     f"{'Fy' if name == 'TY' else 'Fu'}{'(T)' if c.get('fire') else ''} = {_fmt(m['stress_mpa'])}", f"{m['area_basis']} = {_fmt(m['area_mm2'])}",
                      m["Pn_kN"], f"{m['phi_t']:.2f}", m["available_kN"]])
     blocks.append({"kind": "table", "headers": ["Modo", "Estado límite", "Literal", "Esfuerzo resistente (MPa)", "Área resistente (mm²)",
                                                 "Resistencia nominal, Pn (kN)", "Factor de resistencia, φt", "Resistencia de diseño, φt·Pn (kN)"],
@@ -839,7 +870,7 @@ def render_text(blocks: list[dict]) -> str:
             out += ["", f"RESULTADO: {b['status']} ({STATUS_TEXT[b['status']]})"
                     + (f"   Demanda/capacidad máx. = {_fmt(b['ratio'])}" if b["ratio"] is not None else "")]
         elif kind == "summary":
-            out.append("  |  ".join(f"{k}: {v}" for k, v in b["items"]))
+            out.append("  |  ".join(f"{title} {', '.join(lines)}" for title, lines in b["items"]))
         elif kind == "h1":
             out += ["", f"## {b['text']}"]
         elif kind == "h2":
@@ -1118,6 +1149,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                     pdf.set_text_color(*_INK)
                     pdf.multi_cell(width() - 42, 5.5, clean(b["case"]), new_x="LMARGIN", new_y="NEXT")
                     pdf.ln(1.5)
+                title_bottom = pdf.get_y()                           # the status badge below moves the cursor
                 color = _STATUS_COLOR[b["status"]]
                 pdf.set_fill_color(*color)
                 pdf.rect(pdf.w - pdf.r_margin - 38, 19, 38, 10, style="F", round_corners=True, corner_radius=2)
@@ -1125,7 +1157,7 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                 pdf.set_font(FONT, "B", 10)
                 pdf.set_text_color(255, 255, 255)
                 pdf.cell(38, 10, clean(STATUS_TEXT[b["status"]]), align="C")
-                pdf.set_xy(pdf.l_margin, max(pdf.get_y(), 31) + 2)
+                pdf.set_xy(pdf.l_margin, max(title_bottom, 31) + 2)
                 pdf.set_font(FONT, "", 8.5)
                 pdf.set_text_color(*_MUTED)
                 for key, value in b["meta"]:
@@ -1140,8 +1172,8 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                 labels = [pdf.multi_cell(card_w - 6, 3.4, clean(label), dry_run=True, output="LINES") for label, _ in b["items"]]
                 for start in range(0, len(b["items"]), n):           # each row as tall as its longest label
                     label_h = 3.4 * max(len(lines) for lines in labels[start:start + n])
-                    height = label_h + 10
-                    for i, (_, value) in enumerate(b["items"][start:start + n]):
+                    height = label_h + 5.0 + 5.0 * max(len(values) for _, values in b["items"][start:start + n])
+                    for i, (_, values) in enumerate(b["items"][start:start + n]):
                         x = pdf.l_margin + i * (card_w + gap)
                         pdf.set_fill_color(*_CARD)
                         pdf.rect(x, y, card_w, height, style="F", round_corners=True, corner_radius=1.5)
@@ -1150,14 +1182,15 @@ def pdf_bytes(documents: list[list[dict]]) -> bytes:
                         for row, line in enumerate(labels[start + i]):
                             pdf.set_xy(x + 3, y + 2 + row * 3.4)
                             pdf.cell(card_w - 6, 3.4, line)
-                        size = 11.5
+                        size = 10.5
                         pdf.set_font(FONT, "B", size)
-                        while pdf.get_string_width(clean(value)) > card_w - 6 and size > 6:
+                        while max(pdf.get_string_width(clean(value)) for value in values) > card_w - 6 and size > 6:
                             size -= 0.5
                             pdf.set_font(FONT, "B", size)
                         pdf.set_text_color(*_INK)
-                        pdf.set_xy(x + 3, y + 3 + label_h)
-                        pdf.cell(card_w - 6, 6, clean(value))
+                        for row, value in enumerate(values):
+                            pdf.set_xy(x + 3, y + 3 + label_h + row * 5.0)
+                            pdf.cell(card_w - 6, 5.0, clean(value))
                     y += height + 3
                 pdf.set_xy(pdf.l_margin, y + 1)
             elif kind == "h1":

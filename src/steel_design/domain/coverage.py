@@ -8,6 +8,7 @@ import math
 
 from ..models import Obligation, SteelCase
 from ..sections.models import Section
+from .fire import is_elevated
 
 # B4.1a compression elements expected per family (element names of the result).
 EXPECTED_ELEMENTS = {
@@ -71,6 +72,9 @@ def composite_obligations(case: SteelCase, demand: str) -> list[Obligation]:
     kind = case.composite.kind
     if demand == "axial" and case.Pu < 0:
         return [Obligation(id="TY", provision="I2.1c / I2.2c", reason="Fluencia en tracción del acero y del refuerzo.")]
+    if demand == "axial" and kind == "wall" and is_elevated(case):
+        return [Obligation(id="FB", provision="Apéndice 4, 4.2.4d(d)", reason="Pandeo por flexión a temperatura, en el espesor del muro."),
+                Obligation(id="LB", provision="I1.2", reason="Pandeo local: no requerido en muros.")]
     if demand == "axial":
         return [Obligation(id="FB-x", provision="I2", reason="Pandeo por flexión respecto de x."),
                 Obligation(id="FB-y", provision="I2", reason="Pandeo por flexión respecto de y."),

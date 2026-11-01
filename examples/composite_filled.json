@@ -16,6 +16,7 @@
   "cases": [
     {"name": "Compression, flexure and shear", "Pu": 60, "Mux": 3, "Muy": 1, "Vux": 40},
     {"name": "First-order loads, Appendix 8.1", "composite": {"second_order": {"axis": "x", "Mnt": 1.5, "Mlt": 1, "Pnt": 40, "Plt": 10, "M1_M2": -0.5, "Pstory": 20000, "Pmf": 8000, "H": 500, "L": 2000, "drift": 10}}},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 2.3, "Vux": 9.5}
+    {"name": "Concrete pour", "condition": "construction", "Mux": 2.3, "Vux": 9.5},
+    {"name": "Incendio, concreto uniforme", "condition": "fire", "fire": {"steel_temperature": 600, "concrete_temperature": 300}, "Pu": 30}
   ]
 }

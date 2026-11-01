@@ -9,6 +9,7 @@ from ..codes.aisc_360_22.flexure import PHI_B
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import Check, SteelCase
 from ..sections.models import Section
+from .fire import steel_at_temperature, with_fire
 from .flexure import unbraced_length
 
 COMBINED = ("axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z")
@@ -96,7 +97,8 @@ def _h1_h4_modes(case, section, by_id):
         if tfr["applies"]:
             mcx, basis = tfr["design_kNm"], "F13.1 (rotura del ala traccionada)"
         else:
-            mcx, basis = PHI_B * case.material.Fy * section.zx / 1e6, "φb·Mp (F13.1 no aplica)"
+            hot = steel_at_temperature(case)
+            mcx, basis = PHI_B * (hot["Fy_T_mpa"] if hot else case.material.Fy) * section.zx / 1e6, "φb·Mp (F13.1 no aplica)"
         h4 = eq.h4(Pr=axial.demand, Pc=rupture["available_kN"], Mrx=fx.demand, Mcx=mcx)
         modes["H4"] = {"limit_state": "flange_rupture_combined", "provision": "H4", "applies": True,
                        "Pr_kN": axial.demand, "Pc_kN": rupture["available_kN"], "Mrx_kNm": fx.demand,
@@ -122,7 +124,7 @@ def combined_strength(case: SteelCase, section: Section, checks: list[Check]) ->
     if case.Pu > 0:
         notes.append("Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3).")
     governing = max(modes, key=lambda k: modes[k]["ratio"])
-    return {
+    return with_fire({
         "chapter": "H", "code": "ANSI/AISC 360-22", "section": section.name, "family": family,
         "provisions": list(dict.fromkeys(m["provision"] for m in modes.values())),
         "modes": modes,
@@ -132,4 +134,4 @@ def combined_strength(case: SteelCase, section: Section, checks: list[Check]) ->
         "requirements": [],
         "notes": notes,
         "limitations": list(_LIMITATIONS),
-    }
+    }, steel_at_temperature(case), "4.2.4d(h)")

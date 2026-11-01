@@ -2,7 +2,6 @@
 composite coupling beams and walls under fire. LRFD. Formulas in codes/aisc_dg38 and codes/aisc_360_22; not a standard."""
 import math
 
-from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_dg38 import fire as dg38_fire
 from ..codes.aisc_dg38 import walls as dg38
@@ -187,7 +186,7 @@ def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
 
 
 def wall_fire(case: SteelCase, section: Section) -> dict:
-    """Design Guide 38, Chapter 6, on the unit-width column of a planar wall (conservative, Section 6.2.2)."""
+    """Optional reviews of Design Guide 38, Chapter 6, on the unit-width column (6.2.2): rating and vent holes. The strength is A-4-12 (domain/composite.py)."""
     _check_family(case, section)
     if case.Pu <= 0 or case.lengths is None:
         _incomplete("El incendio de la Guía 38 se calcula en compresión (Pu > 0) y con la longitud del miembro.", section,
@@ -205,38 +204,14 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
     pu_unit = case.Pu * 1000.0 * st / wall.length
     mode = {"limit_state": "fire", "provision": "AISC Design Guide 38, 6.2", "applies": True, "equation": "DG38 Ec. 6-5",
             "Pu_unit_kN": pu_unit / 1000.0, "Pno_kN": pno / 1000.0, "Pn_kN": pn / 1000.0, "L_over_tsc": L / tsc, "Pu_over_Pn": pu_unit / pn}
-    ratios, requirements = [], []
-    within_limits = L / tsc <= 20 and pu_unit / pn <= 0.2
-    if within_limits:
+    ratio, requirements = 0.0, []
+    if fire.required_rating_hours is not None:
+        if not (L / tsc <= 20 and pu_unit / pn <= 0.2):
+            _incomplete("La Ec. 6-5 de la Guía 38 exige L/tsc ≤ 20 y Pu/Pn ≤ 0.2; fuera de ellos omita required_rating_hours: la resistencia es A-4-12.",
+                        section, ["composite.fire.required_rating_hours"])
         rating = dg38_fire.fire_resistance_rating(Pu_over_Pn=pu_unit / pn, L=L, tsc=tsc)
         mode["R_hours"] = rating
-        ratios.append(fire.required_rating_hours / rating if rating > 0 else float("inf"))
-    if fire.element_thicknesses:
-        if abs(sum(fire.element_thicknesses) - (tsc / 2 - t)) > 1.0:
-            _incomplete("Los elementos de concreto deben sumar medio espesor de concreto, de la placa al centro del muro.", section,
-                        ["composite.fire.element_thicknesses"])
-        steel = a4.steel_factors(fire.plate_temperature)
-        Fy_T, Es_T = steel["ky"] * Fy, steel["kE"] * eq.E_STEEL
-        arm = tsc / 2 - t / 2
-        half_pno = Fy_T * st * t
-        half_ei = Es_T * (st * t**3 / 12 + st * t * arm**2)
-        position = tsc / 2 - t
-        for thickness, temperature in zip(fire.element_thicknesses, fire.element_temperatures):
-            factors = a4.concrete_factors(temperature, lightweight=concrete.lightweight)
-            area = st * thickness
-            distance = position - thickness / 2
-            position -= thickness
-            half_pno += 0.85 * factors["kc"] * fc * area
-            half_ei += 0.35 * factors["kEc"] * Ec * (st * thickness**3 / 12 + area * distance**2)
-        out = dg38_fire.elevated_strength(Pno_T=2 * half_pno, EI_eff_T=2 * half_ei, Lc=Lc)
-        available = eq.PHI_C_WALL * out["Pn_T"] * wall.length / st
-        mode.update(Pno_T_kN=2 * half_pno / 1000.0, EI_eff_T=2 * half_ei, Pe_T_kN=out["Pe_T"] / 1000.0, Pn_T_kN=out["Pn_T"] / 1000.0,
-                    phi_Pn_T_wall_kN=available / 1000.0)
-        mode["equation"] = "DG38 Ec. 6-1"
-        ratios.append(case.Pu * 1000.0 / available)
-    if not ratios:
-        _incomplete("La Ec. 6-5 exige L/tsc ≤ 20 y Pu/Pn ≤ 0.2. Fuera de ellos, indique el perfil de temperaturas (Ecs. 6-1 a 6-4).",
-                    section, ["composite.fire.element_thicknesses", "composite.fire.element_temperatures"])
+        ratio = fire.required_rating_hours / rating if rating > 0 else float("inf")
     if fire.vent is not None:
         v = fire.vent
         if case.composite.pour_height is None:
@@ -249,8 +224,6 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
             _requirement("vent_d", "DG38 6.3.5", v.diameter >= required, "Diámetro de ventilación ≥ el requerido y ≥ 25 mm."),
             _requirement("vent_s", "DG38 6.3.5", max(v.s1, v.s2) <= min(dg38_fire.VENT_MAX_SPACING, L),
                          "Separación de ventilación ≤ la altura de piso y ≤ 3.66 m.")]
-    ratio = max(ratios)
     return _result(case, section, modes={"FIRE": {**mode, "ratio": ratio}}, governing="FIRE", provisions=["AISC Design Guide 38, Cap. 6"],
                    requirements=requirements, ratio=ratio,
-                   notes=["Fuera de la norma: AISC Design Guide 38, Capítulo 6, sobre la columna de ancho unitario (st). "
-                          "Las temperaturas provienen de un análisis térmico del usuario; Apéndice 4 da las retenciones."])
+                   notes=["Fuera de la norma: AISC Design Guide 38, Capítulo 6, sobre la columna de ancho unitario (st); no da la resistencia, que es la de A-4-12."])

@@ -19,12 +19,6 @@ def fire_resistance_rating(*, Pu_over_Pn, L, tsc) -> float:
     return min(rating, 8.0)
 
 
-def elevated_strength(*, Pno_T, EI_eff_T, Lc) -> dict:
-    """Equations 6-1 and 6-4."""
-    Pe = math.pi**2 * EI_eff_T / Lc**2
-    return {"Pe_T": Pe, "Pn_T": 0.32 ** ((Pno_T / Pe) ** 0.3) * Pno_T}
-
-
 def vent_hole_area(*, s1, s2, Tdc, tdc, omega, rho_w, rho_c, hc) -> float:
     """Equation 6-10; the constant 116 keeps its value in any length unit because the lengths reduce to a square one."""
     return 116 * s1 * s2 * Tdc * omega * rho_w / (tdc * rho_c * hc)

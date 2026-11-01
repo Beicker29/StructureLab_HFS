@@ -58,11 +58,16 @@ def f2_plastic(*, Fy, Zx) -> dict:
     return {"Mn": Fy * Zx, "equation": "F2-1"}
 
 
+def f2_rts(*, Iy, Cw, Sx) -> float:
+    """F2-7."""
+    return math.sqrt(math.sqrt(Iy * Cw) / Sx)
+
+
 def f2_ltb(*, E, Fy, Sx, Zx, ry, Iy, Cw, J, ho, Lb, Cb, channel: bool) -> dict:
     """F2-2 to F2-8: lateral-torsional buckling. c = 1 (I) or (ho/2)*sqrt(Iy/Cw) (channels)."""
     _positive(E=E, Fy=Fy, Sx=Sx, Zx=Zx, ry=ry, Iy=Iy, Cw=Cw, J=J, ho=ho, Lb=Lb, Cb=Cb)
     mp = Fy * Zx
-    rts = math.sqrt(math.sqrt(Iy * Cw) / Sx)                                   # F2-7
+    rts = f2_rts(Iy=Iy, Cw=Cw, Sx=Sx)
     c = ho / 2 * math.sqrt(Iy / Cw) if channel else 1.0                         # F2-8b / F2-8a
     jc = J * c / (Sx * ho)
     lp = 1.76 * ry * math.sqrt(E / Fy)                                          # F2-5

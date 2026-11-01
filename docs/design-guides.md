@@ -110,7 +110,7 @@ Sin ejemplo en las guías, solo con oráculo independiente: factor de forma α (
 | 9 | Vigas de acoplamiento | `composite.kind = coupling_beam` | DG38 2.3.3, A.3 | `aisc_dg38/walls.py` | Compactas; sin fuerza axial |
 | 10 | Placas esbeltas | `wall.allow_slender_plates` | Commentary I1.6a; DG38 2.2.1 | `aisc_360_22/composite.py` | Solo compresión; flexión y cortante siguen exigiendo I1-4 |
 | 11 | Rigideces efectivas de muros | `stiffness.effective` del resultado | I1-1 a I1-3 | `aisc_360_22/composite.py` | |
-| 12 | Muros a fuego | `composite.fire` | DG38 cap. 6; Apéndice 4 | `aisc_dg38/fire.py`, `aisc_360_22/appendix_4.py` | Las temperaturas son dato de un análisis térmico del usuario; muros planos |
+| 12 | Muros a fuego | `composite.fire` | DG38 cap. 6 | `aisc_dg38/fire.py` | Solo horas (Ec. 6-5) y ventilación, opcionales. La resistencia es A-4-12 ([Apéndice 4](appendix-4.md)) |
 | 13 | Colado del concreto | `composite.pour_height` | DG6 4.3; Commentary C-I2-1, C-I2-2; DG38 2.2.1.2 | `aisc_dg06/filled.py`, `aisc_dg38/walls.py` | Recomendación: se reporta en 4.2 y no cambia el estado; validada en HSS |
 
 Todo lo que sale de una guía lo declara la memoria de cálculo como fuera de la norma.

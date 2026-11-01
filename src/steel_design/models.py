@@ -338,21 +338,43 @@ class VentHoles(InputModel):
 
 
 class WallFire(InputModel):
-    """Planar wall under fire (Design Guide 38, Chapter 6). Temperatures come from the user's thermal analysis."""
-    required_rating_hours: PositiveNumber
-    plate_temperature: Optional[FiniteNumber] = Field(None, description="Steel plate temperature (deg C)")
-    element_thicknesses: Optional[list[PositiveNumber]] = Field(
-        None, description="Concrete elements from the plate to mid-thickness, summing tsc/2 - t (mm)")
-    element_temperatures: Optional[list[FiniteNumber]] = Field(None, description="Temperature of each element (deg C)")
+    """Optional reviews of a planar wall under fire: Design Guide 38, Chapter 6, not a standard. The strength is A-4-12 (case.fire)."""
+    required_rating_hours: Optional[PositiveNumber] = Field(None, description="Required fire resistance: Equation 6-5 of the guide (h)")
     vent: Optional[VentHoles] = None
 
     @model_validator(mode="after")
-    def profile_is_complete(self):
-        given = [self.plate_temperature is not None, self.element_thicknesses is not None, self.element_temperatures is not None]
-        if any(given) and not all(given):
-            raise ValueError("El perfil de temperaturas requiere plate_temperature, element_thicknesses y element_temperatures.")
-        if self.element_thicknesses is not None and len(self.element_thicknesses) != len(self.element_temperatures):
-            raise ValueError("Cada elemento de concreto necesita su temperatura.")
+    def some_review(self):
+        if self.required_rating_hours is None and self.vent is None:
+            raise ValueError("composite.fire requiere required_rating_hours o vent (Guía 38, Capítulo 6).")
+        return self
+
+
+class ConcreteElement(InputModel):
+    """One element of the concrete of a filled column, with uniform temperature (User Note of 4.2.4d(d))."""
+    A: PositiveNumber = Field(..., description="Area (mm2)")
+    Ix: PositiveNumber = Field(..., description="Moment of inertia about the x axis of the member (mm4)")
+    Iy: PositiveNumber = Field(..., description="Moment of inertia about the y axis of the member (mm4)")
+    T: float = Field(..., ge=20, le=1200, description="Temperature (deg C)")
+
+
+class ConcreteLayer(InputModel):
+    """One layer of the concrete of a wall, from the plate towards mid-thickness, with uniform temperature."""
+    thickness: PositiveNumber = Field(..., description="Thickness (mm)")
+    T: float = Field(..., ge=20, le=1200, description="Temperature (deg C)")
+
+
+class FireBasis(InputModel):
+    """Temperatures of a fire case (Appendix 4, 4.2.4d), from the user's heat transfer analysis (4.2.2), in deg C."""
+    steel_temperature: float = Field(..., ge=20, lt=1200, description="Maximum steel temperature; bottom flange in beams")
+    concrete_temperature: Optional[float] = Field(None, ge=20, le=1200, description="Uniform concrete temperature: filled columns and walls")
+    concrete_elements: Optional[list[ConcreteElement]] = Field(None, min_length=1, description="Concrete of a filled column by elements; they must add up to Ac, Icx and Icy")
+    concrete_layers: Optional[list[ConcreteLayer]] = Field(None, min_length=1, description="Concrete of a wall by layers, from the plate to mid-thickness; they must add up to tsc/2 - t")
+    bar_temperature: Optional[float] = Field(None, ge=20, lt=1200, description="Temperature of the longitudinal bars of a filled column")
+
+    @model_validator(mode="after")
+    def one_concrete_description(self):
+        if sum(v is not None for v in (self.concrete_temperature, self.concrete_elements, self.concrete_layers)) > 1:
+            raise ValueError("Indique concrete_temperature, concrete_elements o concrete_layers, solo uno.")
         return self
 
 
@@ -476,6 +498,7 @@ class SteelCase(InputModel):
     angle_flexure: Optional[AngleFlexure] = None
     lengths: Optional[Lengths] = Field(
         None, description="Unbraced lengths of this case, or {ultimate, construction}: the one of its condition is taken (fire uses ultimate)")
+    fire: Optional[FireBasis] = Field(None, description="Temperatures of a case with condition = fire (Appendix 4, 4.2.4d)")
     factors: Factors = Field(default_factory=Factors)
     single_angle_e5: Optional[SingleAngleE5Basis] = None
     double_angle_e6: Optional[DoubleAngleE6Basis] = None
@@ -503,12 +526,17 @@ class SteelCase(InputModel):
         if self.composite is not None and self.custom_section is not None:
             raise ValueError("Un miembro compuesto usa un perfil del catálogo, no custom_section.")
         composite = self.composite
-        if self.condition == "construction" and (self.Pu or (composite is not None and (composite.second_order or composite.fire))):
-            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique Pu, second_order ni fire.")
-        if (self.condition == "fire") != (composite is not None and composite.fire is not None):
-            raise ValueError("condition = fire y composite.fire van juntos.")
-        if self.condition == "fire" and any((self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy)):
-            raise ValueError("Flexión y cortante en incendio no están implementados: un case de incendio solo admite Pu.")
+        if self.condition == "construction" and (self.Pu or (composite is not None and composite.second_order)):
+            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique Pu ni second_order.")
+        if (self.condition == "fire") != (self.fire is not None):
+            raise ValueError("condition = fire y fire (temperaturas, Apéndice 4, 4.2.4d) van juntos.")
+        if composite is not None and composite.fire is not None and self.condition != "fire":
+            raise ValueError("composite.fire solo se indica en un case con condition = fire.")
+        if self.condition == "fire" and composite is not None and (composite.second_order or composite.anchor):
+            raise ValueError("Un case de incendio no admite composite.second_order ni composite.anchor (Apéndice 4, 4.2.4d no los trata).")
+        if self.fire is not None and composite is None and any(v is not None for v in (
+                self.fire.concrete_temperature, self.fire.concrete_elements, self.fire.concrete_layers, self.fire.bar_temperature)):
+            raise ValueError("Un miembro de acero solo lleva fire.steel_temperature.")
         if composite is not None and composite.second_order is not None:
             if self.Pu or self.Mux or self.Muy:
                 raise ValueError("Con composite.second_order, Pu, Mux y Muy salen de A-8-1 y A-8-2; no los indique.")
@@ -560,6 +588,7 @@ class DesignResult(BaseModel):
     status: Status
     condition: str = "ultimate"
     serviceability: list = Field(default_factory=list, description="Deflections against their limits; informative, they do not decide the status")
+    fire: Optional[dict] = Field(None, description="Temperatures and retention factors of a fire case (Appendix 4)")
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
     stiffness: dict = Field(default_factory=dict, description="Elastic, effective and direct-analysis stiffnesses (N, mm), whatever the demands")

@@ -91,6 +91,11 @@ PARAMETERS = {
     "Mr_kNm": ("Resistencia requerida a flexión", "Mr", "kN·m"), "Msd_kNm": ("Momento de sección", "Msd", "kN·m"),
     "My_kNm": ("Momento de fluencia", "My", "kN·m"), "PA_kN": ("Carga en el punto A de interacción", "PA", "kN"),
     "PC_kN": ("Carga en el punto C de interacción", "PC", "kN"), "PNA": ("Posición del eje neutro plástico", "PNA", "–"),
+    "st_mm": ("Ancho de la columna unitaria del muro", "st", "mm"),
+    "Fe_ambient_mpa": ("Esfuerzo de pandeo elástico a temperatura ambiente", "Fe", "MPa"), "Lr_T_mm": ("Longitud límite a temperatura elevada", "Lr(T)", "mm"),
+    "FL_T_mpa": ("Esfuerzo de fluencia inicial a temperatura elevada", "FL(T)", "MPa"), "cx": ("Exponente del pandeo lateral-torsional a temperatura elevada", "cx", "–"),
+    "Fcr_T_mpa": ("Esfuerzo crítico a temperatura elevada", "Fcr(T)", "MPa"), "Mn_ambient_kNm": ("Resistencia nominal a flexión a temperatura ambiente", "Mn", "kN·m"),
+    "kcb": ("Factor de retención de la viga compuesta", "kcb", "–"),
     "Pe_T_kN": ("Carga de pandeo elástico a temperatura elevada", "Pe(T)", "kN"), "Pe_kN": ("Carga de pandeo elástico", "Pe", "kN"),
     "Pn_T_kN": ("Resistencia nominal a temperatura elevada", "Pn(T)", "kN"), "Pno_T_kN": ("Resistencia sin efectos de longitud a temperatura elevada", "Pno(T)", "kN"),
     "Pno_kN": ("Resistencia sin efectos de longitud", "Pno", "kN"), "Pno_over_Pe": ("Relación de resistencia y pandeo", "Pno/Pe", "–"),
@@ -115,14 +120,16 @@ PARAMETERS = {
 EQUATION_OF = {
     "Ae_mm2": "Ae_equation", "Fe_torsion_mpa": "Fe_torsion_equation", "Fez_mpa": "Fez_equation", "Fe_mpa": "Fe_equation",
     "Fn_mpa": "Fn_equation", "Pn_kN": "Pn_equation", "Lc_over_r": "slenderness_equation", "B": "B_equation", "Mcr": "Mcr_equation",
-    "be_mm": "be_equation", "Cv1": "Cv_equation", "Cv2": "Cv_equation", "Fcr": "Fcr_equation", "Pno_kN": "Pno_equation",
+    "be_mm": "be_equation", "Cv1": "Cv_equation", "Cv2": "Cv_equation", "Fcr": "Fcr_equation", "Pno_kN": "Pno_equation", "Pno_T_kN": "Pno_equation",
 }
 
 # Value key -> literal. Definitions printed in the text of a360-22w.pdf.
 FIXED_LITERALS = {
     "Lc_mm": "E2", "Cb": "F1, Ec. F1-1", "Cb_used": "F10.2(1)", "rts_mm": "F2.2, Ec. F2-7", "c": "F2.2, Ec. F2-8",
     "C1": "I2.1b, Ec. I2-6", "C3": "I2.2b, Ec. I2-13", "C_I1_1": "I1.5(e), Ec. I1-1", "Ec_mpa": "I2.1b",
-    "phi_t": "D2", "U": "D3, Tabla D3.1", "An_mm2": "B4.3b",
+    "phi_t": "D2", "U": "D3, Tabla D3.1", "An_mm2": "B4.3b", "Lr_T_mm": "Apéndice 4, 4.2.4d(e), Ec. A-4-16", "FL_T_mpa": "Apéndice 4, 4.2.4d(e), Ec. A-4-17",
+    "cx": "Apéndice 4, 4.2.4d(e), Ec. A-4-19M", "Fcr_T_mpa": "Apéndice 4, 4.2.4d(e), Ec. A-4-15", "kcb": "Tabla A-4.2.4", "Mn_ambient_kNm": "I3.2a(a)",
+    "Fe_ambient_mpa": "E3, E4", "EI_eff_T": "Apéndice 4, 4.2.4d(c), (d); Ec. I2-12, I1-1",
 }
 
 SECTION_PROPERTIES = {

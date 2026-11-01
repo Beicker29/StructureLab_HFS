@@ -188,8 +188,7 @@ def member_stiffness(case: SteelCase, section: Section, catalog: Callable[[str],
     try:
         if case.composite is None:
             elastic = _bare_steel(case, section, catalog)
-            return {"Es_mpa": case.material.E, "Gs_mpa": G_STEEL, "geometry": {}, "elastic": elastic,
-                    "effective": [_absent("(EI)eff, (EA)eff", NO_APLICA, "I1.5 corresponde a miembros compuestos.")],
+            return {"Es_mpa": case.material.E, "Gs_mpa": G_STEEL, "geometry": {}, "elastic": elastic, "effective": elastic,
                     "direct_analysis": _direct_steel(case, elastic)}
         Ec, geometry, elastic, effective, direct = _composite(case, section, catalog)
     except SteelDesignError as exc:

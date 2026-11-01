@@ -11,15 +11,21 @@
   "cases": [
     {"name": "Compression, flexure and shear", "Pu": 30000, "Mux": 40000, "Vux": 8000},
     {
-      "name": "Fire, Design Guide 38, Chapter 6",
+      "name": "Fire, Appendix 4, 4.2.4d(d)",
       "condition": "fire",
       "Pu": 16000,
+      "fire": {
+        "steel_temperature": 1004,
+        "concrete_layers": [
+          {"thickness": 22.4, "T": 788}, {"thickness": 22.4, "T": 497}, {"thickness": 22.4, "T": 368}, {"thickness": 22.4, "T": 278},
+          {"thickness": 22.4, "T": 208}, {"thickness": 22.4, "T": 152}, {"thickness": 22.4, "T": 109}, {"thickness": 22.4, "T": 78},
+          {"thickness": 22.4, "T": 57}, {"thickness": 22.4, "T": 42}, {"thickness": 22.4, "T": 33}, {"thickness": 22.4, "T": 28},
+          {"thickness": 22.3, "T": 26}
+        ]
+      },
       "composite": {
         "fire": {
           "required_rating_hours": 3,
-          "plate_temperature": 1004,
-          "element_thicknesses": [22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.4, 22.3],
-          "element_temperatures": [788, 497, 368, 278, 208, 152, 109, 78, 57, 42, 33, 28, 26],
           "vent": {
             "s1": 3048, "s2": 3048, "diameter": 25.4, "dry_thickness": 38.1, "heating_time": 1790,
             "water_content": 0.15, "water_density": 1000

@@ -10,6 +10,7 @@ from ..codes.aisc_360_22 import tension as eq
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import SteelCase
 from ..sections.models import Section
+from .fire import steel_at_temperature, with_fire
 
 _LIMITATIONS = (
     "An (B4.3b) y U (Tabla D3.1) son datos del usuario; el programa no verifica la disposición de agujeros ni la conexión.",
@@ -43,15 +44,18 @@ def tension_strength(case: SteelCase, section: Section) -> dict:
                                       code="TENSION_DOMAIN_BLOCKED",
                                       details={"section": section.name, "An_mm2": an, "Ag_mm2": ag})
 
-    yielding = eq.yielding_strength(Fy=case.material.Fy, Ag=ag)
+    hot = steel_at_temperature(case)
+    Fy, Fu = (hot["Fy_T_mpa"], hot["Fu_T_mpa"]) if hot else (case.material.Fy, case.material.Fu)
+    suffix = "; Apéndice 4, 4.2.4d(a)" if hot else ""
+    yielding = eq.yielding_strength(Fy=Fy, Ag=ag)
     net = eq.effective_net_area(An=an, U=u)
-    rupture = eq.rupture_strength(Fu=case.material.Fu, Ae=net["Ae_mm2"])
+    rupture = eq.rupture_strength(Fu=Fu, Ae=net["Ae_mm2"])
     modes = {
-        "TY": {"limit_state": "tensile_yielding", "provision": "D2(a)", "area_basis": "Ag", "area_mm2": ag,
-               "stress_mpa": case.material.Fy, "Pn_equation": yielding["equation"], "Pn_kN": yielding["Pn_N"] / 1000.0,
+        "TY": {"limit_state": "tensile_yielding", "provision": "D2(a)" + suffix, "area_basis": "Ag", "area_mm2": ag,
+               "stress_mpa": Fy, "Pn_equation": yielding["equation"], "Pn_kN": yielding["Pn_N"] / 1000.0,
                "phi_t": eq.PHI_T["yielding"], "available_kN": eq.available_strength(yielding["Pn_N"], "yielding")},
-        "TR": {"limit_state": "tensile_rupture", "provision": "D2(b) + D3", "area_basis": "Ae", "area_mm2": net["Ae_mm2"],
-               "An_mm2": an, "U": u, "Ae_equation": net["equation"], "stress_mpa": case.material.Fu,
+        "TR": {"limit_state": "tensile_rupture", "provision": "D2(b) + D3" + suffix, "area_basis": "Ae", "area_mm2": net["Ae_mm2"],
+               "An_mm2": an, "U": u, "Ae_equation": net["equation"], "stress_mpa": Fu,
                "Pn_equation": rupture["equation"], "Pn_kN": rupture["Pn_N"] / 1000.0,
                "phi_t": eq.PHI_T["rupture"], "available_kN": eq.available_strength(rupture["Pn_N"], "rupture")},
     }
@@ -68,7 +72,7 @@ def tension_strength(case: SteelCase, section: Section) -> dict:
     if section.type.upper() == "DOUBLE_ANGLE":
         notes.append("D4: las placas de unión y la separación de conectores de miembros armados no se verifican "
                      "(se recomienda esbeltez de cada componente entre conectores ≤ 300).")
-    return {
+    return with_fire({
         "chapter": "D", "code": "ANSI/AISC 360-22",
         "section": section.name, "family": section.type.upper(),
         "inputs": {"Fy_mpa": case.material.Fy, "Fu_mpa": case.material.Fu, "Ag_mm2": ag, "An_mm2": an, "U": u},
@@ -81,4 +85,4 @@ def tension_strength(case: SteelCase, section: Section) -> dict:
         "requirements": [],
         "notes": notes,
         "limitations": list(_LIMITATIONS),
-    }
+    }, hot, "4.2.4d(a)")

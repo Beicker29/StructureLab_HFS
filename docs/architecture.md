@@ -24,9 +24,10 @@ src/steel_design/
 │   ├── shear.py                 capítulo G: sección G por familia y dirección del cortante
 │   ├── interaction.py           capítulo H: H1/H4 y H2 (ángulos simples) con las resistencias de los demás chequeos, Cb de H1.2
 │   ├── composite.py             capítulo I: rellenos, embebidos, vigas, muros y anclajes; remite a E, F y G donde la norma lo indica
-│   ├── speedcore.py             muros en C, vigas de acoplamiento e incendio, por Design Guide 38
+│   ├── fire.py                  Apéndice 4, 4.2.4d: propiedades a temperatura y qué cubre el método simple
+│   ├── speedcore.py             muros en C, vigas de acoplamiento y revisiones opcionales de incendio, por Design Guide 38
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
-│   ├── stiffness.py             rigideces elásticas (E·I, Guía 6, 2.8), efectivas (I1.5) y para método directo (C2.3, I1.5), sea cual sea la demanda
+│   ├── stiffness.py             rigideces elásticas (E·I, Guía 6, 2.8), efectivas (I1.5; sin concreto, iguales a las elásticas) y para método directo (C2.3, I1.5), sea cual sea la demanda
 │   ├── interaction_diagram.py   diagramas P-M de I5 con las Tablas 6-2a a 6-4 del Manual; informativos
 │   ├── requirements.py          requerimientos técnicos de materiales y geometría; uno obligatorio incumplido impide el PASS
 │   ├── coverage.py              obligaciones de D, E, F, G y H derivadas del texto, independientes
@@ -75,7 +76,8 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Ecuaciones I2 a I5, I8.2, φ del Capítulo I, bloques de tensiones | `codes/aisc_360_22/composite.py` |
 | Ecuaciones de los Apéndices 2, 4 y 8.1 | `codes/aisc_360_22/appendix_<n>.py` |
 | Selección por tipo de miembro compuesto, geometría y requisitos del Capítulo I | `domain/composite.py` |
-| Muros en C, vigas de acoplamiento e incendio | `domain/speedcore.py` |
+| Muros en C, vigas de acoplamiento y revisiones de incendio de la guía | `domain/speedcore.py` |
+| Propiedades a temperatura y alcance del método simple (Apéndice 4) | `domain/fire.py` |
 | Coherencia de datos del catálogo (r = √(I/A), S = I/c) | `domain/validation.py` |
 | Elementos B4.1a por familia, selección de modos, E7 por modo | `domain/compression.py` |
 | Estados límite obligatorios (comprobación independiente) | `domain/coverage.py` |

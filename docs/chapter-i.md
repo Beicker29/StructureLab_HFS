@@ -191,7 +191,7 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
 - **DI-18** Muros en C: st y α de I1-6 con el menor de los espesores tsc,w y tsc,f, porque la Guía 38 no resuelve cuál usar en una sección
   con dos; es el lado conservador. A.2.3 a A.2.5 definen el lado comprimido por el signo de Pu: otra combinación queda bloqueada.
 - **DI-19** Incendio: se aplica la Ec. 6-6a tal como la imprime la guía, sin la rama de I2-3, y la longitud L = Ly con Lc = Ky·Ly, porque el
-  ejemplo toma pandeo del espesor. La Ec. 6-5 se usa solo dentro de sus límites; fuera de ellos, se exige el perfil de temperaturas.
+  ejemplo toma pandeo del espesor. La Ec. 6-5 se usa solo dentro de sus límites; fuera de ellos, la revisión de horas queda `INCOMPLETE`. La resistencia a temperatura es A-4-12 ([Apéndice 4](appendix-4.md)), con esa misma Lc.
 - **DI-20** Rigideces en la memoria (indicaciones del usuario, 2026-10-31).
   - Muros: I1-1 a I1-3 solo se aplican a muros de placas. C2.3 con τb del usuario.
   - Rellenos y embebidos, efectivas: (EI)eff por I2-12 e I2-5; (EA)eff = EA elástica; (GA)eff = Gc·Ac. GJ, si hay ecuación, Guía 6, 2-12 a 2-14.
@@ -216,7 +216,7 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
 - **DI-27** Ejemplos (indicación del usuario, 2026-10-31): perfiles de acero, viga compuesta, rellenos, cajón y embebido llevan deflexiones y un case de construcción; la viga de
   acoplamiento, solo deflexiones; los muros y `multi_member`, ninguno. Sus valores son ilustrativos. La construcción de módulos de muro vacíos da INCOMPLETO: el Capítulo F no cubre esas secciones.
 - **DI-26** Casos por condición (indicación del usuario, 2026-10-31): cada case declara `condition` (`ultimate`, `construction`, `fire`). Construcción: acero solo, con sus
-  longitudes, Mu y Vu únicamente. Incendio: solo Pu con `composite.fire`; flexión y cortante en incendio figuran como falta de implementación. Deflexiones (`serviceability`): datos del
+  longitudes, Mu y Vu únicamente. Incendio: Apéndice 4, 4.2.4d, con `fire` ([detalle](appendix-4.md)). Deflexiones (`serviceability`): datos del
   usuario frente a L/n con la luz efectiva; exceder un límite se reporta y no cambia el estado. Una sola memoria por sección, con el case de mayor DCR en cada revisión.
 - **DI-25** Colado del concreto (indicación del usuario, 2026-10-31; no es norma). Rellenos rectangulares: σmax ≤ 0,5 Fy y δmax ≤ L/2000 con
   L = min(Lx, Ly) (DG6 4.3; Commentary C-I2-1, C-I2-2). Redondos: no aplica. Muros planos: altura ≤ 9144 mm con placas que cumplen I1-4

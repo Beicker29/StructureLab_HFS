@@ -17,6 +17,7 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 | `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes, modo gobernante por resistencia de diseño φt·Pn, datos faltantes, nota D1, memoria |
 | `tests/test_flexure.py` | Capítulo F: perfiles reales contra cálculos independientes (F2, F3, F6, F7 incl. Se, F8, F11, F13.1), estados límite reportados, datos faltantes, bloqueos, interacción pendiente, memoria |
 | `tests/test_composite.py` | Capítulo I: rellenos, embebidos y vigas contra cálculos independientes; requisitos, bloqueos y memoria |
+| `tests/test_appendix_4.py` | Apéndice 4, 4.2.4d: incendio contra cálculos independientes, bloqueos y memoria |
 | `tests/test_design_guides.py` | Contraste con los ejemplos de AISC Design Guide 6 y Design Guide 38 y contenidos de esas guías contra cálculos independientes ([detalle](docs/design-guides.md)) |
 | `tests/test_engine.py` | Obligaciones independientes; frontera PASS/FAIL; INCOMPLETE ante dominios bloqueados; barra maciza a mano |
 | `tests/test_inputs.py` | Rechazo de entradas inválidas o incompletas |
@@ -40,6 +41,7 @@ python tests/oracles/chapter_c.py   # regenera la referencia de C2.3 (rigideces 
 python tests/oracles/chapter_g.py   # regenera la referencia del capítulo G
 python tests/oracles/chapter_h.py   # regenera la referencia del capítulo H
 python tests/oracles/chapter_i.py   # regenera la referencia del capítulo I
+python tests/oracles/chapter_a4.py  # regenera la referencia del Apéndice 4, 4.2.4d
 ```
 
 Revisar el diff de la referencia: un valor de referencia solo cambia por una

@@ -92,16 +92,21 @@ def critical_stress_round(*, D_t, Fy) -> float:
 
 def pno_filled(*, cls, shape, Fy, As, fc, Ac, lam, limits, Fn=None, Asr=0.0, Ec=None) -> dict:
     """I2-9a to I2-9e. Ac excludes the bars; Asr*Es/Ec is the bar area transformed to concrete."""
-    c2 = 0.95 if shape == "round" else 0.85
     concrete = Ac + (Asr * E_STEEL / Ec if Asr else 0.0)
-    pp = Fy * As + c2 * fc * concrete                                # I2-9b
+    return pno_filled_of_concrete(cls=cls, shape=shape, Fy=Fy, As=As, fc_Ac=fc * concrete, lam=lam, limits=limits, Fn=Fn)
+
+
+def pno_filled_of_concrete(*, cls, shape, Fy, As, fc_Ac, lam, limits, Fn=None) -> dict:
+    """I2-9a to I2-9e with the force f'c*Ac of the concrete, including the transformed bars."""
+    c2 = 0.95 if shape == "round" else 0.85
+    pp = Fy * As + c2 * fc_Ac                                        # I2-9b
     if cls == "compact":
         return {"Pno": pp, "equation": "I2-9a", "Pp": pp}
     if cls == "noncompact":
-        py = Fy * As + 0.7 * fc * concrete                           # I2-9d
+        py = Fy * As + 0.7 * fc_Ac                                   # I2-9d
         pno = pp - (pp - py) / (limits["r"] - limits["p"]) ** 2 * (lam - limits["p"]) ** 2
         return {"Pno": pno, "equation": "I2-9c", "Pp": pp, "Py": py}
-    return {"Pno": Fn * As + 0.7 * fc * concrete, "equation": "I2-9e", "Fn": Fn}
+    return {"Pno": Fn * As + 0.7 * fc_Ac, "equation": "I2-9e", "Fn": Fn}
 
 
 def rect_plastic_moment(*, Fy, fc, Zs, t, bi, hi, r, Fysr=0.0, bars=()) -> dict:

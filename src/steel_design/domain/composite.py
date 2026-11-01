@@ -8,6 +8,7 @@ codes/aisc_360_22/composite.py. Missing data or decisions raise structured error
 import math
 
 from ..codes.aisc_360_22 import appendix_2 as a2
+from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import appendix_8 as a8
 from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_dg06 import filled as dg06
@@ -15,6 +16,7 @@ from ..codes.aisc_dg06 import members as dg06_members
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import SteelCase
 from ..sections.models import Section
+from .fire import steel_at_temperature, with_fire
 
 _LIMITATIONS = (
     "Diafragmas (I7) y conexión ensayada (I8.4) no se comprueban. La transferencia de carga (I6) corresponde al diseño de conexiones y queda fuera.",
@@ -288,6 +290,101 @@ def _compression_basis(case, section) -> dict:
             "requirements": requirements, "c_name": c_name, "point_c": point_c}
 
 
+def _hot_concrete(case, section) -> tuple:
+    """f'c, Ec and lightweight of a member under the simple method, with the material limits of 4.2.3b."""
+    concrete, bars = case.composite.concrete, case.composite.filled
+    if concrete.fc > a4.FC_MAX:
+        _blocked(f"Apéndice 4, 4.2.3b: se aplica a concretos con f'c ≤ {a4.FC_MAX:g} MPa.", section, fc=concrete.fc)
+    if bars and bars.Fysr > a4.FY_MAX:
+        _blocked(f"Apéndice 4, 4.2.3b: se aplica a barras con Fy ≤ {a4.FY_MAX:g} MPa.", section, Fysr=bars.Fysr)
+    return concrete.fc, eq.concrete_modulus(wc=concrete.wc, fc=concrete.fc), concrete.lightweight
+
+
+def _concrete_elements(case, section, geometry):
+    """(A, Ix, Iy, T) of the concrete of a filled column: one element at a uniform temperature, or those of the user, which must add up to it."""
+    fire = case.fire
+    if fire.concrete_temperature is not None:
+        return [(geometry["Ac"], geometry["Icx"], geometry["Icy"], fire.concrete_temperature)]
+    if not fire.concrete_elements:
+        _incomplete("Apéndice 4, 4.2.4d(c): indique la temperatura del concreto.", section, ["fire.concrete_temperature", "fire.concrete_elements"])
+    for attribute, total in (("A", geometry["Ac"]), ("Ix", geometry["Icx"]), ("Iy", geometry["Icy"])):
+        if abs(sum(getattr(e, attribute) for e in fire.concrete_elements) / total - 1) > 0.01:
+            _incomplete(f"Los elementos de concreto deben sumar {total:.6g} en {attribute} (±1 %): el Ac o el Ic del relleno, sin las barras.", section, ["fire.concrete_elements"])
+    return [(e.A, e.Ix, e.Iy, e.T) for e in fire.concrete_elements]
+
+
+def _filled_fire_modes(case, section, hot):
+    """4.2.4d(c): I2-9 and I2-12 at temperature, A-4-11 and I2-4 (errata 2025). The classification stays at ambient temperature (Commentary)."""
+    geometry = _filled_geometry(case, section)
+    fc, Ec, lightweight = _hot_concrete(case, section)
+    c = _axial_class(section, geometry, case.material.Fy)
+    if c["class"] == "slender":
+        _blocked("Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas.", section, ratio=c["lam"])
+    fc_Ac = Ec_Icx = Ec_Icy = 0.0
+    for area, Ix, Iy, T in _concrete_elements(case, section, geometry):
+        factors = a4.concrete_factors(T, lightweight=lightweight)
+        fc_Ac += factors["kc"] * fc * area
+        Ec_Icx += factors["kEc"] * Ec * Ix
+        Ec_Icy += factors["kEc"] * Ec * Iy
+    Es_bars = 0.0
+    if geometry["Asr"]:
+        if case.fire.bar_temperature is None:
+            _incomplete("Apéndice 4, 4.2.4d(c): indique la temperatura de las barras.", section, ["fire.bar_temperature"])
+        # I2-9b: Asr*Es/Ec transforms the bars to the concrete around them, both at the temperature of the bars (decision DA4-5).
+        around = a4.concrete_factors(case.fire.bar_temperature, lightweight=lightweight)
+        Es_bars = a4.steel_factors(case.fire.bar_temperature)["kE"] * eq.E_STEEL
+        fc_Ac += around["kc"] * fc * geometry["Asr"] * Es_bars / (around["kEc"] * Ec)
+    pno = eq.pno_filled_of_concrete(cls=c["class"], shape=geometry["shape"], Fy=hot["Fy_T_mpa"], As=section.area, fc_Ac=fc_Ac, lam=c["lam"], limits=c["limits"])
+    coefficient = eq.c3_filled(As=section.area, Asr=geometry["Asr"], Ag=section.area + geometry["Afill"])
+    modes = {}
+    for axis, Is, Isr, Ec_Ic, K, L in (("x", section.ix, geometry["Isrx"], Ec_Icx, case.factors.Kx, case.lengths.Lx),
+                                       ("y", section.iy, geometry["Isry"], Ec_Icy, case.factors.Ky, case.lengths.Ly)):
+        ei = hot["E_T_mpa"] * Is + Es_bars * Isr + coefficient * Ec_Ic                 # I2-12 at temperature
+        pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
+        out = a4.filled_compression(Pno_T=pno["Pno"], Pe_T=pe)
+        modes[f"FB-{axis}"] = {"limit_state": "flexural_buckling", "provision": "I2.2b; Apéndice 4, 4.2.4d(c)", "applies": True, "equation": out["equation"],
+                               "Pno_T_kN": pno["Pno"] / 1000.0, "Pno_equation": pno["equation"], "C3": coefficient, "EI_eff_T": ei, "Lc_mm": K * L,
+                               "Pe_T_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"], "Pn_kN": out["Pn"] / 1000.0, "available_kN": eq.PHI_C * out["Pn"] / 1000.0}
+    row = {"element": "wall", "ratio": c["lam"], "lambda_p": c["limits"]["p"], "lambda_r": c["limits"]["r"], "class": c["class"]}
+    return modes, {"elements": [row], "slender": False, "reference": "Tabla I1.1a"}, _filled_requirements(case, section, geometry, flexure=False)
+
+
+def _wall_fire_modes(case, section, hot):
+    """4.2.4d(d) on the column of unit width st, conservative (Commentary), whose buckling is across the thickness (DI-19)."""
+    wall = case.composite.wall
+    if _wall_is_slender(case):
+        _blocked("Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas.", section, b_t=wall.b / wall.t)
+    fc, Ec, lightweight = _hot_concrete(case, section)
+    fire, st, t, tsc = case.fire, wall.st, wall.t, wall.tsc
+    half = tsc / 2 - t
+    if fire.concrete_temperature is not None:
+        layers = [(half, fire.concrete_temperature)]
+    elif fire.concrete_layers:
+        layers = [(layer.thickness, layer.T) for layer in fire.concrete_layers]
+    else:
+        _incomplete("Apéndice 4, 4.2.4d(d): indique la temperatura del concreto.", section, ["fire.concrete_temperature", "fire.concrete_layers"])
+    if abs(sum(thickness for thickness, _ in layers) - half) > 1.0:
+        _incomplete("Las capas de concreto deben sumar medio espesor de concreto, de la placa al centro del muro.", section, ["fire.concrete_layers"])
+    half_pno = hot["Fy_T_mpa"] * st * t
+    half_ei = hot["E_T_mpa"] * (st * t**3 / 12 + st * t * (tsc / 2 - t / 2) ** 2)
+    position = half
+    for thickness, T in layers:
+        factors = a4.concrete_factors(T, lightweight=lightweight)
+        area, distance = st * thickness, position - thickness / 2
+        position -= thickness
+        half_pno += 0.85 * factors["kc"] * fc * area                                     # I2-15
+        half_ei += 0.35 * factors["kEc"] * Ec * (st * thickness**3 / 12 + area * distance**2)   # I1-1
+    Lc = case.factors.Ky * case.lengths.Ly
+    pe = eq.elastic_buckling_load(EI_eff=2 * half_ei, Lc=Lc)
+    out = a4.wall_compression(Pno_T=2 * half_pno, Pe_T=pe)
+    pn = out["Pn"] * wall.length / st
+    modes = {"FB": {"limit_state": "flexural_buckling", "provision": "I2.3a; Apéndice 4, 4.2.4d(d)", "applies": True, "equation": out["equation"], "st_mm": st,
+                    "Pno_T_kN": 2 * half_pno / 1000.0, "EI_eff_T": 2 * half_ei, "Lc_mm": Lc, "Pe_T_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"],
+                    "Pn_T_kN": out["Pn"] / 1000.0, "Pn_kN": pn / 1000.0, "phi_Pn_T_wall_kN": eq.PHI_C_WALL * pn / 1000.0,
+                    "available_kN": eq.PHI_C_WALL * pn / 1000.0}}
+    return modes, None, _wall_requirements(case, section, _wall_geometry(case), compression=True)
+
+
 def composite_compression(case: SteelCase, section: Section, bare_steel=None) -> dict:
     """I2.1b, I2.2b and I2.3a: flexural buckling about both axes; not less than the bare steel of Chapter E."""
     _check_family(case, section)
@@ -297,24 +394,28 @@ def composite_compression(case: SteelCase, section: Section, bare_steel=None) ->
     Ec = eq.concrete_modulus(wc=case.composite.concrete.wc, fc=case.composite.concrete.fc)
     f, ln = case.factors, case.lengths
     phi = eq.PHI_C_WALL if kind == "wall" else eq.PHI_C
-    basis = _compression_basis(case, section)
-    geometry, pno, coefficient, Isrx, Isry = basis["geometry"], basis["pno"], basis["coefficient"], basis["Isrx"], basis["Isry"]
-    classification, requirements, c_name, point_c = basis["classification"], basis["requirements"], basis["c_name"], basis["point_c"]
-    modes = {}
-    for axis, Is, Isr, Ic, K, L in (("x", section.ix, Isrx, geometry["Icx"], f.Kx, ln.Lx),
-                                    ("y", section.iy, Isry, geometry["Icy"], f.Ky, ln.Ly)):
-        ei = (eq.wall_stiffness(Is=Is, Ec=Ec, Ic=Ic) if kind == "wall"
-              else eq.effective_stiffness(Is=Is, Isr=Isr, C=coefficient, Ec=Ec, Ic=Ic))
-        pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
-        out = eq.nominal_compression(Pno=pno["Pno"], Pe=pe)
-        provision = {"wall": "I2.3a", "filled": "I2.2b", "encased": "I2.1b"}[kind]
-        if pno["equation"] == "A-2-1":
-            provision = "Apéndice 2, 2.1.2"
-        modes[f"FB-{axis}"] = {"limit_state": "flexural_buckling", "provision": provision,
-                               "applies": True, "equation": out["equation"], "Pno_kN": pno["Pno"] / 1000.0,
-                               "Pno_equation": pno["equation"], c_name: coefficient, "Ec_mpa": Ec, "PC_kN": point_c / 1000.0,
-                               "EI_eff": ei, "Lc_mm": K * L, "Pe_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"],
-                               "Pn_kN": out["Pn"] / 1000.0, "available_kN": phi * out["Pn"] / 1000.0}
+    hot = steel_at_temperature(case)
+    if hot:
+        modes, classification, requirements = (_filled_fire_modes if kind == "filled" else _wall_fire_modes)(case, section, hot)
+    else:
+        basis = _compression_basis(case, section)
+        geometry, pno, coefficient, Isrx, Isry = basis["geometry"], basis["pno"], basis["coefficient"], basis["Isrx"], basis["Isry"]
+        classification, requirements, c_name, point_c = basis["classification"], basis["requirements"], basis["c_name"], basis["point_c"]
+        modes = {}
+        for axis, Is, Isr, Ic, K, L in (("x", section.ix, Isrx, geometry["Icx"], f.Kx, ln.Lx),
+                                        ("y", section.iy, Isry, geometry["Icy"], f.Ky, ln.Ly)):
+            ei = (eq.wall_stiffness(Is=Is, Ec=Ec, Ic=Ic) if kind == "wall"
+                  else eq.effective_stiffness(Is=Is, Isr=Isr, C=coefficient, Ec=Ec, Ic=Ic))
+            pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
+            out = eq.nominal_compression(Pno=pno["Pno"], Pe=pe)
+            provision = {"wall": "I2.3a", "filled": "I2.2b", "encased": "I2.1b"}[kind]
+            if pno["equation"] == "A-2-1":
+                provision = "Apéndice 2, 2.1.2"
+            modes[f"FB-{axis}"] = {"limit_state": "flexural_buckling", "provision": provision,
+                                   "applies": True, "equation": out["equation"], "Pno_kN": pno["Pno"] / 1000.0,
+                                   "Pno_equation": pno["equation"], c_name: coefficient, "Ec_mpa": Ec, "PC_kN": point_c / 1000.0,
+                                   "EI_eff": ei, "Lc_mm": K * L, "Pe_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"],
+                                   "Pn_kN": out["Pn"] / 1000.0, "available_kN": phi * out["Pn"] / 1000.0}
     governing = min(modes, key=lambda k: modes[k]["Pn_kN"])
     available, notes = modes[governing]["available_kN"], []
     if bare_steel is not None and kind != "wall":
@@ -328,9 +429,10 @@ def composite_compression(case: SteelCase, section: Section, bare_steel=None) ->
                 notes.append(f"Gobierna el acero solo: I2 permite no tomar menos que el Capítulo E ({bare['governing_mode']}).")
     modes["LB"] = {"limit_state": "local_buckling", "provision": "I1.4" if kind == "filled" else "I1.2", "applies": True,
                    "equation": "Tabla I1.1a" if kind == "filled" else "No requerido en embebidos ni en muros (I1.2)"}
-    return _result(case, section, modes=modes, governing=governing, provisions=["I1", modes[governing]["provision"]],
-                   classification=classification, requirements=requirements, notes=notes,
-                   Pn_kN=modes[governing]["Pn_kN"], phi_c=phi, available_kN=available)
+    return with_fire(_result(case, section, modes=modes, governing=governing, provisions=["I1", modes[governing]["provision"].split(";")[0]],
+                             classification=classification, requirements=requirements, notes=notes,
+                             Pn_kN=modes[governing]["Pn_kN"], phi_c=phi, available_kN=available),
+                     hot, "4.2.4d(c)" if kind == "filled" else "4.2.4d(d)")
 
 
 def composite_tension(case: SteelCase, section: Section) -> dict:
@@ -625,11 +727,20 @@ def _beam_flexure(case, section):
             **anchors, "Mn_kNm": out["Mn"] / 1e6}
     requirements = _beam_requirements(beam, section, concrete)
     notes = []
+    hot = steel_at_temperature(case)
+    if hot:
+        kcb = a4.composite_beam_factor(hot["T_C"])
+        if kcb == 0.0:
+            _blocked("Tabla A-4.2.4: la resistencia de la viga compuesta se anula a 1100 °C del ala inferior.", section, T_C=hot["T_C"])
+        at_temperature = a4.composite_beam_strength(Mn=out["Mn"], kcb=kcb)
+        mode.update(provision="I3.2a(a); Apéndice 4, 4.2.4d(f)", equation=at_temperature["equation"], Mn_ambient_kNm=out["Mn"] / 1e6, kcb=kcb,
+                    Mn_kNm=at_temperature["Mn"] / 1e6)
     # Commentary I3.2d: conditions under which slip capacity is not a concern.
     if not (beam.span <= 9100.0 or degree >= 0.5 or sum_qn / (beam.span / 2) >= 230.0):
         notes.append("I3.2d: revise la ductilidad de la conexión; no se cumple ninguna condición del Commentary "
                      "(luz ≤ 9.1 m, acción compuesta ≥ 50 %, o conectores ≥ 230 kN/m).")
-    return _flexure_output(case, section, mn_mode=mode, requirements=requirements, notes=notes, provisions=["I1", "I3.2", "I8.2"])
+    return with_fire(_flexure_output(case, section, mn_mode=mode, requirements=requirements, notes=notes, provisions=["I1", "I3.2", "I8.2"]),
+                     hot, "4.2.4d(f)")
 
 
 def _wall_moment(case, P_N):

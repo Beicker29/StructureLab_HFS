@@ -296,20 +296,21 @@ FIRE_F = [1450, 927, 694, 533, 406, 305, 229, 173, 134, 108, 92, 83, 79]
 def fire_wall(temperatures=True, **over):
     """Design Guide 38, Example 6.1: L = 11 ft, tsc = 24, t = 9/16 in, st = 12 in, story 17 ft, Pu = 3600 kips, Table 6-1."""
     data = wall(132, 24, 0.5625, Pu=3600 * KIP, Lc=17)
-    fire = {"required_rating_hours": 3.0}
+    data["fire"] = {"steel_temperature": (1840 - 32) / 1.8}
     if temperatures:
-        fire.update(plate_temperature=(1840 - 32) / 1.8, element_thicknesses=[0.88 * IN] * 13,
-                    element_temperatures=[(f - 32) / 1.8 for f in FIRE_F])
-    data["composite"]["fire"] = {**fire, **over}
+        data["fire"]["concrete_layers"] = [{"thickness": 0.88 * IN, "T": (f - 32) / 1.8} for f in FIRE_F]
+    data["composite"]["fire"] = {"required_rating_hours": 3.0, **over}
     data["condition"] = "fire"
     return data
 
 
 def test_fire_rating_and_strength_of_example_61(guides_engine):
-    mode = guides_engine.run(SteelCase(tau_b=1.0, **fire_wall())).check("fire").result["modes"]["FIRE"]
+    result = guides_engine.run(SteelCase(tau_b=1.0, **fire_wall()))
+    mode = result.check("fire").result["modes"]["FIRE"]
     assert mode["Pu_unit_kN"] / KIP == pytest.approx(327, rel=TOL)
     assert mode["Pn_kN"] / KIP == pytest.approx(1970, rel=TOL)
     assert mode["R_hours"] == pytest.approx(8.0)                          # 10.1 hours, limited to 8 by Equation 6-5
+    mode = result.check("axial").result["modes"]["FB"]                    # Equation 6-1 of the guide is A-4-12
     assert mode["Pno_T_kN"] / KIP == pytest.approx(1220, rel=TOL)
     assert mode["Pe_T_kN"] / KIP == pytest.approx(2680, rel=0.05)         # Ec is 5% stiffer in SI
     assert mode["Pn_T_kN"] / KIP == pytest.approx(496, rel=TOL)
@@ -327,10 +328,11 @@ def test_vent_holes_of_example_61(guides_engine):
     assert all(r["satisfied"] for r in check.result["requirements"])
 
 
-def test_fire_rating_outside_its_limits_needs_the_temperatures(guides_engine):
-    data = fire_wall(temperatures=False)
+def test_fire_rating_outside_its_limits_is_incomplete_and_the_strength_is_still_calculated(guides_engine):
+    data = fire_wall()
     data["Pu"] = 8000 * KIP
-    assert guides_engine.run(SteelCase(tau_b=1.0, **data)).check("fire").status.value == "INCOMPLETE"
+    result = guides_engine.run(SteelCase(tau_b=1.0, **data))
+    assert result.check("fire").status.value == "INCOMPLETE" and result.check("axial").result is not None
 
 
 def stiffness_of(result, group, symbol):
@@ -439,13 +441,14 @@ def _guide_case(spec):
         return SteelCase(tau_b=1.0, **data, Vux=1.0), "shear_x", {"available_kN": "phiVn_kN"}
     if kind == "wall_fire_oracle":
         data = dict(section_name="MURO", material={"Fy": spec["fy"]}, Pu=spec["Pu"], lengths=_length(spec["height"]), condition="fire",
+                    fire={"steel_temperature": spec["plate_T"],
+                          "concrete_layers": [{"thickness": h, "T": T} for h, T in zip(spec["thicknesses"], spec["temperatures"])]},
                     composite={"kind": "wall", "concrete": _concrete(spec),
                                "wall": {"length": spec["wall_length"], "tsc": spec["tsc"], "t": spec["t"], "tf": spec["t"], "b": 200,
                                         "st": spec["st"], "dtie": 25},
-                               "fire": {"required_rating_hours": spec["required"], "plate_temperature": spec["plate_T"],
-                                        "element_thicknesses": spec["thicknesses"], "element_temperatures": spec["temperatures"]}})
-        keys = ("R_hours", "Pn_kN", "Pno_T_kN", "Pn_T_kN", "phi_Pn_T_wall_kN")
-        return SteelCase(tau_b=1.0, **data), "fire", {"ratio": "ratio", **{f"modes.FIRE.{k}": k for k in keys}}
+                               "fire": {"required_rating_hours": spec["required"]}})
+        keys = ("Pno_T_kN", "Pn_T_kN", "phi_Pn_T_wall_kN")
+        return SteelCase(tau_b=1.0, **data), "axial", {f"modes.FB.{k}": k for k in keys}
 
 
 GUIDE_CASE_IDS = sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] in GUIDE_KINDS and not v["spec"]["kind"].startswith("diagram_") and v["spec"]["kind"] != "appendix_2_biaxial")
@@ -463,6 +466,14 @@ def test_guide_contents_match_independent_calculation(guides_engine, case_id):
             continue
         value = (stiffness_of(result, *field.split(".")[1:]) if field.startswith("stiffness.") else path_of(check.result, field))
         assert value == pytest.approx(float(ref[key]), rel=1e-9), (case_id, field)
+
+
+def test_fire_wall_reviews_of_the_guide_and_ratio_match_independent_calculation(guides_engine):
+    ref = REFERENCE["fire-wall"]
+    result = guides_engine.run(_guide_case(ref["spec"])[0])
+    mode = result.check("fire").result["modes"]["FIRE"]
+    assert mode["R_hours"] == pytest.approx(float(ref["R_hours"]), rel=1e-9) and mode["Pn_kN"] == pytest.approx(float(ref["Pn_kN"]), rel=1e-9)
+    assert result.check("axial").ratio == pytest.approx(float(ref["ratio"]), rel=1e-9)     # Pu/φPn(T) governs the oracle's max(...)
 
 
 def test_uncoupled_wall_of_example_21_meets_every_limit(guides_engine):

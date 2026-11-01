@@ -31,6 +31,7 @@
   },
   "cases": [
     {"name": "Flexure and shear", "Mux": 900, "Vux": 300},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 460, "Vux": 150}
+    {"name": "Concrete pour", "condition": "construction", "Mux": 460, "Vux": 150},
+    {"name": "Incendio, ala inferior a 650 °C", "condition": "fire", "fire": {"steel_temperature": 650}, "Mux": 400, "Vux": 130}
   ]
 }

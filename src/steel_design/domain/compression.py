@@ -9,11 +9,13 @@ not available here raise structured errors instead of returning a strength.
 import math
 from typing import Callable
 
+from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import compression as eq
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from .fire import steel_at_temperature, with_fire
 
 
 SUPPORTED_FAMILIES = ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE",
@@ -376,6 +378,9 @@ def compression_strength(case: SteelCase, section: Section,
 
     classification = classify_elements(section, E, Fy, in_contact=in_contact)
     slender = classification["slender"]
+    hot = steel_at_temperature(case)
+    if hot and slender:
+        _blocked("Apéndice 4, 4.2.4d(b): el método simple solo se aplica a miembros sin elementos esbeltos.", section)
     built_up = None
     if family == "SINGLE_ANGLE":
         elastic, notes = _single_angle_modes(case, section)
@@ -386,7 +391,11 @@ def compression_strength(case: SteelCase, section: Section,
 
     modes = {}
     for name, mode in elastic.items():
-        stress = eq.nominal_stress(Fy, mode["Fe_mpa"])
+        if hot:
+            # Every Fe of E3 and E4 is proportional to E and G, and both carry kE (Table A-4.2.1): Fe(T) = kE*Fe (decision DA4-2).
+            mode = {**mode, "Fe_ambient_mpa": mode["Fe_mpa"], "Fe_mpa": hot["kE"] * mode["Fe_mpa"],
+                    "provision": f"{mode['provision']}; Apéndice 4, 4.2.4d(b)"}
+        stress = a4.compression_stress(Fy_T=hot["Fy_T_mpa"], Fe_T=mode["Fe_mpa"]) if hot else eq.nominal_stress(Fy, mode["Fe_mpa"])
         reduced = slender and "e7_exempt" not in mode
         if reduced:
             area = _effective_area(section, classification, stress["Fn_mpa"], E, Fy)
@@ -410,7 +419,7 @@ def compression_strength(case: SteelCase, section: Section,
         pending.append("Los anchos de pared b, h provienen del catálogo (dimensión exterior − 3·tdes, B4.1b(d) cuando no se conoce el radio interior).")
     if slender and family == "CIRCULAR_HSS" and modes[governing]["effective_area"]["bounded_to_Ag"]:
         pending.append("E7-7: Ae limitada a Ag (criterio ingenieril D-2, docs/chapter-e.md).")
-    return {
+    return with_fire({
         "chapter": "E", "code": "ANSI/AISC 360-22",
         "section": section.name, "family": family,
         "inputs": {"Fy_mpa": Fy, "E_mpa": E, "G_mpa": eq.G_STEEL, "Ag_mm2": section.area,
@@ -429,4 +438,4 @@ def compression_strength(case: SteelCase, section: Section,
         "requirements": built_up["requirements"] if built_up else [],
         "notes": notes,
         "limitations": list(_GENERAL_LIMITATIONS) + pending,
-    }
+    }, hot, "4.2.4d(b)")

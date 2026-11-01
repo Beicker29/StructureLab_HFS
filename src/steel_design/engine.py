@@ -14,6 +14,7 @@ from .domain.speedcore import (c_wall_compression, c_wall_flexure, c_wall_intera
 from .domain.compression import compression_strength
 from .domain.coverage import (composite_obligations, discharge, flexure_obligations, interaction_obligations,
                               required_obligations, shear_obligations)
+from .domain.fire import fire_summary, is_elevated, uncovered_demands
 from .domain.flexure import flexure_strength
 from .domain.interaction_diagram import interaction_diagrams
 from .domain.interaction import COMBINED, amplified_cb_case, combined_strength, tension_cb_factor
@@ -82,6 +83,8 @@ class SteelDesignEngine:
         """H1.2: Cb amplified by axial tension when the user asks for it."""
         if not (case.Pu < 0 and case.flexure and case.flexure.tension_cb_amplification):
             return case, None
+        if is_elevated(case):                # Decision DA4-6: Appendix 4 does not define Pey(T); without amplification it is conservative
+            return case, {"applies": False, "reason": "en incendio no se amplifica Cb (decisión DA4-6)."}
         try:
             factor = tension_cb_factor(case, section)
         except IncompleteSectionDataError as exc:
@@ -101,7 +104,7 @@ class SteelDesignEngine:
                                 serviceability=deflection_checks(case.serviceability),
                                 section_data=section.model_dump(mode="json", exclude_none=True))
         if case.condition == "fire":
-            return self._result(case, section, [self._fire_check(case, section)], inconsistent)
+            return self._result(case, section, self._fire_checks(case, section, inconsistent), inconsistent)
         if case.composite and case.composite.second_order:
             try:
                 case, info = second_order_demands(case, section)
@@ -215,9 +218,22 @@ class SteelDesignEngine:
                                       section, []))
         return checks
 
-    def _fire_check(self, case: SteelCase, section: Section) -> Check:
-        obligations = [Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Muro bajo incendio.")]
-        return self._check("fire", "I", 0.0, "–", obligations, lambda: wall_fire(case, section), section, [])
+    def _fire_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
+        """Appendix 4, 4.2.4d. Each chapter applies the temperature; the demands of a composite member without a rule there stay INCOMPLETE."""
+        if case.composite is None:
+            return self._steel_checks(case, section, inconsistent)
+        uncovered = uncovered_demands(case)
+        checks = self._composite_checks(case.model_copy(update=dict.fromkeys(uncovered, 0.0)), section, inconsistent)
+        for name in uncovered:
+            check_id, unit, demand = _FIRE_CHECKS[name]
+            error = {"code": "FIRE_NOT_COVERED", "provision": "Apéndice 4, 4.2.4d",
+                     "message": f"4.2.4d no da una regla para {name} en composite.kind = {case.composite.kind} a más de 200 °C."}
+            checks.append(Check(id=check_id, chapter="I", demand=abs(getattr(case, name)), unit=unit, status=Status.INCOMPLETE,
+                                obligations=composite_obligations(case, demand), errors=[error]))
+        if case.composite.fire is not None:
+            obligations = [Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Revisiones opcionales del muro bajo incendio.")]
+            checks.append(self._check("fire", "I", 0.0, "–", obligations, lambda: wall_fire(case, section), section, []))
+        return checks
 
     def _guide_member_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
         """C-shaped walls and coupling beams, by the plastic distribution that Design Guide 38 writes out."""
@@ -263,8 +279,13 @@ class SteelDesignEngine:
                      else member_stiffness(case, section, catalog=self._catalog))
         return DesignResult(section=section.name, family=section.type, status=status, condition=case.condition, checks=checks, stiffness=stiffness,
                             requirements=requirements, serviceability=deflection_checks(case.serviceability),
-                            interaction_diagrams=interaction_diagrams(case, section, checks),
+                            interaction_diagrams=interaction_diagrams(case, section, checks) if case.condition != "fire" else [],
+                            fire=fire_summary(case),
                             section_data=section.model_dump(mode="json", exclude_none=True))
+
+
+_FIRE_CHECKS = {"Pu": ("axial", "kN", "axial"), "Mux": ("flexure_x", "kN·m", "flexure"), "Muy": ("flexure_y", "kN·m", "flexure"), "Mw": ("flexure_w", "kN·m", "flexure"),
+                "Mz": ("flexure_z", "kN·m", "flexure"), "Vux": ("shear_x", "kN", "shear"), "Vuy": ("shear_y", "kN", "shear")}
 
 
 def _cb_note(factor: dict) -> str:

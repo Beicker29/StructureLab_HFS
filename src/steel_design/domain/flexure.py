@@ -10,11 +10,13 @@ codes/aisc_360_22/flexure.py. Missing data or decisions raise structured errors.
 import math
 from typing import Callable
 
+from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import flexure as eq
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import FlexureBasis, SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section
+from .fire import steel_at_temperature, with_fire
 
 LIMIT_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
                 "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada (F13.1)",
@@ -84,7 +86,7 @@ def _i_major(case, section, basis, E, Fy):
     ratio_field = "b_t_ratio" if channel else "bf_2tf_ratio"   # B4.1b: full flange (channel), bf/2 (I)
     _require(section, ratio_field, "h_tw_ratio", "sx", "zx", "ry", "iy", "j", "ho")
     flange, web = getattr(section, ratio_field), section.h_tw_ratio
-    lf, lw = eq.limits(10, E, Fy), eq.limits(15, E, Fy)
+    lf, lw = eq.limits(10, case.material.E, case.material.Fy), eq.limits(15, case.material.E, case.material.Fy)
     rows = [_row("flange", 10, flange, lf), _row("web", 15, web, lw)]
     if rows[1]["class"] != "compacto":
         _blocked("Alma no compacta o esbelta: requiere F4/F5, no implementadas en esta etapa.", section, h_tw=web)
@@ -106,6 +108,12 @@ def _i_major(case, section, basis, E, Fy):
     ltb = eq.f2_ltb(E=E, Fy=Fy, Sx=section.sx, Zx=section.zx, ry=section.ry, Iy=section.iy, Cw=section.cw,
                     J=section.j, ho=section.ho, Lb=_lb(case, section, "x"), Cb=basis.Cb, channel=channel)
     modes["LTB"] = _ltb_mode(ltb, "F2.2")
+    hot = steel_at_temperature(case)
+    if hot and not channel and flange_class == "compacto":
+        modes["Y"] = _evaluated("Y", "F2.1", a4.plastic_moment(Fy_T=Fy, Zx=section.zx))
+        modes["LTB"] = _evaluated("LTB", "F2.2", a4.ltb(
+            E_T=E, Fy=case.material.Fy, kp=hot["kp"], ky=hot["ky"], T=hot["T_C"], Sx=section.sx, Zx=section.zx, J=section.j, c=1.0, ho=section.ho,
+            rts=eq.f2_rts(Iy=section.iy, Cw=section.cw, Sx=section.sx), Lb=_lb(case, section, "x"), Cb=basis.Cb))
     modes["TFR"] = _tension_flange(case, section, basis, Fy)
     return provision, rows, modes
 
@@ -122,7 +130,8 @@ def _tension_flange(case, section, basis, Fy):
     afg = section.bf * section.tf
     if basis.Afn > afg:
         _blocked("Afn no puede superar el área bruta del ala Afg = bf·tf.", section, Afn=basis.Afn, Afg=afg)
-    out = eq.f13_tension_flange(Fy=Fy, Fu=case.material.Fu, Afg=afg, Afn=basis.Afn, Sx=section.sx)
+    hot = steel_at_temperature(case)
+    out = eq.f13_tension_flange(Fy=Fy, Fu=hot["Fu_T_mpa"] if hot else case.material.Fu, Afg=afg, Afn=basis.Afn, Sx=section.sx)
     if not out["applies"]:
         return _not_applicable("TFR", "F13.1", out["reason"], **{k: v for k, v in out.items() if k not in {"applies", "reason"}})
     return _evaluated("TFR", "F13.1", {k: v for k, v in out.items() if k != "applies"})
@@ -133,7 +142,7 @@ def _i_minor(case, section, basis, E, Fy):
     ratio_field = "b_t_ratio" if channel else "bf_2tf_ratio"   # F6: full flange (channel), bf/2 (I)
     _require(section, ratio_field, "sy", "zy")
     ratio = getattr(section, ratio_field)
-    lim = eq.limits(13, E, Fy)
+    lim = eq.limits(13, case.material.E, case.material.Fy)
     rows = [_row("flange", 13, ratio, lim)]
     modes = {"Y": _evaluated("Y", "F6.1", eq.f6_plastic(Fy=Fy, Zy=section.zy, Sy=section.sy))}
     if rows[0]["class"] == "compacto":
@@ -151,7 +160,7 @@ def _rect_hss(case, section, basis, E, Fy, axis):
         flange, web, S, Z, inertia, depth, width = "h_tdes_ratio", "b_tdes_ratio", "sy", "zy", "iy", "b_out", "h"
     _require(section, S, Z, inertia, width)
     S, Z, inertia, depth = getattr(section, S), getattr(section, Z), getattr(section, inertia), getattr(section, depth)
-    lf, lw = eq.limits(17, E, Fy), eq.limits(19, E, Fy)
+    lf, lw = eq.limits(17, case.material.E, case.material.Fy), eq.limits(19, case.material.E, case.material.Fy)
     bf_t, hw_t = getattr(section, flange), getattr(section, web)
     rows = [_row("flange", 17, bf_t, lf), _row("web", 19, hw_t, lw)]
     modes = {"Y": _evaluated("Y", "F7.1", eq.f7_plastic(Fy=Fy, Z=Z))}
@@ -188,9 +197,9 @@ def _round_hss(case, section, basis, E, Fy, axis):
     S = section.sx if axis == "x" else section.sy
     Z = section.zx if axis == "x" else section.zy
     dt = section.d_t_ratio
-    if dt >= 0.45 * E / Fy:
+    if dt >= 0.45 * case.material.E / case.material.Fy:
         _blocked("F8 se aplica solo con D/t < 0.45E/Fy.", section, D_t=dt)
-    lim = eq.limits(20, E, Fy)
+    lim = eq.limits(20, case.material.E, case.material.Fy)
     rows = [_row("wall", 20, dt, lim)]
     modes = {"Y": _evaluated("Y", "F8.1", eq.f8_plastic(Fy=Fy, Z=Z))}
     if rows[0]["class"] == "compacto":
@@ -256,7 +265,7 @@ def _double_angle(case, section, basis, E, Fy, axis, catalog):
     web = short_leg if label["configuration"] == "SLBB" else long_leg       # legs in the plane of symmetry
     flange = short_leg if web == long_leg and long_leg != short_leg else long_leg
     t, j = section.t, 2 * component.j                                        # J of both angles
-    lim = eq.limits(12, E, Fy)
+    lim = eq.limits(12, case.material.E, case.material.Fy)
     s_flange = section.ix / section.y                                        # to the back of the flange legs
     modes = {"Y": _evaluated("Y", "F9.1", eq.f9_plastic(Fy=Fy, Zx=section.zx, Sx=section.sx, web_legs=web_legs))}
     ltb = eq.f9_ltb(E=E, Fy=Fy, Zx=section.zx, Sx=section.sx, ry=section.ry, Iy=section.iy, J=j, d=web,
@@ -278,7 +287,7 @@ def _single_angle(case, section, basis, E, Fy, axis):
     _require(section, "d", "b", "t", "area")
     long_leg, short_leg, t = max(section.d, section.b), min(section.d, section.b), section.t
     equal = long_leg == short_leg
-    lim = eq.limits(12, E, Fy)
+    lim = eq.limits(12, case.material.E, case.material.Fy)
     restraint = basis.lateral_torsional_restraint
     rows = [_row("long_leg", 12, long_leg / t, lim), _row("short_leg", 12, short_leg / t, lim)]
     if axis in {"x", "y"}:
@@ -367,6 +376,9 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
     basis = case.flexure or FlexureBasis()
     if abs(E - eq.E_STEEL) > 1e-6:
         _incomplete("El Capítulo F usa E = 200000 MPa.", section, ["material.E"])
+    hot = steel_at_temperature(case)
+    if hot:                                  # The classification stays at ambient temperature (Commentary 4.2.4d): limits use case.material
+        E, Fy = hot["E_T_mpa"], hot["Fy_T_mpa"]
     if axis in {"w", "z"} and family != "SINGLE_ANGLE":
         _blocked("Mw y Mz (ejes principales) solo se usan en ángulos simples; use Mux/Muy.", section)
     if family == "SINGLE_ANGLE":
@@ -383,16 +395,22 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
         provision, rows, modes = _solid(case, section, basis, E, Fy, axis)
     else:
         _blocked("El Capítulo F no está implementado para esta familia.", section)
+    if hot:
+        if any(row["class"] == "esbelto" for row in rows):
+            _blocked("Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas.", section)
+        modes = {k: {**m, "provision": f"{m['provision']}; Apéndice 4, 4.2.4d(e)"} for k, m in modes.items()}
 
     evaluated = {k: m for k, m in modes.items() if m["applies"]}
     governing = min(evaluated, key=lambda k: evaluated[k]["Mn"])
     gov = evaluated[governing]
     notes = [f"Cb = {basis.Cb:g}" + (" (dato del usuario)." if case.flexure and "Cb" in case.flexure.model_fields_set
                                       else " (valor por defecto, límite inferior de F1-1).")]
-    return {
+    if hot and governing not in {"Y", "TFR"} and not gov["equation"].startswith("A-4"):
+        notes.append("Apéndice 4, 4.2.4d(e): Capítulo F con E(T) y Fy(T). El Commentary advierte que esas ecuaciones pueden sobrestimar los modos de inestabilidad (decisión DA4-3).")
+    return with_fire({
         "chapter": "F", "code": "ANSI/AISC 360-22", "axis": axis,
         "section": section.name, "family": family,
-        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lb_mm": unbraced_length(case, axis), "Cb": basis.Cb,
+        "inputs": {"Fy_mpa": case.material.Fy, "E_mpa": case.material.E, "Lb_mm": unbraced_length(case, axis), "Cb": basis.Cb,
                    "tension_flange_holes": basis.tension_flange_holes, "Afn_mm2": basis.Afn,
                    "lateral_torsional_restraint": basis.lateral_torsional_restraint,
                    "angle_flexure": case.angle_flexure.model_dump() if case.angle_flexure else None},
@@ -407,4 +425,4 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
         "requirements": [],
         "notes": notes,
         "limitations": list(_LIMITATIONS),
-    }
+    }, hot, "4.2.4d(e)")

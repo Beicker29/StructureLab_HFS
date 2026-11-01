@@ -36,6 +36,7 @@
       "name": "Combinación 4 — flexión y",
       "Muy": 15
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 100, "Vux": 130}
+    {"name": "Construcción — montaje", "condition": "construction", "Mux": 100, "Vux": 130},
+    {"name": "Incendio a 500 °C", "condition": "fire", "fire": {"steel_temperature": 500}, "Pu": 100, "Mux": 50, "Vux": 50}
   ]
 }
