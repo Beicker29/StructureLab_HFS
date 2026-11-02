@@ -418,7 +418,7 @@ if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_a4/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
     cases = {cid: {"spec": spec, **FUNCTIONS[spec["kind"]](**{k: v for k, v in spec.items() if k != "kind"})} for cid, spec in CASES.items()}
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) Appendix 4, 4.2.3b and 4.2.4d; errata 2025; catalog data/sections.xlsx",
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) Appendix 4, 4.2.3b and 4.2.4d; errata 2025; catalog src/steel_design/data/sections.xlsx",
                "generator": "tests/oracles/chapter_a4.py (Decimal; independent of steel_design)", "cases": _plain(cases)}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
     print(target)

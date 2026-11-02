@@ -1,6 +1,6 @@
 """Independent Chapter I hand calculations (ANSI/AISC 360-22, a360-22w.pdf pp.16.1-89..120), LRFD.
 
-Decimal arithmetic (50 digits); reads data/sections.xlsx through the Chapter F oracle; never imports steel_design.
+Decimal arithmetic (50 digits); reads src/steel_design/data/sections.xlsx through the Chapter F oracle; never imports steel_design.
 Plastic moments are obtained from the sum of forces and moments of each stress block about the top of the section,
 with the neutral axis found by bisection of the axial balance; they do not reuse the Z-based forms of the product,
 except for the catalog Z of the steel shape, which is data.
@@ -1121,7 +1121,7 @@ if __name__ == "__main__":
     target.parent.mkdir(parents=True, exist_ok=True)
     cases = {cid: {"spec": spec, **run_case(spec)} for cid, spec in CASES.items()}
     payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) I1-I5, I8.2, I8.3, Commentary Fig. C-I3.8 and I5; "
-                         "catalog data/sections.xlsx",
+                         "catalog src/steel_design/data/sections.xlsx",
                "generator": "tests/oracles/chapter_i.py (Decimal; independent of steel_design)",
                "cases": _plain(cases)}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")

@@ -6,13 +6,10 @@ import sys
 
 import pytest
 
-from steel_design.engine import SteelDesignEngine
-from steel_design.execution import execute_payload, member_groups
+from steel_design.execution import execute_payload, load_engine, member_groups
 from steel_design.models import SteelCase
 from steel_design import reporting
 from steel_design.reporting import _fmt, calculation_report, pdf_bytes, render_text, report_blocks
-from steel_design.sections.loader import load_sections_from_excel
-from steel_design.sections.repository import SectionRepository
 
 from conftest import CATALOG, ROOT, steel_case
 
@@ -91,9 +88,7 @@ CHAPTERS = ("## 1. Propiedades mecánicas de los materiales", "### 1.1 Acero est
 
 
 def example_documents():
-    repository = SectionRepository()
-    repository.load(load_sections_from_excel(str(CATALOG)))
-    engine = SteelDesignEngine(repository)
+    engine = load_engine()
     for path in sorted((ROOT / "examples").glob("*.json")):
         for group in member_groups(execute_payload(json.loads(path.read_text(encoding="utf-8")), engine)):
             yield path.name, group

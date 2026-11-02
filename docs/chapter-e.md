@@ -9,7 +9,7 @@ ni la tabla B4.1a. Unidades internas: N, mm, MPa; resultados en kN.
 Selección organizada según la Tabla de Nota E1.1 y contrastada con el texto
 obligatorio de E3–E7.
 
-| Familia (`data/sections.xlsx`) | Elementos B4.1a | Modos globales | Con elementos esbeltos | Estado |
+| Familia (`src/steel_design/data/sections.xlsx`) | Elementos B4.1a | Modos globales | Con elementos esbeltos | Estado |
 | --- | --- | --- | --- | --- |
 | W / IPE / HEA / HEB (`W`) | ala caso 1 (bf/2tf), alma caso 5 (h/tw) | E3 (x, y); E4(a) TB (E4-2); E4(d)/(e) con `ya` o `xa` | E7 con Fn de cada modo | Verificado |
 | Canal (`C`) | ala caso 1 (bf completo), alma caso 5 | E3 (x, y); E4(b) FTB (E4-3 con Fex, Nota de E4) | E7 con Fn de cada modo | Verificado |

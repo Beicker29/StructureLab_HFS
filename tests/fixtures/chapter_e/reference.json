@@ -1,5 +1,5 @@
 {
- "source": "ANSI/AISC 360-22 (a360-22w.pdf) E1-E7, B4.1a; catalog data/sections.xlsx",
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) E1-E7, B4.1a; catalog src/steel_design/data/sections.xlsx",
  "generator": "tests/oracles/chapter_e.py (Decimal, 50 digits; independent of steel_design)",
  "cases": {
   "RHSS-nonslender": {

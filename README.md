@@ -5,7 +5,7 @@ solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante)
 (interacción de fuerza axial y flexión) e I (miembros compuestos: PTE rellenos, W embebidos, vigas,
 muros de placas y anclajes de componentes), con los Apéndices 2, 4 (incendio, método simple) y 8.1
 (`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026, copias locales en `references/` que no se versionan). Perfiles del catálogo
-`data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
+`src/steel_design/data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
 
 El resultado es estructurado y en memoria: familia, clasificación B4.1a,
@@ -100,14 +100,10 @@ imprime en pantalla y no se escribe nada.
 Desde Python:
 
 ```python
-from steel_design.engine import SteelDesignEngine
+from steel_design.execution import load_engine
 from steel_design.models import SteelCase
-from steel_design.sections.loader import load_sections_from_excel
-from steel_design.sections.repository import SectionRepository
 
-repo = SectionRepository()
-repo.load(load_sections_from_excel("data/sections.xlsx"))
-result = SteelDesignEngine(repo).run(SteelCase(
+result = load_engine().run(SteelCase(
     section_name="C15X50", material={"Fy": 345}, Pu=300,
     lengths={"Lx": 4000, "Ly": 1000, "Lz": 4000}))
 print(result.status, result.capacity_kN, result.compression["governing_mode"])  # PASS 2254.31 FTB
@@ -125,7 +121,7 @@ símbolos escritos en letras.
 | Campo | Descripción |
 | --- | --- |
 | `section_name` | Nombre del catálogo, o nombre libre con `custom_section` |
-| `material` | Nombre de un acero de `data/Materiales.xlsx`, por ejemplo `"ASTM A36"`, de donde salen Fy y Fu; un JSON no admite Fy ni Fu numéricos ni un nombre fuera del catálogo. Las barras (`Fysr`) y los pernos (`Fu`) se indican en su bloque |
+| `material` | Nombre de un acero de `src/steel_design/data/Materiales.xlsx`, por ejemplo `"ASTM A36"`, de donde salen Fy y Fu; un JSON no admite Fy ni Fu numéricos ni un nombre fuera del catálogo. Las barras (`Fysr`) y los pernos (`Fu`) se indican en su bloque |
 | `Pu` | Resistencia requerida de la combinación LRFD: > 0 compresión (capítulo E), < 0 tracción (capítulo D) |
 | `Mux`, `Muy` | Momentos requeridos de la combinación (kN·m) respecto de los ejes geométricos, capítulo F |
 | `Mw`, `Mz` | Solo ángulos simples: momentos respecto de los ejes principales mayor y menor (kN·m), F10 |

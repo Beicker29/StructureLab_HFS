@@ -1,6 +1,6 @@
 """Independent Chapter D hand calculations (ANSI/AISC 360-22, a360-22w.pdf pp.16.1-32..34).
 
-Decimal arithmetic; Ag is read from data/sections.xlsx with openpyxl; never imports
+Decimal arithmetic; Ag is read from src/steel_design/data/sections.xlsx with openpyxl; never imports
 steel_design. Regenerates tests/fixtures/chapter_d/reference.json:
 
     python tests/oracles/chapter_d.py
@@ -17,7 +17,7 @@ SHEETS = {"W": "W_IPE_HEA_HEB", "CHANNEL": "C", "RECTANGULAR_HSS": "PTE_RECT", "
 
 
 def gross_area(family, name):
-    ws = openpyxl.load_workbook(ROOT / "data/sections.xlsx", read_only=True, data_only=True)[SHEETS[family]]
+    ws = openpyxl.load_workbook(ROOT / "src/steel_design/data/sections.xlsx", read_only=True, data_only=True)[SHEETS[family]]
     rows = ws.iter_rows(values_only=True)
     header = [str(h).strip() if h is not None else None for h in next(rows)]
     for values in rows:
@@ -62,7 +62,7 @@ def _plain(value):
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_d/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) D2, D3; catalog data/sections.xlsx (A)",
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) D2, D3; catalog src/steel_design/data/sections.xlsx (A)",
                "generator": "tests/oracles/chapter_d.py (Decimal; independent of steel_design)",
                "cases": _plain({cid: case(**spec) for cid, spec in CASES.items()})}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")

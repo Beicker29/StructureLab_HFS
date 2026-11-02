@@ -1,6 +1,6 @@
 """Independent Chapter G hand calculations (ANSI/AISC 360-22, a360-22w.pdf pp.16.1-75..81), LRFD.
 
-Decimal arithmetic (50 digits); reads data/sections.xlsx with openpyxl; never imports steel_design.
+Decimal arithmetic (50 digits); reads src/steel_design/data/sections.xlsx with openpyxl; never imports steel_design.
 Webs without stiffeners. HSS: h = hi - 2*ri (clear distance less the inside corner radius, G4).
 Solid bars: G4 other symmetric shapes, Aw = d*t, h/t = d/t, kv = 5; round bars Aw = 0.5*Ag, Cv2 = 1
 (user decision DG-4 in docs/chapter-g.md).
@@ -26,7 +26,7 @@ _WB = None
 
 def row(family, name):
     global _WB
-    _WB = _WB or openpyxl.load_workbook(ROOT / "data/sections.xlsx", read_only=True, data_only=True)
+    _WB = _WB or openpyxl.load_workbook(ROOT / "src/steel_design/data/sections.xlsx", read_only=True, data_only=True)
     rows = _WB[SHEETS[family]].iter_rows(values_only=True)
     header = [str(h).strip() if h is not None else None for h in next(rows)]
     for values in rows:
@@ -158,7 +158,7 @@ def _plain(value):
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_g/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) G1-G6; catalog data/sections.xlsx",
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) G1-G6; catalog src/steel_design/data/sections.xlsx",
                "generator": "tests/oracles/chapter_g.py (Decimal; independent of steel_design)",
                "cases": _plain({cid: build(spec) for cid, spec in CASES.items()})}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")

@@ -1,5 +1,5 @@
 {
- "source": "ANSI/AISC 360-22 (a360-22w.pdf) I1-I5, I8.2, I8.3, Commentary Fig. C-I3.8 and I5; catalog data/sections.xlsx",
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) I1-I5, I8.2, I8.3, Commentary Fig. C-I3.8 and I5; catalog src/steel_design/data/sections.xlsx",
  "generator": "tests/oracles/chapter_i.py (Decimal; independent of steel_design)",
  "cases": {
   "filled-rect-compact-C": {

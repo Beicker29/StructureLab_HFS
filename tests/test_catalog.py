@@ -1,4 +1,4 @@
-"""data/sections.xlsx import: families, AISC metric units, B4 ratios and identity."""
+"""src/steel_design/data/sections.xlsx import: families, AISC metric units, B4 ratios and identity."""
 import pytest
 
 from steel_design.errors import AmbiguousSectionError

@@ -1,5 +1,5 @@
 {
- "source": "ANSI/AISC 360-22 (a360-22w.pdf) F1-F13, B4.1b, errata E25-02; catalog data/sections.xlsx",
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) F1-F13, B4.1b, errata E25-02; catalog src/steel_design/data/sections.xlsx",
  "generator": "tests/oracles/chapter_f.py (Decimal; independent of steel_design)",
  "cases": {
   "W-F2-yielding": {

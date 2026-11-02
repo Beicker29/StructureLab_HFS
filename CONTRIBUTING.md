@@ -35,7 +35,7 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 
 `tests/oracles/chapter_c.py`, `chapter_d.py`, `chapter_e.py`, `chapter_f.py`, `chapter_g.py`, `chapter_h.py` (este
 reutiliza los oráculos D, E y F para las resistencias), `chapter_i.py` y `chapter_a4.py` se escriben directamente desde la Specification, en
-Decimal, leyendo `data/sections.xlsx` con sus propias escalas de unidades y **sin
+Decimal, leyendo `src/steel_design/data/sections.xlsx` con sus propias escalas de unidades y **sin
 importar `steel_design`**. Las pruebas consumen el resultado congelado
 `tests/fixtures/chapter_<x>/reference.json`. Para añadir un caso:
 

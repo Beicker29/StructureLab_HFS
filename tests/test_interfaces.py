@@ -24,6 +24,12 @@ def test_examples_run_in_memory(engine, example):
     assert overall_status([r for _, _, r in results]).value == "PASS"
 
 
+def test_cli_uses_the_catalogs_of_the_package_from_any_folder(tmp_path):
+    run = subprocess.run([sys.executable, "-m", "steel_design.run", str(ROOT / "examples/channel.json")], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8")
+    assert run.returncode == 0, run.stderr
+    assert json.loads(run.stdout)["status"] == "PASS"
+
+
 def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):
     run = cli(ROOT / "examples/channel.json", cwd=tmp_path)
     assert run.returncode == 0, run.stderr

@@ -1,7 +1,7 @@
 """Independent Chapter E hand calculations (ANSI/AISC 360-22, a360-22w.pdf).
 
 Written directly from the Specification text (B4.1a p.16.1-21, E1-E7
-pp.16.1-38..49), in Decimal with 50 digits. It reads data/sections.xlsx with
+pp.16.1-38..49), in Decimal with 50 digits. It reads src/steel_design/data/sections.xlsx with
 openpyxl and its own unit scales; it never imports steel_design. Run it to
 regenerate tests/fixtures/chapter_e/reference.json; the tests consume that
 frozen file:
@@ -28,7 +28,7 @@ _WORKBOOK = None
 
 def row(family, name):
     global _WORKBOOK
-    _WORKBOOK = _WORKBOOK or openpyxl.load_workbook(ROOT / "data/sections.xlsx", read_only=True, data_only=True)
+    _WORKBOOK = _WORKBOOK or openpyxl.load_workbook(ROOT / "src/steel_design/data/sections.xlsx", read_only=True, data_only=True)
     rows = _WORKBOOK[SHEETS[family]].iter_rows(values_only=True)
     header = [str(h).strip() if h is not None else None for h in next(rows)]
     for values in rows:
@@ -269,7 +269,7 @@ def _plain(value):
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_e/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) E1-E7, B4.1a; catalog data/sections.xlsx",
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) E1-E7, B4.1a; catalog src/steel_design/data/sections.xlsx",
                "generator": "tests/oracles/chapter_e.py (Decimal, 50 digits; independent of steel_design)",
                "cases": _plain({cid: case(**spec) for cid, spec in CASES.items()})}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")

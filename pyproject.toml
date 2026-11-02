@@ -30,6 +30,9 @@ structurelab-hfs = "steel_design.run:main"
 [tool.setuptools]
 include-package-data = false
 
+[tool.setuptools.package-data]
+steel_design = ["data/*.xlsx"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["steel_design", "steel_design.*"]

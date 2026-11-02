@@ -1,4 +1,4 @@
-"""Read data/sections.xlsx (AISC v16 metric database layout plus PTE sheets) into Section records.
+"""Read src/steel_design/data/sections.xlsx (AISC v16 metric database layout plus PTE sheets) into Section records.
 
 Strict: an unknown sheet, a missing required column or a non-numeric value raises
 CatalogSchemaError. Placeholders ("–", "#DIV/0!", ...) mean "no data" and stay None.
@@ -15,6 +15,7 @@ from ..models import FiniteNumber
 from .identity import section_identity
 from .models import Section, SectionSource
 
+SECTIONS_CATALOG = Path(__file__).resolve().parents[1] / "data" / "sections.xlsx"
 _NUMBER = TypeAdapter(FiniteNumber)
 
 SHEET_FAMILY = {"W_IPE_HEA_HEB": "W", "C": "CHANNEL", "L": "SINGLE_ANGLE", "2L": "DOUBLE_ANGLE",
@@ -65,7 +66,7 @@ def _derive_ratios(values: dict, family: str) -> None:
         values["d_t_ratio"] = values["od"] / tdes
 
 
-def load_sections_from_excel(filepath: str) -> list[Section]:
+def load_sections_from_excel(filepath: str | Path) -> list[Section]:
     # Hash exactly the bytes parsed, not a second read of a changing file.
     source_bytes = Path(filepath).read_bytes()
     source_hash = hashlib.sha256(source_bytes).hexdigest()

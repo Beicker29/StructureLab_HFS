@@ -1,4 +1,4 @@
-"""Catalog of structural steels, data/Materiales.xlsx: name, Fy and Fu (MPa). A JSON input names its material here."""
+"""Catalog of structural steels, src/steel_design/data/Materiales.xlsx: name, Fy and Fu (MPa). A JSON input names its material here."""
 from functools import lru_cache
 from pathlib import Path
 
@@ -6,7 +6,7 @@ import openpyxl
 
 from .errors import ValidationError
 
-CATALOG = Path(__file__).resolve().parents[2] / "data" / "Materiales.xlsx"
+CATALOG = Path(__file__).resolve().parent / "data" / "Materiales.xlsx"
 _HEADERS = ("Material", "Fy (MPa)", "Fu (MPa)")
 
 

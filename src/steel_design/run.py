@@ -10,12 +10,10 @@ from pathlib import Path
 from pydantic import ValidationError as PydanticValidationError
 
 from .errors import SteelDesignError
-from .engine import SteelDesignEngine
-from .execution import execute_payload, governing, member_groups, overall_status
+from .execution import execute_payload, governing, load_engine, member_groups, overall_status
 from .models import unique_json_object
 from .reporting import pdf_bytes, render_text, report_blocks
-from .sections.loader import load_sections_from_excel
-from .sections.repository import SectionRepository
+from .sections.loader import SECTIONS_CATALOG
 
 DEFAULT_DIR = "results"  # local output folder, ignored by git; never read by the engine
 _AUTO = object()
@@ -35,7 +33,7 @@ def _error(error: Exception, *, stage: str):
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Member design per ANSI/AISC 360-22, LRFD")
     parser.add_argument("input_file", help="JSON case or bundle")
-    parser.add_argument("--sections", default="data/sections.xlsx", help="Section catalog (.xlsx)")
+    parser.add_argument("--sections", default=SECTIONS_CATALOG, help="Section catalog (.xlsx); by default, the one of the package")
     parser.add_argument("--output", default=None, help="Optional path to also write the JSON result")
     parser.add_argument("--report", nargs="?", const=_AUTO, default=None,
                         help=f"Calculation report (text); without a path: {DEFAULT_DIR}/<input name>.txt")
@@ -44,8 +42,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     try:
-        repository = SectionRepository()
-        repository.load(load_sections_from_excel(args.sections))
+        engine = load_engine(args.sections)
     except Exception as exc:
         _error(exc, stage="load_sections")
     try:
@@ -53,7 +50,7 @@ def main(argv=None):
     except Exception as exc:
         _error(exc, stage="parse_input")
     try:
-        executions = execute_payload(payload, SteelDesignEngine(repository))
+        executions = execute_payload(payload, engine)
     except Exception as exc:
         _error(exc, stage="run_engine")
 

@@ -1,5 +1,5 @@
 {
- "source": "ANSI/AISC 360-22 (a360-22w.pdf) G1-G6; catalog data/sections.xlsx",
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) G1-G6; catalog src/steel_design/data/sections.xlsx",
  "generator": "tests/oracles/chapter_g.py (Decimal; independent of steel_design)",
  "cases": {
   "W-G2.1a": {

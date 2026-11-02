@@ -36,3 +36,11 @@ jobs:
         run: python -m pytest -q
       - name: Build distribution
         run: python -m build
+      - name: Run the installed wheel outside the repository
+        shell: bash
+        run: |
+          python -m pip install --target "$RUNNER_TEMP/site" dist/*.whl
+          cd "$RUNNER_TEMP"
+          export PYTHONPATH="$RUNNER_TEMP/site"
+          python -c "import pathlib, steel_design; assert pathlib.Path(steel_design.__file__).parents[1].name == 'site'"
+          python -m steel_design.run "$GITHUB_WORKSPACE/examples/channel.json" > /dev/null

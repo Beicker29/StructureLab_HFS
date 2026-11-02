@@ -1,5 +1,5 @@
 {
- "source": "ANSI/AISC 360-22 (a360-22w.pdf) D2, D3; catalog data/sections.xlsx (A)",
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) D2, D3; catalog src/steel_design/data/sections.xlsx (A)",
  "generator": "tests/oracles/chapter_d.py (Decimal; independent of steel_design)",
  "cases": {
   "W-rupture-governs": {

@@ -1,5 +1,5 @@
 {
- "source": "ANSI/AISC 360-22 (a360-22w.pdf) Appendix 4, 4.2.3b and 4.2.4d; errata 2025; catalog data/sections.xlsx",
+ "source": "ANSI/AISC 360-22 (a360-22w.pdf) Appendix 4, 4.2.3b and 4.2.4d; errata 2025; catalog src/steel_design/data/sections.xlsx",
  "generator": "tests/oracles/chapter_a4.py (Decimal; independent of steel_design)",
  "cases": {
   "T-W-350": {

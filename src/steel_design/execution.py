@@ -8,6 +8,15 @@ from .errors import ValidationError
 from .engine import SteelDesignEngine
 from .materials import material_by_name
 from .models import DesignResult, SteelCase, Status
+from .sections.loader import SECTIONS_CATALOG, load_sections_from_excel
+from .sections.repository import SectionRepository
+
+
+def load_engine(catalog=SECTIONS_CATALOG) -> SteelDesignEngine:
+    """The engine with its section catalog: the one that travels with the package, unless another file is given."""
+    repository = SectionRepository()
+    repository.load(load_sections_from_excel(catalog))
+    return SteelDesignEngine(repository)
 
 
 def _merge(base: dict, override: dict) -> dict:
@@ -18,7 +27,7 @@ def _merge(base: dict, override: dict) -> dict:
 
 
 def _case(data: dict) -> SteelCase:
-    """A JSON input names its material; Fy and Fu come from data/Materiales.xlsx."""
+    """A JSON input names its material; Fy and Fu come from src/steel_design/data/Materiales.xlsx."""
     if "material" in data:
         data = {**data, "material": material_by_name(data["material"])}
     return SteelCase(**data)

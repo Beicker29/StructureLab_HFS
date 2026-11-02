@@ -8,7 +8,7 @@ from steel_design.sections.loader import load_sections_from_excel
 from steel_design.sections.repository import SectionRepository
 
 ROOT = Path(__file__).resolve().parents[1]
-CATALOG = ROOT / "data/sections.xlsx"
+CATALOG = ROOT / "src/steel_design/data/sections.xlsx"
 
 
 @pytest.fixture(scope="session")

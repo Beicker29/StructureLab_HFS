@@ -38,7 +38,7 @@ def _plain(value):
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_c/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) C2.3; catalog data/sections.xlsx",
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) C2.3; catalog src/steel_design/data/sections.xlsx",
                "generator": "tests/oracles/chapter_c.py (Decimal; independent of steel_design)",
                "cases": _plain({cid: {"spec": spec, **case(**spec)} for cid, spec in CASES.items()})}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")

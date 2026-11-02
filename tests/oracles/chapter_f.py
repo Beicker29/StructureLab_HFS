@@ -1,6 +1,6 @@
 """Independent Chapter F hand calculations (ANSI/AISC 360-22, a360-22w.pdf pp.16.1-50..73, B4.1b), LRFD.
 
-Decimal arithmetic (50 digits); reads data/sections.xlsx with openpyxl and its own unit
+Decimal arithmetic (50 digits); reads src/steel_design/data/sections.xlsx with openpyxl and its own unit
 scales; never imports steel_design. F7 LTB numbering per errata E25-02 (F7-8..F7-11).
 Regenerates tests/fixtures/chapter_f/reference.json:
 
@@ -26,7 +26,7 @@ _WB = None
 
 def row(family, name):
     global _WB
-    _WB = _WB or openpyxl.load_workbook(ROOT / "data/sections.xlsx", read_only=True, data_only=True)
+    _WB = _WB or openpyxl.load_workbook(ROOT / "src/steel_design/data/sections.xlsx", read_only=True, data_only=True)
     sheet = SHEETS[family]
     rows = _WB[sheet].iter_rows(values_only=True)
     header = [str(h).strip() if h is not None else None for h in next(rows)]
@@ -333,7 +333,7 @@ def _plain(value):
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_f/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) F1-F13, B4.1b, errata E25-02; catalog data/sections.xlsx",
+    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) F1-F13, B4.1b, errata E25-02; catalog src/steel_design/data/sections.xlsx",
                "generator": "tests/oracles/chapter_f.py (Decimal; independent of steel_design)",
                "cases": _plain({cid: build(spec) for cid, spec in CASES.items()})}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
