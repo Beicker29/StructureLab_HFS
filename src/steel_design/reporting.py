@@ -12,13 +12,9 @@ from typing import NamedTuple
 
 from .execution import overall_status
 from .models import DesignResult, SteelCase
-from .report_glossary import (EQUATION_OF, FIXED_LITERALS, MODE_NAMES, PARAMETERS, SECTION_PROPERTIES, STIFFNESS_NAMES,
+from .report_glossary import (EQUATION_OF, FIXED_LITERALS, FLEXURE_STATES, LIMIT_STATES, MODE_NAMES, PARAMETERS, SECTION_PROPERTIES, STIFFNESS_NAMES,
                               parameter_label)
 
-LIMIT_STATES = {"tensile_yielding": "fluencia en la sección bruta", "tensile_rupture": "rotura en la sección neta",
-                "flexural_buckling": "pandeo por flexión", "torsional_buckling": "pandeo torsional",
-                "flexural_torsional_buckling": "pandeo flexotorsional",
-                "constrained_axis_torsional_buckling": "pandeo torsional con arriostramiento desplazado"}
 STATUS_TEXT = {"PASS": "CUMPLE", "FAIL": "NO CUMPLE", "INCOMPLETE": "INCOMPLETO"}
 # Mode keys shown in the mode table; other scalar keys of a mode are listed as intermediate values.
 _MODE_KEYS = {"limit_state", "provision", "axis", "Fe_equation", "Fe_mpa", "Fn_mpa", "Fn_equation",
@@ -47,9 +43,6 @@ CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y
                 "shear_x": "Cortante paralelo a y (con Mux)", "shear_y": "Cortante paralelo a x (con Muy)",
                 "interaction": "Interacción de fuerzas combinadas", "anchor": "Anclaje de componente",
                 "fire": "Incendio (Guía 38)"}
-FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
-                  "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
-                  "LLB": "pandeo local del ala del ángulo"}
 
 
 def _check_title(check) -> str:

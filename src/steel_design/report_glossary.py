@@ -119,6 +119,14 @@ PARAMETERS = {
     "yn_mm": ("Posición del eje neutro elástico", "yn", "mm"), "b_eff_mm": ("Ancho efectivo de la losa", "b", "mm"),
 }
 
+LIMIT_STATES = {"tensile_yielding": "fluencia en la sección bruta", "tensile_rupture": "rotura en la sección neta",
+                "flexural_buckling": "pandeo por flexión", "torsional_buckling": "pandeo torsional",
+                "flexural_torsional_buckling": "pandeo flexotorsional",
+                "constrained_axis_torsional_buckling": "pandeo torsional con arriostramiento desplazado"}
+FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
+                  "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
+                  "LLB": "pandeo local del ala del ángulo"}
+
 EQUATION_OF = {
     "Ae_mm2": "Ae_equation", "Fe_torsion_mpa": "Fe_torsion_equation", "Fez_mpa": "Fez_equation", "Fe_mpa": "Fe_equation",
     "Fn_mpa": "Fn_equation", "Pn_kN": "Pn_equation", "Lc_over_r": "slenderness_equation", "B": "B_equation", "Mcr": "Mcr_equation",
