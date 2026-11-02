@@ -11,7 +11,7 @@ class SectionRepository:
     winner is inferred.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._sections: dict[str, list[Section]] = {}
 
     def load(self, sections: list[Section]):

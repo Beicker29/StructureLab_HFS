@@ -3,6 +3,8 @@
 I5(a) members: compact filled sections without bars (Manual Tables 6-3, 6-4) and encased sections whose bars fit Tables 6-2a, 6-2b.
 Each point is transformed as in Commentary I5: lambda = Pn/Pno on the axial force, then phi_c and phi_b. Formulas: codes/aisc_dg06.
 """
+from typing import Any
+
 from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_dg06 import interaction_tables as tables
 from ..models import Check, SteelCase
@@ -82,12 +84,12 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
     composite = case.composite
     if composite is None or composite.kind not in {"filled", "encased"} or not any(c.id == "interaction" for c in checks):
         return []
-    by_id = {c.id: c for c in checks}
+    by_id: dict[str, Check] = {c.id: c for c in checks}
     flexures = {axis: by_id[f"flexure_{axis}"] for axis in ("x", "y") if f"flexure_{axis}" in by_id}
     axial = by_id.get("axial")
     out = []
     for axis, flexure in flexures.items():
-        entry = {"axis": axis}
+        entry: dict[str, Any] = {"axis": axis}
         reason = None
         table = points = None
         if flexure.result is None or (axial is not None and axial.result is None):

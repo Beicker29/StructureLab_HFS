@@ -150,7 +150,8 @@ def beam_flexure(case, section):
     right = beam.right_beam_spacing / 2 if beam.right_beam_spacing else beam.right_edge_distance
     width = eq.effective_slab_width(span=beam.span, left=left, right=right)
     b, hr = width["b_mm"], beam.deck.hr if beam.deck else 0.0
-    sum_qn, anchors = 0.0, {}
+    sum_qn = 0.0
+    anchors: dict = {}
     if beam.studs:
         Rg, Rp = _anchor_factors(beam, section)
         Asa = math.pi * beam.studs.d**2 / 4

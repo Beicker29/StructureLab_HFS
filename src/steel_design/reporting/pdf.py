@@ -1,6 +1,7 @@
 """The report as PDF, drawn from the document model. Requires fpdf2 ([pdf] extra)."""
 import logging
 import math
+from collections.abc import Sequence
 from pathlib import Path
 
 from .glossary import STATUS_TEXT, fmt
@@ -18,7 +19,7 @@ _LATIN1 = {"φ": "phi", "λ": "lambda", "Σ": "sum", "≤": "<=", "→": "->", "
            "−": "-", "²": "2", "⁴": "4", "⁶": "6", "r̄o": "ro", "α": "alpha"}
 
 
-def _column_widths(minimums: list[float], weights: list[float], total: float) -> list[float]:
+def _column_widths(minimums: Sequence[float], weights: Sequence[float], total: float) -> list[float]:
     """Column widths (mm): each one holds its longest word; what remains is shared by weight. A word breaks only if they exceed
     the total."""
     spare = total - sum(minimums)
@@ -43,8 +44,8 @@ class _Renderer:
         renderer = self
         self.font_face = FontFace
 
-        class Report(FPDF):
-            member = ""
+        class Report(FPDF):  # type: ignore[valid-type, misc]  # fpdf2 is an optional extra, imported when a PDF is requested
+            member: str | None = ""
 
             def header(self):
                 if self.page_no() == 1 or self.member is None:

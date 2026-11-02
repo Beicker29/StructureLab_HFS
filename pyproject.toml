@@ -41,7 +41,29 @@ namespaces = false
 
 [tool.mypy]
 python_version = "3.12"
-files = ["src/steel_design/codes"]
+files = ["src/steel_design"]
+plugins = ["pydantic.mypy"]
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["openpyxl.*", "fpdf.*"]
+ignore_missing_imports = true
+
+# The input declares as optional what each member type requires: a model validator or require_properties() has already checked it
+# when these modules read it, which mypy cannot follow. Everything else is still checked here.
+[[tool.mypy.overrides]]
+module = [
+    "steel_design.engine",
+    "steel_design.sections.geometry",
+    "steel_design.domain.composite.*",
+    "steel_design.domain.compression",
+    "steel_design.domain.coverage",
+    "steel_design.domain.fire",
+    "steel_design.domain.interaction",
+    "steel_design.domain.interaction_diagram",
+    "steel_design.domain.speedcore",
+]
+disable_error_code = ["union-attr", "operator", "index", "arg-type", "type-var"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

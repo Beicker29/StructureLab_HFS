@@ -1,10 +1,10 @@
 """The neutral document model of the report of one member."""
 import re
 from datetime import UTC, datetime
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from ..execution import overall_status
-from ..models import DesignResult, SteelCase
+from ..models import Check, DesignResult, SteelCase
 from .glossary import (
     EQUATION_OF,
     FIXED_LITERALS,
@@ -98,7 +98,7 @@ def _nested(blocks: list[dict]) -> list[dict]:
 def _check_blocks(case: SteelCase, check, notes: list, limitations: list) -> list[dict]:
     r = check.result
     if r is None:
-        blocks = [{"kind": "alert", "text": f"{error.get('code')}: {error.get('message')}",
+        blocks: list[dict[str, Any]] = [{"kind": "alert", "text": f"{error.get('code')}: {error.get('message')}",
                    "detail": str(error["details"]) if error.get("details") else None} for error in check.errors]
         return blocks + [{"kind": "p", "text": "Comprobación INCOMPLETA: no se informa ninguna resistencia supuesta."}]
     fire = r.get("fire")
@@ -145,7 +145,7 @@ class _Governing(NamedTuple):
     tag: str | None
     case: SteelCase
     result: DesignResult
-    check: object
+    check: Check
 
 
 _CONDITIONS = (("construction", "construcción"), ("ultimate", "últimas"), ("fire", "incendio"))
@@ -183,7 +183,7 @@ def _case_name(tag: str | None) -> str:
 
 def _axial_review(number, title, tension, executions, data, absent, notes, limitations) -> list[dict]:
     """The governing case of the axial force, in ultimate and in fire conditions."""
-    blocks = [{"kind": "h1", "text": f"{number}. {title}"}]
+    blocks: list[dict[str, Any]] = [{"kind": "h1", "text": f"{number}. {title}"}]
     found = [
         (g, suffix)
         for g, suffix in (
@@ -208,7 +208,7 @@ def _axial_review(number, title, tension, executions, data, absent, notes, limit
 
 def _condition_chapter(number, title, axes, data, executions, notes, limitations) -> list[dict]:
     """Construction, ultimate and fire conditions, each one about the X and Y axes."""
-    blocks = [{"kind": "h1", "text": f"{number}. {title}"}]
+    blocks: list[dict[str, Any]] = [{"kind": "h1", "text": f"{number}. {title}"}]
     for index, (condition, label) in enumerate(_CONDITIONS, start=1):
         blocks.append({"kind": "h2", "text": f"{number}.{index} {_CONDITION_TITLE[label]}"})
         for axis_index, (axis_label, check_ids, demand) in enumerate(axes, start=1):
@@ -233,7 +233,7 @@ def report_blocks(executions: list) -> list[dict]:
     ratios = [r.ratio for r in results if r.ratio is not None]
     ratio = max(ratios) if ratios else None
     simple_method = "; Apéndice 4, 4.2.4d" if any(r.fire and r.fire["simple_method"] for r in results) else ""
-    blocks = [
+    blocks: list[dict[str, Any]] = [
         {
             "kind": "title",
             "member": result.section,
@@ -263,7 +263,8 @@ def report_blocks(executions: list) -> list[dict]:
             cards.append((f"{prefix}{_check_title(c).split(' (')[0]}:", strength + [dcr]))
     if cards:
         blocks.append({"kind": "summary", "items": cards})
-    notes, limitations = [], []
+    notes: list[str] = []
+    limitations: list[str] = []
     blocks += _material_blocks(case, result)
     blocks += _temperature_blocks(executions)
     blocks += _geometry_blocks(case, result, tag, executions)
@@ -341,9 +342,12 @@ def _property_table(rows: list) -> dict:
 def _material_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
     mat, st = case.material, result.stiffness
     composite = case.composite
-    blocks = [{"kind": "h1", "text": "1. Propiedades mecánicas de los materiales"}, {"kind": "h2", "text": "1.1 Acero estructural"}]
+    blocks: list[dict[str, Any]] = [
+        {"kind": "h1", "text": "1. Propiedades mecánicas de los materiales"},
+        {"kind": "h2", "text": "1.1 Acero estructural"},
+    ]
     origin = "Catálogo Materiales.xlsx" if mat.name else "Dato del usuario"
-    rows = [["Material", mat.name, "–", origin]] if mat.name else []
+    rows: list[list[Any]] = [["Material", mat.name, "–", origin]] if mat.name else []
     rows += [["Esfuerzo de fluencia mínimo especificado (Fy)", mat.Fy, "MPa", origin],
              ["Resistencia a tracción mínima especificada (Fu)", mat.Fu if mat.Fu else "no indicado", "MPa", origin],
              ["Módulo de elasticidad del acero (Es)", st.get("Es_mpa", mat.E), "MPa", "I2.1b" if composite else "E3"]]
@@ -379,7 +383,7 @@ def _material_blocks(case: SteelCase, result: DesignResult) -> list[dict]:
 
 def _temperature_blocks(executions: list) -> list[dict]:
     """1.4: the temperatures of each fire case, data of the user, with their retention factors (Appendix 4, 4.2.3b)."""
-    blocks = [{"kind": "h2", "text": "1.4 Propiedades a temperatura elevada"}]
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "1.4 Propiedades a temperatura elevada"}]
     fires = [(tag, r.fire) for tag, _, r in executions if r.fire]
     if not fires:
         return blocks + [{"kind": "p", "text": f"{NO_APLICA}: ningún case de incendio."}]
@@ -440,7 +444,7 @@ def _stiffness_table(rows: list[dict]) -> dict:
 
 
 def _lengths_table(executions: list) -> dict | None:
-    rows = {}
+    rows: dict = {}
     for _, case, _ in executions:
         if case.lengths:
             name = "construcción" if case.condition == "construction" else "últimas e incendio"
@@ -457,12 +461,26 @@ def _geometry_blocks(case: SteelCase, result: DesignResult, tag: str | None, exe
     st = result.stiffness
     if case.composite:
         items.append(("Miembro compuesto", case.composite.kind))
-    blocks = [{"kind": "h1", "text": "2. Propiedades geométricas"}, {"kind": "h2", "text": "2.1 Geometría"}, {"kind": "kv", "items": items},
-              {"kind": "table", "headers": ["Propiedad", "Valor", "Unidad", "Fuente"], "rows": [
-                  ["{} ({})".format(*SECTION_PROPERTIES[k]), v, _SECTION_UNITS.get(k, "–" if k.endswith("ratio") else "mm"),
-                   "Catálogo" if source else "Entrada"]
-                  for k, v in result.section_data.items() if k not in {"name", "type", "source"}]}]
-    if st.get("geometry"):
+    blocks: list[dict[str, Any]] = [
+        {"kind": "h1", "text": "2. Propiedades geométricas"},
+        {"kind": "h2", "text": "2.1 Geometría"},
+        {"kind": "kv", "items": items},
+        {
+            "kind": "table",
+            "headers": ["Propiedad", "Valor", "Unidad", "Fuente"],
+            "rows": [
+                [
+                    "{} ({})".format(*SECTION_PROPERTIES[k]),
+                    v,
+                    _SECTION_UNITS.get(k, "–" if k.endswith("ratio") else "mm"),
+                    "Catálogo" if source else "Entrada",
+                ]
+                for k, v in result.section_data.items()
+                if k not in {"name", "type", "source"}
+            ],
+        },
+    ]
+    if case.composite and st.get("geometry"):
         provision = {"filled": "I2.2b", "encased": "I2.1b", "wall": "I1.5(e)", "c_wall": "I1.5(e)"}.get(case.composite.kind, "–")
         blocks.append({"kind": "table", "headers": ["Propiedad", "Valor", "Unidad", "Literal"], "rows": [
             [parameter_label(k), v, PARAMETERS[k][2], provision] for k, v in st["geometry"].items()]})
@@ -532,7 +550,7 @@ def _requirement_table(rows: list[dict]) -> dict:
 
 def _merged_requirements(executions: list, group: str) -> list[dict]:
     """Each requirement once, as its least favorable load case leaves it; construction cases have the steel section alone."""
-    rows = {}
+    rows: dict = {}
     for _, case, result in executions:
         for row in result.requirements[group] if case.condition != "construction" else []:
             key = (row["description"], row["provision"])
@@ -561,7 +579,7 @@ def _demand_table(executions: list, condition: str, label: str) -> list[dict]:
         [_case_name(tag), case.Pu, case.Mux, case.Muy] + ([case.Mw, case.Mz] if angle else []) + [case.Vux, case.Vuy]
         for tag, case, _ in cases
     ]
-    blocks = [
+    blocks: list[dict[str, Any]] = [
         {"kind": "table", "headers": ["Case", "Pu (kN)", "Mux (kN·m)", "Muy (kN·m)"] + moments + ["Vux (kN)", "Vuy (kN)"], "rows": rows}
     ]
     if condition == "fire":
@@ -581,7 +599,7 @@ def _demand_table(executions: list, condition: str, label: str) -> list[dict]:
 
 
 def _demand_blocks(executions: list) -> list[dict]:
-    blocks = [
+    blocks: list[dict[str, Any]] = [
         {"kind": "h1", "text": "3. Solicitaciones"},
         {
             "kind": "p",
@@ -613,7 +631,7 @@ def _demand_blocks(executions: list) -> list[dict]:
 
 
 def _service_blocks(result: DesignResult, governing: list) -> list[dict]:
-    blocks = [
+    blocks: list[dict[str, Any]] = [
         {"kind": "h1", "text": "5. Revisión de condiciones de funcionalidad y/o servicio"},
         {"kind": "h2", "text": "5.1 Revisión de deflexiones"},
     ]
@@ -673,10 +691,10 @@ def _compression_data(case: SteelCase) -> list[dict]:
                                  f"L = {fmt(b.L)} mm; condiciones (1) {fmt(b.loaded_at_ends_through_same_leg)}, "
                                  f"(2) {fmt(b.welded_or_two_bolts_min)}, (3) {fmt(b.no_intermediate_transverse_loads)}"))
     if case.double_angle_e6:
-        b = case.double_angle_e6
-        items.append(("Base E6", f"conectores {b.connectors}; a = {fmt(b.a)} mm; conexión de extremo "
-                                 f"soldada o pretensada: {fmt(b.end_connection_welded_or_pretensioned)}"))
-    blocks = [{"kind": "kv", "items": items}] if items else []
+        e6 = case.double_angle_e6
+        items.append(("Base E6", f"conectores {e6.connectors}; a = {fmt(e6.a)} mm; conexión de extremo "
+                                 f"soldada o pretensada: {fmt(e6.end_connection_welded_or_pretensioned)}"))
+    blocks: list[dict[str, Any]] = [{"kind": "kv", "items": items}] if items else []
     if ln is not None:
         blocks.append({"kind": "table", "headers": ["Longitud no arriostrada (L)", "Valor (mm)", "Factor de longitud efectiva (K)",
                                                     "Longitud efectiva, Lc = K·L (mm)", "Literal"], "rows": [
@@ -729,7 +747,7 @@ def _flexure_data(case: SteelCase, check) -> list[dict]:
 
 
 def _diagram_blocks(result: DesignResult) -> list[dict]:
-    blocks = []
+    blocks: list[dict[str, Any]] = []
     for d in result.interaction_diagrams:
         name = f"Diagrama de interacción respecto de {d['axis']}"
         if "reason" in d:
@@ -797,7 +815,7 @@ def _dcr_blocks(executions: list, governing: list, ratio, notes: list, limitatio
             ]
         )
         ratios.append(c.ratio if c.ratio is not None else -1.0)
-    table = {
+    table: dict[str, Any] = {
         "kind": "table",
         "headers": ["Condición", "Revisión", "Case gobernante", "Demanda", "Capacidad", "Índice demanda/capacidad (DCR)", "Estado"],
         "rows": rows,
@@ -808,7 +826,7 @@ def _dcr_blocks(executions: list, governing: list, ratio, notes: list, limitatio
     if ratios and max(ratios) >= 0:
         items.append(("Case del DCR máximo", rows[ratios.index(max(ratios))][2]))
     items.append(("Estado global", STATUS_TEXT[overall_status([r for _, _, r in executions]).value]))
-    blocks = [
+    blocks: list[dict[str, Any]] = [
         {"kind": "h1", "text": "11. Índices DCR"},
         {"kind": "h2", "text": "11.1 Demanda/capacidad por revisión, con el case de mayor DCR"},
         table,
@@ -842,7 +860,7 @@ def _verification(check) -> tuple:
 
 
 def _tension_blocks(case: SteelCase, check, c: dict) -> list[dict]:
-    blocks = [{"kind": "h2", "text": "Área neta efectiva (D3)"},
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "Área neta efectiva (D3)"},
               {"kind": "p", "text": f"Área neta efectiva: Ae = An·U = {fmt(c['inputs']['An_mm2'])} · {fmt(c['inputs']['U'])} = "
                                     f"{fmt(c['modes']['TR']['area_mm2'])} mm² (D3, Ec. D3-1)"},
               {"kind": "h2", "text": "Disposiciones aplicadas"},
@@ -891,7 +909,7 @@ def _tension_blocks(case: SteelCase, check, c: dict) -> list[dict]:
 
 
 def _compression_blocks(case: SteelCase, check, c: dict) -> list[dict]:
-    blocks = [{"kind": "h2", "text": "Clasificación de elementos (B4.1a)"}]
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "Clasificación de elementos (B4.1a)"}]
     rows = [[_ELEMENTS.get(r["element"], r["element"]), r["b4_case"], r["ratio"], r["lambda_r"],
              "esbelto" if r["slender"] else "no esbelto"] for r in c["classification"]["elements"]]
     if rows:
@@ -936,7 +954,7 @@ def _compression_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     for name, m in c["modes"].items():
         blocks.append({"kind": "h3", "text": f"Modo {name}: {LIMIT_STATES.get(m['limit_state'], m['limit_state'])} "
                                              f"({m['provision']}, eje {m['axis']})"})
-        table = _parameters(m, _MODE_KEYS - {"Fy_over_Fe"})
+        table: dict[str, Any] = _parameters(m, _MODE_KEYS - {"Fy_over_Fe"})
         table["rows"].append([f"Resistencia nominal (Pn = Fn · {m['area_basis']})", m["Pn_kN"], "kN", _literal("Pn_kN", m)])
         blocks.append(table)
         if m.get("e7_exempt"):
@@ -968,7 +986,7 @@ _FLEXURE_KEYS = {"limit_state", "provision", "applies", "reason", "Mn", "Mn_kNm"
 
 
 def _flexure_blocks(case: SteelCase, check, c: dict) -> list[dict]:
-    blocks = [{"kind": "h2", "text": "Clasificación de elementos (B4.1b)"}]
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "Clasificación de elementos (B4.1b)"}]
     rows = [[_ELEMENTS.get(r["element"], r["element"]), r["b4_case"], r["ratio"], r["lambda_p"], r["lambda_r"], r["class"]]
             for r in c["classification"]["elements"]]
     if rows:
@@ -1009,7 +1027,7 @@ def _flexure_blocks(case: SteelCase, check, c: dict) -> list[dict]:
         }
     )
     for name, m in c["modes"].items():
-        table = _parameters(m, _FLEXURE_KEYS)
+        table: dict[str, Any] = _parameters(m, _FLEXURE_KEYS)
         if m["applies"] or table["rows"]:
             blocks.append({"kind": "h3", "text": f"{name}: {FLEXURE_STATES.get(name, name)} ({m['provision']})"})
             if not m["applies"]:
@@ -1034,7 +1052,7 @@ _SHEAR_KEYS = {"limit_state", "provision", "applies", "Vn", "Vn_kN", "phi_v", "a
 
 
 def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
-    blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
     rows = [[_ELEMENTS.get(r["element"], r["element"]), r["ratio"], "–" if r["kv"] is None else r["kv"], r["limit"],
              r["Cv"], f"G2, Ec. {r['Cv_equation']}"] for r in c["classification"]["elements"]]
     if rows:
@@ -1042,7 +1060,7 @@ def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
                    {"kind": "table", "headers": ["Elemento", "Relación ancho-espesor (h/t)", "Coeficiente de pandeo por cortante (kv)",
                                                  "Límite de la relación h/t", "Coeficiente de cortante (Cv)", "Literal"], "rows": rows}]
     m = c["modes"]["V"]
-    table = _parameters(m, _SHEAR_KEYS)
+    table: dict[str, Any] = _parameters(m, _SHEAR_KEYS)
     items = [("Resistencia nominal a cortante (Vn)", f"{fmt(m['Vn_kN'])} kN ({m['provision']}, Ec. {m['equation']})"),
              (f"Resistencia de diseño ({m['provision']})", f"φv·Vn = {m['phi_v']:.2f} · Vn = {fmt(c['available_kN'])} kN"),
              _verification(check)]
@@ -1054,7 +1072,7 @@ _COMPOSITE_KEYS = {"limit_state", "provision", "applies", "equation"}
 
 
 def _composite_blocks(check, c: dict) -> list[dict]:
-    blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
     rows = [[_ELEMENTS.get(r["element"], r["element"]), r["ratio"], r["lambda_p"], r["lambda_r"], r["class"]]
             for r in c["classification"]["elements"]]
     if rows:
@@ -1117,7 +1135,7 @@ def _h2_blocks(c: dict) -> list[dict]:
 
 
 def _interaction_blocks(case: SteelCase, check, c: dict) -> list[dict]:
-    blocks = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
+    blocks: list[dict[str, Any]] = [{"kind": "h2", "text": "Disposiciones aplicadas"}, {"kind": "p", "text": ", ".join(c["provisions"])}]
     if "H1" not in c["modes"]:
         return blocks + _h2_blocks(c)
     rows = []

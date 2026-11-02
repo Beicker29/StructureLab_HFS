@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -28,7 +29,7 @@ _AUTO = object()
 
 
 def _error(error: Exception, *, stage: str):
-    payload = {"type": error.__class__.__name__, "message": str(error), "stage": stage}
+    payload: dict[str, Any] = {"type": error.__class__.__name__, "message": str(error), "stage": stage}
     if isinstance(error, SteelDesignError):
         payload.update(code=error.code, details=error.details)
     if isinstance(error, PydanticValidationError):

@@ -241,12 +241,14 @@ class SteelDesignEngine:
                     )
                 checks.append(check)
             else:
-                mode, provision, compute = {
+                mode, provision, method_strength = {
                     "I5": ("I5", "I5(b)", composite_i5), "M2": ("M2", "Commentary I5", composite_method2),
                     "M2S": ("M2", "Commentary I5", composite_method2), "wall": ("I5c", "I5(c)", composite_wall_interaction),
                     "A2": ("A2", "Apéndice 2, 2.1.4", composite_appendix_2_interaction)}[method]
                 obligations = [Obligation(id=mode, provision=provision, reason="Interacción de fuerza axial y flexión.")]
-                check = self._check("interaction", "I", 0.0, "–", obligations, lambda: compute(case, section, combined), section, [])
+                check = self._check(
+                    "interaction", "I", 0.0, "–", obligations, lambda: method_strength(case, section, combined), section, []
+                )
                 if method == "A2" and requested and check.result:
                     check.result["notes"].append(
                         f"Se pidió {requested}, pero rige el Apéndice 2 por los materiales de alta resistencia (DI-22)."

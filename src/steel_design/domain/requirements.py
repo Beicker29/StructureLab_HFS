@@ -90,7 +90,7 @@ def _from_section(rows):
 
 def _merged(*groups):
     """A requirement that two provisions repeat appears once, with both literals."""
-    out = {}
+    out: dict = {}
     for row in (r for group in groups for r in group):
         if row["id"] in out and row["provision"] not in out[row["id"]]["provision"]:
             out[row["id"]]["provision"] += f", {row['provision']}"

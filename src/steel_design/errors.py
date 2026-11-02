@@ -1,4 +1,5 @@
-from typing import Any
+from collections.abc import Callable
+from typing import Any, NoReturn
 
 
 class SteelDesignError(Exception):
@@ -56,16 +57,16 @@ class IncompleteSectionDataError(SteelDesignError):
     default_code = "INCOMPLETE_SECTION_DATA"
 
 
-def blocking_error(code: str):
+def blocking_error(code: str) -> Callable[..., NoReturn]:
     """The raiser of one domain for what the program does not cover."""
-    def blocked(reason, section, **details):
+    def blocked(reason, section, **details) -> NoReturn:
         raise RuleNotImplementedError(reason, code=code, details={"section": section.name, "profile_type": section.type, **details})
     return blocked
 
 
-def incomplete_error(code: str, *, with_type: bool = True):
+def incomplete_error(code: str, *, with_type: bool = True) -> Callable[..., NoReturn]:
     """The raiser of one domain for missing data."""
-    def incomplete(reason, section, fields):
+    def incomplete(reason, section, fields) -> NoReturn:
         details = (
             {"section": section.name, "profile_type": section.type, "fields": fields}
             if with_type

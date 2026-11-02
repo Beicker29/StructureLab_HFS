@@ -19,7 +19,7 @@ def composite_anchor(case: SteelCase, section: Section) -> dict:
             blocked("I8.3d cubre conectores de canal a cortante; la tracción no está cubierta.", section)
         Ec = eq.concrete_modulus(wc=concrete.wc, fc=concrete.fc)
         qn = eq.channel_strength(tf=anchor.tf, tw=anchor.tw, la=anchor.la, fc=concrete.fc, Ec=Ec) / 1000.0
-        qcv = eq.PHI_CHANNEL * qn
+        qcv: float | None = eq.PHI_CHANNEL * qn
         mode = {"limit_state": "anchor_shear", "provision": "I8.3d", "applies": True, "equation": "I8-2", "Qnv_kN": qn,
                 "phi_v": eq.PHI_CHANNEL, "Qcv_kN": qcv, "Qrv_kN": Qrv, "ratio": Qrv / qcv}
         requirements = [requirement_row("spacing", "I8.3e(d)", anchor.spacing <= 600.0, "Separación de canales ≤ 600 mm.")]
@@ -35,8 +35,9 @@ def composite_anchor(case: SteelCase, section: Section) -> dict:
                  section, fields=["composite.anchor.head_diameter"])
     near_edge = anchor.edge_distance is not None and anchor.edge_distance < 1.5 * h
     close = anchor.spacing < 3 * h
-    qcv = qct = None
-    terms = {}
+    qcv = None
+    qct: float | None = None
+    terms: dict = {}
     if Qrv:
         qnv = eq.stud_shear_strength(Fu=anchor.Fu, Asa=Asa) / 1000.0
         if anchor.breakout_in_shear:

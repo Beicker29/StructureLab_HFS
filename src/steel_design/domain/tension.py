@@ -5,6 +5,7 @@ evaluated; the governing one is the lowest design strength phi_t*Pn, not the
 lowest Pn, because their resistance factors differ (D2). LRFD only. Formulas live in codes/aisc_360_22/tension.py.
 """
 import math
+from typing import cast
 
 from ..codes.aisc_360_22 import tension as eq
 from ..errors import RuleNotImplementedError, incomplete_error
@@ -47,7 +48,7 @@ def tension_strength(case: SteelCase, section: Section) -> dict:
     suffix = "; Apéndice 4, 4.2.4d(a)" if hot else ""
     yielding = eq.yielding_strength(Fy=Fy, Ag=ag)
     net = eq.effective_net_area(An=an, U=u)
-    rupture = eq.rupture_strength(Fu=Fu, Ae=net["Ae_mm2"])
+    rupture = eq.rupture_strength(Fu=cast(float, Fu), Ae=net["Ae_mm2"])   # checked above; above 400 deg C, Fy(T)
     modes = {
         "TY": {"limit_state": "tensile_yielding", "provision": "D2(a)" + suffix, "area_basis": "Ag", "area_mm2": ag,
                "stress_mpa": Fy, "Pn_equation": yielding["equation"], "Pn_kN": yielding["Pn_N"] / 1000.0,

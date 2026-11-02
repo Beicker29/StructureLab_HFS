@@ -8,6 +8,7 @@ not available here raise structured errors instead of returning a strength.
 """
 import math
 from collections.abc import Callable
+from typing import Any
 
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import compression as eq
@@ -70,7 +71,7 @@ def classify_elements(section: Section, E: float, Fy: float, *, in_contact: bool
     rows = []
     if family == "SINGLE_ANGLE":
         long_leg, short_leg = _angle_legs(section)
-        layout = [("long_leg", long_leg / section.t, 3, "t", 1, "UNSTIFFENED"),
+        layout: list[tuple[str, Any, int, str, int, str | None]] = [("long_leg", long_leg / section.t, 3, "t", 1, "UNSTIFFENED"),
                   ("short_leg", short_leg / section.t, 3, "t", 1, "UNSTIFFENED")]
     elif family == "DOUBLE_ANGLE":
         long_leg, short_leg = _angle_legs(section)

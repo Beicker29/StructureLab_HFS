@@ -37,6 +37,7 @@ _STATE_TEXT = {"Y": ("F1.1", "Fluencia (momento plástico)."), "LTB": ("F1.1", "
 
 def flexure_obligations(section: Section, axis: str) -> list[Obligation]:
     family = section.type.upper()
+    states: tuple[str, ...]
     if family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
         states = ("Y", "LTB")                     # F11
     elif family == "SINGLE_ANGLE":

@@ -3,7 +3,7 @@
 ```powershell
 python -m pip install -e ".[dev]"
 python -m ruff check .
-python -m mypy             # por ahora, solo codes/
+python -m mypy             # todo el paquete; ver las excepciones por módulo en pyproject.toml
 python -m pytest -q
 python -m build            # opcional: comprueba el empaquetado
 ```

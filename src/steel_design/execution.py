@@ -3,6 +3,7 @@
 No filesystem access; a future web API calls execute_payload directly.
 """
 import copy
+from typing import cast
 
 from .engine import SteelDesignEngine
 from .errors import ValidationError
@@ -56,7 +57,7 @@ def execute_payload(payload: dict, engine: SteelDesignEngine) -> list[tuple[str 
 
 def member_groups(executions: list) -> list[list]:
     """The cases of each member: one calculation report per section, however many load cases it has."""
-    groups = {}
+    groups: dict[str, list] = {}
     for execution in executions:
         groups.setdefault(execution[1].section_name, []).append(execution)
     return list(groups.values())
@@ -83,7 +84,7 @@ def governing(executions: list[tuple[str | None, SteelCase, DesignResult]]) -> d
     rated = [(tag, c) for tag, _, r in executions for c in r.checks if c.ratio is not None]
     if not rated:
         return None
-    tag, c = max(rated, key=lambda item: item[1].ratio)
+    tag, c = max(rated, key=lambda item: cast(float, item[1].ratio))
     return {"name": tag, "check": c.id, "chapter": c.chapter, "status": c.status.value, "ratio": c.ratio,
             "capacity": c.capacity, "demand": c.demand, "unit": c.unit}
 

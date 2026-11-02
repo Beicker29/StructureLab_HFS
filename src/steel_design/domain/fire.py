@@ -3,6 +3,8 @@
 The temperatures are data of the case (heat transfer analysis, 4.2.2). At or below 200 deg C of steel, the strengths ignore temperature.
 Each chapter applies these properties in its own domain module. Formulas live in codes/aisc_360_22/appendix_4.py.
 """
+from typing import Any
+
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22.constants import G_STEEL
 from ..errors import RuleNotImplementedError
@@ -78,7 +80,7 @@ def fire_summary(case: SteelCase) -> dict | None:
     if case.fire is None:
         return None
     fire = case.fire
-    out = {"T_C": fire.steel_temperature, "simple_method": is_elevated(case), "steel": None, "concrete": [], "bars": None}
+    out: dict[str, Any] = {"T_C": fire.steel_temperature, "simple_method": is_elevated(case), "steel": None, "concrete": [], "bars": None}
     if out["simple_method"] and case.material.Fy <= a4.FY_MAX:
         out["steel"] = steel_at_temperature(case)
     if case.composite is None:

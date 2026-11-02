@@ -591,11 +591,11 @@ class SteelCase(InputModel):
         if self.condition == "fire" and composite is not None and (composite.second_order or composite.anchor):
             raise ValueError("Un case de incendio no admite composite.second_order ni composite.anchor (Apéndice 4, 4.2.4d no los trata).")
         if self.fire is not None:
-            self._temperatures_of_each_material()
+            self._temperatures_of_each_material(self.fire)
 
-    def _temperatures_of_each_material(self):
+    def _temperatures_of_each_material(self, fire: FireBasis):
         """Each material present has its temperature, always (user's decision DA4-9): the JSON states them, nothing is assumed."""
-        fire, composite = self.fire, self.composite
+        composite = self.composite
         concrete_given = {
             "uniform": fire.concrete_temperature is not None,
             "layers": fire.concrete_layers is not None,
@@ -681,14 +681,14 @@ class DesignResult(BaseModel):
         "capítulos quedan fuera de este resultado."
     )
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def ratio(self) -> float | None:
         """Largest demand/capacity ratio among the evaluated checks."""
         ratios = [c.ratio for c in self.checks if c.ratio is not None]
         return max(ratios) if ratios else None
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def errors(self) -> list[dict]:
         out = [{**e, "check": c.id} for c in self.checks for e in c.errors]
