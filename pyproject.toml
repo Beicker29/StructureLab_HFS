@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "structurelab-hfs"
 version = "0.3.0"
-description = "Member compressive strength per ANSI/AISC 360-22 Chapter E"
+description = "Steel and composite member strength per ANSI/AISC 360-22, LRFD"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

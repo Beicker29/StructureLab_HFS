@@ -1,4 +1,4 @@
-"""CLI: read a JSON case (or bundle), run Chapter E, print the JSON result.
+"""CLI: read a JSON case (or bundle), run the engine, print the JSON result.
 
 Nothing is written to disk unless --output, --report or --pdf is given.
 """
@@ -33,7 +33,7 @@ def _error(error: Exception, *, stage: str):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="ANSI/AISC 360-22 Chapter E compression design")
+    parser = argparse.ArgumentParser(description="Member design per ANSI/AISC 360-22, LRFD")
     parser.add_argument("input_file", help="JSON case or bundle")
     parser.add_argument("--sections", default="data/sections.xlsx", help="Section catalog (.xlsx)")
     parser.add_argument("--output", default=None, help="Optional path to also write the JSON result")

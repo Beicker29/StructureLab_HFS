@@ -16,6 +16,12 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 | `tests/test_compression.py` | Perfiles reales contra cálculos independientes (todas las familias soportadas); selección; bloqueos; propiedades de fórmulas (continuidad E3/E5, c2, E4-4 → E4-3, E6, E7-7) |
 | `tests/test_tension.py` | Capítulo D: perfiles reales de las seis familias contra cálculos independientes, modo gobernante por resistencia de diseño φt·Pn, datos faltantes, nota D1, memoria |
 | `tests/test_flexure.py` | Capítulo F: perfiles reales contra cálculos independientes (F2, F3, F6, F7 incl. Se, F8, F11, F13.1), estados límite reportados, datos faltantes, bloqueos, interacción pendiente, memoria |
+| `tests/test_shear.py` | Capítulo G: perfiles reales contra cálculos independientes, selección y bloqueos |
+| `tests/test_interaction.py` | Capítulo H: H1, H2 y H4 contra cálculos independientes |
+| `tests/test_interaction_diagram.py` | Diagramas de interacción de rellenos y embebidos |
+| `tests/test_requirements_direct_analysis.py` | Requerimientos técnicos y rigideces para el método directo |
+| `tests/test_design_examples.py` | Contraste con los AISC Design Examples v16.0 |
+| `tests/test_beta_w_catalog.py` | βw de los ángulos del catálogo |
 | `tests/test_composite.py` | Capítulo I: rellenos, embebidos y vigas contra cálculos independientes; requisitos, bloqueos y memoria |
 | `tests/test_appendix_4.py` | Apéndice 4, 4.2.4d: incendio contra cálculos independientes, bloqueos y memoria |
 | `tests/test_design_guides.py` | Contraste con los ejemplos de AISC Design Guide 6 y Design Guide 38 y contenidos de esas guías contra cálculos independientes ([detalle](docs/design-guides.md)) |
@@ -27,8 +33,8 @@ La CI (`.github/workflows/ci.yml`) ejecuta lo mismo en Windows y Ubuntu con Pyth
 
 ## Oráculo independiente
 
-`tests/oracles/chapter_d.py`, `chapter_e.py`, `chapter_f.py`, `chapter_g.py`, `chapter_h.py` (este
-reutiliza los oráculos D, E y F para las resistencias) y `chapter_i.py` se escriben directamente desde la Specification, en
+`tests/oracles/chapter_c.py`, `chapter_d.py`, `chapter_e.py`, `chapter_f.py`, `chapter_g.py`, `chapter_h.py` (este
+reutiliza los oráculos D, E y F para las resistencias), `chapter_i.py` y `chapter_a4.py` se escriben directamente desde la Specification, en
 Decimal, leyendo `data/sections.xlsx` con sus propias escalas de unidades y **sin
 importar `steel_design`**. Las pruebas consumen el resultado congelado
 `tests/fixtures/chapter_<x>/reference.json`. Para añadir un caso:

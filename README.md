@@ -3,8 +3,8 @@
 Motor de cálculo de la **resistencia de miembros de acero** según ANSI/AISC 360-22,
 solo LRFD: capítulos D (tracción), E (compresión), F (flexión), G (cortante), H
 (interacción de fuerza axial y flexión) e I (miembros compuestos: PTE rellenos, W embebidos, vigas,
-muros de placas y anclajes de componentes)
-(`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026, copias locales que no se versionan). Perfiles del catálogo
+muros de placas y anclajes de componentes), con los Apéndices 2, 4 (incendio, método simple) y 8.1
+(`a360-22w.pdf` y erratas de enero 2025 y septiembre 2026, copias locales en `references/` que no se versionan). Perfiles del catálogo
 `data/sections.xlsx` (base AISC v16 métrica + PTE) o barras macizas definidas en
 la entrada.
 
@@ -173,5 +173,8 @@ datos faltantes devuelve `INCOMPLETE` con el motivo; nunca una resistencia supue
 - [Capítulo F: alcance, verificación, decisiones e incidencias del catálogo](docs/chapter-f.md)
 - [Capítulo G: alcance, verificación y decisiones](docs/chapter-g.md)
 - [Capítulo H: alcance, verificación y decisiones](docs/chapter-h.md)
+- [Capítulo I: alcance, verificación y decisiones](docs/chapter-i.md)
+- [Apéndice 4: incendio por el método simple](docs/appendix-4.md)
+- [AISC Design Guides 6 y 38](docs/design-guides.md)
 - [Pruebas y validación](CONTRIBUTING.md)
 - [Hoja de ruta](docs/ROADMAP.md)
