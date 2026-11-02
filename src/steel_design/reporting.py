@@ -707,7 +707,7 @@ def _compression_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     gov = c["modes"][c["governing_mode"]]
     items = [("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
              ("Resistencia nominal (Pn)", f"{_fmt(c['Pn_kN'])} kN ({gov['provision']}, Ec. {c['governing_equation']})"),
-             ("Resistencia de diseño (E1)", f"φc·Pn = 0.90 · Pn = {_fmt(c['available_kN'])} kN"),
+             ("Resistencia de diseño (E1)", f"φc·Pn = {c['phi_c']:.2f} · Pn = {_fmt(c['available_kN'])} kN"),
              _verification(check)]
     for req in c["requirements"]:
         items.append((f"Requisito {req['id']} (E6.2)", f"a/ri = {_fmt(req['a_over_ri'])} ≤ {_fmt(req['limit'])} → "
@@ -754,7 +754,7 @@ def _flexure_blocks(case: SteelCase, check, c: dict) -> list[dict]:
         ("Estado límite gobernante", f"{c['governing_mode']} — {FLEXURE_STATES.get(c['governing_mode'], '')} "
                                      f"({gov['provision']}, Ec. {gov['equation']})"),
         ("Resistencia nominal a flexión (Mn)", f"{_fmt(c['Mn_kNm'])} kN·m"),
-        ("Resistencia de diseño (F1)", f"φb·Mn = 0.90 · Mn = {_fmt(c['available_kNm'])} kN·m"),
+        ("Resistencia de diseño (F1)", f"φb·Mn = {c['phi_b']:.2f} · Mn = {_fmt(c['available_kNm'])} kN·m"),
         _verification(check)]}]
     return blocks
 
