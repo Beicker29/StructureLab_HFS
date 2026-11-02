@@ -620,7 +620,7 @@ class DesignResult(BaseModel):
     interaction_diagrams: list = Field(default_factory=list, description="Interaction diagrams of Manual Tables 6-2a to 6-4; informative")
     scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
                   "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
-                  "I5, I8.2 e I8.3; Apéndices 2 y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica cada chequeo: no "
+                  "I5, I8.2 e I8.3; Apéndices 2, 4 (incendio, método simple) y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica cada chequeo: no "
                   "es norma. Longitudes efectivas, análisis estructural, combinaciones de carga, conexiones, torsión y demás "
                   "capítulos quedan fuera de este resultado.")
 
