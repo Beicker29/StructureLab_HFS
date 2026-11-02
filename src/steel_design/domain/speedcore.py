@@ -9,7 +9,7 @@ from ..errors import IncompleteSectionDataError
 from ..models import SteelCase
 from ..sections.models import Section
 from .composite import _blocked, _check_family, _incomplete, _requirement, _result, composite_materials, concrete_profile, wall_strip_at_temperature
-from .fire import EXTENSION, steel_at_temperature, with_fire
+from .fire import SLENDER_BLOCK, steel_at_temperature, with_fire, with_fire_extension
 
 _GUIDE_NOTE = "Fuera de la norma: AISC Design Guide 38. La guía desarrolla la distribución plástica de I1.2a para esta forma."
 
@@ -37,7 +37,7 @@ def _c_wall_requirements(case, properties):
 def _c_wall_slender_at_temperature(case, section):
     wall = case.composite.c_wall
     if steel_at_temperature(case) and wall.b / wall.tp > 1.2 * math.sqrt(eq.E_STEEL / case.material.Fy):
-        _blocked("Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas.", section, b_t=wall.b / wall.tp)
+        _blocked(SLENDER_BLOCK, section, b_t=wall.b / wall.tp)
 
 
 def _c_wall_fire_compression(case, section, hot):
@@ -91,8 +91,8 @@ def c_wall_tension(case: SteelCase, section: Section) -> dict:
     pn = eq.tension_yielding(Fy=composite_materials(case, section, "web")["Fy"], As=props["As"])
     mode = {"limit_state": "tensile_yielding", "provision": "I2.3b", "applies": True, "equation": "I2-16", "Pn_kN": pn / 1000.0,
             "available_kN": eq.PHI_T * pn / 1000.0}
-    return with_fire(_result(case, section, modes={"TY": mode}, governing="TY", provisions=["I1", "I2.3b"], notes=[_GUIDE_NOTE],
-                             Pn_kN=pn / 1000.0, phi_t=eq.PHI_T, available_kN=mode["available_kN"]), steel_at_temperature(case), "Commentary 4.2.4d", EXTENSION)
+    return with_fire_extension(_result(case, section, modes={"TY": mode}, governing="TY", provisions=["I1", "I2.3b"], notes=[_GUIDE_NOTE],
+                             Pn_kN=pn / 1000.0, phi_t=eq.PHI_T, available_kN=mode["available_kN"]), steel_at_temperature(case))
 
 
 def _c_wall_moment(case, section, axis, P_N, props):
@@ -132,9 +132,9 @@ def c_wall_flexure(case: SteelCase, section: Section, axis: str) -> dict:
     mn = out["Mp"] / 1e6
     mode = {"limit_state": "flexural_yielding", "provision": "I3.5", "applies": True, "equation": out["equation"],
             "C_mm": out["C"], "Mn_kNm": mn, "available_kNm": eq.PHI_B * mn}
-    return with_fire(_result(case, section, modes={"Y": mode}, governing="Y", provisions=["I1", "I3.5"], Mn_kNm=mn, phi_b=eq.PHI_B,
+    return with_fire_extension(_result(case, section, modes={"Y": mode}, governing="Y", provisions=["I1", "I3.5"], Mn_kNm=mn, phi_b=eq.PHI_B,
                              requirements=_c_wall_requirements(case, props), notes=[_GUIDE_NOTE], available_kNm=eq.PHI_B * mn),
-                     steel_at_temperature(case), "Commentary 4.2.4d", EXTENSION)
+                     steel_at_temperature(case))
 
 
 def c_wall_shear(case: SteelCase, section: Section, axis: str) -> dict:
@@ -148,8 +148,8 @@ def c_wall_shear(case: SteelCase, section: Section, axis: str) -> dict:
     vn = out["Vn"] / 1000.0
     mode = {"limit_state": "shear", "provision": "I4.4", "applies": True, "equation": "I4-2", "Asw_mm2": props["Asw"],
             "Ac_mm2": props["Acw"], "Vn_kN": vn, "available_kN": eq.PHI_V_WALL * vn}
-    return with_fire(_result(case, section, modes={"V": mode}, governing="V", provisions=["I1", "I4.4"], notes=[_GUIDE_NOTE], Vn_kN=vn,
-                             phi_v=eq.PHI_V_WALL, available_kN=mode["available_kN"]), steel_at_temperature(case), "Commentary 4.2.4d", EXTENSION)
+    return with_fire_extension(_result(case, section, modes={"V": mode}, governing="V", provisions=["I1", "I4.4"], notes=[_GUIDE_NOTE], Vn_kN=vn,
+                             phi_v=eq.PHI_V_WALL, available_kN=mode["available_kN"]), steel_at_temperature(case))
 
 
 def c_wall_interaction(case: SteelCase, section: Section, checks: list) -> dict:
@@ -169,9 +169,9 @@ def c_wall_interaction(case: SteelCase, section: Section, checks: list) -> dict:
     mode = {"limit_state": "combined_flexure_axial", "provision": "I5(c)", "applies": True, "equation": out["equation"],
             "Pr_kN": case.Pu, "Mr_kNm": flexure.demand, "C_mm": out["C"], "Mn_at_Pr_kNm": out["Mp"] / 1e6, "Mc_at_Pr_kNm": capacity,
             "ratio": ratio}
-    return with_fire(_result(case, section, modes={"I5c": mode}, governing="I5c", provisions=["I5(c)", "I1.2a"], ratio=ratio,
+    return with_fire_extension(_result(case, section, modes={"I5c": mode}, governing="I5c", provisions=["I5(c)", "I1.2a"], ratio=ratio,
                              notes=[_GUIDE_NOTE, "Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."]),
-                     steel_at_temperature(case), "Commentary 4.2.4d", EXTENSION)
+                     steel_at_temperature(case))
 
 
 def _coupling_requirements(case, section):
@@ -202,9 +202,9 @@ def coupling_beam_flexure(case: SteelCase, section: Section, axis: str) -> dict:
     mn = out["Mp"] / 1e6
     mode = {"limit_state": "flexural_yielding", "provision": "I3.4b", "applies": True, "equation": out["equation"], "C_mm": out["C"],
             "Mn_kNm": mn, "available_kNm": eq.PHI_B * mn}
-    return with_fire(_result(case, section, modes={"Y": mode}, governing="Y", provisions=["I1", "I3.4b"], Mn_kNm=mn, phi_b=eq.PHI_B,
+    return with_fire_extension(_result(case, section, modes={"Y": mode}, governing="Y", provisions=["I1", "I3.4b"], Mn_kNm=mn, phi_b=eq.PHI_B,
                              requirements=_coupling_requirements(case, section), notes=[_GUIDE_NOTE], available_kNm=eq.PHI_B * mn),
-                     steel_at_temperature(case), "Commentary 4.2.4d", EXTENSION)
+                     steel_at_temperature(case))
 
 
 def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
@@ -219,8 +219,8 @@ def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
     vn = eq.shear_filled(Av=Av, Fy=m["Fy"], Kc=1.0, Ac=Ac, fc=m["fc"]) / 1000.0
     mode = {"limit_state": "shear", "provision": "I4.2", "applies": True, "equation": "I4-1", "Av_mm2": Av, "Ac_mm2": Ac, "Kc": 1.0,
             "Vn_kN": vn, "available_kN": eq.PHI_V_FILLED * vn}
-    return with_fire(_result(case, section, modes={"V": mode}, governing="V", provisions=["I1", "I4.2"], notes=[_GUIDE_NOTE], Vn_kN=vn,
-                             phi_v=eq.PHI_V_FILLED, available_kN=mode["available_kN"]), steel_at_temperature(case), "Commentary 4.2.4d", EXTENSION)
+    return with_fire_extension(_result(case, section, modes={"V": mode}, governing="V", provisions=["I1", "I4.2"], notes=[_GUIDE_NOTE], Vn_kN=vn,
+                             phi_v=eq.PHI_V_FILLED, available_kN=mode["available_kN"]), steel_at_temperature(case))
 
 
 def wall_fire(case: SteelCase, section: Section) -> dict:

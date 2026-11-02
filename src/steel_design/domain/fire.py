@@ -12,6 +12,7 @@ NOTES = ("Apéndice 4, 4.2.2 y 4.2.4: las temperaturas provienen del análisis t
          "combinación A-4-1. Las conexiones y, en miembros rellenos, los agujeros de ventilación de 4.2.4a no se revisan aquí.")
 EXTENSION = ("Fuera de 4.2.4d y de la Guía 38, que a temperatura solo tratan la compresión de rellenos y muros: ecuaciones de temperatura ambiente con las propiedades "
              "de 4.2.3b, como indica en general el Commentary de 4.2.4d. Es una decisión de ingeniería (DA4-8).")
+SLENDER_BLOCK = "Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas."
 _DEMANDS = ("Pu", "Mux", "Muy", "Mw", "Mz", "Vux", "Vuy")
 
 
@@ -41,6 +42,11 @@ def with_fire(result: dict, hot: dict | None, provision: str, *notes: str) -> di
         result["provisions"].append(f"Apéndice 4, {provision}")
         result["notes"] += [NOTES, *notes]
     return result
+
+
+def with_fire_extension(result: dict, hot: dict | None) -> dict:
+    """with_fire for what 4.2.4d does not state: the ambient equations with the properties of 4.2.3b (DA4-8)."""
+    return with_fire(result, hot, "Commentary 4.2.4d", EXTENSION)
 
 
 def uncovered_demands(case: SteelCase) -> list[str]:

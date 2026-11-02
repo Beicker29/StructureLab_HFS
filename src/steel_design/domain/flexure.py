@@ -17,7 +17,7 @@ from ..errors import blocking_error, incomplete_error
 from ..models import FlexureBasis, SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section, missing_properties
-from .fire import steel_at_temperature, with_fire
+from .fire import SLENDER_BLOCK, steel_at_temperature, with_fire
 
 _LIMITATIONS = (
     "Lb sale de las longitudes (DF-13) y Cb es dato del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone que los apoyos "
@@ -390,7 +390,7 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
         _blocked("El Capítulo F no está implementado para esta familia.", section)
     if hot:
         if any(row["class"] == "esbelto" for row in rows):
-            _blocked("Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas.", section)
+            _blocked(SLENDER_BLOCK, section)
         modes = {k: {**m, "provision": f"{m['provision']}; Apéndice 4, 4.2.4d(e)"} for k, m in modes.items()}
 
     evaluated = {k: m for k, m in modes.items() if m["applies"]}
