@@ -25,7 +25,7 @@ from .domain.stiffness import member_stiffness
 from .domain.tension import tension_strength
 from .domain.validation import section_inconsistencies, validate_case, validate_section
 from .errors import IncompleteSectionDataError, RuleNotImplementedError, SectionNotFoundError
-from .models import Check, DesignResult, Obligation, SteelCase, Status
+from .models import Check, DesignResult, Obligation, SteelCase, Status, worst_status
 from .sections.geometry import (build_box_section, build_c_wall_section, build_coupling_beam_section, build_custom_section,
                                 build_wall_section)
 from .sections.models import Section
@@ -263,10 +263,7 @@ class SteelDesignEngine:
 
     @staticmethod
     def _status(checks: list[Check]) -> Status:
-        statuses = {c.status for c in checks}
-        if Status.FAIL in statuses:
-            return Status.FAIL                        # a known failure is never hidden by incompleteness
-        return Status.INCOMPLETE if Status.INCOMPLETE in statuses else Status.PASS
+        return worst_status(c.status for c in checks)
 
     def _result(self, case: SteelCase, section: Section, checks: list[Check], inconsistent) -> DesignResult:
         status = self._status(checks)

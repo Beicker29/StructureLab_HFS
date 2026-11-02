@@ -7,7 +7,7 @@ import copy
 from .errors import ValidationError
 from .engine import SteelDesignEngine
 from .materials import material_by_name
-from .models import DesignResult, SteelCase, Status
+from .models import DesignResult, SteelCase, Status, worst_status
 from .sections.loader import SECTIONS_CATALOG, load_sections_from_excel
 from .sections.repository import SectionRepository
 
@@ -89,7 +89,4 @@ def governing(executions: list[tuple[str | None, SteelCase, DesignResult]]) -> d
 
 
 def overall_status(results: list[DesignResult]) -> Status:
-    statuses = {r.status for r in results}
-    if Status.INCOMPLETE in statuses:
-        return Status.INCOMPLETE
-    return Status.FAIL if Status.FAIL in statuses else Status.PASS
+    return worst_status(r.status for r in results)

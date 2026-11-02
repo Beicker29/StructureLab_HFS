@@ -575,6 +575,14 @@ class Status(str, Enum):
     INCOMPLETE = "INCOMPLETE"
 
 
+def worst_status(statuses) -> Status:
+    """A known failure is never hidden by incompleteness; PASS only when every status is PASS."""
+    statuses = set(statuses)
+    if Status.FAIL in statuses:
+        return Status.FAIL
+    return Status.INCOMPLETE if Status.INCOMPLETE in statuses else Status.PASS
+
+
 class Obligation(BaseModel):
     """A limit state required by the applicable chapter, derived independently of the selection."""
     id: str

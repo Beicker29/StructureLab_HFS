@@ -7,6 +7,8 @@ from steel_design.domain.coverage import discharge, required_obligations
 from steel_design.errors import AmbiguousSectionError, SectionNotFoundError
 from steel_design.sections.repository import SectionRepository
 from steel_design.engine import SteelDesignEngine
+from steel_design.execution import overall_status
+from steel_design.models import DesignResult, Status, worst_status
 
 from conftest import steel_case
 
@@ -74,3 +76,10 @@ def test_unknown_and_ambiguous_sections(engine, sections):
     repo.load([w, w.model_copy(update={"area": 1.0})])
     with pytest.raises(AmbiguousSectionError):
         SteelDesignEngine(repo).run(steel_case("w14x90"))
+
+
+@pytest.mark.parametrize("statuses, expected", [(["PASS", "PASS"], "PASS"), (["PASS", "INCOMPLETE"], "INCOMPLETE"), (["PASS", "FAIL"], "FAIL"), (["INCOMPLETE", "FAIL"], "FAIL")])
+def test_a_known_failure_is_never_hidden_by_incompleteness(statuses, expected):
+    assert worst_status(Status(s) for s in statuses).value == expected
+    results = [DesignResult(section="W14X90", family="W", status=s) for s in statuses]
+    assert overall_status(results).value == expected
