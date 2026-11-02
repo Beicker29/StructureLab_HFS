@@ -1,21 +1,12 @@
-"""Calculation report (memoria de cálculo) of one member, from the results of all its load cases: plain text and PDF.
-
-Presentation only: every value comes from the engine result; nothing is recomputed. Each review shows the load case
-with the largest DCR. report_blocks() builds one neutral document model (title, summary, headings, key-value lists,
-tables, notes); render_text() and pdf_bytes() draw that same model.
-"""
+"""The neutral document model of the report of one member."""
 from datetime import datetime, timezone
-import math
-from pathlib import Path
 import re
 from typing import NamedTuple
 
-from .execution import overall_status
-from .models import DesignResult, SteelCase
-from .report_glossary import (EQUATION_OF, FIXED_LITERALS, FLEXURE_STATES, LIMIT_STATES, MODE_NAMES, PARAMETERS, SECTION_PROPERTIES, STIFFNESS_NAMES,
-                              parameter_label)
+from ..execution import overall_status
+from ..models import DesignResult, SteelCase
+from .glossary import (EQUATION_OF, FIXED_LITERALS, FLEXURE_STATES, LIMIT_STATES, MODE_NAMES, PARAMETERS, SECTION_PROPERTIES, STATUS_TEXT, STIFFNESS_NAMES, fmt, parameter_label)
 
-STATUS_TEXT = {"PASS": "CUMPLE", "FAIL": "NO CUMPLE", "INCOMPLETE": "INCOMPLETO"}
 # Mode keys shown in the mode table; other scalar keys of a mode are listed as intermediate values.
 _MODE_KEYS = {"limit_state", "provision", "axis", "Fe_equation", "Fe_mpa", "Fn_mpa", "Fn_equation",
               "Fy_over_Fe", "area_mm2", "Pn_equation", "area_basis", "effective_area", "Pn_kN", "available_kN",
@@ -26,17 +17,7 @@ _SECTION_UNITS = {"area": "mm²", "ix": "mm⁴", "iy": "mm⁴", "iw": "mm⁴", "
 _ELEMENTS = {"flange": "ala", "web": "alma", "wall_b": "pared b", "wall_h": "pared h", "wall": "pared",
              "long_leg": "ala larga", "short_leg": "ala corta", "flange_legs": "alas horizontales",
              "web_legs": "alas verticales", "walls": "paredes paralelas al cortante", "bar": "barra"}
-def _fmt(value) -> str:
-    if isinstance(value, bool):
-        return "sí" if value else "no"
-    if isinstance(value, int) or not isinstance(value, float):
-        return str(value)
-    if value != 0 and (abs(value) >= 1e7 or abs(value) < 1e-3):
-        return f"{value:.4e}"
-    return f"{value:.3f}"
 
-
-# --- document model ------------------------------------------------------------------------
 
 CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y",
                 "flexure_w": "Flexión respecto del eje principal w", "flexure_z": "Flexión respecto del eje principal z",
@@ -103,8 +84,8 @@ def _check_blocks(case: SteelCase, check, notes: list, limitations: list) -> lis
                    "detail": str(error["details"]) if error.get("details") else None} for error in check.errors]
         return blocks + [{"kind": "p", "text": "Comprobación INCOMPLETA: no se informa ninguna resistencia supuesta."}]
     fire = r.get("fire")
-    temperature = [{"kind": "kv", "items": [("Propiedades a temperatura elevada (Apéndice 4, 4.2.3b)", f"T = {_fmt(fire['T_C'])} °C; Fy(T) = {_fmt(fire['Fy_T_mpa'])} MPa; "
-                                                                                                    f"E(T) = {_fmt(fire['E_T_mpa'])} MPa")]}] if fire else []
+    temperature = [{"kind": "kv", "items": [("Propiedades a temperatura elevada (Apéndice 4, 4.2.3b)", f"T = {fmt(fire['T_C'])} °C; Fy(T) = {fmt(fire['Fy_T_mpa'])} MPa; "
+                                                                                                    f"E(T) = {fmt(fire['E_T_mpa'])} MPa")]}] if fire else []
     if check.chapter == "E":
         blocks = _compression_blocks(case, check, r)
     elif check.chapter == "D":
@@ -222,7 +203,7 @@ def report_blocks(executions: list) -> list[dict]:
             name = "Interacción" if c.id == "interaction" else CHECK_TITLES[c.id]
             cards.append((f"{prefix}{name} ({c.result['governing_equation'] if c.result else c.chapter}):", [dcr]))
         else:
-            strength = [f"{_capacity_label(c)}={_fmt(c.capacity)} {c.unit}"] if c.capacity is not None else []
+            strength = [f"{_capacity_label(c)}={fmt(c.capacity)} {c.unit}"] if c.capacity is not None else []
             cards.append((f"{prefix}{_check_title(c).split(' (')[0]}:", strength + [dcr]))
     if cards:
         blocks.append({"kind": "summary", "items": cards})
@@ -453,8 +434,8 @@ def _demand_table(executions: list, condition: str, label: str) -> list[dict]:
     for tag, _, result in cases:
         info = next(((c.result or {}).get("second_order") for c in result.checks if (c.result or {}).get("second_order")), None)
         if info:
-            blocks.append({"kind": "p", "text": f"Apéndice 8.1, case {_case_name(tag)}: las revisiones usan Pr = {_fmt(info['Pr_kN'])} kN y Mr = {_fmt(info['Mr_kNm'])} kN·m "
-                                                f"(B1 = {_fmt(info['B1'])}, B2 = {_fmt(info['B2'])})."})
+            blocks.append({"kind": "p", "text": f"Apéndice 8.1, case {_case_name(tag)}: las revisiones usan Pr = {fmt(info['Pr_kN'])} kN y Mr = {fmt(info['Mr_kNm'])} kN·m "
+                                                f"(B1 = {fmt(info['B1'])}, B2 = {fmt(info['B2'])})."})
     return blocks
 
 
@@ -496,8 +477,8 @@ def _service_blocks(result: DesignResult, governing: list) -> list[dict]:
         return blocks + [{"kind": "p", "text": f"{NO_APLICA}: ningún case de construcción."}]
     blocks.append({"kind": "p", "text": "Resistencia de la sección de acero sola (I3.1b en vigas compuestas), con las longitudes de construcción. El detalle está en 8.1 y 9.1."})
     blocks.append({"kind": "table", "headers": ["Revisión", "Case", "Demanda", "Resistencia", "DCR", "Estado"], "rows": [
-        [_check_title(g.check), _case_name(g.tag), f"{_fmt(g.check.demand)} {g.check.unit}",
-         f"{_fmt(g.check.capacity)} {g.check.unit}" if g.check.capacity is not None else "no calculada",
+        [_check_title(g.check), _case_name(g.tag), f"{fmt(g.check.demand)} {g.check.unit}",
+         f"{fmt(g.check.capacity)} {g.check.unit}" if g.check.capacity is not None else "no calculada",
          g.check.ratio if g.check.ratio is not None else "no calculado", STATUS_TEXT[g.check.status.value]] for g in rows]})
     return blocks
 
@@ -506,16 +487,16 @@ def _compression_data(case: SteelCase) -> list[dict]:
     f, ln = case.factors, case.lengths
     items = []
     if f.xa or f.ya:
-        items.append(("Arriostramiento desplazado", f"xa = {_fmt(f.xa)} mm; ya = {_fmt(f.ya)} mm"))
+        items.append(("Arriostramiento desplazado", f"xa = {fmt(f.xa)} mm; ya = {fmt(f.ya)} mm"))
     if case.single_angle_e5:
         b = case.single_angle_e5
         items.append(("Base E5", f"configuración E5({b.configuration}); ala conectada {b.connected_leg}; "
-                                 f"L = {_fmt(b.L)} mm; condiciones (1) {_fmt(b.loaded_at_ends_through_same_leg)}, "
-                                 f"(2) {_fmt(b.welded_or_two_bolts_min)}, (3) {_fmt(b.no_intermediate_transverse_loads)}"))
+                                 f"L = {fmt(b.L)} mm; condiciones (1) {fmt(b.loaded_at_ends_through_same_leg)}, "
+                                 f"(2) {fmt(b.welded_or_two_bolts_min)}, (3) {fmt(b.no_intermediate_transverse_loads)}"))
     if case.double_angle_e6:
         b = case.double_angle_e6
-        items.append(("Base E6", f"conectores {b.connectors}; a = {_fmt(b.a)} mm; conexión de extremo "
-                                 f"soldada o pretensada: {_fmt(b.end_connection_welded_or_pretensioned)}"))
+        items.append(("Base E6", f"conectores {b.connectors}; a = {fmt(b.a)} mm; conexión de extremo "
+                                 f"soldada o pretensada: {fmt(b.end_connection_welded_or_pretensioned)}"))
     blocks = [{"kind": "kv", "items": items}] if items else []
     if ln is not None:
         blocks.append({"kind": "table", "headers": ["Longitud no arriostrada (L)", "Valor (mm)", "Factor de longitud efectiva (K)",
@@ -544,7 +525,7 @@ def _shear_data(case: SteelCase) -> list[dict]:
 
 def _flexure_data(case: SteelCase, check) -> list[dict]:
     fl = case.flexure
-    holes = "no declarado" if not fl or fl.tension_flange_holes is None else _fmt(fl.tension_flange_holes)
+    holes = "no declarado" if not fl or fl.tension_flange_holes is None else fmt(fl.tension_flange_holes)
     lb = ((check.result or {}).get("inputs") or {}).get("Lb_mm")
     rule = "min(Ly, Lz)" if check.id in {"flexure_x", "flexure_w"} else "min(Lx, Lz)"
     rows = [["Longitud no arriostrada lateralmente (Lb)", lb if lb else NO_APLICA, "mm", f"{rule}, de las longitudes de la condición"],
@@ -565,14 +546,6 @@ def _flexure_data(case: SteelCase, check) -> list[dict]:
     return [_property_table(rows)]
 
 
-def _axis_scale(largest: float) -> tuple[float, float]:
-    """Round axis maximum and step, about four intervals: 1, 2, 2.5 or 5 times a power of ten."""
-    raw = (largest or 1.0) / 4
-    power = 10 ** math.floor(math.log10(raw))
-    step = next(s * power for s in (1, 2, 2.5, 5, 10) if s * power >= raw)
-    return step * math.ceil(largest / step + 1e-9) if largest else step * 4, step
-
-
 def _diagram_blocks(result: DesignResult) -> list[dict]:
     blocks = []
     for d in result.interaction_diagrams:
@@ -585,7 +558,7 @@ def _diagram_blocks(result: DesignResult) -> list[dict]:
         demand = (d["Mr_kNm"], d["Pr_kN"]) if d["Pr_kN"] is not None else None
         blocks += [{"kind": "h3", "text": f"{name}: {d['table']}"},
                    {"kind": "p", "text": f"Distribución plástica, I1.2a. Es informativo y no decide el estado: el índice lo da la revisión anterior. {d['note']} "
-                                         f"λ = {_fmt(d['lambda'])}; φc = {d['phi_c']:.2f}; φb = {d['phi_b']:.2f}."},
+                                         f"λ = {fmt(d['lambda'])}; φc = {d['phi_c']:.2f}; φb = {d['phi_b']:.2f}."},
                    {"kind": "table", "headers": ["Punto", "Fuerza axial nominal, P (kN)", "Momento nominal, M (kN·m)", "Con longitud, λ·P (kN)",
                                                  "De diseño, φc·λ·P (kN)", "De diseño, φb·M (kN·m)"], "rows": rows},
                    {"kind": "chart", "title": f"Fuerza axial y momento respecto de {d['axis']}", "x_label": "Momento (kN·m)", "y_label": "Fuerza axial (kN)",
@@ -602,13 +575,13 @@ def _dcr_blocks(executions: list, governing: list, ratio, notes: list, limitatio
         if c.unit == "–":
             demand, capacity = "–", "1.000"
         else:
-            demand, capacity = f"{_fmt(c.demand)} {c.unit}", f"{_fmt(c.capacity)} {c.unit}" if c.capacity is not None else "no calculada"
+            demand, capacity = f"{fmt(c.demand)} {c.unit}", f"{fmt(c.capacity)} {c.unit}" if c.capacity is not None else "no calculada"
         rows.append([label.capitalize(), _check_title(c), _case_name(g.tag), demand, capacity, c.ratio if c.ratio is not None else "no calculado", STATUS_TEXT[c.status.value]])
         ratios.append(c.ratio if c.ratio is not None else -1.0)
     table = {"kind": "table", "headers": ["Condición", "Revisión", "Case gobernante", "Demanda", "Capacidad", "Índice demanda/capacidad (DCR)", "Estado"], "rows": rows}
     if ratios and max(ratios) >= 0:
         table["highlight"] = ratios.index(max(ratios))
-    items = [("Índice demanda/capacidad máximo (DCR)", _fmt(ratio) if ratio is not None else "no calculado")]
+    items = [("Índice demanda/capacidad máximo (DCR)", fmt(ratio) if ratio is not None else "no calculado")]
     if ratios and max(ratios) >= 0:
         items.append(("Case del DCR máximo", rows[ratios.index(max(ratios))][2]))
     items.append(("Estado global", STATUS_TEXT[overall_status([r for _, _, r in executions]).value]))
@@ -634,21 +607,21 @@ def _dcr_blocks(executions: list, governing: list, ratio, notes: list, limitatio
 
 def _verification(check) -> tuple:
     symbol = _DEMAND_SYMBOL[check.chapter] if check.chapter in "FG" else "|Pu|"
-    return ("Verificación", f"{symbol} / {_capacity_label(check)} = {_fmt(check.demand)} / {_fmt(check.capacity)} "
-                            f"= {_fmt(check.ratio)}")
+    return ("Verificación", f"{symbol} / {_capacity_label(check)} = {fmt(check.demand)} / {fmt(check.capacity)} "
+                            f"= {fmt(check.ratio)}")
 
 
 def _tension_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     blocks = [{"kind": "h2", "text": "Área neta efectiva (D3)"},
-              {"kind": "p", "text": f"Área neta efectiva: Ae = An·U = {_fmt(c['inputs']['An_mm2'])} · {_fmt(c['inputs']['U'])} = "
-                                    f"{_fmt(c['modes']['TR']['area_mm2'])} mm² (D3, Ec. D3-1)"},
+              {"kind": "p", "text": f"Área neta efectiva: Ae = An·U = {fmt(c['inputs']['An_mm2'])} · {fmt(c['inputs']['U'])} = "
+                                    f"{fmt(c['modes']['TR']['area_mm2'])} mm² (D3, Ec. D3-1)"},
               {"kind": "h2", "text": "Disposiciones aplicadas"},
               {"kind": "p", "text": ", ".join(c["provisions"])},
               {"kind": "h2", "text": "Estados límite (D2)"}]
     rows = []
     for name, m in c["modes"].items():
         rows.append([name, LIMIT_STATES.get(m["limit_state"], m["limit_state"]), f"{m['provision']}, Ec. {m['Pn_equation']}",
-                     f"{'Fy' if name == 'TY' else 'Fu'}{'(T)' if c.get('fire') else ''} = {_fmt(m['stress_mpa'])}", f"{m['area_basis']} = {_fmt(m['area_mm2'])}",
+                     f"{'Fy' if name == 'TY' else 'Fu'}{'(T)' if c.get('fire') else ''} = {fmt(m['stress_mpa'])}", f"{m['area_basis']} = {fmt(m['area_mm2'])}",
                      m["Pn_kN"], f"{m['phi_t']:.2f}", m["available_kN"]])
     blocks.append({"kind": "table", "headers": ["Modo", "Estado límite", "Literal", "Esfuerzo resistente (MPa)", "Área resistente (mm²)",
                                                 "Resistencia nominal, Pn (kN)", "Factor de resistencia, φt", "Resistencia de diseño, φt·Pn (kN)"],
@@ -659,7 +632,7 @@ def _tension_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     blocks += [{"kind": "h2", "text": "Resistencia"},
                {"kind": "kv", "items": [
                    ("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
-                   ("Resistencia de diseño (D2)", f"min(φt·Pn) = {_fmt(c['available_kN'])} kN ({c['governing_mode']})"),
+                   ("Resistencia de diseño (D2)", f"min(φt·Pn) = {fmt(c['available_kN'])} kN ({c['governing_mode']})"),
                    _verification(check)]}]
     return blocks
 
@@ -682,7 +655,7 @@ def _compression_blocks(case: SteelCase, check, c: dict) -> list[dict]:
                    "headers": ["Modo", "Literal", "Ec. de Fe", "Esfuerzo de pandeo elástico, Fe (MPa)", "Ec. de Fn",
                                "Esfuerzo nominal, Fn (MPa)", "Área resistente (mm²)", "Resistencia nominal, Pn (kN)"],
                    "rows": [[f"{name}: {MODE_NAMES.get(name, name)}", m["provision"], m["Fe_equation"], m["Fe_mpa"], m["Fn_equation"], m["Fn_mpa"],
-                             f"{m['area_basis']} = {_fmt(m['area_mm2'])}", m["Pn_kN"]]
+                             f"{m['area_basis']} = {fmt(m['area_mm2'])}", m["Pn_kN"]]
                             for name, m in c["modes"].items()],
                    "highlight": list(c["modes"]).index(c["governing_mode"])})
     for name, m in c["modes"].items():
@@ -699,18 +672,18 @@ def _compression_blocks(case: SteelCase, check, c: dict) -> list[dict]:
                            "headers": ["Elemento", "n", "b (mm)", "t (mm)", "Ec.", "be (mm)", "(b − be)·t (mm²)"],
                            "rows": [[_ELEMENTS.get(p["element"], p["element"]), p["count"], p["b_mm"], p["t_mm"],
                                      p["equation"], p["be_mm"], p["area_loss_mm2"]] for p in area["plates"]]})
-            blocks.append({"kind": "p", "text": f"Ae = Ag − Σ n·(b − be)·t = {_fmt(area['Ae_mm2'])} mm² (E7-1)"})
+            blocks.append({"kind": "p", "text": f"Ae = Ag − Σ n·(b − be)·t = {fmt(area['Ae_mm2'])} mm² (E7-1)"})
         elif area.get("equation") in {"E7-6", "E7-7"}:
-            blocks.append({"kind": "p", "text": f"Ae = {_fmt(area['Ae_mm2'])} mm² ({area['equation']}; valor de "
-                                                f"la ecuación {_fmt(area['Ae_equation_mm2'])}, limitado a Ag: "
-                                                f"{_fmt(area['bounded_to_Ag'])})"})
+            blocks.append({"kind": "p", "text": f"Ae = {fmt(area['Ae_mm2'])} mm² ({area['equation']}; valor de "
+                                                f"la ecuación {fmt(area['Ae_equation_mm2'])}, limitado a Ag: "
+                                                f"{fmt(area['bounded_to_Ag'])})"})
     gov = c["modes"][c["governing_mode"]]
     items = [("Modo gobernante", f"{c['governing_mode']} — {LIMIT_STATES.get(gov['limit_state'], gov['limit_state'])}"),
-             ("Resistencia nominal (Pn)", f"{_fmt(c['Pn_kN'])} kN ({gov['provision']}, Ec. {c['governing_equation']})"),
-             ("Resistencia de diseño (E1)", f"φc·Pn = {c['phi_c']:.2f} · Pn = {_fmt(c['available_kN'])} kN"),
+             ("Resistencia nominal (Pn)", f"{fmt(c['Pn_kN'])} kN ({gov['provision']}, Ec. {c['governing_equation']})"),
+             ("Resistencia de diseño (E1)", f"φc·Pn = {c['phi_c']:.2f} · Pn = {fmt(c['available_kN'])} kN"),
              _verification(check)]
     for req in c["requirements"]:
-        items.append((f"Requisito {req['id']} (E6.2)", f"a/ri = {_fmt(req['a_over_ri'])} ≤ {_fmt(req['limit'])} → "
+        items.append((f"Requisito {req['id']} (E6.2)", f"a/ri = {fmt(req['a_over_ri'])} ≤ {fmt(req['limit'])} → "
                                                 f"{'cumple' if req['satisfied'] else 'NO cumple'}"))
     blocks += [{"kind": "h2", "text": "Resistencia"}, {"kind": "kv", "items": items}]
     return blocks
@@ -753,8 +726,8 @@ def _flexure_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     blocks += [{"kind": "h2", "text": "Resistencia"}, {"kind": "kv", "items": [
         ("Estado límite gobernante", f"{c['governing_mode']} — {FLEXURE_STATES.get(c['governing_mode'], '')} "
                                      f"({gov['provision']}, Ec. {gov['equation']})"),
-        ("Resistencia nominal a flexión (Mn)", f"{_fmt(c['Mn_kNm'])} kN·m"),
-        ("Resistencia de diseño (F1)", f"φb·Mn = {c['phi_b']:.2f} · Mn = {_fmt(c['available_kNm'])} kN·m"),
+        ("Resistencia nominal a flexión (Mn)", f"{fmt(c['Mn_kNm'])} kN·m"),
+        ("Resistencia de diseño (F1)", f"φb·Mn = {c['phi_b']:.2f} · Mn = {fmt(c['available_kNm'])} kN·m"),
         _verification(check)]}]
     return blocks
 
@@ -772,8 +745,8 @@ def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
                                                  "Límite de la relación h/t", "Coeficiente de cortante (Cv)", "Literal"], "rows": rows}]
     m = c["modes"]["V"]
     table = _parameters(m, _SHEAR_KEYS)
-    items = [("Resistencia nominal a cortante (Vn)", f"{_fmt(m['Vn_kN'])} kN ({m['provision']}, Ec. {m['equation']})"),
-             (f"Resistencia de diseño ({m['provision']})", f"φv·Vn = {m['phi_v']:.2f} · Vn = {_fmt(c['available_kN'])} kN"),
+    items = [("Resistencia nominal a cortante (Vn)", f"{fmt(m['Vn_kN'])} kN ({m['provision']}, Ec. {m['equation']})"),
+             (f"Resistencia de diseño ({m['provision']})", f"φv·Vn = {m['phi_v']:.2f} · Vn = {fmt(c['available_kN'])} kN"),
              _verification(check)]
     blocks += [{"kind": "h2", "text": "Resistencia"}, table, {"kind": "kv", "items": items}]
     return blocks
@@ -794,7 +767,7 @@ def _composite_blocks(check, c: dict) -> list[dict]:
     if "A2-otro" in c["modes"]:
         blocks += [{"kind": "h2", "text": "Revisión con cp y cm del otro eje (no gobierna)"}, _parameters(c["modes"]["A2-otro"], _COMPOSITE_KEYS)]
     if check.ratio is not None:
-        blocks.append({"kind": "kv", "items": [("Verificación", f"{_fmt(check.demand)} / {_fmt(check.capacity)} = {_fmt(check.ratio)}")]})
+        blocks.append({"kind": "kv", "items": [("Verificación", f"{fmt(check.demand)} / {fmt(check.capacity)} = {fmt(check.ratio)}")]})
     if c["requirements"]:
         blocks += [{"kind": "h2", "text": "Limitaciones del Capítulo I"},
                    {"kind": "table", "headers": ["Requisito", "Disposición", "Cumple"],
@@ -810,11 +783,11 @@ def _h2_blocks(c: dict) -> list[dict]:
             {"kind": "table", "headers": ["Punto", "Pr/Pc", "Mrw/Mcw", "Mrz/Mcz", "|Suma|"], "rows": rows,
              "highlight": list(c["modes"]).index(c["governing_mode"])},
             {"kind": "kv", "items": [
-                ("Fuerza axial requerida y de diseño (Pr, Pc)", f"{_fmt(m['Pr_kN'])} kN; {_fmt(m['Pc_kN']) if m['Pc_kN'] else '–'} kN ({m['axial']})"),
-                ("Momento en w requerido y de diseño (Mrw, Mcw)", f"{_fmt(m['Mrw_kNm'])}; {_fmt(m['Mcw_kNm']) if m['Mcw_kNm'] else '–'} kN·m"),
-                ("Momento en z requerido y de diseño (Mrz, Mcz)", f"{_fmt(m['Mrz_kNm'])}; {_fmt(m['Mcz_kNm']) if m['Mcz_kNm'] else '–'} kN·m"),
+                ("Fuerza axial requerida y de diseño (Pr, Pc)", f"{fmt(m['Pr_kN'])} kN; {fmt(m['Pc_kN']) if m['Pc_kN'] else '–'} kN ({m['axial']})"),
+                ("Momento en w requerido y de diseño (Mrw, Mcw)", f"{fmt(m['Mrw_kNm'])}; {fmt(m['Mcw_kNm']) if m['Mcw_kNm'] else '–'} kN·m"),
+                ("Momento en z requerido y de diseño (Mrz, Mcz)", f"{fmt(m['Mrz_kNm'])}; {fmt(m['Mcz_kNm']) if m['Mcz_kNm'] else '–'} kN·m"),
                 ("Criterio (H2)", "Términos con el signo de su tensión: compresión positiva, tracción negativa"),
-                ("Verificación", f"{c['governing_mode']}: {_fmt(c['ratio'])} ≤ 1.0 → "
+                ("Verificación", f"{c['governing_mode']}: {fmt(c['ratio'])} ≤ 1.0 → "
                                  f"{'cumple' if c['ratio'] <= 1.0 else 'NO cumple'}")]}]
 
 
@@ -825,387 +798,19 @@ def _interaction_blocks(case: SteelCase, check, c: dict) -> list[dict]:
     rows = []
     for name, m in c["modes"].items():
         if name == "H1":
-            terms = f"Pr/Pc = {_fmt(m['Pr_Pc'])}; Mrx/Mcx = {_fmt(m['Mrx_Mcx'])}; Mry/Mcy = {_fmt(m['Mry_Mcy'])}"
+            terms = f"Pr/Pc = {fmt(m['Pr_Pc'])}; Mrx/Mcx = {fmt(m['Mrx_Mcx'])}; Mry/Mcy = {fmt(m['Mry_Mcy'])}"
         else:
-            terms = f"Pr/Pc = {_fmt(m['Pr_Pc'])}; Mrx/Mcx = {_fmt(m['Mrx_Mcx'])} ({m['Mcx_basis']})"
+            terms = f"Pr/Pc = {fmt(m['Pr_Pc'])}; Mrx/Mcx = {fmt(m['Mrx_Mcx'])} ({m['Mcx_basis']})"
         rows.append([name, m["provision"], m["equation"], terms, m["ratio"]])
     blocks += [{"kind": "h2", "text": "Ecuaciones de interacción"},
                {"kind": "table", "headers": ["Comprobación", "Literal", "Ec.", "Términos", "Valor de la interacción"], "rows": rows,
                 "highlight": list(c["modes"]).index(c["governing_mode"])}]
     h1 = c["modes"]["H1"]
     blocks.append({"kind": "kv", "items": [
-        ("Fuerza axial requerida y de diseño (Pr, Pc)", f"{_fmt(h1['Pr_kN'])} kN; {_fmt(h1['Pc_kN']) if h1['Pc_kN'] else '–'} kN ({h1['axial']})"),
-        ("Momento en x requerido y de diseño (Mrx, Mcx)", f"{_fmt(h1['Mrx_kNm'])}; {_fmt(h1['Mcx_kNm']) if h1['Mcx_kNm'] else '–'} kN·m"),
-        ("Momento en y requerido y de diseño (Mry, Mcy)", f"{_fmt(h1['Mry_kNm'])}; {_fmt(h1['Mcy_kNm']) if h1['Mcy_kNm'] else '–'} kN·m"),
+        ("Fuerza axial requerida y de diseño (Pr, Pc)", f"{fmt(h1['Pr_kN'])} kN; {fmt(h1['Pc_kN']) if h1['Pc_kN'] else '–'} kN ({h1['axial']})"),
+        ("Momento en x requerido y de diseño (Mrx, Mcx)", f"{fmt(h1['Mrx_kNm'])}; {fmt(h1['Mcx_kNm']) if h1['Mcx_kNm'] else '–'} kN·m"),
+        ("Momento en y requerido y de diseño (Mry, Mcy)", f"{fmt(h1['Mry_kNm'])}; {fmt(h1['Mcy_kNm']) if h1['Mcy_kNm'] else '–'} kN·m"),
         ("Criterio (H1.1)", "Ec. H1-1a si Pr/Pc ≥ 0.2; si no, Ec. H1-1b"),
-        ("Verificación", f"{c['governing_mode']}: {_fmt(c['ratio'])} ≤ 1.0 → "
+        ("Verificación", f"{c['governing_mode']}: {fmt(c['ratio'])} ≤ 1.0 → "
                          f"{'cumple' if c['ratio'] <= 1.0 else 'NO cumple'}")]})
     return blocks
-
-
-# --- plain text ----------------------------------------------------------------------------
-
-def _text_table(headers, rows) -> list[str]:
-    cells = [[str(h) for h in headers]] + [[_fmt(v) for v in row] for row in rows]
-    widths = [max(len(row[i]) for row in cells) for i in range(len(headers))]
-    line = lambda row: "  ".join(c.ljust(w) for c, w in zip(row, widths)).rstrip()  # noqa: E731
-    return [line(cells[0]), "  ".join("-" * w for w in widths)] + [line(r) for r in cells[1:]]
-
-
-def render_text(blocks: list[dict]) -> str:
-    out = []
-    for b in blocks:
-        kind = b["kind"]
-        if kind == "title":
-            out.append(f"# Memoria de cálculo — {b['action']} {b['member']}"
-                       + (f" · {b['case']}" if b.get("case") else ""))
-            out += [f"{k}: {v}" for k, v in b["meta"]]
-            out += ["", f"RESULTADO: {b['status']} ({STATUS_TEXT[b['status']]})"
-                    + (f"   Demanda/capacidad máx. = {_fmt(b['ratio'])}" if b["ratio"] is not None else "")]
-        elif kind == "summary":
-            out.append("  |  ".join(f"{title} {', '.join(lines)}" for title, lines in b["items"]))
-        elif kind == "h1":
-            out += ["", f"## {b['text']}"]
-        elif kind == "h2":
-            out += ["", f"### {b['text']}"]
-        elif kind == "h3":
-            out += ["", f"#### {b['text']}"]
-        elif kind == "kv":
-            out += [("  " if b.get("compact") else "") + f"{k}: {v}" for k, v in b["items"]]
-        elif kind == "table":
-            out += _text_table(b["headers"], b["rows"])
-        elif kind == "p":
-            out.append(b["text"])
-        elif kind == "note":
-            out.append(f"- {b['text']}")
-        elif kind == "alert":
-            out.append(f"! {b['text']}" + (f"\n  Detalle: {b['detail']}" if b.get("detail") else ""))
-    return "\n".join(out) + "\n"
-
-
-# --- PDF ---------------------------------------------------------------------------------------
-
-_INK, _MUTED, _RULE, _NAVY = (31, 41, 55), (107, 114, 128), (209, 213, 219), (23, 50, 84)
-_HEAD_FILL, _ZEBRA, _CARD, _HIGHLIGHT = (234, 239, 245), (248, 250, 252), (243, 246, 250), (255, 248, 225)
-_STATUS_COLOR = {"PASS": (46, 125, 50), "FAIL": (183, 28, 28), "INCOMPLETE": (178, 106, 0)}
-_FONT_CANDIDATES = [  # (regular, bold); first pair found on this machine is embedded
-    ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
-    ("C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/segoeuib.ttf"),
-    ("C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/arialbd.ttf"),
-    ("/Library/Fonts/Arial.ttf", "/Library/Fonts/Arial Bold.ttf"),
-]
-_LATIN1 = {"φ": "phi", "λ": "lambda", "Σ": "sum", "≤": "<=", "→": "->", "—": "-", "–": "-",
-           "−": "-", "²": "2", "⁴": "4", "⁶": "6", "r̄o": "ro", "α": "alpha"}
-
-
-def _column_widths(minimums: list[float], weights: list[float], total: float) -> list[float]:
-    """Column widths (mm): each one holds its longest word; what remains is shared by weight. A word breaks only if they exceed the total."""
-    spare = total - sum(minimums)
-    if spare <= 0:
-        return [total * m / sum(minimums) for m in minimums]
-    return [m + spare * w / sum(weights) for m, w in zip(minimums, weights)]
-
-
-def pdf_bytes(documents: list[list[dict]]) -> bytes:
-    """PDF in memory from report_blocks() documents (one page sequence each). Requires fpdf2 ([pdf] extra)."""
-    try:
-        from fpdf import FPDF
-        from fpdf.fonts import FontFace
-    except ImportError as exc:
-        raise RuntimeError('PDF output requires fpdf2: pip install -e ".[pdf]"') from exc
-    import logging
-    logging.getLogger("fontTools").setLevel(logging.ERROR)  # font subsetting chatter
-
-    class Report(FPDF):
-        member = ""
-
-        def header(self):
-            if self.page_no() == 1 or self.member is None:
-                return
-            self.set_font(FONT, "", 7.5)
-            self.set_text_color(*_MUTED)
-            self.cell(0, 5, clean(f"Memoria de cálculo — {self.member}"), new_x="LMARGIN", new_y="NEXT")
-            self.set_draw_color(*_RULE)
-            self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
-            self.ln(4)
-
-        def footer(self):
-            self.set_y(-12)
-            self.set_draw_color(*_RULE)
-            self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
-            self.set_font(FONT, "", 7.5)
-            self.set_text_color(*_MUTED)
-            self.cell(0, 6, clean("StructureLab_HFS · ANSI/AISC 360-22"))
-            self.cell(0, 6, f"{self.page_no()} / {{nb}}", align="R")
-
-    pdf = Report(format="A4")
-    pdf.set_margins(18, 16, 18)
-    pdf.set_auto_page_break(True, margin=18)
-    FONT = "Helvetica"
-    unicode_font = next(((r, b) for r, b in _FONT_CANDIDATES if Path(r).is_file() and Path(b).is_file()), None)
-    if unicode_font:
-        pdf.add_font("Body", "", unicode_font[0])
-        pdf.add_font("Body", "B", unicode_font[1])
-        FONT = "Body"
-
-    def clean(text: str) -> str:
-        if unicode_font:
-            return text
-        for k, v in _LATIN1.items():
-            text = text.replace(k, v)
-        return text.encode("latin-1", "replace").decode("latin-1")
-
-    width = lambda: pdf.w - pdf.l_margin - pdf.r_margin  # noqa: E731
-
-    def heading(text, size, space):
-        if pdf.get_y() > pdf.h - (85 if size >= 11 else 60):   # keep a heading with its first lines; a chapter also with its subheading
-            pdf.add_page()
-        pdf.ln(space)
-        pdf.set_font(FONT, "B", size)
-        pdf.set_text_color(*(_NAVY if size >= 9.5 else _INK))
-        pdf.multi_cell(0, size * 0.5, clean(text), new_x="LMARGIN", new_y="NEXT")
-        if size >= 11:
-            pdf.set_draw_color(*_NAVY)
-            pdf.set_line_width(0.4)
-            pdf.line(pdf.l_margin, pdf.get_y() + 0.8, pdf.l_margin + 14, pdf.get_y() + 0.8)
-            pdf.set_line_width(0.2)
-            pdf.ln(3)
-        else:
-            pdf.ln(1)
-
-    def chart(b):
-        """P-M diagram: thin lines, one axis, legend for the two series, direct labels on the nominal points only."""
-        w, h = 120.0, 70.0
-        if pdf.get_y() + h + 22 > pdf.h - pdf.b_margin:
-            pdf.add_page()
-        x0, y0 = pdf.l_margin + 16, pdf.get_y() + 12
-        all_points = [q for series in b["series"] for q in series["points"]]
-        demand = b.get("demand")
-        top_x, step_x = _axis_scale(max([q[0] for q in all_points] + ([demand[0]] if demand else [])))
-        top_y, step_y = _axis_scale(max([q[1] for q in all_points] + ([demand[1]] if demand else [])))
-        to_xy = lambda m, p: (x0 + m / top_x * w, y0 + h - p / top_y * h)  # noqa: E731
-        pdf.set_font(FONT, "B", 8)
-        pdf.set_text_color(*_INK)
-        pdf.set_xy(pdf.l_margin, y0 - 11)
-        pdf.cell(w + 16, 4, clean(b["title"]))
-        pdf.set_font(FONT, "", 7)
-        pdf.set_text_color(*_MUTED)
-        pdf.set_draw_color(*_RULE)
-        pdf.set_line_width(0.1)
-        for i in range(round(top_y / step_y) + 1):
-            gy = y0 + h - i * step_y / top_y * h
-            pdf.line(x0, gy, x0 + w, gy)
-            pdf.set_xy(x0 - 15, gy - 2)
-            pdf.cell(14, 4, f"{i * step_y:g}", align="R")
-        for i in range(round(top_x / step_x) + 1):
-            gx = x0 + i * step_x / top_x * w
-            pdf.set_xy(gx - 10, y0 + h + 0.5)
-            pdf.cell(20, 4, f"{i * step_x:g}", align="C")
-        pdf.set_xy(x0, y0 + h + 4.5)
-        pdf.cell(w, 4, clean(b["x_label"]), align="C")
-        pdf.set_xy(pdf.l_margin, y0 - 7)
-        pdf.cell(30, 3, clean(b["y_label"]))
-        pdf.set_draw_color(*_MUTED)
-        pdf.line(x0, y0, x0, y0 + h)
-        pdf.line(x0, y0 + h, x0 + w, y0 + h)
-        colors = {True: (42, 120, 214), False: (235, 104, 52)}             # first two hues of the validated palette
-        for series in b["series"]:
-            color = colors[series["dash"]]
-            pdf.set_draw_color(*color)
-            pdf.set_fill_color(*color)
-            pdf.set_line_width(0.5)
-            if series["dash"]:
-                pdf.set_dash_pattern(dash=1.6, gap=1.0)
-            line = [to_xy(q[0], q[1]) for q in series["points"]]
-            for a, c in zip(line, line[1:]):
-                pdf.line(a[0], a[1], c[0], c[1])
-            pdf.set_dash_pattern()
-            pdf.set_font(FONT, "", 7.5)
-            pdf.set_text_color(*_INK)
-            for (x, y), q in zip(line, series["points"]):
-                pdf.ellipse(x - 0.8, y - 0.8, 1.6, 1.6, style="F")
-                if q[2]:
-                    pdf.set_xy(x + 0.8, y - 4.2)
-                    pdf.cell(4, 3.5, q[2])
-        legend_y = y0 + h + 9
-        cursor = x0
-        pdf.set_font(FONT, "", 7.5)
-        pdf.set_text_color(*_INK)
-        for series in b["series"]:
-            pdf.set_draw_color(*colors[series["dash"]])
-            pdf.set_line_width(0.5)
-            if series["dash"]:
-                pdf.set_dash_pattern(dash=1.6, gap=1.0)
-            pdf.line(cursor, legend_y + 2, cursor + 7, legend_y + 2)
-            pdf.set_dash_pattern()
-            pdf.set_xy(cursor + 8, legend_y)
-            label = clean(series["name"])
-            pdf.cell(pdf.get_string_width(label) + 1, 4, label)
-            cursor += pdf.get_string_width(label) + 13
-        if demand:
-            mx, my = to_xy(demand[0], demand[1])
-            pdf.set_fill_color(*_INK)
-            pdf.set_draw_color(255, 255, 255)
-            pdf.set_line_width(0.3)
-            pdf.ellipse(mx - 1.2, my - 1.2, 2.4, 2.4, style="DF")
-            pdf.set_xy(mx + 1.4, my - 1.8)
-            pdf.cell(16, 3.5, "(Mu, Pu)")
-            pdf.ellipse(cursor, legend_y + 0.9, 2.2, 2.2, style="DF")
-            pdf.set_xy(cursor + 3, legend_y)
-            pdf.cell(25, 4, "Demanda (Mu, Pu)")
-        pdf.set_line_width(0.2)
-        pdf.set_draw_color(*_RULE)
-        pdf.set_xy(pdf.l_margin, legend_y + 7)
-
-    def table(headers, rows, highlight=None, compact=False, kv=False):
-        texts = [[clean(_fmt(v)) for v in row] for row in rows]
-        if len(rows) <= 12 and pdf.get_y() + (len(rows) + 1) * 6.5 > pdf.h - pdf.b_margin:
-            pdf.add_page()
-        # Wide enough for the longest word of the column, with a cap so that a long cell does not squeeze the others.
-        cap = max(14, 150 // len(headers))
-        weights = [max(8, max((len(w) for w in " ".join([str(h)] + [r[i] for r in texts]).split()), default=1),
-                       min(max([len(str(h))] + [len(r[i]) for r in texts]), cap)) + 2 for i, h in enumerate(headers)]
-        numeric = [all(isinstance(r[i], (int, float)) for r in rows) for i in range(len(headers))]
-        pdf.set_font(FONT, "", 8.5 if not compact else 8)
-        pdf.set_text_color(*_INK)
-        pdf.set_draw_color(*_RULE)
-        fill = _CARD if kv else _ZEBRA
-        pdf.set_fill_color(*fill)  # never inherit a previous fill (status badge, cards)
-        natural = sum(weights) * 2.1  # mm, about one character of 8.5 pt per weight unit
-        pdf.set_font(FONT, "B", 8.5)  # headings and the highlighted row are bold, so the widest case
-        minimums = [max(pdf.get_string_width(word) for word in " ".join([clean(str(h))] + [r[i] for r in texts]).split() or [""]) + 3.2 + 0.6
-                    for i, h in enumerate(headers)]
-        pdf.set_font(FONT, "", 8.5 if not compact else 8)
-        total = min(width(), max(natural, 70, sum(minimums)))
-        style = dict(width=total, col_widths=_column_widths(minimums, weights, total), line_height=5.2, padding=(1, 1.6),
-                     text_align=["RIGHT" if n else "LEFT" for n in numeric], align="LEFT",
-                     cell_fill_color=fill)
-        if kv:
-            style.update(width=width(), borders_layout="NONE", first_row_as_headings=False, col_widths=(28, 72),
-                         cell_fill_mode="ALL")
-        else:
-            style.update(borders_layout="HORIZONTAL_LINES", cell_fill_mode="ROWS",
-                         headings_style=FontFace(emphasis="BOLD", color=_NAVY, fill_color=_HEAD_FILL),
-                         repeat_headings=1)
-        with pdf.table(**style) as t:
-            if not kv:
-                head = t.row()
-                for h in headers:
-                    head.cell(clean(h))
-            for i, row in enumerate(texts):
-                r = t.row()
-                for j, cell in enumerate(row):
-                    if kv and j == 0:
-                        r.cell(cell, style=FontFace(color=_MUTED))
-                    elif i == highlight:
-                        r.cell(cell, style=FontFace(emphasis="BOLD", fill_color=_HIGHLIGHT))
-                    else:
-                        r.cell(cell)
-        pdf.ln(2)
-
-    def keep_headings_with_table(blocks, index):
-        """Headings go to the next page with the short table that they announce, which table() would move there alone."""
-        needed, following = 0.0, index
-        while following < len(blocks) and blocks[following]["kind"] in {"h1", "h2", "h3"}:
-            needed += {"h1": 16.0, "h2": 10.0, "h3": 8.0}[blocks[following]["kind"]]
-            following += 1
-        short_table = following < len(blocks) and blocks[following]["kind"] == "table" and len(blocks[following]["rows"]) <= 12
-        rows = (len(blocks[following]["rows"]) + 1) * 6.5 if short_table else 0.0
-        if pdf.get_y() + needed + rows > pdf.h - pdf.b_margin or pdf.get_y() + needed > pdf.h - 60:
-            pdf.add_page()
-
-    for blocks in documents:
-        pdf.member = None
-        pdf.add_page()
-        for index, b in enumerate(blocks):
-            kind = b["kind"]
-            if kind in {"h1", "h2", "h3"} and blocks[index - 1]["kind"] not in {"h1", "h2", "h3"}:
-                keep_headings_with_table(blocks, index)
-            if kind == "title":
-                pdf.member = b["member"] + (f" · {b['case']}" if b.get("case") else "")
-                pdf.set_fill_color(*_NAVY)
-                pdf.rect(0, 0, pdf.w, 4, style="F")
-                pdf.set_y(14)
-                pdf.set_font(FONT, "", 9)
-                pdf.set_text_color(*_MUTED)
-                pdf.multi_cell(width() - 42, 4.2, clean(f"MEMORIA DE CÁLCULO · {b['action'].upper()}"), align="L", new_x="LMARGIN", new_y="NEXT")
-                pdf.set_font(FONT, "B", 18)
-                pdf.set_text_color(*_NAVY)
-                pdf.multi_cell(width() - 42, 9, clean(b["member"]), new_x="LMARGIN", new_y="NEXT")
-                if b.get("case"):
-                    pdf.set_font(FONT, "", 10.5)
-                    pdf.set_text_color(*_INK)
-                    pdf.multi_cell(width() - 42, 5.5, clean(b["case"]), new_x="LMARGIN", new_y="NEXT")
-                    pdf.ln(1.5)
-                title_bottom = pdf.get_y()                           # the status badge below moves the cursor
-                color = _STATUS_COLOR[b["status"]]
-                pdf.set_fill_color(*color)
-                pdf.rect(pdf.w - pdf.r_margin - 38, 19, 38, 10, style="F", round_corners=True, corner_radius=2)
-                pdf.set_xy(pdf.w - pdf.r_margin - 38, 19)
-                pdf.set_font(FONT, "B", 10)
-                pdf.set_text_color(255, 255, 255)
-                pdf.cell(38, 10, clean(STATUS_TEXT[b["status"]]), align="C")
-                pdf.set_xy(pdf.l_margin, max(title_bottom, 31) + 2)
-                pdf.set_font(FONT, "", 8.5)
-                pdf.set_text_color(*_MUTED)
-                for key, value in b["meta"]:
-                    pdf.multi_cell(0, 4.5, clean(f"{key}: {value}"), align="L", new_x="LMARGIN", new_y="NEXT")
-                pdf.set_draw_color(*_RULE)
-                pdf.line(pdf.l_margin, pdf.get_y() + 2, pdf.w - pdf.r_margin, pdf.get_y() + 2)
-                pdf.ln(6)
-            elif kind == "summary":
-                gap, n = 3, min(len(b["items"]), 3)                  # at most three cards per row
-                card_w, y = (width() - gap * (n - 1)) / n, pdf.get_y()
-                pdf.set_font(FONT, "", 7.5)
-                labels = [pdf.multi_cell(card_w - 6, 3.4, clean(label), dry_run=True, output="LINES") for label, _ in b["items"]]
-                for start in range(0, len(b["items"]), n):           # each row as tall as its longest label
-                    label_h = 3.4 * max(len(lines) for lines in labels[start:start + n])
-                    height = label_h + 5.0 + 5.0 * max(len(values) for _, values in b["items"][start:start + n])
-                    for i, (_, values) in enumerate(b["items"][start:start + n]):
-                        x = pdf.l_margin + i * (card_w + gap)
-                        pdf.set_fill_color(*_CARD)
-                        pdf.rect(x, y, card_w, height, style="F", round_corners=True, corner_radius=1.5)
-                        pdf.set_font(FONT, "", 7.5)
-                        pdf.set_text_color(*_MUTED)
-                        for row, line in enumerate(labels[start + i]):
-                            pdf.set_xy(x + 3, y + 2 + row * 3.4)
-                            pdf.cell(card_w - 6, 3.4, line)
-                        size = 10.5
-                        pdf.set_font(FONT, "B", size)
-                        while max(pdf.get_string_width(clean(value)) for value in values) > card_w - 6 and size > 6:
-                            size -= 0.5
-                            pdf.set_font(FONT, "B", size)
-                        pdf.set_text_color(*_INK)
-                        for row, value in enumerate(values):
-                            pdf.set_xy(x + 3, y + 3 + label_h + row * 5.0)
-                            pdf.cell(card_w - 6, 5.0, clean(value))
-                    y += height + 3
-                pdf.set_xy(pdf.l_margin, y + 1)
-            elif kind == "h1":
-                heading(b["text"], 12, 4)
-            elif kind == "h2":
-                heading(b["text"], 10, 2.5)
-            elif kind == "h3":
-                heading(b["text"], 8.8, 1.5)
-            elif kind == "kv":
-                table(["", ""], [list(item) for item in b["items"]], kv=True, compact=b.get("compact", False))
-            elif kind == "table":
-                table(b["headers"], b["rows"], highlight=b.get("highlight"))
-            elif kind in {"p", "note"}:
-                pdf.set_font(FONT, "", 8.5 if kind == "p" else 8)
-                pdf.set_text_color(*(_INK if kind == "p" else _MUTED))
-                text = clean(("•  " if kind == "note" else "") + b["text"])
-                pdf.multi_cell(0, 4.6, text, align="L", new_x="LMARGIN", new_y="NEXT")
-                pdf.ln(1)
-            elif kind == "chart":
-                chart(b)
-            elif kind == "alert":
-                pdf.set_fill_color(255, 243, 224)
-                pdf.set_draw_color(*_STATUS_COLOR["INCOMPLETE"])
-                pdf.set_font(FONT, "B", 8.5)
-                pdf.set_text_color(*_INK)
-                text = b["text"] + (f"\nDetalle: {b['detail']}" if b.get("detail") else "")
-                pdf.multi_cell(0, 4.8, clean(text), border="L", fill=True, padding=2.5, align="L",
-                               new_x="LMARGIN", new_y="NEXT")
-                pdf.ln(2)
-    return bytes(pdf.output())

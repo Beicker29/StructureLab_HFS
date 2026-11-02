@@ -1,6 +1,6 @@
 """ANSI/AISC 360-22 Chapter I formulations (composite members). Pure functions; units N, mm, MPa. LRFD only.
 
-Stress blocks of filled rectangular sections: Commentary Fig. C-I3.8. Selection lives in domain/composite.py.
+Stress blocks of filled rectangular sections: Commentary Fig. C-I3.8. Selection lives in domain/composite/.
 """
 import math
 

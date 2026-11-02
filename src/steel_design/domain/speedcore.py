@@ -225,7 +225,7 @@ def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
 
 
 def wall_fire(case: SteelCase, section: Section) -> dict:
-    """Optional reviews of Design Guide 38, Chapter 6, on the unit-width column (6.2.2): rating and vent holes. The strength is A-4-12 (domain/composite.py)."""
+    """Optional reviews of Design Guide 38, Chapter 6, on the unit-width column (6.2.2): rating and vent holes. The strength is A-4-12 (domain/composite/wall.py)."""
     check_family(case, section)
     if case.Pu <= 0 or case.lengths is None:
         incomplete("El incendio de la Guía 38 se calcula en compresión (Pu > 0) y con la longitud del miembro.", section,

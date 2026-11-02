@@ -12,7 +12,9 @@ from pydantic import ValidationError as PydanticValidationError
 from .errors import SteelDesignError
 from .execution import execute_payload, governing, load_engine, member_groups, overall_status
 from .models import unique_json_object
-from .reporting import pdf_bytes, render_text, report_blocks
+from .reporting.document import report_blocks
+from .reporting.pdf import pdf_bytes
+from .reporting.text import render_text
 from .sections.loader import SECTIONS_CATALOG
 
 DEFAULT_DIR = "results"  # local output folder, ignored by git; never read by the engine

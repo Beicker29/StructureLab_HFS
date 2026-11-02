@@ -112,7 +112,7 @@ print(result.status, result.capacity_kN, result.compression["governing_mode"])  
 La memoria se obtiene del mismo resultado, sin recalcular:
 `blocks = report_blocks([(nombre, case, result), ...])` con los cases de un miembro (modelo del documento), `render_text(blocks)`
 (texto) y `pdf_bytes([blocks, ...])` (PDF en memoria, p. ej. para una respuesta web),
-todos en `steel_design.reporting`. El PDF usa una fuente Unicode del sistema
+en `steel_design.reporting` (`document`, `text` y `pdf`). El PDF usa una fuente Unicode del sistema
 (DejaVu Sans, Segoe UI o Arial) para φ, λ y Σ; sin ella recurre a Helvetica con
 símbolos escritos en letras.
 

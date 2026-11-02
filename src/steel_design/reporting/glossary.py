@@ -193,3 +193,16 @@ def parameter_label(key: str) -> str:
         return key
     description, symbol, _ = entry
     return f"{description} ({symbol})" if symbol else description
+
+
+STATUS_TEXT = {"PASS": "CUMPLE", "FAIL": "NO CUMPLE", "INCOMPLETE": "INCOMPLETO"}
+
+
+def fmt(value) -> str:
+    if isinstance(value, bool):
+        return "sí" if value else "no"
+    if isinstance(value, int) or not isinstance(value, float):
+        return str(value)
+    if value != 0 and (abs(value) >= 1e7 or abs(value) < 1e-3):
+        return f"{value:.4e}"
+    return f"{value:.3f}"

@@ -8,8 +8,11 @@ import pytest
 
 from steel_design.execution import execute_payload, load_engine, member_groups
 from steel_design.models import SteelCase
-from steel_design import reporting
-from steel_design.reporting import _fmt, pdf_bytes, render_text, report_blocks
+from steel_design.reporting import document, pdf as pdf_module
+from steel_design.reporting.document import report_blocks
+from steel_design.reporting.glossary import fmt
+from steel_design.reporting.pdf import pdf_bytes
+from steel_design.reporting.text import render_text
 
 from conftest import CATALOG, ROOT, calculation_report, steel_case
 
@@ -25,10 +28,10 @@ def test_report_shows_inputs_modes_and_governing_values(engine):
                     "#### Resistencia", "#### Obligaciones del Capítulo E", "### 11.4 Notas y limitaciones"):
         assert heading in text
     for name, mode in c["modes"].items():
-        assert f"Modo {name}:" in text and _fmt(mode["Pn_kN"]) in text and mode["Fe_equation"] in text
+        assert f"Modo {name}:" in text and fmt(mode["Pn_kN"]) in text and mode["Fe_equation"] in text
     assert "Modo gobernante: FTB" in text
-    assert _fmt(c["available_kN"]) in text and "Pn/Ω" not in text and "ASD" not in text
-    assert _fmt(result.ratio) in text
+    assert fmt(c["available_kN"]) in text and "Pn/Ω" not in text and "ASD" not in text
+    assert fmt(result.ratio) in text
 
 
 def test_report_lists_effective_widths_of_slender_elements(engine):
@@ -71,7 +74,7 @@ def test_cli_default_report_location_is_ignored_results_folder(tmp_path):
 
 @pytest.mark.parametrize("value, expected", [(1, "1"), (True, "sí"), (2.5, "2.500"), (4.3e12, "4.3000e+12"), (200000.0, "200000.000")])
 def test_number_format(value, expected):
-    assert _fmt(value) == expected
+    assert fmt(value) == expected
 
 
 CHAPTERS = ("## 1. Propiedades mecánicas de los materiales", "### 1.1 Acero estructural", "### 1.2 Concreto estructural",
@@ -300,23 +303,23 @@ def test_pdf_header_data_are_one_per_line(engine, monkeypatch):
 
 
 def test_pdf_columns_hold_their_longest_word(monkeypatch):
-    original, tight = reporting._column_widths, []
+    original, tight = pdf_module._column_widths, []
 
     def recorded(minimums, weights, total):
         if sum(minimums) > total:
             tight.append((minimums, total))
         return original(minimums, weights, total)
 
-    monkeypatch.setattr(reporting, "_column_widths", recorded)
+    monkeypatch.setattr(pdf_module, "_column_widths", recorded)
     for name, group in example_documents():
         pdf_bytes([report_blocks(group)])
     assert tight == []
 
 
 def test_column_widths_respect_the_minimums():
-    widths = reporting._column_widths([10.0, 20.0], [1.0, 3.0], 70.0)
+    widths = pdf_module._column_widths([10.0, 20.0], [1.0, 3.0], 70.0)
     assert widths == pytest.approx([20.0, 50.0])
-    assert sum(reporting._column_widths([50.0, 50.0], [1.0, 1.0], 80.0)) == pytest.approx(80.0)
+    assert sum(pdf_module._column_widths([50.0, 50.0], [1.0, 1.0], 80.0)) == pytest.approx(80.0)
 
 
 def test_every_reference_of_every_report_names_its_document():
@@ -347,7 +350,7 @@ def test_every_reference_of_every_report_names_its_document():
     ("Dato del usuario", "Dato del usuario"),
 ])
 def test_reference_names_the_document(text, expected):
-    assert reporting._reference(text) == expected
+    assert document._reference(text) == expected
 
 
 def test_report_names_the_material_and_its_catalog(engine):

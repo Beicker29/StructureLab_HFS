@@ -23,7 +23,7 @@ src/steel_design/
 │   ├── flexure.py               capítulo F: clasificación B4.1b, sección F por familia y eje, estados límite
 │   ├── shear.py                 capítulo G: sección G por familia y dirección del cortante
 │   ├── interaction.py           capítulo H: H1/H4 y H2 (ángulos simples) con las resistencias de los demás chequeos, Cb de H1.2
-│   ├── composite.py             capítulo I: rellenos, embebidos, vigas, muros y anclajes; remite a E, F y G donde la norma lo indica
+│   ├── composite/               capítulo I, un módulo por miembro: common, filled, encased, beam, wall, anchor; members (por solicitación) e interaction; remite a E, F y G
 │   ├── fire.py                  Apéndice 4, 4.2.4d: propiedades a temperatura y qué cubre el método simple
 │   ├── speedcore.py             muros en C, vigas de acoplamiento y revisiones opcionales de incendio, por Design Guide 38
 │   ├── compression.py           capítulo E: clasificación, selección, ejecución y resistencia gobernante
@@ -36,8 +36,8 @@ src/steel_design/
 │                                interacción H si actúan juntas fuerza axial y flexión → estado
 ├── materials.py                 catálogo de aceros src/steel_design/data/Materiales.xlsx (nombre, Fy, Fu)
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
-├── reporting.py                 memoria de cálculo (texto y PDF) a partir del resultado, sin recalcular
-├── report_glossary.py           nombres en palabras, unidades y literales de lo que imprime la memoria
+├── data/                        catálogos del paquete: sections.xlsx y Materiales.xlsx
+├── reporting/                   memoria de cálculo, sin recalcular: document (modelo), text, pdf y glossary (nombres, unidades y literales)
 └── run.py                       CLI (JSON en stdout; archivos solo con --output, --report, --pdf → results/ ignorado)
 ```
 
@@ -75,7 +75,7 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Fórmulas que solo aparecen en una Design Guide | `codes/aisc_dg06/`, `codes/aisc_dg38/` |
 | Ecuaciones I2 a I5, I8.2, φ del Capítulo I, bloques de tensiones | `codes/aisc_360_22/composite.py` |
 | Ecuaciones de los Apéndices 2, 4 y 8.1 | `codes/aisc_360_22/appendix_<n>.py` |
-| Selección por tipo de miembro compuesto, geometría y requisitos del Capítulo I | `domain/composite.py` |
+| Selección por tipo de miembro compuesto, geometría y requisitos del Capítulo I | `domain/composite/` |
 | Muros en C, vigas de acoplamiento y revisiones de incendio de la guía | `domain/speedcore.py` |
 | Propiedades a temperatura y alcance del método simple (Apéndice 4) | `domain/fire.py` |
 | Coherencia de datos del catálogo (r = √(I/A), S = I/c) | `domain/validation.py` |
@@ -85,8 +85,8 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Decisión PASS/FAIL/INCOMPLETE | `engine.py` |
 | Rigideces elásticas, efectivas y para método directo | `domain/stiffness.py` |
 | Requerimientos técnicos de materiales y geometría | `domain/requirements.py` |
-| Presentación de la memoria de cálculo | `reporting.py` |
-| Nombres en palabras y literales de la memoria | `report_glossary.py` |
+| Presentación de la memoria de cálculo | `reporting/document.py`, `reporting/text.py`, `reporting/pdf.py` |
+| Nombres en palabras y literales de la memoria | `reporting/glossary.py` |
 
 Ninguna interfaz (CLI, futura web) calcula capacidades: todas llaman a `engine`.
 

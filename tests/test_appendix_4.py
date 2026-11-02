@@ -10,7 +10,8 @@ import pytest
 from steel_design.codes.aisc_360_22 import appendix_4 as a4
 from steel_design.execution import execute_payload, member_groups
 from steel_design.models import SteelCase
-from steel_design.reporting import render_text, report_blocks
+from steel_design.reporting.document import report_blocks
+from steel_design.reporting.text import render_text
 
 from conftest import ROOT
 

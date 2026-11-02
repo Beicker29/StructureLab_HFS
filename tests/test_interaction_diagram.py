@@ -9,7 +9,8 @@ import pytest
 
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import SteelCase
-from steel_design.reporting import pdf_bytes, report_blocks
+from steel_design.reporting.document import report_blocks
+from steel_design.reporting.pdf import pdf_bytes
 from steel_design.sections.repository import SectionRepository
 
 from conftest import ROOT, calculation_report
