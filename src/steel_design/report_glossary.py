@@ -91,6 +91,8 @@ PARAMETERS = {
     "Mr_kNm": ("Resistencia requerida a flexión", "Mr", "kN·m"), "Msd_kNm": ("Momento de sección", "Msd", "kN·m"),
     "My_kNm": ("Momento de fluencia", "My", "kN·m"), "PA_kN": ("Carga en el punto A de interacción", "PA", "kN"),
     "PC_kN": ("Carga en el punto C de interacción", "PC", "kN"), "PNA": ("Posición del eje neutro plástico", "PNA", "–"),
+    "Pno_T_web_kN": ("Pno(T) de la columna unitaria del alma", "Pno(T)", "kN"), "Pn_T_web_kN": ("Pn(T) de la columna unitaria del alma", "Pn(T)", "kN"),
+    "Pno_T_flange_kN": ("Pno(T) de la columna unitaria del ala", "Pno(T)", "kN"), "Pn_T_flange_kN": ("Pn(T) de la columna unitaria del ala", "Pn(T)", "kN"),
     "st_mm": ("Ancho de la columna unitaria del muro", "st", "mm"),
     "Fe_ambient_mpa": ("Esfuerzo de pandeo elástico a temperatura ambiente", "Fe", "MPa"), "Lr_T_mm": ("Longitud límite a temperatura elevada", "Lr(T)", "mm"),
     "FL_T_mpa": ("Esfuerzo de fluencia inicial a temperatura elevada", "FL(T)", "MPa"), "cx": ("Exponente del pandeo lateral-torsional a temperatura elevada", "cx", "–"),

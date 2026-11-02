@@ -293,12 +293,10 @@ def test_c_wall_blocks_what_the_guide_does_not_cover(guides_engine):
 FIRE_F = [1450, 927, 694, 533, 406, 305, 229, 173, 134, 108, 92, 83, 79]
 
 
-def fire_wall(temperatures=True, **over):
+def fire_wall(**over):
     """Design Guide 38, Example 6.1: L = 11 ft, tsc = 24, t = 9/16 in, st = 12 in, story 17 ft, Pu = 3600 kips, Table 6-1."""
     data = wall(132, 24, 0.5625, Pu=3600 * KIP, Lc=17)
-    data["fire"] = {"steel_temperature": (1840 - 32) / 1.8}
-    if temperatures:
-        data["fire"]["concrete_layers"] = [{"thickness": 0.88 * IN, "T": (f - 32) / 1.8} for f in FIRE_F]
+    data["fire"] = {"steel_temperature": (1840 - 32) / 1.8, "concrete_layers": [{"thickness": 0.88 * IN, "T": (f - 32) / 1.8} for f in FIRE_F]}
     data["composite"]["fire"] = {"required_rating_hours": 3.0, **over}
     data["condition"] = "fire"
     return data

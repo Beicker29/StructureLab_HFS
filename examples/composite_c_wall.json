@@ -11,6 +11,11 @@
     }
   },
   "cases": [
-    {"name": "Design Guide 38, A.2.3: tension and minor axis flexure", "Pu": -54700, "Muy": 80000, "Vuy": 6000}
+    {"name": "Design Guide 38, A.2.3: tension and minor axis flexure", "Pu": -54700, "Muy": 80000, "Vuy": 6000},
+    {"name": "Incendio con perfiles en alma y alas", "condition": "fire", "Pu": 20000, "lengths": {"Lx": 5000, "Ly": 5000, "Lz": 5000},
+     "fire": {"steel_temperature": 800,
+              "web_layers": [{"thickness": 80, "T": 500}, {"thickness": 85.3, "T": 150}],
+              "flange_layers": [{"thickness": 100, "T": 500}, {"thickness": 192.3, "T": 120}]}},
+    {"name": "Incendio con temperatura constante", "condition": "fire", "Muy": 20000, "Vuy": 2000, "fire": {"steel_temperature": 700, "concrete_temperature": 200}}
   ]
 }

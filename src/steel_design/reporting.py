@@ -337,13 +337,13 @@ def _temperature_blocks(executions: list) -> list[dict]:
         s = fire["steel"]
         steel.append([_case_name(tag), fire["T_C"], s["kE"], s["kp"], s["ky"], s["Fy_T_mpa"], s["Fu_T_mpa"] if s["Fu_T_mpa"] else "no indicado", s["E_T_mpa"], s["G_T_mpa"], "Tabla A-4.2.1"] if s
                      else [_case_name(tag), fire["T_C"]] + ["sin efecto"] * 7 + ["Apéndice 4, 4.2.4d"])
-        concrete += [[_case_name(tag), c["T_C"], c["kc"], c["kEc"], c["fc_T_mpa"], "Tabla A-4.2.2"] for c in fire["concrete"]]
+        concrete += [[_case_name(tag), c["zone"], c["T_C"], c["kc"], c["kEc"], c["fc_T_mpa"], "Tabla A-4.2.2"] for c in fire["concrete"]]
         if fire["bars"]:
             bars.append([_case_name(tag), fire["bars"]["T_C"], fire["bars"]["kE"], fire["bars"]["ky"], "Tabla A-4.2.1"])
     blocks.append({"kind": "p", "text": "Temperaturas del análisis térmico del usuario (Apéndice 4, 4.2.2). Con T del acero ≤ 200 °C las resistencias no consideran la temperatura (4.2.4d)."})
     blocks.append({"kind": "table", "headers": ["Case", "T del acero (°C)", "kE", "kp", "ky", "Fy(T) (MPa)", "Fu(T) (MPa)", "E(T) (MPa)", "G(T) (MPa)", "Literal"], "rows": steel})
     if concrete:
-        blocks.append({"kind": "table", "headers": ["Case", "T del concreto (°C)", "kc", "kEc", "f'c(T) (MPa)", "Literal"], "rows": concrete})
+        blocks.append({"kind": "table", "headers": ["Case", "Zona", "T del concreto (°C)", "kc", "kEc", "f'c(T) (MPa)", "Literal"], "rows": concrete})
     if bars:
         blocks.append({"kind": "table", "headers": ["Case", "T de las barras (°C)", "kE", "ky", "Literal"], "rows": bars})
     return blocks

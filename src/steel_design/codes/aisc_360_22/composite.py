@@ -312,10 +312,10 @@ def pno_wall(*, Fy, As, fc, Ac) -> float:
     return Fy * As + 0.85 * fc * Ac
 
 
-def wall_shear(*, Asw, Fy, Ec, Ac) -> dict:
+def wall_shear(*, Asw, Fy, Ec, Ac, Es=E_STEEL, Gs=G_STEEL) -> dict:
     """I4-2 to I4-4."""
-    Ks = G_STEEL * Asw
-    Ksc = 0.7 * (Ec * Ac) * (E_STEEL * Asw) / (4 * E_STEEL * Asw + Ec * Ac)
+    Ks = Gs * Asw
+    Ksc = 0.7 * (Ec * Ac) * (Es * Asw) / (4 * Es * Asw + Ec * Ac)
     return {"Vn": (Ks + Ksc) / math.sqrt(3 * Ks**2 + Ksc**2) * Asw * Fy, "Ks_N": Ks, "Ksc_N": Ksc}
 
 

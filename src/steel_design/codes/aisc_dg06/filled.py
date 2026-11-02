@@ -23,7 +23,7 @@ def _between(r, low, high):
     return tuple(a - b for a, b in zip(above_low, above_high))
 
 
-def round_yield_moment(*, Fy, fc, Ec, D, t, Fysr=0.0, bars=()) -> dict:
+def round_yield_moment(*, Fy, fc, Ec, D, t, Fysr=0.0, bars=(), Es=E_STEEL) -> dict:
     """Neutral axis at yn (compression above): steel linear from Fy at the top fiber and yielded in tension below;
     concrete linear up to 0.7f'c at the inside of the tube; bars with the strain of the concrete, up to Fysr.
     bars = [(area, v from the bending axis)]. Returns My (N*mm) and yn (mm).
@@ -48,7 +48,7 @@ def round_yield_moment(*, Fy, fc, Ec, D, t, Fysr=0.0, bars=()) -> dict:
         moment += slope_c * (c_i - yn * c_q)
         strain_top = 0.7 * fc / Ec
         for area, v in bars:
-            stress = E_STEEL * strain_top * (v - yn) / (ri - yn)
+            stress = Es * strain_top * (v - yn) / (ri - yn)
             stress = max(min(stress, Fysr), -Fysr)
             if v > yn:                                               # the bar displaces compressed concrete
                 concrete = slope_c * (v - yn)

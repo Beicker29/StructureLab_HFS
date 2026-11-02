@@ -227,7 +227,7 @@ class SteelDesignEngine:
         for name in uncovered:
             check_id, unit, demand = _FIRE_CHECKS[name]
             error = {"code": "FIRE_NOT_COVERED", "provision": "Apéndice 4, 4.2.4d",
-                     "message": f"4.2.4d no da una regla para {name} en composite.kind = {case.composite.kind} a más de 200 °C."}
+                     "message": f"Sin método a más de 200 °C para {name} en composite.kind = {case.composite.kind} (Apéndice 4, 4.2.4d; decisión DA4-1)."}
             checks.append(Check(id=check_id, chapter="I", demand=abs(getattr(case, name)), unit=unit, status=Status.INCOMPLETE,
                                 obligations=composite_obligations(case, demand), errors=[error]))
         if case.composite.fire is not None:
@@ -279,7 +279,7 @@ class SteelDesignEngine:
                      else member_stiffness(case, section, catalog=self._catalog))
         return DesignResult(section=section.name, family=section.type, status=status, condition=case.condition, checks=checks, stiffness=stiffness,
                             requirements=requirements, serviceability=deflection_checks(case.serviceability),
-                            interaction_diagrams=interaction_diagrams(case, section, checks) if case.condition != "fire" else [],
+                            interaction_diagrams=interaction_diagrams(case, section, checks),
                             fire=fire_summary(case),
                             section_data=section.model_dump(mode="json", exclude_none=True))
 

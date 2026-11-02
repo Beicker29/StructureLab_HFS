@@ -349,32 +349,28 @@ class WallFire(InputModel):
         return self
 
 
-class ConcreteElement(InputModel):
-    """One element of the concrete of a filled column, with uniform temperature (User Note of 4.2.4d(d))."""
-    A: PositiveNumber = Field(..., description="Area (mm2)")
-    Ix: PositiveNumber = Field(..., description="Moment of inertia about the x axis of the member (mm4)")
-    Iy: PositiveNumber = Field(..., description="Moment of inertia about the y axis of the member (mm4)")
-    T: float = Field(..., ge=20, le=1200, description="Temperature (deg C)")
-
-
 class ConcreteLayer(InputModel):
-    """One layer of the concrete of a wall, from the plate towards mid-thickness, with uniform temperature."""
+    """One layer of the concrete of a wall or coupling beam, from the plate towards mid-thickness, with uniform temperature."""
     thickness: PositiveNumber = Field(..., description="Thickness (mm)")
-    T: float = Field(..., ge=20, le=1200, description="Temperature (deg C)")
+    T: float = Field(..., ge=20, lt=1200, description="Temperature (deg C)")
 
 
 class FireBasis(InputModel):
-    """Temperatures of a fire case (Appendix 4, 4.2.4d), from the user's heat transfer analysis (4.2.2), in deg C."""
-    steel_temperature: float = Field(..., ge=20, lt=1200, description="Maximum steel temperature; bottom flange in beams")
-    concrete_temperature: Optional[float] = Field(None, ge=20, le=1200, description="Uniform concrete temperature: filled columns and walls")
-    concrete_elements: Optional[list[ConcreteElement]] = Field(None, min_length=1, description="Concrete of a filled column by elements; they must add up to Ac, Icx and Icy")
-    concrete_layers: Optional[list[ConcreteLayer]] = Field(None, min_length=1, description="Concrete of a wall by layers, from the plate to mid-thickness; they must add up to tsc/2 - t")
-    bar_temperature: Optional[float] = Field(None, ge=20, lt=1200, description="Temperature of the longitudinal bars of a filled column")
+    """Temperatures of a fire case (Appendix 4, 4.2.4d), from the user's heat transfer analysis (4.2.2), in deg C. Each material has its own."""
+    steel_temperature: float = Field(..., ge=20, lt=1200, description="Steel temperature, uniform; bottom flange in beams")
+    concrete_temperature: Optional[float] = Field(None, ge=20, lt=1200, description="Uniform concrete temperature")
+    concrete_layers: Optional[list[ConcreteLayer]] = Field(None, min_length=1, description="Walls and coupling beams: profile from the plate to mid-thickness; adds up to half the concrete")
+    web_layers: Optional[list[ConcreteLayer]] = Field(None, min_length=1, description="C-shaped walls: profile of the web, adds up to tsc_w/2 - tp")
+    flange_layers: Optional[list[ConcreteLayer]] = Field(None, min_length=1, description="C-shaped walls: profile of the flanges, adds up to tsc_f/2 - tp")
+    bar_temperature: Optional[float] = Field(None, ge=20, lt=1200, description="Temperature of the longitudinal bars")
 
     @model_validator(mode="after")
     def one_concrete_description(self):
-        if sum(v is not None for v in (self.concrete_temperature, self.concrete_elements, self.concrete_layers)) > 1:
-            raise ValueError("Indique concrete_temperature, concrete_elements o concrete_layers, solo uno.")
+        panels = self.web_layers is not None or self.flange_layers is not None
+        if panels and (self.web_layers is None or self.flange_layers is None):
+            raise ValueError("Un muro en C por capas requiere web_layers y flange_layers.")
+        if sum((self.concrete_temperature is not None, self.concrete_layers is not None, panels)) > 1:
+            raise ValueError("Indique una sola descripción del concreto: concrete_temperature, concrete_layers o web_layers con flange_layers.")
         return self
 
 
@@ -534,9 +530,8 @@ class SteelCase(InputModel):
             raise ValueError("composite.fire solo se indica en un case con condition = fire.")
         if self.condition == "fire" and composite is not None and (composite.second_order or composite.anchor):
             raise ValueError("Un case de incendio no admite composite.second_order ni composite.anchor (Apéndice 4, 4.2.4d no los trata).")
-        if self.fire is not None and composite is None and any(v is not None for v in (
-                self.fire.concrete_temperature, self.fire.concrete_elements, self.fire.concrete_layers, self.fire.bar_temperature)):
-            raise ValueError("Un miembro de acero solo lleva fire.steel_temperature.")
+        if self.fire is not None:
+            self._temperatures_of_each_material()
         if composite is not None and composite.second_order is not None:
             if self.Pu or self.Mux or self.Muy:
                 raise ValueError("Con composite.second_order, Pu, Mux y Muy salen de A-8-1 y A-8-2; no los indique.")
@@ -551,6 +546,27 @@ class SteelCase(InputModel):
         if self.Pu > 0 and self.lengths is None:
             raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
         return self
+
+    def _temperatures_of_each_material(self):
+        """Each material present has its temperature, always (user's decision DA4-9): the JSON states them, nothing is assumed."""
+        fire, composite = self.fire, self.composite
+        concrete_given = {"uniform": fire.concrete_temperature is not None, "layers": fire.concrete_layers is not None, "panels": fire.web_layers is not None}
+        if composite is None:
+            if any(concrete_given.values()) or fire.bar_temperature is not None:
+                raise ValueError("Un miembro de acero solo lleva fire.steel_temperature.")
+            return
+        allowed = {"filled": {"uniform"}, "encased": {"uniform"}, "beam": {"uniform"}, "wall": {"uniform", "layers"},
+                   "coupling_beam": {"uniform", "layers"}, "c_wall": {"uniform", "panels"}}[composite.kind]
+        given = {name for name, value in concrete_given.items() if value}
+        if not given:
+            raise ValueError("Un case de incendio debe indicar la temperatura del concreto (fire.concrete_temperature o su perfil).")
+        if given - allowed:
+            raise ValueError(f"composite.kind = {composite.kind} no admite ese perfil de temperaturas del concreto.")
+        bars = composite.encased or composite.filled
+        if bars and fire.bar_temperature is None:
+            raise ValueError("Un miembro con barras debe indicar fire.bar_temperature.")
+        if not bars and fire.bar_temperature is not None:
+            raise ValueError("fire.bar_temperature corresponde a un miembro con barras.")
 
 
 class Status(str, Enum):

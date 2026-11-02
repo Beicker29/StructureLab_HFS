@@ -3,20 +3,23 @@
 Not a standard: ANSI/AISC 360-22 I3.5 and I5(c) refer to the plastic stress distribution of I1.2a, and the guide writes it
 out for these shapes. Units N, mm. C is measured from the outer face of the web (A.2.1 to A.2.5), from the end of the web
 (A.2.6) or from the compression face (A.3). Each function reports whether C lies in the zone its equations assume.
+fc is the concrete of the web; fc_f, that of the flanges when it differs (at temperature, DA4-8).
 """
 
 WET_CONCRETE_POUR_HEIGHT = 9144.0   # Section 2.2.1.2: 30 ft, for modules that meet the plate slenderness requirement (mm)
 
 
-def c_wall_properties(*, L, W, tsc_w, tsc_f, tp, n) -> dict:
-    """Areas, elastic centroid (from the web outer face) and inertias; n = Ec/Es, as in Example 2.3."""
+def c_wall_properties(*, L, W, tsc_w, tsc_f, tp, n, n_f=None) -> dict:
+    """Areas, elastic centroid (from the web outer face) and inertias; n = Ec/Es, as in Example 2.3; n_f in the flanges when it differs."""
+    n_f = n if n_f is None else n_f
     tc_w, tc_f = tsc_w - 2 * tp, tsc_f - 2 * tp
     web = L - 4 * tp
     steel = [(tp * W, W / 2)] * 4 + [(web * tp, tsc_w - tp / 2), (web * tp, tp / 2), (tc_f * tp, W - tp / 2), (tc_f * tp, W - tp / 2)]
     core = W - tsc_w - tp
     concrete = [(core * tc_f, tsc_w + core / 2)] * 2 + [(web * tc_w, tsc_w / 2)]
     As, Ac = sum(a for a, _ in steel), sum(a for a, _ in concrete)
-    y = (sum(a * v for a, v in steel) + n * sum(a * v for a, v in concrete)) / (As + n * Ac)
+    y = ((sum(a * v for a, v in steel) + n_f * 2 * core * tc_f * (tsc_w + core / 2) + n * web * tc_w * tsc_w / 2)
+         / (As + n_f * 2 * core * tc_f + n * web * tc_w))
     # Minor axis (through y): depth along W. Major axis (mid-length): depth along L.
     Is_y = (4 * tp * W**3 / 12 + 4 * tp * W * (W / 2 - y) ** 2
             + web * tp**3 / 12 * 2 + web * tp * ((tsc_w - tp / 2 - y) ** 2 + (tp / 2 - y) ** 2)
@@ -37,10 +40,10 @@ def _geometry(L, tp, tsc_w, tsc_f):
     return L - 4 * tp, tsc_w - 2 * tp, tsc_f - 2 * tp
 
 
-def flange_tips_in_compression(*, L, W, tsc_w, tsc_f, tp, Fy, fc, T=0.0, y=0.0) -> dict:
+def flange_tips_in_compression(*, L, W, tsc_w, tsc_f, tp, Fy, fc, fc_f=None, T=0.0, y=0.0) -> dict:
     """A.2.1 (T = 0) and A.2.3 (axial tension T > 0 at the centroid y): plastic neutral axis in the flanges."""
     web, _, tc_f = _geometry(L, tp, tsc_w, tsc_f)
-    c = 0.85 * fc
+    c = 0.85 * (fc if fc_f is None else fc_f)                        # only the concrete of the flanges compresses
     C = (T + 4 * tp * W * Fy + 2 * tp * tc_f * Fy + c * 2 * tc_f * (W - tp) - 2 * tp * web * Fy) / (8 * tp * Fy + c * 2 * tc_f)
     C1, C2, C3 = 4 * (W - C) * tp * Fy, 2 * tc_f * tp * Fy, c * 2 * tc_f * (W - C - tp)
     T1, T2, T3 = 4 * C * tp * Fy, web * tp * Fy, web * tp * Fy
@@ -49,7 +52,7 @@ def flange_tips_in_compression(*, L, W, tsc_w, tsc_f, tp, Fy, fc, T=0.0, y=0.0) 
     return {"C": C, "Mp": Mp, "equation": "DG38 A.2.3" if T else "DG38 A.2.1", "valid": tsc_w <= C <= W - tp}
 
 
-def web_in_compression(*, L, W, tsc_w, tsc_f, tp, Fy, fc) -> dict:
+def web_in_compression(*, L, W, tsc_w, tsc_f, tp, Fy, fc, fc_f=None) -> dict:
     """A.2.2: no axial force, plastic neutral axis in the web."""
     web, _, tc_f = _geometry(L, tp, tsc_w, tsc_f)
     c = 0.85 * fc
@@ -61,15 +64,15 @@ def web_in_compression(*, L, W, tsc_w, tsc_f, tp, Fy, fc) -> dict:
     return {"C": C, "Mp": Mp, "equation": "DG38 A.2.2", "valid": tp <= C <= tsc_w - tp}
 
 
-def web_in_compression_with_axial(*, L, W, tsc_w, tsc_f, tp, Fy, fc, P, y) -> dict:
+def web_in_compression_with_axial(*, L, W, tsc_w, tsc_f, tp, Fy, fc, P, y, fc_f=None) -> dict:
     """A.2.4 (neutral axis in the flange concrete) or, when its C falls short of the web, A.2.5 (in the interior web plate)."""
     web, tc_w, tc_f = _geometry(L, tp, tsc_w, tsc_f)
-    c = 0.85 * fc
-    C = ((P - 2 * tp * web * Fy - tc_w * web * c + 2 * tc_f * tsc_w * c + 4 * tp * W * Fy + 2 * tp * tc_f * Fy)
-         / (8 * tp * Fy + 2 * tc_f * c))
+    c, cf = 0.85 * fc, 0.85 * (fc if fc_f is None else fc_f)
+    C = ((P - 2 * tp * web * Fy - tc_w * web * c + 2 * tc_f * tsc_w * cf + 4 * tp * W * Fy + 2 * tp * tc_f * Fy)
+         / (8 * tp * Fy + 2 * tc_f * cf))
     if C >= tsc_w:
         C1, C2, C3 = 4 * C * tp * Fy, tp * web * Fy, tp * web * Fy
-        C4, C5 = c * tc_w * web, c * 2 * tc_f * (C - tsc_w)
+        C4, C5 = c * tc_w * web, cf * 2 * tc_f * (C - tsc_w)
         T1, T2 = 4 * (W - C) * tp * Fy, 2 * tp * tc_f * Fy
         Mp = (C1 * C / 2 + C2 * (C - tp / 2) + C3 * (C - tsc_w + tp / 2) + C4 * (C - tsc_w / 2) + C5 * (C - tsc_w) / 2
               + T1 * (W - C) / 2 + T2 * (W - C - tp / 2) + P * (y - C))
@@ -84,14 +87,14 @@ def web_in_compression_with_axial(*, L, W, tsc_w, tsc_f, tp, Fy, fc, P, y) -> di
     return {"C": C, "Mp": Mp, "equation": "DG38 A.2.5", "valid": tsc_w - tp <= C <= tsc_w}
 
 
-def major_axis(*, L, W, tsc_w, tsc_f, tp, Fy, fc) -> dict:
+def major_axis(*, L, W, tsc_w, tsc_f, tp, Fy, fc, fc_f=None) -> dict:
     """A.2.6: no axial force, plastic neutral axis in the web. The flange-wall length without perpendicular plates is Wc."""
     _, tc_w, tc_f = _geometry(L, tp, tsc_w, tsc_f)
     Wc = W - 3 * tp
-    c = 0.85 * fc
-    C = (2 * L * tp * Fy + c * (tc_w * tsc_f - tc_f * Wc)) / (4 * tp * Fy + c * tc_w)
+    c, cf = 0.85 * fc, 0.85 * (fc if fc_f is None else fc_f)
+    C = (2 * L * tp * Fy + c * tc_w * tsc_f - cf * tc_f * Wc) / (4 * tp * Fy + c * tc_w)
     flange, end = Wc * tp * Fy, tsc_f * tp * Fy
-    C4, C5, C6 = 2 * C * tp * Fy, c * Wc * tc_f, c * (C - tsc_f) * tc_w
+    C4, C5, C6 = 2 * C * tp * Fy, cf * Wc * tc_f, c * (C - tsc_f) * tc_w
     T4 = 2 * (L - C) * tp * Fy
     Mp = (flange * (C - tp / 2) + flange * (C - tsc_f + tp / 2) + end * (C - tsc_f / 2) + C4 * C / 2 + C5 * (C - tsc_f / 2)
           + C6 * (C - tsc_f) / 2 + flange * (L - C - tp / 2) + flange * (L - C - tsc_f + tp / 2) + end * (L - C - tsc_f / 2)

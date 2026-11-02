@@ -7,7 +7,7 @@ from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_dg06 import interaction_tables as tables
 from ..models import Check, SteelCase
 from ..sections.models import Section
-from .composite import _encased_geometry, _filled_geometry, uses_appendix_2
+from .composite import _encased_geometry, _filled_geometry, composite_materials, uses_appendix_2
 
 TOLERANCE_MM = 1e-6
 TITLES = {"6-2a": "Tabla 6-2a del Manual (Guía 6, Fig. 2-7)", "6-2b": "Tabla 6-2b del Manual (Guía 6, Fig. 2-8)",
@@ -15,7 +15,8 @@ TITLES = {"6-2a": "Tabla 6-2a del Manual (Guía 6, Fig. 2-7)", "6-2b": "Tabla 6-
 
 
 def _filled_points(case, section, geometry, axis):
-    Fy, fc = case.material.Fy, case.composite.concrete.fc
+    m = composite_materials(case, section)                # at the temperature of a fire case
+    Fy, fc = m["Fy"], m["fc"]
     if geometry["shape"] == "round":
         return "6-4", tables.table_6_4(Fy=Fy, fc=fc, d=geometry["D"], t=geometry["t"])
     bi, hi, H, Zs = ((geometry["bi"], geometry["hi"], section.h_out, section.zx) if axis == "x"
@@ -81,7 +82,9 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
         lam, note = 1.0, "Sin compresión: sin reducción por longitud (λ = 1)."
         if axial is not None and case.Pu > 0:
             mode = axial.result["modes"][axial.result["governing_mode"]]
-            lam, note = mode["Pn_kN"] / mode["Pno_kN"], "λ = Pn/Pno (Commentary I5)."
+            lam, note = mode["Pn_kN"] / mode.get("Pno_kN", mode.get("Pno_T_kN")), "λ = Pn/Pno (Commentary I5)."
+        if case.condition == "fire" and case.fire.steel_temperature > 200:
+            note += " Con Fy(T) y f'c(T) del case de incendio (decisión DA4-8)."
         rows = [{"point": name, "P_kN": P / 1000.0, "M_kNm": M / 1e6, "lambda_P_kN": lam * P / 1000.0,
                  "design_P_kN": eq.PHI_C * lam * P / 1000.0, "design_M_kNm": eq.PHI_B * M / 1e6} for name, (P, M) in points.items()]
         out.append({**entry, "table": TITLES[table], "lambda": lam, "note": note, "phi_c": eq.PHI_C, "phi_b": eq.PHI_B, "points": rows,

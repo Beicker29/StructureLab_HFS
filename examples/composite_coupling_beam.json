@@ -13,6 +13,8 @@
     "coupling_beam": {"b": 450, "h": 600, "tf": 20, "tw": 12}
   },
   "cases": [
-    {"name": "Design Guide 38, A.3 and Equation 2-19", "Mux": 1800, "Vux": 1500}
+    {"name": "Design Guide 38, A.3 and Equation 2-19", "Mux": 1800, "Vux": 1500},
+    {"name": "Incendio con perfil de concreto", "condition": "fire", "Mux": 300, "Vux": 300,
+     "fire": {"steel_temperature": 700, "concrete_layers": [{"thickness": 100, "T": 400}, {"thickness": 113, "T": 150}]}}
   ]
 }

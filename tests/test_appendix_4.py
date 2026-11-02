@@ -19,6 +19,7 @@ HOLES = {"tension_flange_holes": False}
 CONCRETE = {"fc": 35, "wc": 2320, "lightweight": False}
 STUDS = {"count": 44, "d": 19, "Fu": 450, "length": 120, "over_web": True,
          "detailing": {"longitudinal_spacing": 300, "lateral_cover": 50, "free_edge": True, "free_edge_distance": 300, "distribution": "uniform"}}
+TIES = {"db": 10, "spacing": 300}
 
 
 def fire_case(T, *, name="W12X72", L=4000, fire=None, **data):
@@ -32,9 +33,36 @@ def beam_data(**over):
             "beam": {"moment": "positive", "span": 13716, "left_beam_spacing": 3048, "right_beam_spacing": 3048, "tc": 114, "shored": True, "studs": STUDS, **over}}
 
 
-def _case_of(ref):
-    spec = ref["spec"]
-    kind, T = spec["kind"], spec["T"]
+def composite_fire(name, composite, temperatures, L=None, fy=345, tau_b=1.0, **demand):
+    lengths = {"lengths": {"Lx": L, "Ly": L, "Lz": L}} if L else {}
+    return SteelCase(section_name=name, material={"Fy": fy}, condition="fire", fire=temperatures, tau_b=tau_b, composite=composite, **lengths, **demand)
+
+
+def _layers(layers):
+    return [{"thickness": h, "T": t} for h, t in layers]
+
+
+def _bars(spec):
+    return {"Fysr": spec["Fysr"], "transverse": TIES, "bars": [{"area": a, "db": db, "x": x, "y": y} for a, db, x, y in spec["bars"]]}
+
+
+def _wall(spec):
+    return {"kind": "wall", "concrete": {"fc": spec["fc"], "wc": spec.get("wc", 2320), "lightweight": False},
+            "wall": {"length": spec["L"], "tsc": spec["tsc"], "t": spec["t"], "tf": spec["tf"], "b": 200, "st": 300, "dtie": 25}}
+
+
+def _c_wall(spec, compression="flange_tips"):
+    return {"kind": "c_wall", "concrete": {"fc": spec.get("fc", 35), "wc": 2320, "lightweight": False},
+            "c_wall": {"L": spec["L"], "W": spec["W"], "tsc_w": spec.get("tsc_w", 400), "tsc_f": spec["tsc_f"], "tp": spec["tp"], "b": 300, "st": 300, "dtie": 25,
+                       "minor_axis_compression": compression}}
+
+
+def _coupling(spec):
+    return {"kind": "coupling_beam", "concrete": {"fc": spec["fc"], "wc": 2320, "lightweight": False},
+            "coupling_beam": {k: spec[k] for k in ("b", "h", "tf", "tw")}}
+
+
+def _steel_case_of(spec, kind, T):
     if kind == "tension":
         return fire_case(T, name=spec["name"], L=None, Pu=-1, tension={"An": spec["An"], "U": spec["U"]}), "axial", {"available_kN": "phiPn_kN"}
     if kind == "compression":
@@ -52,32 +80,82 @@ def _case_of(ref):
     if kind == "shear_w":
         moment = {"Vux": 1} if spec["axis"] == "x" else {"Vuy": 1}
         return fire_case(T, name=spec["name"], L=None, **moment), f"shear_{spec['axis']}", {"available_kN": "phiVn_kN"}
-    if kind == "interaction":
-        return fire_case(T, name=spec["name"], L=spec["L"], Pu=spec["Pu"], Mux=spec["Mu"]), "interaction", {"ratio": "ratio"}
-    length = {"Lx": spec.get("L", 1), "Ly": spec.get("L", 1), "Lz": spec.get("L", 1)}
-    if kind in {"filled_uniform", "filled_elements", "filled_round_bars"}:
-        composite = {"kind": "filled", "concrete": CONCRETE}
-        temperatures = {"steel_temperature": T}
-        if kind == "filled_uniform":
-            temperatures["concrete_temperature"] = spec["Tc"]
-        elif kind == "filled_round_bars":
-            temperatures.update(concrete_temperature=spec["Tc"], bar_temperature=spec["bar_T"])
-            composite["filled"] = {"Fysr": 420, "transverse": {"db": 10, "spacing": 300},
-                                   "bars": [{"area": a, "db": db, "x": x, "y": y} for a, db, x, y in spec["bars"]]}
-        else:
-            temperatures["concrete_elements"] = [{"A": float(a), "Ix": float(x), "Iy": float(y), "T": t} for a, x, y, t in ref["elements"]]
-        return (SteelCase(section_name=spec["name"], material={"Fy": spec["fy"]}, condition="fire", fire=temperatures, Pu=1, lengths=length, tau_b=0.8, composite=composite),
-                "axial", {"Pn_kN": "Pn_kN", "available_kN": "phiPn_kN"})
+    assert kind == "interaction"
+    return fire_case(T, name=spec["name"], L=spec["L"], Pu=spec["Pu"], Mux=spec["Mu"]), "interaction", {"ratio": "ratio"}
+
+
+def _case_of(ref):
+    spec = ref["spec"]
+    kind, T = spec["kind"], spec["T"]
+    if kind in {"tension", "compression", "ltb_compact_w", "noncompact_w", "minor_axis_w", "shear_w", "interaction"}:
+        return _steel_case_of(spec, kind, T)
+    if kind == "beam":
+        case = fire_case(T, name=spec["name"], Mux=1, L=None, composite=beam_data(), tau_b=1.0, fire={"concrete_temperature": 300})
+        return case, "flexure_x", {"modes.Y.kcb": "kcb", "Mn_kNm": "Mn_kNm", "available_kNm": "phiMn_kNm"}
+    fire = {"steel_temperature": T}
+    if kind.startswith("filled"):
+        return _filled_case(spec, kind, fire)
     if kind == "wall_uniform":
         composite = {"kind": "wall", "concrete": {"fc": spec["fc"], "wc": spec["wc"], "lightweight": False},
                      "wall": {"length": spec["wall_length"], "tsc": spec["tsc"], "t": spec["t"], "tf": spec["t"], "b": 200, "st": spec["st"], "dtie": 25}}
-        height = {"Lx": spec["height"], "Ly": spec["height"], "Lz": spec["height"]}
-        return (SteelCase(section_name="MURO", material={"Fy": spec["fy"]}, condition="fire", fire={"steel_temperature": T, "concrete_temperature": spec["Tc"]},
-                          Pu=1, lengths=height, tau_b=1.0, composite=composite),
+        return (composite_fire("MURO", composite, {**fire, "concrete_temperature": spec["Tc"]}, L=spec["height"], Pu=1),
                 "axial", {"modes.FB.Pno_T_kN": "Pno_T_kN", "modes.FB.Pn_T_kN": "Pn_T_kN", "available_kN": "phiPn_kN"})
-    assert kind == "beam"
-    return (fire_case(T, name=spec["name"], Mux=1, L=None, composite=beam_data(), tau_b=1.0), "flexure_x",
-            {"modes.Y.kcb": "kcb", "Mn_kNm": "Mn_kNm", "available_kNm": "phiMn_kNm"})
+    if kind == "wall_tension":
+        return composite_fire("MURO", _wall({**spec, "fc": 40}), {**fire, "concrete_temperature": 200}, Pu=-1), "axial", {"available_kN": "phiPn_kN"}
+    if kind == "wall_flexure":
+        temperatures = {**fire, "concrete_layers": _layers(spec["layers"])}
+        if spec.get("P"):
+            return composite_fire("MURO", _wall(spec), temperatures, L=5000, Pu=spec["P"], Mux=1), "interaction", {"modes.I5c.Mc_at_Pr_kNm": "Mc_kNm"}
+        return composite_fire("MURO", _wall(spec), temperatures, Mux=1), "flexure_x", {"Mn_kNm": "Mn_kNm"}
+    if kind == "wall_shear":
+        return composite_fire("MURO", _wall(spec), {**fire, "concrete_layers": _layers(spec["layers"])}, Vux=1), "shear_x", {"available_kN": "phiVn_kN"}
+    return _c_wall_or_coupling(spec, kind, fire)
+
+
+def _filled_case(spec, kind, fire):
+    filled = {"kind": "filled", "concrete": {**CONCRETE, "fc": spec.get("fc", 35)}}
+    fire["concrete_temperature"] = spec.get("Tc", 300)
+    if "bars" in spec:
+        fire["bar_temperature"] = spec["bar_T"]
+        filled["filled"] = _bars({"Fysr": 420, **spec})
+    common = dict(name=spec["name"], composite=filled, temperatures=fire, fy=spec["fy"], tau_b=0.8)
+    if kind in {"filled_uniform", "filled_round_bars"}:
+        return composite_fire(L=spec["L"], Pu=1, **common), "axial", {"Pn_kN": "Pn_kN", "available_kN": "phiPn_kN"}
+    if kind == "filled_tension":
+        return composite_fire(Pu=-1, **common), "axial", {"available_kN": "phiPn_kN"}
+    if kind in {"filled_flexure", "filled_round_bars_flexure"}:
+        axis = spec.get("axis", "x")
+        return composite_fire(**common, **{"Mux" if axis == "x" else "Muy": 1}), f"flexure_{axis}", {"Mn_kNm": "Mn_kNm"}
+    if kind == "filled_shear":
+        return composite_fire(Vux=1, **common), "shear_x", {"available_kN": "phiVn_kN"}
+    if kind == "filled_h1":
+        return composite_fire(L=spec["L"], Pu=spec["Pu"], Mux=spec["Mu"], **common), "interaction", {"ratio": "ratio"}
+    assert kind == "filled_m2s"
+    filled["interaction"] = "M2S"
+    return composite_fire(L=spec["L"], Pu=spec["Pu"], Mux=spec["Mu"], **common), "interaction", {"ratio": "ratio", "modes.M2.PA_kN": "PA_kN", "modes.M2.PC_kN": "PC_kN"}
+
+
+def _c_wall_or_coupling(spec, kind, fire):
+    profiles = {"web_layers": _layers(spec["web"]), "flange_layers": _layers(spec["flange"])} if "web" in spec else {}
+    if kind == "c_wall_compression":
+        return (composite_fire("MURO-C", _c_wall(spec), {**fire, **profiles}, L=spec["height"], Pu=1), "axial",
+                {"modes.FB.Pn_T_web_kN": "Pn_T_web_kN", "modes.FB.Pn_T_flange_kN": "Pn_T_flange_kN", "Pn_kN": "Pn_kN", "available_kN": "phiPn_kN"})
+    if kind == "c_wall_tension":
+        return composite_fire("MURO-C", _c_wall(spec), {**fire, "concrete_temperature": 200}, Pu=-1), "axial", {"available_kN": "phiPn_kN"}
+    if kind == "c_wall_flexure":
+        moment = {"Mux": 1} if spec["mode"] == "major" else {"Muy": 1}
+        return (composite_fire("MURO-C", _c_wall(spec), {**fire, "concrete_temperature": spec["Tc"]}, **moment), "flexure_x" if spec["mode"] == "major" else "flexure_y",
+                {"Mn_kNm": "Mn_kNm"})
+    if kind == "c_wall_major_profiles":
+        return composite_fire("MURO-C", _c_wall(spec), {**fire, **profiles}, Mux=1), "flexure_x", {"Mn_kNm": "Mn_kNm"}
+    if kind == "c_wall_shear":
+        temperatures = {**fire, "web_layers": _layers(((184, 300),)), "flange_layers": _layers(spec["flange"])}
+        return composite_fire("MURO-C", _c_wall({**spec, "L": 6000}), temperatures, Vuy=1), "shear_y", {"available_kN": "phiVn_kN"}
+    temperatures = {**fire, "concrete_layers": _layers(spec["layers"])}
+    if kind == "coupling_m":
+        return composite_fire("CB", _coupling(spec), temperatures, Mux=1), "flexure_x", {"Mn_kNm": "Mn_kNm"}
+    assert kind == "coupling_v"
+    return composite_fire("CB", _coupling(spec), temperatures, Vux=1), "shear_x", {"available_kN": "phiVn_kN"}
 
 
 def _path(result, dotted):
@@ -130,10 +208,11 @@ def test_at_200_degrees_or_less_the_strength_is_the_ambient_one(engine, build):
     assert engine.run(build(200.1)).checks[0].result["fire"]["T_C"] == 200.1
 
 
-def test_filled_flexure_at_200_degrees_uses_chapter_i(engine):
-    case = SteelCase(section_name="PTE100X50X3MM", material={"Fy": 345}, condition="fire", fire={"steel_temperature": 150}, Mux=1, tau_b=0.8,
-                     composite={"kind": "filled", "concrete": CONCRETE})
-    assert engine.run(case).check("flexure_x").capacity is not None
+def test_composite_member_at_200_degrees_ignores_the_temperature_of_its_concrete(engine):
+    composite = {"kind": "filled", "concrete": CONCRETE}
+    hot = composite_fire("PTE100X50X3MM", composite, {"steel_temperature": 150, "concrete_temperature": 900}, tau_b=0.8, Mux=1)
+    ambient = hot.model_copy(update={"condition": "ultimate", "fire": None})
+    assert engine.run(hot).check("flexure_x").capacity == engine.run(ambient).check("flexure_x").capacity
 
 
 def test_classification_stays_at_ambient_temperature(engine):
@@ -144,9 +223,34 @@ def test_classification_stays_at_ambient_temperature(engine):
     assert result["modes"]["FLB"]["equation"] == "F3-1"
 
 
+def test_noncompact_filled_flexure_keeps_its_ambient_class_at_temperature(engine):
+    composite = {"kind": "filled", "concrete": CONCRETE}
+    temperatures = {"steel_temperature": 700, "concrete_temperature": 300}
+    result = engine.run(composite_fire("PTE300X100X5MM", composite, temperatures, tau_b=0.8, Muy=1)).check("flexure_y").result
+    ambient = engine.run(SteelCase(section_name="PTE300X100X5MM", material={"Fy": 345}, tau_b=0.8, composite=composite, Muy=1)).check("flexure_y").result
+    assert [r["class"] for r in result["classification"]["elements"]] == [r["class"] for r in ambient["classification"]["elements"]]
+    mode = result["modes"]["Y"]
+    assert mode["equation"] == "I3-5b" and mode["My_kNm"] <= mode["Mn_kNm"] <= mode["Mp_kNm"]
+
+
 def test_instability_by_chapter_f_warns_of_the_commentary(engine):
     result = engine.run(fire_case(550, name="W14X90", L=9000, Mux=1)).check("flexure_x").result
     assert result["governing_mode"] == "LTB" and any("Commentary" in n and "DA4-3" in n for n in result["notes"])
+
+
+def test_composite_extensions_say_they_are_outside_the_standard(engine):
+    composite = {"kind": "filled", "concrete": CONCRETE}
+    result = engine.run(composite_fire("PTE100X50X3MM", composite, {"steel_temperature": 600, "concrete_temperature": 300}, tau_b=0.8, Mux=1)).check("flexure_x").result
+    assert any("DA4-8" in n for n in result["notes"])
+
+
+def test_interaction_diagram_uses_the_materials_at_temperature(engine):
+    composite = {"kind": "filled", "concrete": CONCRETE}
+    data = dict(section_name="PTE100X50X3MM", material={"Fy": 345}, tau_b=0.8, composite=composite, Pu=5, Mux=0.5, lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000})
+    ambient = engine.run(SteelCase(**data)).interaction_diagrams[0]
+    hot = engine.run(SteelCase(**data, condition="fire", fire={"steel_temperature": 600, "concrete_temperature": 300})).interaction_diagrams[0]
+    point = {p["point"]: p for p in hot["points"]}
+    assert point["A"]["P_kN"] < {p["point"]: p for p in ambient["points"]}["A"]["P_kN"] and "DA4-8" in hot["note"]
 
 
 @pytest.mark.parametrize("build", [
@@ -159,8 +263,7 @@ def test_what_the_simple_method_excludes_is_incomplete(engine, build):
 
 
 def test_slender_compression_elements_are_blocked(engine):
-    case = fire_case(550, name="PTE300X100X5MM", L=1000, Pu=1)
-    result = engine.run(case).check("axial")
+    result = engine.run(fire_case(550, name="PTE300X100X5MM", L=1000, Pu=1)).check("axial")
     assert result.status.value == "INCOMPLETE" and "elementos esbeltos" in result.errors[0]["message"]
 
 
@@ -178,58 +281,66 @@ def test_cb_is_not_amplified_in_fire(engine):
     assert result["inputs"]["Cb"] == 1.2 and any("DA4-6" in n for n in result["notes"])
 
 
-@pytest.mark.parametrize("composite, demand, check_id", [
-    ({"kind": "filled", "concrete": CONCRETE}, {"Mux": 1}, "flexure_x"),
-    ({"kind": "filled", "concrete": CONCRETE}, {"Vux": 1}, "shear_x"),
-    ({"kind": "filled", "concrete": CONCRETE}, {"Pu": -1}, "axial"),
-])
-def test_filled_demands_without_a_rule_stay_incomplete(engine, composite, demand, check_id):
-    case = SteelCase(section_name="PTE100X50X3MM", material={"Fy": 345}, condition="fire", fire={"steel_temperature": 500, "concrete_temperature": 200},
-                     tau_b=0.8, composite=composite, **demand)
-    check = engine.run(case).check(check_id)
-    assert check.status.value == "INCOMPLETE" and check.errors[0]["code"] == "FIRE_NOT_COVERED"
-
-
-def test_encased_column_stays_incomplete(engine):
-    encased = {"H": 610, "B": 610, "Fysr": 420, "transverse": {"db": 10, "spacing": 300},
+def _encased(**demand):
+    encased = {"H": 610, "B": 610, "Fysr": 420, "transverse": TIES,
                "bars": [{"area": 510, "db": 25.4, "x": x, "y": y} for x, y in ((241, 241), (241, -241), (-241, 241), (-241, -241))]}
-    case = SteelCase(section_name="W10X45", material={"Fy": 345}, condition="fire", fire={"steel_temperature": 500}, Pu=1, tau_b=0.8,
-                     lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000}, composite={"kind": "encased", "concrete": CONCRETE, "encased": encased})
-    result = engine.run(case)
-    assert result.status.value == "INCOMPLETE" and result.check("axial").errors[0]["code"] == "FIRE_NOT_COVERED"
+    temperatures = {"steel_temperature": 500, "concrete_temperature": 200, "bar_temperature": 300}
+    return composite_fire("W10X45", {"kind": "encased", "concrete": CONCRETE, "encased": encased}, temperatures, L=3000, tau_b=0.8, **demand)
 
 
-@pytest.mark.parametrize("fire, field", [
-    ({}, "fire.concrete_temperature"),
-    ({"concrete_elements": [{"A": 1000, "Ix": 1e6, "Iy": 1e6, "T": 300}]}, "fire.concrete_elements"),
+@pytest.mark.parametrize("demand, check_id", [({"Pu": 1}, "axial"), ({"Mux": 1}, "flexure_x"), ({"Vux": 1}, "shear_x")])
+def test_encased_column_stays_incomplete_above_200_degrees(engine, demand, check_id):
+    result = engine.run(_encased(**demand))
+    assert result.status.value == "INCOMPLETE" and result.check(check_id).errors[0]["code"] == "FIRE_NOT_COVERED"
+
+
+@pytest.mark.parametrize("build", [
+    lambda: composite_fire("PTE100X50X3MM", {"kind": "filled", "concrete": CONCRETE}, {"steel_temperature": 500}, tau_b=0.8, Mux=1),
+    lambda: composite_fire("W21X50", beam_data(), {"steel_temperature": 500}, Mux=1),
+    lambda: composite_fire("MURO", _wall({"fc": 40, "L": 3300, "tsc": 600, "t": 14, "tf": 14}), {"steel_temperature": 500}, Mux=1),
+    lambda: composite_fire('PTER8"X5.00MM', {"kind": "filled", "concrete": CONCRETE, "filled": _bars({"Fysr": 420, "bars": [(200, 16, 0, 55), (200, 16, 0, -55)]})},
+                           {"steel_temperature": 500, "concrete_temperature": 300}, tau_b=0.8, Mux=1),
+    lambda: composite_fire("PTE100X50X3MM", {"kind": "filled", "concrete": CONCRETE}, {"steel_temperature": 500, "concrete_temperature": 300, "bar_temperature": 300}, tau_b=0.8, Mux=1),
+    lambda: composite_fire("PTE100X50X3MM", {"kind": "filled", "concrete": CONCRETE}, {"steel_temperature": 500, "concrete_layers": [{"thickness": 10, "T": 300}]}, tau_b=0.8, Mux=1),
+    lambda: composite_fire("MURO-C", _c_wall({"L": 6000, "W": 2500, "tsc_f": 500, "tp": 16}), {"steel_temperature": 500, "concrete_layers": [{"thickness": 10, "T": 300}]}, Mux=1),
+    lambda: composite_fire("MURO-C", _c_wall({"L": 6000, "W": 2500, "tsc_f": 500, "tp": 16}), {"steel_temperature": 500, "web_layers": [{"thickness": 10, "T": 300}]}, Mux=1),
 ])
-def test_filled_needs_the_concrete_temperature_and_elements_that_add_up(engine, fire, field):
-    case = SteelCase(section_name="PTE100X50X3MM", material={"Fy": 345}, condition="fire", fire={"steel_temperature": 500, **fire}, Pu=1, tau_b=0.8,
-                     lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000}, composite={"kind": "filled", "concrete": CONCRETE})
-    check = engine.run(case).check("axial")
-    assert check.status.value == "INCOMPLETE" and field in check.errors[0]["details"]["fields"]
+def test_each_material_needs_its_temperature_and_only_where_it_applies(build):
+    with pytest.raises(ValueError):
+        build()
 
 
-def test_filled_with_bars_needs_their_temperature(engine):
-    filled = {"Fysr": 420, "transverse": {"db": 10, "spacing": 300}, "bars": [{"area": 200, "db": 16, "x": x, "y": y} for x, y in ((0, 55), (0, -55), (55, 0), (-55, 0))]}
-    case = SteelCase(section_name='PTER8"X5.00MM', material={"Fy": 345}, condition="fire", fire={"steel_temperature": 500, "concrete_temperature": 300}, Pu=1, tau_b=0.8,
-                     lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000}, composite={"kind": "filled", "concrete": CONCRETE, "filled": filled})
-    assert "fire.bar_temperature" in engine.run(case).check("axial").errors[0]["details"]["fields"]
+def test_layers_must_add_up_to_half_the_concrete(engine):
+    case = composite_fire("MURO", _wall({"fc": 40, "L": 3300, "tsc": 600, "t": 14, "tf": 14}), {"steel_temperature": 500, "concrete_layers": [{"thickness": 100, "T": 300}]}, Mux=1)
+    check = engine.run(case).check("flexure_x")
+    assert check.status.value == "INCOMPLETE" and "fire.concrete_layers" in check.errors[0]["details"]["fields"]
+
+
+def test_c_wall_whose_neutral_axis_leaves_the_web_at_temperature_is_blocked(engine):
+    # A.2.6 assumes the neutral axis in the web. At 700 deg C the steel loses so much that the concrete of the flanges balances it: no equation of the guide applies.
+    spec = {"L": 6000, "W": 2500, "tsc_f": 500, "tp": 16}
+    check = engine.run(composite_fire("MURO-C", _c_wall(spec), {"steel_temperature": 700, "concrete_temperature": 250}, Mux=1)).check("flexure_x")
+    assert check.status.value == "INCOMPLETE" and "eje neutro" in check.errors[0]["message"]
+
+
+def test_coupling_beam_axial_stays_blocked(engine):
+    spec = {"fc": 40, "b": 450, "h": 600, "tf": 20, "tw": 12}
+    check = engine.run(composite_fire("CB", _coupling(spec), {"steel_temperature": 500, "concrete_temperature": 200}, L=2000, Pu=1)).check("axial")
+    assert check.status.value == "INCOMPLETE"
 
 
 def test_concrete_above_55_mpa_is_outside_the_tables(engine):
-    case = SteelCase(section_name="PTE100X50X3MM", material={"Fy": 345}, condition="fire", fire={"steel_temperature": 500, "concrete_temperature": 200}, Pu=1, tau_b=0.8,
-                     lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000}, composite={"kind": "filled", "concrete": {**CONCRETE, "fc": 60}})
+    case = composite_fire("PTE100X50X3MM", {"kind": "filled", "concrete": {**CONCRETE, "fc": 60}}, {"steel_temperature": 500, "concrete_temperature": 200}, L=2000, tau_b=0.8, Pu=1)
     assert "55" in engine.run(case).check("axial").errors[0]["message"]
 
 
 def test_beam_above_1100_degrees_is_blocked(engine):
-    check = engine.run(fire_case(1100, Mux=1, L=None, name="W21X50", composite=beam_data(), tau_b=1.0)).check("flexure_x")
+    check = engine.run(fire_case(1100, Mux=1, L=None, name="W21X50", composite=beam_data(), tau_b=1.0, fire={"concrete_temperature": 300})).check("flexure_x")
     assert check.status.value == "INCOMPLETE" and "1100" in check.errors[0]["message"]
 
 
 def test_negative_flexure_of_a_beam_is_chapter_f_at_temperature(engine):
-    case = fire_case(600, name="W21X50", Mux=1, L=2000, composite=beam_data(moment="negative"), tau_b=1.0)
+    case = fire_case(600, name="W21X50", Mux=1, L=2000, composite=beam_data(moment="negative"), tau_b=1.0, fire={"concrete_temperature": 300})
     check = engine.run(case).check("flexure_x")
     assert check.chapter == "F" and check.result["governing_equation"].startswith("A-4")
 
@@ -240,7 +351,7 @@ def test_negative_flexure_of_a_beam_is_chapter_f_at_temperature(engine):
     {"condition": "fire", "fire": {"steel_temperature": 1200}, "Vux": 1},
     {"condition": "fire", "fire": {"steel_temperature": 10}, "Vux": 1},
     {"condition": "fire", "fire": {"steel_temperature": 500, "concrete_temperature": 200}, "Vux": 1},
-    {"condition": "fire", "fire": {"steel_temperature": 500, "concrete_temperature": 200, "concrete_layers": [{"thickness": 1, "T": 1}]}, "Vux": 1},
+    {"condition": "fire", "fire": {"steel_temperature": 500, "concrete_temperature": 200, "concrete_layers": [{"thickness": 1, "T": 100}]}, "Vux": 1},
 ])
 def test_rejected_inputs(data):
     with pytest.raises(ValueError):
@@ -256,6 +367,14 @@ def test_report_of_a_fire_case(engine):
                      "### 7.2 Tracción (Capítulo D), condiciones de incendio", "Apéndice 4, 4.2.4d", "A-4-9", "### 9.3 Condiciones de incendio", "combinación A-4-1"):
         assert sentence in text, sentence
     assert "esta resistencia en incendio no está programada" not in text
+
+
+def test_report_shows_the_three_temperatures(engine):
+    data = json.loads((ROOT / "examples/composite_filled_bars.json").read_text(encoding="utf-8"))
+    (group,) = member_groups(execute_payload(data, engine))
+    text = render_text(report_blocks(group))
+    for sentence in ("T del acero (°C)", "T del concreto (°C)", "T de las barras (°C)", "A-4-11", "DA4-8"):
+        assert sentence in text, sentence
 
 
 def test_a_steel_member_rejects_the_concrete_temperature_through_the_json(engine):
