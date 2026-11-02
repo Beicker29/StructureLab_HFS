@@ -5,7 +5,7 @@ from ...errors import IncompleteSectionDataError
 from ...models import SteelCase
 from ...sections.models import Section
 from ..fire import steel_at_temperature, with_fire_extension
-from .common import blocked, composite_materials, composite_result
+from .common import blocked, composite_materials, composite_result, uses_appendix_2
 from .filled import filled_geometry
 
 
@@ -164,3 +164,12 @@ def composite_i5(case: SteelCase, section: Section, checks: list) -> dict:
     return with_fire_extension(composite_result(case, section, modes={"I5": mode}, governing="I5", provisions=["I5"], ratio=out["ratio"],
                              notes=["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."]),
                      steel_at_temperature(case))
+
+
+def interaction_method(case: SteelCase, section: Section, checks: list) -> tuple[str, bool]:
+    """The method of a composite member, and whether a requested Method 2 had to be replaced by H1.1 (DI-22)."""
+    method = "wall" if case.composite.kind == "wall" else (case.composite.interaction or default_interaction(case, checks))
+    if uses_appendix_2(case, section) and case.Pu > 0:
+        method = "A2"
+    replaced = method in {"M2", "M2S"} and requested_interaction_replaced(case)
+    return ("H1" if replaced else method), replaced

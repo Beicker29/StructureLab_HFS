@@ -8,7 +8,7 @@ Section stiffnesses (domain/stiffness.py) are reported whatever the demands.
 """
 from .domain.composite.anchor import composite_anchor
 from .domain.composite.common import uses_appendix_2
-from .domain.composite.interaction import composite_appendix_2_interaction, composite_i5, composite_method2, default_interaction, requested_interaction_replaced
+from .domain.composite.interaction import composite_appendix_2_interaction, composite_i5, composite_method2, interaction_method
 from .domain.composite.members import composite_compression, composite_flexure, composite_shear, composite_tension, second_order_demands
 from .domain.composite.wall import composite_wall_interaction
 from .domain.speedcore import (c_wall_compression, c_wall_flexure, c_wall_interaction, c_wall_shear, c_wall_tension,
@@ -186,13 +186,8 @@ class SteelDesignEngine:
                     lambda axis=axis, steel=steel: composite_shear(case, section, axis, steel), section, inconsistent))
         combined = [c for c in checks if c.id in COMBINED]
         if len(combined) > 1:
-            method = "wall" if kind == "wall" else (case.composite.interaction or default_interaction(case, combined))
+            method, replaced = interaction_method(case, section, combined)
             requested = case.composite.interaction
-            if uses_appendix_2(case, section) and case.Pu > 0:
-                method = "A2"
-            replaced = method in {"M2", "M2S"} and requested_interaction_replaced(case)
-            if replaced:
-                method = "H1"
             if method == "H1":
                 check = self._check("interaction", "H", 0.0, "–", interaction_obligations(case, section),
                                     lambda: combined_strength(case, section, combined), section, [])
