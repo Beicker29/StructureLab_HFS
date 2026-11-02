@@ -5,14 +5,10 @@ computed per limit state (D2) and the lowest design strength governs. LRFD only.
 """
 import math
 
+from ._checks import positive as _positive
+
 # D2(a) tensile yielding and D2(b) tensile rupture: phi_t (LRFD)
 PHI_T = {"yielding": 0.90, "rupture": 0.75}
-
-
-def _positive(**values):
-    for name, value in values.items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
-            raise ValueError(f"{name} must be finite and positive, got {value!r}")
 
 
 def yielding_strength(*, Fy: float, Ag: float) -> dict:

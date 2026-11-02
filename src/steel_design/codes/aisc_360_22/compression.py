@@ -6,6 +6,8 @@ actually applied. Units: N, mm, MPa. Selection lives in domain/compression.py.
 """
 import math
 
+from ._checks import positive as _positive
+
 
 from .constants import E_STEEL, G_STEEL
 
@@ -22,12 +24,6 @@ _B41A = {
 
 # Table E7.1, effective width imperfection adjustment factor c1
 E7_C1 = {"STIFFENED": 0.18, "HSS_WALL": 0.20, "UNSTIFFENED": 0.22}
-
-
-def _positive(**values):
-    for name, value in values.items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
-            raise ValueError(f"{name} must be finite and positive, got {value!r}")
 
 
 def lambda_r(case: int, E: float, Fy: float) -> float:

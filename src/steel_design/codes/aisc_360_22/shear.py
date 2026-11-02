@@ -5,6 +5,8 @@ stiffeners (G2.4) are not implemented. Selection lives in domain/shear.py.
 """
 import math
 
+from ._checks import positive as _positive
+
 from .constants import E_STEEL
 
 PHI_V = 0.90          # G1(a)
@@ -12,12 +14,6 @@ PHI_V_ROLLED = 1.00   # G2.1(a): webs of rolled I-shapes with h/tw <= 2.24*sqrt(
 KV_UNSTIFFENED = 5.34  # G2.1(b)(2)(i)
 KV_HSS = 5.0           # G4
 KV_LEG = 1.2           # G3, G6
-
-
-def _positive(**values):
-    for name, value in values.items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
-            raise ValueError(f"{name} must be finite and positive, got {value!r}")
 
 
 def rolled_web_limit(*, E, Fy) -> float:

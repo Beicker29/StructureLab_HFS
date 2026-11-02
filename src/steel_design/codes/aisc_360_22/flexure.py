@@ -6,6 +6,8 @@ equation identifier actually applied. F7 numbering follows errata E25-02
 """
 import math
 
+from ._checks import positive as _positive
+
 from .constants import E_STEEL
 
 PHI_B = 0.90        # F1(a), LRFD
@@ -20,12 +22,6 @@ _B41B = {
     19: (2.42, 5.70, "sqrt"),  # webs of rectangular HSS
     20: (0.07, 0.31, "linear"),  # round HSS, D/t
 }
-
-
-def _positive(**values):
-    for name, value in values.items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
-            raise ValueError(f"{name} must be finite and positive, got {value!r}")
 
 
 def limits(case: int, E: float, Fy: float) -> dict:
