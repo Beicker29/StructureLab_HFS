@@ -4,6 +4,7 @@ import pytest
 
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import SteelCase
+from steel_design.reporting import render_text, report_blocks
 from steel_design.sections.loader import load_sections_from_excel
 from steel_design.sections.repository import SectionRepository
 
@@ -31,3 +32,8 @@ def engine(catalog):
 def steel_case(name="W14X90", *, Pu=100, L=3000, Ly=None, Lz=None, Fy=345, **extra):
     return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy}, Pu=Pu,
                      lengths={"Lx": L, "Ly": Ly or L, "Lz": Lz or L}, **extra)
+
+
+def calculation_report(case, result, *, title=None):
+    """Plain-text calculation report of one load case."""
+    return render_text(report_blocks([(title, case, result)]))

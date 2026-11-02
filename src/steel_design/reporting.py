@@ -890,11 +890,6 @@ def render_text(blocks: list[dict]) -> str:
     return "\n".join(out) + "\n"
 
 
-def calculation_report(case: SteelCase, result: DesignResult, *, title: str | None = None) -> str:
-    """Plain-text calculation report of one member."""
-    return render_text(report_blocks([(title, case, result)]))
-
-
 # --- PDF ---------------------------------------------------------------------------------------
 
 _INK, _MUTED, _RULE, _NAVY = (31, 41, 55), (107, 114, 128), (209, 213, 219), (23, 50, 84)

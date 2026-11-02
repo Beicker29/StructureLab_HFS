@@ -10,9 +10,8 @@ import pytest
 
 from steel_design.codes.aisc_360_22 import interaction as eq
 from steel_design.models import SteelCase
-from steel_design.reporting import calculation_report
 
-from conftest import ROOT
+from conftest import ROOT, calculation_report
 
 _FIXTURE = json.loads((ROOT / "tests/fixtures/chapter_h/reference.json").read_text(encoding="utf-8"))
 REFERENCE, REFERENCE_H2 = _FIXTURE["cases"], _FIXTURE["h2_cases"]

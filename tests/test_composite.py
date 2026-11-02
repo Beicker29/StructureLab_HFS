@@ -11,9 +11,8 @@ from steel_design.codes.aisc_360_22 import composite as eq
 from steel_design.domain.compression import compression_strength
 from steel_design.models import SteelCase
 from steel_design.execution import execute_payload, overall_status
-from steel_design.reporting import calculation_report
 
-from conftest import ROOT
+from conftest import ROOT, calculation_report
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_i/reference.json").read_text(encoding="utf-8"))["cases"]
 REFERENCE_F = json.loads((ROOT / "tests/fixtures/chapter_f/reference.json").read_text(encoding="utf-8"))["cases"]

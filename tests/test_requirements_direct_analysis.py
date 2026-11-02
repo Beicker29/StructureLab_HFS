@@ -7,9 +7,8 @@ import json
 import pytest
 
 from steel_design.models import SteelCase
-from steel_design.reporting import calculation_report
 
-from conftest import ROOT, steel_case
+from conftest import ROOT, calculation_report, steel_case
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_c/reference.json").read_text(encoding="utf-8"))["cases"]
 CONCRETE = {"fc": 35, "wc": 2320, "lightweight": False}

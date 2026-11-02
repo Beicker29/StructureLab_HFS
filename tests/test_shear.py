@@ -9,9 +9,8 @@ import pytest
 
 from steel_design.codes.aisc_360_22 import shear as eq
 from steel_design.models import SteelCase
-from steel_design.reporting import calculation_report
 
-from conftest import ROOT
+from conftest import ROOT, calculation_report
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_g/reference.json").read_text(encoding="utf-8"))["cases"]
 

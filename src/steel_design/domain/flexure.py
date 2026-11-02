@@ -18,9 +18,6 @@ from ..sections.identity import double_angle_label
 from ..sections.models import Section
 from .fire import steel_at_temperature, with_fire
 
-LIMIT_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
-                "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada (F13.1)",
-                "LLB": "pandeo local del ala del ángulo"}
 _LIMITATIONS = (
     "Lb sale de las longitudes (DF-13) y Cb es dato del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone que los apoyos "
     "restringen la rotación respecto del eje longitudinal (F1(b)).",

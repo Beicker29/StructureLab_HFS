@@ -9,9 +9,9 @@ import pytest
 from steel_design.execution import execute_payload, load_engine, member_groups
 from steel_design.models import SteelCase
 from steel_design import reporting
-from steel_design.reporting import _fmt, calculation_report, pdf_bytes, render_text, report_blocks
+from steel_design.reporting import _fmt, pdf_bytes, render_text, report_blocks
 
-from conftest import CATALOG, ROOT, steel_case
+from conftest import CATALOG, ROOT, calculation_report, steel_case
 
 
 def test_report_shows_inputs_modes_and_governing_values(engine):

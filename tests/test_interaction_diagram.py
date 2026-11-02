@@ -9,10 +9,10 @@ import pytest
 
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import SteelCase
-from steel_design.reporting import calculation_report, pdf_bytes, report_blocks
+from steel_design.reporting import pdf_bytes, report_blocks
 from steel_design.sections.repository import SectionRepository
 
-from conftest import ROOT
+from conftest import ROOT, calculation_report
 from test_design_examples import EXTRA, KIP, KIPFT, encased_member, filled_member
 from test_design_guides import encased_w14x211
 
