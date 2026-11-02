@@ -402,34 +402,26 @@ class CompositeBasis(InputModel):
 
     @model_validator(mode="after")
     def data_of_the_declared_kind(self):
-        if self.pour_height is not None and self.kind not in {"filled", "wall"}:
-            raise ValueError("composite.pour_height corresponde solo a kind = filled o wall.")
-        if self.box is not None and self.kind != "filled":
-            raise ValueError("composite.box corresponde solo a kind = filled.")
-        if (self.kind == "c_wall") != (self.c_wall is not None):
-            raise ValueError("composite.c_wall corresponde solo a kind = c_wall, y es obligatorio en ese caso.")
-        if (self.kind == "coupling_beam") != (self.coupling_beam is not None):
-            raise ValueError("composite.coupling_beam corresponde solo a kind = coupling_beam, y es obligatorio en ese caso.")
-        if self.fire is not None and self.kind != "wall":
-            raise ValueError("composite.fire corresponde solo a kind = wall (Guía 38, Capítulo 6).")
-        if self.second_order is not None and self.kind not in {"filled", "encased", "wall"}:
-            raise ValueError("composite.second_order se aplica a rellenos, embebidos y muros planos.")
-        if self.anchor is not None and self.kind in {"c_wall", "coupling_beam"}:
-            raise ValueError("composite.anchor (I8.3) no está disponible para muros en C ni vigas de acoplamiento.")
-        if self.biaxial_shape_factor and self.interaction != "M2S":
-            raise ValueError("composite.biaxial_shape_factor solo se aplica con interaction = M2S.")
-        if self.kind in {"c_wall", "coupling_beam"} and self.interaction is not None:
-            raise ValueError("Muros en C y vigas de acoplamiento usan la distribución plástica; no indique composite.interaction.")
-        if (self.kind == "encased") != (self.encased is not None):
-            raise ValueError("composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso.")
-        if (self.kind == "beam") != (self.beam is not None):
-            raise ValueError("composite.beam corresponde solo a kind = beam, y es obligatorio en ese caso.")
-        if (self.kind == "wall") != (self.wall is not None):
-            raise ValueError("composite.wall corresponde solo a kind = wall, y es obligatorio en ese caso.")
-        if self.filled is not None and self.kind != "filled":
-            raise ValueError("composite.filled corresponde solo a kind = filled.")
-        if self.kind == "wall" and self.interaction is not None:
-            raise ValueError("Los muros usan la distribución plástica de I5(c); no indique composite.interaction.")
+        kind = self.kind
+        rules = (
+            (self.pour_height is not None and kind not in {"filled", "wall"}, "composite.pour_height corresponde solo a kind = filled o wall."),
+            (self.box is not None and kind != "filled", "composite.box corresponde solo a kind = filled."),
+            ((kind == "c_wall") != (self.c_wall is not None), "composite.c_wall corresponde solo a kind = c_wall, y es obligatorio en ese caso."),
+            ((kind == "coupling_beam") != (self.coupling_beam is not None), "composite.coupling_beam corresponde solo a kind = coupling_beam, y es obligatorio en ese caso."),
+            (self.fire is not None and kind != "wall", "composite.fire corresponde solo a kind = wall (Guía 38, Capítulo 6)."),
+            (self.second_order is not None and kind not in {"filled", "encased", "wall"}, "composite.second_order se aplica a rellenos, embebidos y muros planos."),
+            (self.anchor is not None and kind in {"c_wall", "coupling_beam"}, "composite.anchor (I8.3) no está disponible para muros en C ni vigas de acoplamiento."),
+            (self.biaxial_shape_factor and self.interaction != "M2S", "composite.biaxial_shape_factor solo se aplica con interaction = M2S."),
+            (kind in {"c_wall", "coupling_beam"} and self.interaction is not None, "Muros en C y vigas de acoplamiento usan la distribución plástica; no indique composite.interaction."),
+            ((kind == "encased") != (self.encased is not None), "composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso."),
+            ((kind == "beam") != (self.beam is not None), "composite.beam corresponde solo a kind = beam, y es obligatorio en ese caso."),
+            ((kind == "wall") != (self.wall is not None), "composite.wall corresponde solo a kind = wall, y es obligatorio en ese caso."),
+            (self.filled is not None and kind != "filled", "composite.filled corresponde solo a kind = filled."),
+            (kind == "wall" and self.interaction is not None, "Los muros usan la distribución plástica de I5(c); no indique composite.interaction."),
+        )
+        for failed, message in rules:
+            if failed:
+                raise ValueError(message)
         return self
 
 
@@ -522,16 +514,7 @@ class SteelCase(InputModel):
         if self.composite is not None and self.custom_section is not None:
             raise ValueError("Un miembro compuesto usa un perfil del catálogo, no custom_section.")
         composite = self.composite
-        if self.condition == "construction" and (self.Pu or (composite is not None and composite.second_order)):
-            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique Pu ni second_order.")
-        if (self.condition == "fire") != (self.fire is not None):
-            raise ValueError("condition = fire y fire (temperaturas, Apéndice 4, 4.2.4d) van juntos.")
-        if composite is not None and composite.fire is not None and self.condition != "fire":
-            raise ValueError("composite.fire solo se indica en un case con condition = fire.")
-        if self.condition == "fire" and composite is not None and (composite.second_order or composite.anchor):
-            raise ValueError("Un case de incendio no admite composite.second_order ni composite.anchor (Apéndice 4, 4.2.4d no los trata).")
-        if self.fire is not None:
-            self._temperatures_of_each_material()
+        self._data_of_the_condition()
         if composite is not None and composite.second_order is not None:
             if self.Pu or self.Mux or self.Muy:
                 raise ValueError("Con composite.second_order, Pu, Mux y Muy salen de A-8-1 y A-8-2; no los indique.")
@@ -546,6 +529,19 @@ class SteelCase(InputModel):
         if self.Pu > 0 and self.lengths is None:
             raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
         return self
+
+    def _data_of_the_condition(self):
+        composite = self.composite
+        if self.condition == "construction" and (self.Pu or (composite is not None and composite.second_order)):
+            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique Pu ni second_order.")
+        if (self.condition == "fire") != (self.fire is not None):
+            raise ValueError("condition = fire y fire (temperaturas, Apéndice 4, 4.2.4d) van juntos.")
+        if composite is not None and composite.fire is not None and self.condition != "fire":
+            raise ValueError("composite.fire solo se indica en un case con condition = fire.")
+        if self.condition == "fire" and composite is not None and (composite.second_order or composite.anchor):
+            raise ValueError("Un case de incendio no admite composite.second_order ni composite.anchor (Apéndice 4, 4.2.4d no los trata).")
+        if self.fire is not None:
+            self._temperatures_of_each_material()
 
     def _temperatures_of_each_material(self):
         """Each material present has its temperature, always (user's decision DA4-9): the JSON states them, nothing is assumed."""
