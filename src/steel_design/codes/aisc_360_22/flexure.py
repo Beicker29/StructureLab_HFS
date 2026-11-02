@@ -8,7 +8,6 @@ import math
 
 from ._checks import positive as _positive
 
-from .constants import E_STEEL
 
 PHI_B = 0.90        # F1(a), LRFD
 

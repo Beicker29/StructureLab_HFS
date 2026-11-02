@@ -9,7 +9,6 @@ import math
 from ._checks import positive as _positive
 
 
-from .constants import E_STEEL, G_STEEL
 
 PHI_C = 0.90         # S22 E1, LRFD
 

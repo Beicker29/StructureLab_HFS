@@ -11,7 +11,7 @@ from typing import Callable
 
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import compression as eq
-from ..codes.aisc_360_22.constants import is_standard_modulus
+from ..codes.aisc_360_22.constants import G_STEEL, is_standard_modulus
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section, missing_properties
@@ -103,7 +103,7 @@ def _flexural_mode(axis, E, K, L, r):
 def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     """Elastic buckling stresses of every applicable global mode, plus pending notes."""
     family = section.type.upper()
-    E, G = case.material.E, eq.G_STEEL
+    E, G = case.material.E, G_STEEL
     f, ln = case.factors, case.lengths
     offsets = f.xa != 0 or f.ya != 0
     notes = []
@@ -266,7 +266,7 @@ def _single_angle_ftb(case: SteelCase, section: Section, equal_legs: bool) -> di
     rw = math.sqrt(section.iw / section.area)
     few = eq.elastic_flexural_stress(E, lc, rw)
     fez_axis = eq.elastic_flexural_stress(E, lc, section.rz)
-    fet = eq.torsional_stress(E=E, G=eq.G_STEEL, Cw=section.cw, J=section.j, Lcz=lcz, Ag=section.area, ro=section.ro)
+    fet = eq.torsional_stress(E=E, G=G_STEEL, Cw=section.cw, J=section.j, Lcz=lcz, Ag=section.area, ro=section.ro)
     mode = {"limit_state": "flexural_torsional_buckling", "axis": "w+z", "Lc_mm": lc, "Lcz_mm": lcz,
             "rw_mm": rw, "rz_mm": section.rz, "Few_mpa": few, "Fez_axis_mpa": fez_axis, "Fe_torsion_mpa": fet,
             "Fe_torsion_equation": "E4-7", "ro_mm": section.ro, "Lc_over_r": lc / section.rz,
@@ -312,7 +312,7 @@ def _double_angle_modes(case: SteelCase, section: Section, component: Section) -
                      "Fe_mpa": fey}
     j, lcz = 2 * component.j, f.Kz * ln.Lz
     # E4 User Note: the Cw term may be omitted for double angles. J = sum of both angles.
-    fez = eq.torsional_stress(E=E, G=eq.G_STEEL, Cw=0.0, J=j, Lcz=lcz, Ag=section.area, ro=section.ro)
+    fez = eq.torsional_stress(E=E, G=G_STEEL, Cw=0.0, J=j, Lcz=lcz, Ag=section.area, ro=section.ro)
     modes["FTB"] = {"limit_state": "flexural_torsional_buckling", "provision": "E4(b) + E6", "axis": "y+z",
                     "Fe_equation": "E4-3", "symmetry_axis": "y", "Fey_mpa": fey, "Fez_mpa": fez,
                     "Fez_equation": "E4-7 (Cw term omitted)", "J_mm4": j, "ro_mm": section.ro, "H": section.H,
@@ -414,7 +414,7 @@ def compression_strength(case: SteelCase, section: Section,
     return with_fire({
         "chapter": "E", "code": "ANSI/AISC 360-22",
         "section": section.name, "family": family,
-        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "G_mpa": eq.G_STEEL, "Ag_mm2": section.area,
+        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "G_mpa": G_STEEL, "Ag_mm2": section.area,
                    "Kx": case.factors.Kx, "Ky": case.factors.Ky, "Kz": case.factors.Kz,
                    "Lx_mm": case.lengths.Lx, "Ly_mm": case.lengths.Ly, "Lz_mm": case.lengths.Lz},
         "classification": classification,

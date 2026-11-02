@@ -3,7 +3,6 @@
 Each limit state has its own resistance factor, so design strengths are
 computed per limit state (D2) and the lowest design strength governs. LRFD only.
 """
-import math
 
 from ._checks import positive as _positive
 

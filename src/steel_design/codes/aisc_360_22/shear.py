@@ -7,7 +7,6 @@ import math
 
 from ._checks import positive as _positive
 
-from .constants import E_STEEL
 
 PHI_V = 0.90          # G1(a)
 PHI_V_ROLLED = 1.00   # G2.1(a): webs of rolled I-shapes with h/tw <= 2.24*sqrt(E/Fy)

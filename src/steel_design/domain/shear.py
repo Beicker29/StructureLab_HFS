@@ -6,7 +6,6 @@ web of I-shapes and channels, the H walls of rectangular HSS and the legs parall
 double angles (G3), rectangular HSS and solid bars (G4), round HSS (G5). Webs without transverse
 stiffeners. Formulas live in codes/aisc_360_22/shear.py. Missing data or decisions raise structured errors.
 """
-import math
 
 from ..codes.aisc_360_22 import shear as eq
 from ..codes.aisc_360_22.constants import is_standard_modulus

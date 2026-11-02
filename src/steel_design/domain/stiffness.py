@@ -9,7 +9,7 @@ import math
 from typing import Callable
 
 from ..codes.aisc_360_22 import composite as eq
-from ..codes.aisc_360_22.compression import G_STEEL
+from ..codes.aisc_360_22.constants import G_STEEL
 from ..codes.aisc_dg06 import members as dg06_members
 from ..errors import SteelDesignError
 from ..models import SteelCase

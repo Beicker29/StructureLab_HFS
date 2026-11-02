@@ -4,7 +4,7 @@ The temperatures are data of the case (heat transfer analysis, 4.2.2). At or bel
 Each chapter applies these properties in its own domain module. Formulas live in codes/aisc_360_22/appendix_4.py.
 """
 from ..codes.aisc_360_22 import appendix_4 as a4
-from ..codes.aisc_360_22.compression import G_STEEL
+from ..codes.aisc_360_22.constants import G_STEEL
 from ..errors import RuleNotImplementedError
 from ..models import SteelCase
 

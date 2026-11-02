@@ -14,7 +14,7 @@ from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..codes.aisc_dg06 import filled as dg06
 from ..codes.aisc_dg06 import members as dg06_members
-from ..errors import IncompleteSectionDataError, blocking_error, incomplete_error
+from ..errors import IncompleteSectionDataError, RuleNotImplementedError, blocking_error, incomplete_error
 from ..models import SteelCase
 from ..sections.models import Section, missing_properties
 from .fire import SLENDER_BLOCK, steel_at_temperature, with_fire, with_fire_extension
