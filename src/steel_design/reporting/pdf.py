@@ -26,6 +26,7 @@ def _column_widths(minimums: Sequence[float], weights: Sequence[float], total: f
     if spare <= 0:
         return [total * m / sum(minimums) for m in minimums]
     return [m + spare * w / sum(weights) for m, w in zip(minimums, weights)]
+TABLE_MIN_FONT = 6.5  # pt
 _HEADINGS = {"h1": (12, 4), "h2": (10, 2.5), "h3": (8.8, 1.5)}
 
 
@@ -204,12 +205,22 @@ class _Renderer:
         fill = _CARD if kv else _ZEBRA
         pdf.set_fill_color(*fill)  # never inherit a previous fill (status badge, cards)
         natural = sum(weights) * 2.1  # mm, about one character of 8.5 pt per weight unit
+        def word_widths():
+            return [
+                max(pdf.get_string_width(word) for word in " ".join([clean(str(h))] + [r[i] for r in texts]).split() or [""]) + 3.2 + 0.6
+                for i, h in enumerate(headers)
+            ]
+
+        size = 8.5 if not compact else 8
         pdf.set_font(FONT, "B", 8.5)  # headings and the highlighted row are bold, so the widest case
-        minimums = [
-            max(pdf.get_string_width(word) for word in " ".join([clean(str(h))] + [r[i] for r in texts]).split() or [""]) + 3.2 + 0.6
-            for i, h in enumerate(headers)
-        ]
-        pdf.set_font(FONT, "", 8.5 if not compact else 8)
+        minimums = word_widths()
+        bold = 8.5
+        while sum(minimums) > width() and bold > TABLE_MIN_FONT:  # a wider system font: smaller letters before breaking a word
+            bold -= 0.25
+            size = min(size, bold)
+            pdf.set_font(FONT, "B", bold)
+            minimums = word_widths()
+        pdf.set_font(FONT, "", size)
         total = min(width(), max(natural, 70, sum(minimums)))
         style = dict(width=total, col_widths=_column_widths(minimums, weights, total), line_height=5.2, padding=(1, 1.6),
                      text_align=["RIGHT" if n else "LEFT" for n in numeric], align="LEFT",
