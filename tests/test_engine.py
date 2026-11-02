@@ -7,8 +7,8 @@ from conftest import steel_case
 from steel_design.domain.coverage import discharge, required_obligations
 from steel_design.engine import SteelDesignEngine
 from steel_design.errors import AmbiguousSectionError, SectionNotFoundError
-from steel_design.execution import overall_status
-from steel_design.models import DesignResult, Status, worst_status
+from steel_design.execution import execute_payload, governing, overall_status
+from steel_design.models import DesignResult, Status, SteelCase, worst_status
 from steel_design.sections.repository import SectionRepository
 
 
@@ -85,3 +85,39 @@ def test_a_known_failure_is_never_hidden_by_incompleteness(statuses, expected):
     assert worst_status(Status(s) for s in statuses).value == expected
     results = [DesignResult(section="W14X90", family="W", status=s) for s in statuses]
     assert overall_status(results).value == expected
+
+
+def test_cb_amplification_without_lengths_is_reported_and_not_assumed(engine):
+    flexure = {"tension_flange_holes": False, "Cb": 1.2, "tension_cb_amplification": True}
+    case = SteelCase(
+        section_name="W14X90", material={"Fy": 345, "Fu": 448}, Pu=-100, Mux=50, tension={"An": 15000, "U": 0.9}, flexure=flexure
+    )
+    assert engine.run(case).check("flexure_x").status == Status.INCOMPLETE
+
+
+def test_second_order_on_a_member_of_another_family_is_incomplete(engine):
+    second_order = {
+        "axis": "x",
+        "Mnt": 1.5,
+        "Mlt": 1,
+        "Pnt": 40,
+        "Plt": 10,
+        "M1_M2": -0.5,
+        "Pstory": 20000,
+        "Pmf": 8000,
+        "H": 500,
+        "L": 2000,
+        "drift": 10,
+    }
+    case = SteelCase(section_name="W14X90", material={"Fy": 345}, tau_b=0.8, lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000},
+                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False}, "second_order": second_order})
+    result = engine.run(case)
+    assert result.status == Status.INCOMPLETE and result.check("axial").capacity is None
+
+
+def test_governing_is_the_check_with_the_largest_ratio(engine):
+    data = {"section_name": "W14X90", "material": "ASTM A572 Gr 50", "lengths": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
+            "cases": [{"name": "leve", "Pu": 100}, {"name": "fuerte", "Pu": 2500}]}
+    executions = execute_payload(data, engine)
+    top = governing(executions)
+    assert top["name"] == "fuerte" and top["check"] == "axial" and top["ratio"] == executions[1][2].check("axial").ratio
