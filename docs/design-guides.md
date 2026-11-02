@@ -1,6 +1,6 @@
 # Verificación con las Design Guides de AISC y contenidos candidatos
 
-Fuentes en la raíz del repositorio:
+Fuentes en `references/` (local, no se versiona):
 
 - *AISC Design Guide 6: Composite Column Design*, 2.ª ed., 2025 (en adelante DG6).
 - *AISC Design Guide 38: SpeedCore Systems for Steel Structures*, 2023 (en adelante DG38).

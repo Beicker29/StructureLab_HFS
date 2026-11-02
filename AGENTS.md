@@ -4,7 +4,7 @@
 
 - El repositorio implementa los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 y 2), con los Apéndices 2, 4 (método simple, 4.2.4d) y 8.1, de ANSI/AISC 360-22, solo LRFD (no añadir ASD), y contenidos de las Design Guides 6 y 38 que no son norma. Los demás
   se reincorporan en el orden de la [hoja de ruta](docs/ROADMAP.md), uno por vez.
-- Fuente normativa: `a360-22w.pdf` y las erratas (PDF locales en la raíz, ignorados por Git; no versionar PDF). Las Design Guides y los Design Examples sirven para
+- Fuente normativa: `a360-22w.pdf` y las erratas (PDF locales en `references/`, ignorada por Git; no versionar PDF). Las Design Guides y los Design Examples sirven para
   contrastar e interpretar, no son norma ([guías](docs/design-guides.md)). Alcance,
   decisiones y consultas abiertas: [D](docs/chapter-d.md), [E](docs/chapter-e.md), [F](docs/chapter-f.md),
   [G](docs/chapter-g.md), [H](docs/chapter-h.md), [I](docs/chapter-i.md) y [Apéndice 4](docs/appendix-4.md).
@@ -33,7 +33,7 @@
   bloquear con error estructurado (`INCOMPLETE`).
 - Una decisión que AISC 360-22 no resuelve inequívocamente se consulta al usuario
   (problema, referencia, alternativas, consecuencias, recomendación) y se registra
-  en `docs/chapter-e.md`.
+  en el documento del capítulo correspondiente.
 - `PASS` solo para el alcance declarado, con todas las obligaciones cumplidas.
 - `float` en el cálculo; redondeo solo para presentación.
 

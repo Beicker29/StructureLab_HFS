@@ -185,5 +185,6 @@ results/
 tests/.tmp_tests/
 *.whl
 # Reference PDFs (standards, guides) and generated reports stay local; Excel lock files
+references/
 *.pdf
 ~$*
