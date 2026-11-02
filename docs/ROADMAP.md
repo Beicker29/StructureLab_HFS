@@ -1,7 +1,7 @@
 # Hoja de ruta
 
 El repositorio contiene los capítulos D, E, F, G, H (H1, H2 en ángulos simples, H4) e I (etapas 1 y 2), con los Apéndices 2, 4 (método simple) y 8.1, de
-ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no son norma. El Capítulo I anterior sigue en el historial de Git (commit `d3a1b02`).
+ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no son norma. El Capítulo I anterior sigue en el historial de Git (commit `c834819`).
 
 ## Hecho
 
