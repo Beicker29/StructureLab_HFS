@@ -4,6 +4,8 @@ Pure functions; units N, mm, MPa; moments in N*mm; temperatures in deg C. Select
 """
 import math
 
+from .composite import elastic_buckling_load
+
 SIMPLE_METHOD_MIN = 200.0   # 4.2.4d: at or below this steel temperature the strengths ignore temperature
 FY_MAX = 450.0              # 4.2.3b: Fy of structural and reinforcing steel
 FC_MAX = 55.0               # 4.2.3b: f'c
@@ -62,6 +64,22 @@ def filled_compression(*, Pno_T, Pe_T) -> dict:
 def wall_compression(*, Pno_T, Pe_T) -> dict:
     """A-4-12, in lieu of I2-2 and I2-3."""
     return {"Pn": 0.32 ** ((Pno_T / Pe_T) ** 0.3) * Pno_T, "equation": "A-4-12", "Pno_over_Pe": Pno_T / Pe_T}
+
+
+def wall_strip(*, Fy_T, E_T, fc, Ec, st, t, tsc, layers, Lc, lightweight) -> dict:
+    """A-4-12 on one column of unit width st, with I2-15 and I1-1 added by layers (Design Guide 38, 6-2 and 6-3)."""
+    half_pno = Fy_T * st * t
+    half_ei = E_T * (st * t**3 / 12 + st * t * (tsc / 2 - t / 2) ** 2)
+    position = tsc / 2 - t
+    for thickness, T in layers:
+        factors = concrete_factors(T, lightweight=lightweight)
+        area, distance = st * thickness, position - thickness / 2
+        position -= thickness
+        half_pno += 0.85 * factors["kc"] * fc * area                                     # I2-15
+        half_ei += 0.35 * factors["kEc"] * Ec * (st * thickness**3 / 12 + area * distance**2)   # I1-1
+    pe = elastic_buckling_load(EI_eff=2 * half_ei, Lc=Lc)
+    out = wall_compression(Pno_T=2 * half_pno, Pe_T=pe)
+    return {"Pno_T": 2 * half_pno, "EI_eff_T": 2 * half_ei, "Pe_T": pe, "Pn_T": out["Pn"], "Pno_over_Pe": out["Pno_over_Pe"], "equation": out["equation"]}
 
 
 def composite_beam_strength(*, Mn, kcb) -> dict:

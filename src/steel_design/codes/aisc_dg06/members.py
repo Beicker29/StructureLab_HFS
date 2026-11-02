@@ -11,6 +11,11 @@ def biaxial_interaction(*, Pr, Pc, Pcc, x, y, alpha) -> dict:
     return {"ratio": (Pr - Pcc) / (Pc - Pcc) + (x**alpha + y**alpha) ** (1 / alpha), "equation": "DG6 Ec. 2-2b"}
 
 
+def tension_control_pno(*, Fy, As, Fysr, Asr, fc, Ac) -> float:
+    """Section 2.4.1: the axial strength that decides whether the member is a beam, Pu < 0.10Pn."""
+    return Fy * As + Fysr * Asr + 0.85 * fc * Ac
+
+
 def tension_control(*, hn, h, v_tension, Fysr) -> dict:
     """Section 2.4.1 and Example 2.4: tensile strain of the outermost bar, with the neutral axis at hn from the center."""
     c = h / 2 - hn

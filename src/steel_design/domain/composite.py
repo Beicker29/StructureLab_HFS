@@ -272,10 +272,10 @@ def _compression_basis(case, section) -> dict:
         geometry = _filled_geometry(case, section)
         pno, coefficient, Isrx, Isry, classification, requirements = _filled_compression(case, section, geometry)
         c_name = "C3"
-        point_c = (0.95 if geometry["shape"] == "round" else 0.85) * fc * geometry["Ac"]
+        point_c = eq.point_c(fc=fc, Ac=geometry["Ac"], c2=0.95 if geometry["shape"] == "round" else 0.85)
     else:
         geometry = _encased_geometry(case, section)
-        point_c = 0.85 * fc * geometry["Ac"]
+        point_c = eq.point_c(fc=fc, Ac=geometry["Ac"])
         e = case.composite.encased
         pno = {"Pno": eq.pno_encased(Fy=Fy, As=section.area, Fysr=e.Fysr, Asr=geometry["Asr"], fc=fc, Ac=geometry["Ac"]),
                "equation": "I2-7"}
@@ -350,28 +350,17 @@ def _filled_fire_modes(case, section, hot):
         out = a4.filled_compression(Pno_T=pno["Pno"], Pe_T=pe)
         modes[f"FB-{axis}"] = {"limit_state": "flexural_buckling", "provision": "I2.2b; Apéndice 4, 4.2.4d(c)", "applies": True, "equation": out["equation"], "Pn_equation": out["equation"],
                                "Pno_T_kN": pno["Pno"] / 1000.0, "Pno_equation": pno["equation"], "C3": coefficient, "EI_eff_T": ei, "Lc_mm": K * L,
-                               "PC_kN": (0.95 if geometry["shape"] == "round" else 0.85) * m["fc"] * geometry["Ac"] / 1000.0,
+                               "PC_kN": eq.point_c(fc=m["fc"], Ac=geometry["Ac"], c2=0.95 if geometry["shape"] == "round" else 0.85) / 1000.0,
                                "Pe_T_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"], "Pn_kN": out["Pn"] / 1000.0, "available_kN": eq.PHI_C * out["Pn"] / 1000.0}
     row = {"element": "wall", "ratio": c["lam"], "lambda_p": c["limits"]["p"], "lambda_r": c["limits"]["r"], "class": c["class"]}
     return modes, {"elements": [row], "slender": False, "reference": "Tabla I1.1a"}, _filled_requirements(case, section, geometry, flexure=False)
 
 
 def wall_strip_at_temperature(case, hot, *, st, t, tsc, layers, Lc) -> dict:
-    """A-4-12 on one column of unit width st, with I2-15 and I1-1 added by layers (Design Guide 38, 6-2 and 6-3)."""
+    """A-4-12 on one column of unit width, with the steel at the temperature of the case and the concrete by layers."""
     concrete = case.composite.concrete
-    Ec = eq.concrete_modulus(wc=concrete.wc, fc=concrete.fc)
-    half_pno = hot["Fy_T_mpa"] * st * t
-    half_ei = hot["E_T_mpa"] * (st * t**3 / 12 + st * t * (tsc / 2 - t / 2) ** 2)
-    position = tsc / 2 - t
-    for thickness, T in layers:
-        factors = a4.concrete_factors(T, lightweight=concrete.lightweight)
-        area, distance = st * thickness, position - thickness / 2
-        position -= thickness
-        half_pno += 0.85 * factors["kc"] * concrete.fc * area                            # I2-15
-        half_ei += 0.35 * factors["kEc"] * Ec * (st * thickness**3 / 12 + area * distance**2)   # I1-1
-    pe = eq.elastic_buckling_load(EI_eff=2 * half_ei, Lc=Lc)
-    out = a4.wall_compression(Pno_T=2 * half_pno, Pe_T=pe)
-    return {"Pno_T": 2 * half_pno, "EI_eff_T": 2 * half_ei, "Pe_T": pe, "Pn_T": out["Pn"], "Pno_over_Pe": out["Pno_over_Pe"], "equation": out["equation"]}
+    return a4.wall_strip(Fy_T=hot["Fy_T_mpa"], E_T=hot["E_T_mpa"], fc=concrete.fc, Ec=eq.concrete_modulus(wc=concrete.wc, fc=concrete.fc),
+                         st=st, t=t, tsc=tsc, layers=layers, Lc=Lc, lightweight=concrete.lightweight)
 
 
 def _wall_fire_modes(case, section, hot):
@@ -561,7 +550,7 @@ def _filled_flexure_strength(case, section, axis, hot):
         mode = {"provision": "I3.4b(a)", "equation": "I3-5a", "Mp_kNm": plastic["Mp"] / 1e6, "hn_mm": plastic["hn_mm"],
                 "Md_kNm": plastic["Md"] / 1e6, "Mn_kNm": plastic["Mp"] / 1e6}
         if bars:
-            pno = m["Fy"] * section.area + Fysr * geometry["Asr"] + 0.85 * fc * geometry["Ac"]
+            pno = dg06_members.tension_control_pno(Fy=m["Fy"], As=section.area, Fysr=Fysr, Asr=geometry["Asr"], fc=fc, Ac=geometry["Ac"])
             control, notes = _tension_control(case, plastic["hn_mm"], H, bars, geometry["Fysr"], pno, requirement, "I3.4a(d)")
             return _flexure_output(case, section, mn_mode={**mode, **control}, classification=classification,
                                    requirements=requirement, notes=notes, provisions=["I1", "I3.4"])
@@ -730,9 +719,9 @@ def _beam_flexure(case, section):
         qn = eq.channel_strength(tf=c.tf, tw=c.tw, la=c.la, fc=concrete.fc, Ec=Ec)
         sum_qn += c.count * qn
         anchors["Qn_channel_kN"] = qn / 1000.0
-    crushing, steel = 0.85 * concrete.fc * b * beam.tc, Fy * section.area       # I3-1a, I3-1b; ribs neglected (I3.2c)
+    crushing, steel = eq.beam_slab_crushing(fc=concrete.fc, b=b, tc=beam.tc), eq.beam_steel_yielding(Fy=Fy, As=section.area)   # ribs neglected (I3.2c)
     C = min(crushing, steel, sum_qn)                                            # I3-1c
-    a = C / (0.85 * concrete.fc * b)
+    a = eq.beam_block_depth(C=C, fc=concrete.fc, b=b)
     out = eq.beam_plastic_moment(C=C, a=a, Ycon=beam.tc + hr, Fy=Fy, As=section.area, d=section.d, bf=section.bf,
                                  tf=section.tf, tw=section.tw)
     degree = sum_qn / min(crushing, steel)

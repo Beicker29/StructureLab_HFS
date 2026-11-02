@@ -22,6 +22,26 @@ def concrete_modulus(*, wc, fc) -> float:
     return 0.043 * wc**1.5 * math.sqrt(fc)
 
 
+def point_c(*, fc, Ac, c2=0.85) -> float:
+    """Point C of the interaction diagram: c2*f'c*Ac, with c2 = 0.95 in round filled sections (Commentary I5)."""
+    return c2 * fc * Ac
+
+
+def beam_slab_crushing(*, fc, b, tc) -> float:
+    """I3-1a."""
+    return 0.85 * fc * b * tc
+
+
+def beam_steel_yielding(*, Fy, As) -> float:
+    """I3-1b."""
+    return Fy * As
+
+
+def beam_block_depth(*, C, fc, b) -> float:
+    """Depth of the compression block of the slab under the force C."""
+    return C / (0.85 * fc * b)
+
+
 def c1_encased(*, As, Asr, Ag) -> float:
     """I2-6."""
     return min(0.25 + 3 * (As + Asr) / Ag, 0.7)
