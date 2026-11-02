@@ -32,8 +32,15 @@ jobs:
         run: python -m pip install -e ".[dev]"
       - name: Lint
         run: python -m ruff check .
+      - name: Types
+        run: python -m mypy
       - name: Tests
         run: python -m pytest -q
+      - name: Oracles reproduce their references
+        shell: bash
+        run: |
+          for oracle in tests/oracles/chapter_*.py; do python "$oracle"; done
+          git diff --exit-code -- tests/fixtures
       - name: Build distribution
         run: python -m build
       - name: Run the installed wheel outside the repository
