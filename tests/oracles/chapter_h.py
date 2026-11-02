@@ -13,6 +13,8 @@ import json
 import sys
 from pathlib import Path
 
+from _common import _plain
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chapter_d  # noqa: E402
 import chapter_e  # noqa: E402
@@ -149,14 +151,6 @@ CASES = {
     "2L-H1-1b": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Pu=40, Mux=5, L=2000, Lb=2000,
                      e6=("welded", 500), web_legs="tension"),
 }
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    return value
 
 
 if __name__ == "__main__":

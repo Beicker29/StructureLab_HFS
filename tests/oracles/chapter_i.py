@@ -13,6 +13,8 @@ import json
 import sys
 from pathlib import Path
 
+from _common import _plain
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chapter_f  # noqa: E402
 
@@ -1104,16 +1106,6 @@ def run_case(spec):
         args = {k: v for k, v in spec.items() if k not in {"kind", "member"}}
         return method2(spec["member"], **args)
     return FUNCTIONS[spec["kind"]](**{k: v for k, v in spec.items() if k != "kind"})
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, (list, tuple)):
-        return [_plain(v) for v in value]
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    return value
 
 
 if __name__ == "__main__":

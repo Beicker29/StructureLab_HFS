@@ -10,6 +10,8 @@ import json
 import sys
 from pathlib import Path
 
+from _common import _plain
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chapter_e  # noqa: E402
 import chapter_f  # noqa: E402
@@ -404,14 +406,6 @@ CASES = {
     "B-650": dict(kind="beam", T=650, **BEAM_MEMBER),
     "B-250": dict(kind="beam", T=250, **BEAM_MEMBER),
 }
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, (list, tuple)):
-        return [_plain(v) for v in value]
-    return {k: _plain(v) for k, v in value.items()} if isinstance(value, dict) else value
 
 
 if __name__ == "__main__":

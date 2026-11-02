@@ -11,6 +11,8 @@ frozen file:
 from decimal import Decimal as D, getcontext
 import json
 from pathlib import Path
+
+from _common import _plain, sqrt
 import re
 
 import openpyxl
@@ -44,10 +46,6 @@ def row(family, name):
                         pass
             return out
     raise KeyError(name)
-
-
-def sqrt(x):
-    return x.sqrt()
 
 
 def fn_e3(fy, fe):
@@ -254,16 +252,6 @@ CASES = {
     "2L-separated-snug": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4X3/4", fy=345, Lx=2000, e6=("snug_tight", 800)),
     "2L-LLBB-pretensioned": dict(family="DOUBLE_ANGLE", name="2L8X4X1/2LLBB", fy=345, Lx=3000, e6=("pretensioned", 1500)),
 }
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [_plain(v) for v in value]
-    return value
 
 
 if __name__ == "__main__":

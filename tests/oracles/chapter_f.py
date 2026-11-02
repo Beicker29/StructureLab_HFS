@@ -10,6 +10,8 @@ from decimal import Decimal as D, getcontext
 import json
 from pathlib import Path
 
+from _common import _plain, sqrt
+
 import openpyxl
 
 getcontext().prec = 50
@@ -44,10 +46,6 @@ def row(family, name):
                         pass
             return out
     raise KeyError(name)
-
-
-def sqrt(x):
-    return x.sqrt()
 
 
 def interp(mp, mlow, x, xp, xr):
@@ -320,14 +318,6 @@ def build(spec):
     modes = {"w": w_or_channel, "rhss": rect_hss, "chss": round_hss, "bar": solid_rect, "round": solid_round,
              "2l": double_angle, "lg": single_angle_geometric, "lp": single_angle_principal}[kind](**args)
     return {"spec": spec, **summarize(modes)}
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    return value
 
 
 if __name__ == "__main__":

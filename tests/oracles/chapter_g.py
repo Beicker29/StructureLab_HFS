@@ -13,6 +13,8 @@ import json
 import re
 from pathlib import Path
 
+from _common import _plain, sqrt
+
 import openpyxl
 
 getcontext().prec = 50
@@ -42,10 +44,6 @@ def row(family, name):
                         pass
             return out
     raise KeyError(name)
-
-
-def sqrt(x):
-    return x.sqrt()
 
 
 def cv1(htw, kv, fy):
@@ -145,14 +143,6 @@ def build(spec):
     modes = {"i": i_shape, "rhss": rect_hss, "chss": round_hss, "angle": angle, "bar": bar, "round": solid_round}
     vn, phi = modes[spec["kind"]](**args)
     return {"spec": spec, "Vn_kN": vn / 1000, "phi_v": phi, "phiVn_kN": phi * vn / 1000}
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    return value
 
 
 if __name__ == "__main__":

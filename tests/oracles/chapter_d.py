@@ -9,6 +9,8 @@ from decimal import Decimal as D
 import json
 from pathlib import Path
 
+from _common import _plain
+
 import openpyxl
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -49,14 +51,6 @@ CASES = {
     "RHSS-slotted": dict(family="RECTANGULAR_HSS", name="PTE100X100X4MM", Fy=345, Fu=450, An=1350, U="0.80"),
     "CHSS-slotted": dict(family="CIRCULAR_HSS", name='PTER4"X3.00MM', Fy=345, Fu=450, An=950, U="0.87"),
 }
-
-
-def _plain(value):
-    if isinstance(value, D):
-        return str(value)
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    return value
 
 
 if __name__ == "__main__":
