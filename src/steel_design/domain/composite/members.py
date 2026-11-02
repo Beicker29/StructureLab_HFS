@@ -112,10 +112,23 @@ def composite_compression(case: SteelCase, section: Section, bare_steel=None) ->
                 notes.append(f"Gobierna el acero solo: I2 permite no tomar menos que el Capítulo E ({bare['governing_mode']}).")
     modes["LB"] = {"limit_state": "local_buckling", "provision": "I1.4" if kind == "filled" else "I1.2", "applies": True,
                    "equation": "Tabla I1.1a" if kind == "filled" else "No requerido en embebidos ni en muros (I1.2)"}
-    return with_fire(composite_result(case, section, modes=modes, governing=governing, provisions=["I1", modes[governing]["provision"].split(";")[0]],
-                             classification=classification, requirements=requirements, notes=notes,
-                             Pn_kN=modes[governing]["Pn_kN"], phi_c=phi, available_kN=available),
-                     hot, "4.2.4d(c)" if kind == "filled" else "4.2.4d(d)")
+    return with_fire(
+        composite_result(
+            case,
+            section,
+            modes=modes,
+            governing=governing,
+            provisions=["I1", modes[governing]["provision"].split(";")[0]],
+            classification=classification,
+            requirements=requirements,
+            notes=notes,
+            Pn_kN=modes[governing]["Pn_kN"],
+            phi_c=phi,
+            available_kN=available,
+        ),
+        hot,
+        "4.2.4d(c)" if kind == "filled" else "4.2.4d(d)",
+    )
 
 
 

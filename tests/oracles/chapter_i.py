@@ -436,7 +436,9 @@ def appendix_2_biaxial(name, fy, fc, wc, L, Pu, Mux, Muy):
     g, lam, _ = a2_data(name, fy)
     axial = appendix_2_compression(name, fy, fc, wc, L)
     ratio_p = axial["Pn_kN"] / axial["Pno_kN"]
-    m = D(Mux) / (D("0.90") * appendix_2_flexure(name, fy, fc, "x")["Mn_kNm"]) + D(Muy) / (D("0.90") * appendix_2_flexure(name, fy, fc, "y")["Mn_kNm"])
+    m = D(Mux) / (D("0.90") * appendix_2_flexure(name, fy, fc, "x")["Mn_kNm"]) + D(Muy) / (
+        D("0.90") * appendix_2_flexure(name, fy, fc, "y")["Mn_kNm"]
+    )
     x = pu / axial["phiPn_kN"]
     values = []
     for bh in (g["p"]["B"] / g["p"]["Ht"], g["p"]["Ht"] / g["p"]["B"]):
@@ -768,7 +770,9 @@ def diagram_rect(name, fy, fc, axis="x"):
     he = hn / 2 + H / 4
     pe = D("0.85") * fc * ac / 2 + D("0.85") * fc * bi * he + 4 * fy * t * he
     me = md - fy * 2 * t * he**2 - D("0.85") * fc * bi * he**2 / 2
-    return _points(A=(fy * p["A"] + D("0.85") * fc * ac, D(0)), E=(pe, me), C=(D("0.85") * fc * ac, mb), D=(D("0.85") * fc * ac / 2, md), B=(D(0), mb))
+    return _points(
+        A=(fy * p["A"] + D("0.85") * fc * ac, D(0)), E=(pe, me), C=(D("0.85") * fc * ac, mb), D=(D("0.85") * fc * ac / 2, md), B=(D(0), mb)
+    )
 
 
 def diagram_round(name, fy, fc):
@@ -1084,21 +1088,53 @@ CASES = {
     "fire-wall": dict(kind="wall_fire_oracle", fy=345, fc=40, wc=2320, height=5000, wall_length=3300, tsc=600, t=14, st=300, Pu=16000,
                       plate_T=1000, thicknesses=[40, 40, 40, 40, 42, 42, 42],temperatures=[780, 500, 370, 280, 200, 120, 60], required=3),
 }
-FUNCTIONS = {"filled_compression": filled_compression, "filled_rect_flexure": filled_rect_flexure,
-             "filled_round_flexure": filled_round_flexure, "filled_shear": filled_shear,
-             "encased_compression": encased_compression, "encased_tension": encased_tension,
-             "encased_flexure": encased_flexure, "beam_flexure": beam_flexure, "beam_detailing": beam_detailing, "filled_placement": filled_placement, "deflection_limit": deflection_limit, "box_steel_flexure": box_steel_flexure, "i5": i5,
-             "wall_compression": wall_compression, "wall_tension": wall_tension, "wall_moment": wall_moment,
-             "wall_shear": wall_shear_oracle, "wall_interaction": wall_interaction, "anchor": anchor_oracle,
-             "round_with_bars_compression": round_with_bars_compression, "round_with_bars_flexure": round_with_bars_flexure,
-             "rect_with_bars_flexure": rect_with_bars_flexure, "appendix_2_compression": appendix_2_compression,
-             "appendix_2_flexure": appendix_2_flexure, "appendix_2_interaction": appendix_2_interaction,
-             "second_order": second_order, "tension_control": tension_control, "box_compression": box_compression,
-             "box_flexure": box_flexure, "box_shear": box_shear, "biaxial": biaxial, "service_filled": service_filled,
-             "service_round": service_round, "service_encased": service_encased, "service_box": service_box, "appendix_2_biaxial": appendix_2_biaxial, "diagram_rect": diagram_rect, "diagram_round": diagram_round,
-             "diagram_encased": diagram_encased, "wall_slender": wall_slender, "wall_stiffnesses": wall_stiffnesses,
-             "c_wall_case": c_wall_case, "coupling_flexure": coupling_flexure, "coupling_shear": coupling_shear,
-             "wall_fire_oracle": wall_fire_oracle}
+FUNCTIONS = {
+    "filled_compression": filled_compression,
+    "filled_rect_flexure": filled_rect_flexure,
+    "filled_round_flexure": filled_round_flexure,
+    "filled_shear": filled_shear,
+    "encased_compression": encased_compression,
+    "encased_tension": encased_tension,
+    "encased_flexure": encased_flexure,
+    "beam_flexure": beam_flexure,
+    "beam_detailing": beam_detailing,
+    "filled_placement": filled_placement,
+    "deflection_limit": deflection_limit,
+    "box_steel_flexure": box_steel_flexure,
+    "i5": i5,
+    "wall_compression": wall_compression,
+    "wall_tension": wall_tension,
+    "wall_moment": wall_moment,
+    "wall_shear": wall_shear_oracle,
+    "wall_interaction": wall_interaction,
+    "anchor": anchor_oracle,
+    "round_with_bars_compression": round_with_bars_compression,
+    "round_with_bars_flexure": round_with_bars_flexure,
+    "rect_with_bars_flexure": rect_with_bars_flexure,
+    "appendix_2_compression": appendix_2_compression,
+    "appendix_2_flexure": appendix_2_flexure,
+    "appendix_2_interaction": appendix_2_interaction,
+    "second_order": second_order,
+    "tension_control": tension_control,
+    "box_compression": box_compression,
+    "box_flexure": box_flexure,
+    "box_shear": box_shear,
+    "biaxial": biaxial,
+    "service_filled": service_filled,
+    "service_round": service_round,
+    "service_encased": service_encased,
+    "service_box": service_box,
+    "appendix_2_biaxial": appendix_2_biaxial,
+    "diagram_rect": diagram_rect,
+    "diagram_round": diagram_round,
+    "diagram_encased": diagram_encased,
+    "wall_slender": wall_slender,
+    "wall_stiffnesses": wall_stiffnesses,
+    "c_wall_case": c_wall_case,
+    "coupling_flexure": coupling_flexure,
+    "coupling_shear": coupling_shear,
+    "wall_fire_oracle": wall_fire_oracle,
+}
 
 
 def run_case(spec):

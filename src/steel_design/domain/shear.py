@@ -132,7 +132,11 @@ def _solid(section, E, Fy, axis):
 def _yielding_at_temperature(section, rows, out, ky):
     """4.2.4d(g): shear yielding only; Cv and Fcr keep their ambient values (Commentary). The strength is then proportional to Fy."""
     if any(row["Cv"] < 1.0 for row in rows) or out.get("Fcr_equation", "0.6Fy") != "0.6Fy":
-        _blocked("Apéndice 4, 4.2.4d(g): solo cubre la fluencia por cortante; aquí rige el pandeo por cortante, que exige un método alternativo.", section)
+        _blocked(
+            "Apéndice 4, 4.2.4d(g): solo cubre la fluencia por cortante; aquí rige el pandeo por cortante, que exige un método "
+            "alternativo.",
+            section,
+        )
     return {**out, **{key: ky * out[key] for key in ("Vn", "Vn_per_flange_N", "Fcr") if key in out}}
 
 

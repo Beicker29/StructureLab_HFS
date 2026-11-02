@@ -66,6 +66,10 @@ def blocking_error(code: str):
 def incomplete_error(code: str, *, with_type: bool = True):
     """The raiser of one domain for missing data."""
     def incomplete(reason, section, fields):
-        details = {"section": section.name, "profile_type": section.type, "fields": fields} if with_type else {"section": section.name, "fields": fields}
+        details = (
+            {"section": section.name, "profile_type": section.type, "fields": fields}
+            if with_type
+            else {"section": section.name, "fields": fields}
+        )
         raise IncompleteSectionDataError(reason, code=code, details=details)
     return incomplete

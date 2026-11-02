@@ -8,10 +8,16 @@ from ..codes.aisc_360_22.constants import G_STEEL
 from ..errors import RuleNotImplementedError
 from ..models import SteelCase
 
-NOTES = ("Apéndice 4, 4.2.2 y 4.2.4: las temperaturas provienen del análisis térmico del usuario (T uniforme en la sección) y las solicitaciones de la "
-         "combinación A-4-1. Las conexiones y, en miembros rellenos, los agujeros de ventilación de 4.2.4a no se revisan aquí.")
-EXTENSION = ("Fuera de 4.2.4d y de la Guía 38, que a temperatura solo tratan la compresión de rellenos y muros: ecuaciones de temperatura ambiente con las propiedades "
-             "de 4.2.3b, como indica en general el Commentary de 4.2.4d. Es una decisión de ingeniería (DA4-8).")
+NOTES = (
+    "Apéndice 4, 4.2.2 y 4.2.4: las temperaturas provienen del análisis térmico del usuario (T uniforme en la sección) y las "
+    "solicitaciones de la "
+    "combinación A-4-1. Las conexiones y, en miembros rellenos, los agujeros de ventilación de 4.2.4a no se revisan aquí."
+)
+EXTENSION = (
+    "Fuera de 4.2.4d y de la Guía 38, que a temperatura solo tratan la compresión de rellenos y muros: ecuaciones de temperatura "
+    "ambiente con las propiedades "
+    "de 4.2.3b, como indica en general el Commentary de 4.2.4d. Es una decisión de ingeniería (DA4-8)."
+)
 SLENDER_BLOCK = "Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas."
 _DEMANDS = ("Pu", "Mux", "Muy", "Mw", "Mz", "Vux", "Vuy")
 
@@ -32,7 +38,14 @@ def steel_at_temperature(case: SteelCase) -> dict | None:
     factors = a4.steel_factors(T)
     Fy_T = factors["ky"] * Fy
     Fu_T = a4.tensile_strength(Fu=case.material.Fu, Fy_T=Fy_T, T=T)
-    return {"T_C": T, **factors, "Fy_T_mpa": Fy_T, "Fu_T_mpa": Fu_T, "E_T_mpa": factors["kE"] * case.material.E, "G_T_mpa": factors["kE"] * G_STEEL}
+    return {
+        "T_C": T,
+        **factors,
+        "Fy_T_mpa": Fy_T,
+        "Fu_T_mpa": Fu_T,
+        "E_T_mpa": factors["kE"] * case.material.E,
+        "G_T_mpa": factors["kE"] * G_STEEL,
+    }
 
 
 def with_fire(result: dict, hot: dict | None, provision: str, *notes: str) -> dict:
@@ -50,7 +63,8 @@ def with_fire_extension(result: dict, hot: dict | None) -> dict:
 
 
 def uncovered_demands(case: SteelCase) -> list[str]:
-    """The demands of a composite member above 200 deg C that stay blocked: encased members (DA4-1) and the axial force of a composite beam."""
+    """The demands of a composite member above 200 deg C that stay blocked: encased members (DA4-1) and the axial force of a
+    composite beam."""
     if not is_elevated(case) or case.composite is None:
         return []
     demands = [name for name in _DEMANDS if getattr(case, name)]

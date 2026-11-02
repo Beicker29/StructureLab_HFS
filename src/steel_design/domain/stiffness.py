@@ -2,7 +2,8 @@
 
 Elastic: E*A, E*I, G*J, E*Cw for bare steel; AISC Design Guide 6, Section 2.8 (not a standard) for filled and encased members.
 Effective: Specification I1.5; only composite members. Direct analysis: reduced stiffnesses of C2.3 and I1.5, for when the program
-carries out that analysis; tau_b is 1.0 in noncomposite members and a datum of the user in composite ones. A value that does not apply or that the program cannot calculate is an explicit row, so
+carries out that analysis; tau_b is 1.0 in noncomposite members and a datum of the user in composite ones. A value that does not
+apply or that the program cannot calculate is an explicit row, so
 that the report can say which of the two it is.
 """
 import math
@@ -85,7 +86,8 @@ def _direct_steel(case, elastic, prefix=""):
 
 
 def _filled_or_encased(case, section, catalog):
-    """Elastic: Design Guide 6, 2.8. Effective: I2-5, I2-12; EA is the elastic one and (GA)eff = Gc*Ac (DI-20). Direct analysis: 0.8 on them."""
+    """Elastic: Design Guide 6, 2.8. Effective: I2-5, I2-12; EA is the elastic one and (GA)eff = Gc*Ac (DI-20). Direct analysis:
+    0.8 on them."""
     kind = case.composite.kind
     Ec, Es = eq.concrete_modulus(wc=case.composite.concrete.wc, fc=case.composite.concrete.fc), eq.E_STEEL
     basis = compression_basis(case, section)
@@ -139,9 +141,13 @@ def _filled_or_encased(case, section, catalog):
         effective = [_value("(EA)eff", "EA", EA, "I1.5(b): EA elástica"), _value("(EI)eff,x", "EI", EIx, f"I1.5(a), Ec. {equation}"),
                      _value("(EI)eff,y", "EI", EIy, f"I1.5(a), Ec. {equation}"),
                      _value("(GA)eff", "GA", GAc, "Gc·Ac; indicación del usuario (DI-20)")] + torsion
-        direct = [_tau_row(case, "I1.5(d)"), _value("EA*", "EA", C2_FACTOR * EA, "I1.5, Nota: 0.8·(EA)eff"),
-                  _flexural_star(case.tau_b, "EI*x", EIx, "I1.5(a), C2.3: 0.8·τb·(EI)eff"), _flexural_star(case.tau_b, "EI*y", EIy, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
-                  _value("GA*", "GA", C2_FACTOR * GAc, "C2.3(a): 0.8·(GA)eff (DI-20)")]
+        direct = [
+            _tau_row(case, "I1.5(d)"),
+            _value("EA*", "EA", C2_FACTOR * EA, "I1.5, Nota: 0.8·(EA)eff"),
+            _flexural_star(case.tau_b, "EI*x", EIx, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
+            _flexural_star(case.tau_b, "EI*y", EIy, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
+            _value("GA*", "GA", C2_FACTOR * GAc, "C2.3(a): 0.8·(GA)eff (DI-20)"),
+        ]
         for row in torsion:
             star = f"{row['symbol']}*"
             direct.append(_value(star, "GJ", C2_FACTOR * row["value"], f"C2.3(a): 0.8·{row['symbol']} (DI-20)")
@@ -156,9 +162,14 @@ def _wall_rows(case, Is_x, Is_y, Ic_x, Ic_y, As, Asw, Ac, Ac_shear, Ec):
     EA, GA = eq.wall_axial_stiffness(As=As, Ec=Ec, Ac=Ac), eq.wall_shear_stiffness(Asw=Asw, Ec=Ec, Ac=Ac_shear)
     effective = [_value("(EI)eff,x", "EI", EIx, "I1.5(e), Ec. I1-1"), _value("(EI)eff,y", "EI", EIy, "I1.5(e), Ec. I1-1"),
                  _value("(EA)eff", "EA", EA, "I1.5(e), Ec. I1-2"), _value("(GA)eff", "GA", GA, "I1.5(e), Ec. I1-3")]
-    direct = [_tau_row(case, "I1.5(f)"), _flexural_star(case.tau_b, "EI*x", EIx, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
-              _flexural_star(case.tau_b, "EI*y", EIy, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"), _value("EA*", "EA", C2_FACTOR * EA, "C2.3(a): 0.8·(EA)eff"),
-              _value("GA*", "GA", C2_FACTOR * GA, "C2.3(a): 0.8·(GA)eff"), _absent("GJ*", FALTA, "I1.5 no define la rigidez torsional de muros de placas.")]
+    direct = [
+        _tau_row(case, "I1.5(f)"),
+        _flexural_star(case.tau_b, "EI*x", EIx, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
+        _flexural_star(case.tau_b, "EI*y", EIy, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
+        _value("EA*", "EA", C2_FACTOR * EA, "C2.3(a): 0.8·(EA)eff"),
+        _value("GA*", "GA", C2_FACTOR * GA, "C2.3(a): 0.8·(GA)eff"),
+        _absent("GJ*", FALTA, "I1.5 no define la rigidez torsional de muros de placas."),
+    ]
     return effective, direct
 
 
@@ -173,20 +184,42 @@ def _composite(case, section, catalog):
     if kind == "wall":
         g = wall_geometry(case)
         geometry = {"Ac_mm2": g["Ac"], "Icx_mm4": g["Icx"], "Icy_mm4": g["Icy"]}
-        return (Ec, geometry, no_guide, *_wall_rows(case, section.ix, section.iy, g["Icx"], g["Icy"], section.area, g["Asw"], g["Ac"], g["Ac"], Ec))
+        return (
+            Ec,
+            geometry,
+            no_guide,
+            *_wall_rows(case, section.ix, section.iy, g["Icx"], g["Icy"], section.area, g["Asw"], g["Ac"], g["Ac"], Ec),
+        )
     if kind == "c_wall":
         _, _, p = _c_wall_data(case)
         geometry = {"Ac_mm2": p["Ac"], "Icx_mm4": p["Ic_x"], "Icy_mm4": p["Ic_y"]}
-        return (Ec, geometry, no_guide, *_wall_rows(case, p["Is_x"], p["Is_y"], p["Ic_x"], p["Ic_y"], p["As"], p["Asw"], p["Ac"], p["Acw"], Ec))
+        return (
+            Ec,
+            geometry,
+            no_guide,
+            *_wall_rows(case, p["Is_x"], p["Is_y"], p["Ic_x"], p["Ic_y"], p["As"], p["Asw"], p["Ac"], p["Acw"], Ec),
+        )
     no_direct = [_absent("EA*, EI*, GA*, GJ*", FALTA, "I1.5 no da estas rigideces para este miembro y no hay expresión implementada.")]
     if kind == "coupling_beam":
-        return Ec, {}, no_guide, [_absent("(EI)eff, (EA)eff, (GA)eff", FALTA, "Sin expresión implementada para vigas de acoplamiento.")], no_direct
-    return (Ec, {}, no_guide, [_absent("(EI)eff, EA", NO_APLICA, "I1.5 trata miembros embebidos, rellenos y muros de placas, no vigas compuestas.")],
-            no_direct)
+        return (
+            Ec,
+            {},
+            no_guide,
+            [_absent("(EI)eff, (EA)eff, (GA)eff", FALTA, "Sin expresión implementada para vigas de acoplamiento.")],
+            no_direct,
+        )
+    return (
+        Ec,
+        {},
+        no_guide,
+        [_absent("(EI)eff, EA", NO_APLICA, "I1.5 trata miembros embebidos, rellenos y muros de placas, no vigas compuestas.")],
+        no_direct,
+    )
 
 
 def member_stiffness(case: SteelCase, section: Section, catalog: Callable[[str], Section] | None = None) -> dict:
-    """{"Es_mpa", "Gs_mpa", "Ec_mpa", "Gc_mpa", "geometry", "elastic", "effective", "direct_analysis"}, or {"error"} when it cannot be evaluated."""
+    """{"Es_mpa", "Gs_mpa", "Ec_mpa", "Gc_mpa", "geometry", "elastic", "effective", "direct_analysis"}, or {"error"} when it
+    cannot be evaluated."""
     try:
         if case.composite is None:
             elastic = _bare_steel(case, section, catalog)

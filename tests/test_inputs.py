@@ -65,9 +65,15 @@ def test_catalog_has_exactly_the_expected_materials():
     assert set(material_catalog()) == set(CATALOG)
 
 
-@pytest.mark.parametrize("material, code", [
-    ("ASTM A992", "UNKNOWN_MATERIAL"), ({"Fy": 345}, "INVALID_MATERIAL"), ({"name": "ASTM A36", "Fy": 248, "Fu": 410}, "INVALID_MATERIAL"), (345, "INVALID_MATERIAL"),
-])
+@pytest.mark.parametrize(
+    "material, code",
+    [
+        ("ASTM A992", "UNKNOWN_MATERIAL"),
+        ({"Fy": 345}, "INVALID_MATERIAL"),
+        ({"name": "ASTM A36", "Fy": 248, "Fu": 410}, "INVALID_MATERIAL"),
+        (345, "INVALID_MATERIAL"),
+    ],
+)
 def test_json_rejects_other_materials_and_numeric_values(material, code):
     with pytest.raises(SteelDesignError) as error:
         prepare_cases({"section_name": "W14X90", "material": material, "Vux": 1})
@@ -75,7 +81,9 @@ def test_json_rejects_other_materials_and_numeric_values(material, code):
 
 
 def test_a_load_case_can_name_another_material():
-    cases = prepare_cases({"section_name": "W14X90", "material": "ASTM A36", "cases": [{"Vux": 1}, {"Vux": 1, "material": "ASTM A572 Gr 50"}]})
+    cases = prepare_cases(
+        {"section_name": "W14X90", "material": "ASTM A36", "cases": [{"Vux": 1}, {"Vux": 1, "material": "ASTM A572 Gr 50"}]}
+    )
     assert [c.material.Fy for _, c in cases] == [248, 345]
 
 

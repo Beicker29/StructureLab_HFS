@@ -61,7 +61,9 @@ def test_points_match_independent_calculation(engine, case_id):
 def test_design_points_apply_lambda_and_phi(engine):
     diagram = engine.run(oracle_case(REFERENCE[DIAGRAMS[0]]["spec"])).interaction_diagrams[0]
     for p in diagram["points"]:
-        assert p["design_P_kN"] == pytest.approx(0.75 * diagram["lambda"] * p["P_kN"]) and p["design_M_kNm"] == pytest.approx(0.9 * p["M_kNm"])
+        assert p["design_P_kN"] == pytest.approx(0.75 * diagram["lambda"] * p["P_kN"]) and p["design_M_kNm"] == pytest.approx(
+            0.9 * p["M_kNm"]
+        )
     assert 0 < diagram["lambda"] < 1
 
 
@@ -113,7 +115,9 @@ def test_noncompact_filled_member_uses_i5_in_compression_with_one_axis(engine):
     assert check.result["governing_mode"] == "I5" and "no compacta" in result.interaction_diagrams[0]["reason"]
 
 
-@pytest.mark.parametrize("demands", [{"Pu": 10, "Mux": 1, "Muy": 1, "lengths": LENGTHS}, {"Pu": -10, "Mux": 1, "tension": {"An": 500, "U": 1.0}}])
+@pytest.mark.parametrize(
+    "demands", [{"Pu": 10, "Mux": 1, "Muy": 1, "lengths": LENGTHS}, {"Pu": -10, "Mux": 1, "tension": {"An": 500, "U": 1.0}}]
+)
 def test_noncompact_filled_member_falls_back_to_h1_1_where_i5_does_not_cover(engine, demands):
     assert engine.run(filled("PTE120X60X2MM", **demands)).check("interaction").chapter == "H"
 
@@ -128,7 +132,9 @@ def test_bars_in_a_filled_member_remove_the_diagram_and_keep_h1_1(engine):
 
 
 def test_encased_bars_out_of_the_table_arrangement_have_no_diagram(engine):
-    bars = [{"area": 510, "db": 25.4, "x": x, "y": y} for x, y in ((240, 240), (240, 100), (240, -240), (-240, 240), (-240, 100), (-240, -240))]
+    bars = [
+        {"area": 510, "db": 25.4, "x": x, "y": y} for x, y in ((240, 240), (240, 100), (240, -240), (-240, 240), (-240, 100), (-240, -240))
+    ]
     case = SteelCase(section_name="W10X45", material={"Fy": 345}, tau_b=0.8, Pu=100, Mux=10, lengths=LENGTHS,
                      composite={"kind": "encased", "concrete": CONCRETE,
                                 "encased": {"H": 610, "B": 610, "Fysr": 420, "bars": bars, "transverse": TIES}})
@@ -224,7 +230,9 @@ def test_high_strength_uniaxial_keeps_one_set_of_coefficients(engine):
 @pytest.mark.parametrize("requested", ["H1", "I5", "M2", "M2S"])
 def test_requested_method_in_high_strength_is_replaced_and_reported(engine, requested):
     check = engine.run(high_strength(interaction=requested, Pu=100, Mux=10)).check("interaction")
-    assert check.result["governing_mode"] == "A2" and any(f"Se pidió {requested}, pero rige el Apéndice 2" in n for n in check.result["notes"])
+    assert check.result["governing_mode"] == "A2" and any(
+        f"Se pidió {requested}, pero rige el Apéndice 2" in n for n in check.result["notes"]
+    )
 
 
 def test_high_strength_without_compression_uses_h1_1_and_says_so(engine):

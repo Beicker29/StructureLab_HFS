@@ -38,9 +38,28 @@ def anchor_case(spec, member=None, **overrides):
 
 DETAILING = {"longitudinal_spacing": 300, "lateral_cover": 50, "free_edge": True, "free_edge_distance": 300, "distribution": "uniform"}
 WALL = {"length": 3000, "tsc": 300, "t": 10, "tf": 20, "b": 200, "st": 200, "dtie": 25}
-GUIDE_KINDS = {"appendix_2_biaxial", "service_encased", "service_box", "diagram_rect", "diagram_round", "diagram_encased", "second_order", "tension_control", "box_compression", "box_flexure",
-               "box_shear", "biaxial", "service_filled", "service_round", "wall_slender", "wall_stiffnesses", "c_wall_case",
-               "coupling_flexure", "coupling_shear", "wall_fire_oracle"}
+GUIDE_KINDS = {
+    "appendix_2_biaxial",
+    "service_encased",
+    "service_box",
+    "diagram_rect",
+    "diagram_round",
+    "diagram_encased",
+    "second_order",
+    "tension_control",
+    "box_compression",
+    "box_flexure",
+    "box_shear",
+    "biaxial",
+    "service_filled",
+    "service_round",
+    "wall_slender",
+    "wall_stiffnesses",
+    "c_wall_case",
+    "coupling_flexure",
+    "coupling_shear",
+    "wall_fire_oracle",
+}
 
 
 def wall_member(fc=35, wall=None, **demands):
@@ -126,7 +145,14 @@ def build(spec):
     return SteelCase(tau_b=1.0, **data, Mux=1), "flexure_x", "available_kNm", "phiMn_kNm"
 
 
-@pytest.mark.parametrize("case_id", sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] not in GUIDE_KINDS | {"beam_detailing", "filled_placement", "deflection_limit", "box_steel_flexure"}))
+@pytest.mark.parametrize(
+    "case_id",
+    sorted(
+        c
+        for c, v in REFERENCE.items()
+        if v["spec"]["kind"] not in GUIDE_KINDS | {"beam_detailing", "filled_placement", "deflection_limit", "box_steel_flexure"}
+    ),
+)
 def test_profiles_match_independent_calculation(engine, case_id):
     ref = REFERENCE[case_id]
     case, check_id, field, expected = build(ref["spec"])
@@ -249,10 +275,25 @@ def test_bare_steel_is_a_lower_bound_of_the_compressive_strength(engine, section
 
 
 def beam(**overrides):
-    data = {"moment": "positive", "span": 9000, "left_beam_spacing": 3000, "right_beam_spacing": 3000, "tc": 120,
-            "shored": True, "studs": {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True, "detailing": DETAILING}, **overrides}
-    return SteelCase(tau_b=1.0, section_name="W14X30", material={"Fy": 345}, Mux=100, lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000}, flexure={"tension_flange_holes": False},
-                     composite={"kind": "beam", "concrete": {"fc": 28, "wc": 2320, "lightweight": False}, "beam": data})
+    data = {
+        "moment": "positive",
+        "span": 9000,
+        "left_beam_spacing": 3000,
+        "right_beam_spacing": 3000,
+        "tc": 120,
+        "shored": True,
+        "studs": {"count": 30, "d": 19, "Fu": 450, "length": 100, "over_web": True, "detailing": DETAILING},
+        **overrides,
+    }
+    return SteelCase(
+        tau_b=1.0,
+        section_name="W14X30",
+        material={"Fy": 345},
+        Mux=100,
+        lengths={"Lx": 2000, "Ly": 2000, "Lz": 2000},
+        flexure={"tension_flange_holes": False},
+        composite={"kind": "beam", "concrete": {"fc": 28, "wc": 2320, "lightweight": False}, "beam": data},
+    )
 
 
 def test_negative_flexure_is_the_steel_section_of_chapter_f(engine):
@@ -333,7 +374,11 @@ def construction_bundle(Mux, shored=False):
     data = beam(shored=shored).model_dump(exclude_none=True)
     for field in ("Mux", "condition"):
         data.pop(field)
-    return {**data, "material": "ASTM A572 Gr 50", "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": Mux, "Vux": 10}]}
+    return {
+        **data,
+        "material": "ASTM A572 Gr 50",
+        "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": Mux, "Vux": 10}],
+    }
 
 
 def test_unshored_beam_fails_when_the_steel_section_is_short(engine):
@@ -344,10 +389,15 @@ def test_unshored_beam_fails_when_the_steel_section_is_short(engine):
 
 def test_construction_uses_the_steel_section_alone(engine):
     ref = REFERENCE_F["W-F2-inelastic-LTB"]             # W18X50, Lb = 4000 mm, independent calculation of Chapter F
-    data = {"section_name": "W18X50", "material": "ASTM A572 Gr 50", "flexure": {"tension_flange_holes": False},
-            "composite": beam().model_dump(exclude_none=True)["composite"],
-            "lengths": {"ultimate": {"Lx": 9000, "Ly": 1000, "Lz": 1000}, "construction": {"Lx": 9000, "Ly": 4000, "Lz": 6000}},
-            "tau_b": 1.0, "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": 100, "Vux": 10}]}
+    data = {
+        "section_name": "W18X50",
+        "material": "ASTM A572 Gr 50",
+        "flexure": {"tension_flange_holes": False},
+        "composite": beam().model_dump(exclude_none=True)["composite"],
+        "lengths": {"ultimate": {"Lx": 9000, "Ly": 1000, "Lz": 1000}, "construction": {"Lx": 9000, "Ly": 4000, "Lz": 6000}},
+        "tau_b": 1.0,
+        "cases": [{"name": "Última", "Mux": 100}, {"name": "Vaciado", "condition": "construction", "Mux": 100, "Vux": 10}],
+    }
     (_, _, ultimate), (_, _, construction) = execute_payload(data, engine)
     assert construction.check("flexure_x").chapter == "F" and construction.check("shear_x").chapter == "G"
     assert construction.check("flexure_x").capacity == pytest.approx(float(ref["phiMn_kNm"]), rel=1e-9)
@@ -594,9 +644,18 @@ def test_box_in_construction_matches_independent_calculation(engine, case_id):
     ref = REFERENCE[case_id]
     spec = ref["spec"]
     lb = spec["Lb"]
-    case = SteelCase(tau_b=1.0, section_name="CAJON", material={"Fy": spec["fy"]}, condition="construction", lengths={"Lx": lb, "Ly": lb, "Lz": lb},
-                     **{"Mux" if spec["axis"] == "x" else "Muy": 1},
-                     composite={"kind": "filled", "concrete": {"fc": 35, "wc": 2320, "lightweight": False},
-                                "box": {"B": spec["B"], "H": spec["H"], "t": spec["t"]}})
+    case = SteelCase(
+        tau_b=1.0,
+        section_name="CAJON",
+        material={"Fy": spec["fy"]},
+        condition="construction",
+        lengths={"Lx": lb, "Ly": lb, "Lz": lb},
+        **{"Mux" if spec["axis"] == "x" else "Muy": 1},
+        composite={
+            "kind": "filled",
+            "concrete": {"fc": 35, "wc": 2320, "lightweight": False},
+            "box": {"B": spec["B"], "H": spec["H"], "t": spec["t"]},
+        },
+    )
     check = engine.run(case).check(f"flexure_{spec['axis']}")
     assert check.capacity == pytest.approx(float(ref["phiMn_kNm"]), rel=1e-9)

@@ -64,7 +64,9 @@ class Section(InputModel):
     x: NonNegativeNumber | None = Field(None, alias="x", description="Angle: centroid distance from the heel along x (mm)")
     y: NonNegativeNumber | None = Field(None, alias="y", description="Angle: centroid distance from the heel along y (mm)")
     tan_alpha: NonNegativeNumber | None = Field(None, alias="tan_alpha", description="Angle: tangent of the angle between the y and z axes")
-    beta_w: NonNegativeNumber | None = Field(None, description="Angle: |beta_w| of F10-4 (mm), 0 for equal legs; the sign depends on the leg in compression")
+    beta_w: NonNegativeNumber | None = Field(
+        None, description="Angle: |beta_w| of F10-4 (mm), 0 for equal legs; the sign depends on the leg in compression"
+    )
 
     # Slenderness metrics from AISC database
     bf_2tf_ratio: NonNegativeNumber | None = Field(None, alias="bf/2tf", description="Flange slenderness bf/2tf")

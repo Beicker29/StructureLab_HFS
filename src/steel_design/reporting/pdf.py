@@ -19,7 +19,8 @@ _LATIN1 = {"φ": "phi", "λ": "lambda", "Σ": "sum", "≤": "<=", "→": "->", "
 
 
 def _column_widths(minimums: list[float], weights: list[float], total: float) -> list[float]:
-    """Column widths (mm): each one holds its longest word; what remains is shared by weight. A word breaks only if they exceed the total."""
+    """Column widths (mm): each one holds its longest word; what remains is shared by weight. A word breaks only if they exceed
+    the total."""
     spare = total - sum(minimums)
     if spare <= 0:
         return [total * m / sum(minimums) for m in minimums]
@@ -203,8 +204,10 @@ class _Renderer:
         pdf.set_fill_color(*fill)  # never inherit a previous fill (status badge, cards)
         natural = sum(weights) * 2.1  # mm, about one character of 8.5 pt per weight unit
         pdf.set_font(FONT, "B", 8.5)  # headings and the highlighted row are bold, so the widest case
-        minimums = [max(pdf.get_string_width(word) for word in " ".join([clean(str(h))] + [r[i] for r in texts]).split() or [""]) + 3.2 + 0.6
-                    for i, h in enumerate(headers)]
+        minimums = [
+            max(pdf.get_string_width(word) for word in " ".join([clean(str(h))] + [r[i] for r in texts]).split() or [""]) + 3.2 + 0.6
+            for i, h in enumerate(headers)
+        ]
         pdf.set_font(FONT, "", 8.5 if not compact else 8)
         total = min(width(), max(natural, 70, sum(minimums)))
         style = dict(width=total, col_widths=_column_widths(minimums, weights, total), line_height=5.2, padding=(1, 1.6),

@@ -8,7 +8,8 @@ from ...sections.models import missing_properties
 from ..fire import steel_at_temperature
 
 _LIMITATIONS = (
-    "Diafragmas (I7) y conexión ensayada (I8.4) no se comprueban. La transferencia de carga (I6) corresponde al diseño de conexiones y queda fuera.",
+    "Diafragmas (I7) y conexión ensayada (I8.4) no se comprueban. La transferencia de carga (I6) corresponde al diseño de "
+    "conexiones y queda fuera.",
     "El diseño del concreto y del refuerzo según ACI 318 (I1.1) queda fuera de este cálculo.",
     "Pr y Mr son datos del usuario, salvo con composite.second_order (Apéndice 8.1): se supone que provienen de un análisis "
     "según el Capítulo C con las rigideces de I1.5 (decisión DH-3).",
@@ -86,7 +87,8 @@ def composite_result(case, section, *, modes, governing, provisions, classificat
 
 
 def concrete_profile(case, section, part=None) -> list[tuple]:
-    """(thickness, T) of the concrete of a fire case, from a plate to mid-thickness: one layer at a uniform temperature, or the profile of the user."""
+    """(thickness, T) of the concrete of a fire case, from a plate to mid-thickness: one layer at a uniform temperature, or the
+    profile of the user."""
     composite, fire = case.composite, case.fire
     half, layers = 1.0, None
     if composite.kind == "wall":
@@ -107,10 +109,19 @@ def concrete_profile(case, section, part=None) -> list[tuple]:
 
 def composite_materials(case, section, part=None) -> dict:
     """Fy, f'c, Ec, Es, Gs and Fysr of the strength: ambient or, above 200 deg C, at temperature (4.2.3b). With a profile, kc and kEc
-    are the mean by thickness (decision DA4-8), the same as adding layers when the profile runs across the thickness and the block along the length."""
+    are the mean by thickness (decision DA4-8), the same as adding layers when the profile runs across the thickness and the
+    block along the length."""
     concrete, bars = case.composite.concrete, case.composite.filled
     Ec = eq.concrete_modulus(wc=concrete.wc, fc=concrete.fc)
-    out = {"Fy": case.material.Fy, "fc": concrete.fc, "Ec": Ec, "Es": eq.E_STEEL, "Gs": eq.G_STEEL, "Fysr": bars.Fysr if bars else 0.0, "Es_bars": eq.E_STEEL}
+    out = {
+        "Fy": case.material.Fy,
+        "fc": concrete.fc,
+        "Ec": Ec,
+        "Es": eq.E_STEEL,
+        "Gs": eq.G_STEEL,
+        "Fysr": bars.Fysr if bars else 0.0,
+        "Es_bars": eq.E_STEEL,
+    }
     hot = steel_at_temperature(case)
     if not hot:
         return out

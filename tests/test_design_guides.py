@@ -183,8 +183,10 @@ def test_tension_control_is_required_only_for_declared_beams(guides_engine):
     data["composite"]["flexural_member"] = True
     check = guides_engine.run(SteelCase(tau_b=1.0, **data)).check("flexure_x")
     assert any(r["id"] == "tension_controlled" for r in check.result["requirements"])
-    assert not any(r["id"] == "tension_controlled" for r in guides_engine.run(SteelCase(tau_b=1.0, **encased_w14x211("eight", Mux=1.0))).check(
-        "flexure_x").result["requirements"])
+    assert not any(
+        r["id"] == "tension_controlled"
+        for r in guides_engine.run(SteelCase(tau_b=1.0, **encased_w14x211("eight", Mux=1.0))).check("flexure_x").result["requirements"]
+    )
 
 
 def test_biaxial_shape_factor_gives_more_strength_than_c_i5_1(guides_engine):
@@ -265,11 +267,17 @@ def c_wall(minor="flange_tips", **demands):
 
 
 def test_c_wall_flexure_with_axial_force_of_example_23(guides_engine):
-    tension = guides_engine.run(SteelCase(tau_b=1.0, **c_wall(Pu=-12300 * KIP, Muy=722000 * KIPIN))).check("interaction").result["modes"]["I5c"]
+    tension = (
+        guides_engine.run(SteelCase(tau_b=1.0, **c_wall(Pu=-12300 * KIP, Muy=722000 * KIPIN))).check("interaction").result["modes"]["I5c"]
+    )
     assert tension["equation"] == "DG38 A.2.3"
     assert tension["C_mm"] / IN == pytest.approx(119, rel=TOL)
     assert tension["Mn_at_Pr_kNm"] / KIPIN == pytest.approx(2380000, rel=TOL)
-    compression = guides_engine.run(SteelCase(tau_b=1.0, **c_wall("web", Pu=12300 * KIP, Muy=722000 * KIPIN))).check("interaction").result["modes"]["I5c"]
+    compression = (
+        guides_engine.run(SteelCase(tau_b=1.0, **c_wall("web", Pu=12300 * KIP, Muy=722000 * KIPIN)))
+        .check("interaction")
+        .result["modes"]["I5c"]
+    )
     assert compression["equation"] == "DG38 A.2.5"
     assert compression["C_mm"] / IN == pytest.approx(13.6, rel=TOL)
     assert compression["Mn_at_Pr_kNm"] / KIPIN == pytest.approx(2160000, rel=TOL)
@@ -285,7 +293,9 @@ def test_c_wall_properties_and_shear_of_example_23(guides_engine):
 
 def test_c_wall_blocks_what_the_guide_does_not_cover(guides_engine):
     assert guides_engine.run(SteelCase(tau_b=1.0, **c_wall(Pu=12300 * KIP, Muy=1.0))).check("interaction").status.value == "INCOMPLETE"
-    assert guides_engine.run(SteelCase(tau_b=1.0, **c_wall("web", Pu=1000 * KIP, Mux=1.0))).check("interaction").status.value == "INCOMPLETE"
+    assert (
+        guides_engine.run(SteelCase(tau_b=1.0, **c_wall("web", Pu=1000 * KIP, Mux=1.0))).check("interaction").status.value == "INCOMPLETE"
+    )
     assert guides_engine.run(SteelCase(tau_b=1.0, **c_wall(Vux=1.0))).check("shear_x").status.value == "INCOMPLETE"
 
 
@@ -295,7 +305,10 @@ FIRE_F = [1450, 927, 694, 533, 406, 305, 229, 173, 134, 108, 92, 83, 79]
 def fire_wall(**over):
     """Design Guide 38, Example 6.1: L = 11 ft, tsc = 24, t = 9/16 in, st = 12 in, story 17 ft, Pu = 3600 kips, Table 6-1."""
     data = wall(132, 24, 0.5625, Pu=3600 * KIP, Lc=17)
-    data["fire"] = {"steel_temperature": (1840 - 32) / 1.8, "concrete_layers": [{"thickness": 0.88 * IN, "T": (f - 32) / 1.8} for f in FIRE_F]}
+    data["fire"] = {
+        "steel_temperature": (1840 - 32) / 1.8,
+        "concrete_layers": [{"thickness": 0.88 * IN, "T": (f - 32) / 1.8} for f in FIRE_F],
+    }
     data["composite"]["fire"] = {"required_rating_hours": 3.0, **over}
     data["condition"] = "fire"
     return data
@@ -385,7 +398,11 @@ def _guide_case(spec):
     if kind == "second_order":
         so = {k: spec[k] for k in ("Pnt", "Plt", "Mnt", "Mlt", "M1_M2", "Pstory", "Pmf", "H", "drift")}
         data = _filled(spec, second_order={**so, "axis": "x", "L": spec["story"]})
-        return SteelCase(tau_b=1.0, **data, lengths=_length(spec["L"])), "axial", {f"second_order.{k}": k for k in ("B1", "B2", "Pr_kN", "Mr_kNm")}
+        return (
+            SteelCase(tau_b=1.0, **data, lengths=_length(spec["L"])),
+            "axial",
+            {f"second_order.{k}": k for k in ("B1", "B2", "Pr_kN", "Mr_kNm")},
+        )
     if kind == "tension_control":
         return SteelCase(tau_b=1.0, **_encased(spec), Mux=1.0), "flexure_x", {"epsilon_t": "epsilon_t", "epsilon_limit": "epsilon_limit"}
     if kind == "box_compression":
@@ -396,39 +413,85 @@ def _guide_case(spec):
         return _box(spec, Vux=1.0), "shear_x", {"available_kN": "phiVn_kN"}
     if kind == "biaxial":
         data = (_filled if spec["member"] == "filled" else _encased)(spec, interaction="M2S", biaxial_shape_factor=True)
-        return SteelCase(tau_b=1.0, **data, Pu=spec["Pu"], Mux=spec["Mux"], Muy=spec["Muy"], lengths=_length(spec["L"])), "interaction", {"ratio": "ratio"}
+        return (
+            SteelCase(tau_b=1.0, **data, Pu=spec["Pu"], Mux=spec["Mux"], Muy=spec["Muy"], lengths=_length(spec["L"])),
+            "interaction",
+            {"ratio": "ratio"},
+        )
     if kind in {"service_filled", "service_round"}:
-        keys = {"elastic.EIx": "EI_service", "elastic.EA": "EA_service", "elastic.GA": "GA_service", "elastic.GJ": "GJ_service",
-                "direct_analysis.EA*": "EA_star", "direct_analysis.EI*x": "EI_star_x", "effective.(GA)eff": "GA_eff", "direct_analysis.GA*": "GA_star"}
+        keys = {
+            "elastic.EIx": "EI_service",
+            "elastic.EA": "EA_service",
+            "elastic.GA": "GA_service",
+            "elastic.GJ": "GJ_service",
+            "direct_analysis.EA*": "EA_star",
+            "direct_analysis.EI*x": "EI_star_x",
+            "effective.(GA)eff": "GA_eff",
+            "direct_analysis.GA*": "GA_star",
+        }
         if kind == "service_round":
             keys = {"elastic.GJ": "GJ_service", "elastic.GAs": "GAs", "elastic.GAc": "GAc"}
-        return (SteelCase(tau_b=0.8, **_filled(spec), Pu=spec["Pu"], lengths=_length(spec["L"])), "axial", {f"stiffness.{k}": v for k, v in keys.items()})
+        return (
+            SteelCase(tau_b=0.8, **_filled(spec), Pu=spec["Pu"], lengths=_length(spec["L"])),
+            "axial",
+            {f"stiffness.{k}": v for k, v in keys.items()},
+        )
     if kind == "service_encased":
-        return (SteelCase(tau_b=1.0, **_encased({**spec, "Fysr": 420}), Pu=1.0, lengths=_length(4000)), "axial",
-                {"stiffness.elastic.GAs": "GAs", "stiffness.elastic.GAc": "GAc", "stiffness.elastic.GJs": "GJs", "stiffness.elastic.GJc": "GJc",
-                 "stiffness.effective.GJs": "GJs", "stiffness.effective.GJc": "GJc", "stiffness.effective.(GA)eff": "GAc",
-                 "stiffness.direct_analysis.GJs*": "GJs_star", "stiffness.direct_analysis.GJc*": "GJc_star", "stiffness.direct_analysis.GA*": "GA_star"})
+        return (
+            SteelCase(tau_b=1.0, **_encased({**spec, "Fysr": 420}), Pu=1.0, lengths=_length(4000)),
+            "axial",
+            {
+                "stiffness.elastic.GAs": "GAs",
+                "stiffness.elastic.GAc": "GAc",
+                "stiffness.elastic.GJs": "GJs",
+                "stiffness.elastic.GJc": "GJc",
+                "stiffness.effective.GJs": "GJs",
+                "stiffness.effective.GJc": "GJc",
+                "stiffness.effective.(GA)eff": "GAc",
+                "stiffness.direct_analysis.GJs*": "GJs_star",
+                "stiffness.direct_analysis.GJc*": "GJc_star",
+                "stiffness.direct_analysis.GA*": "GA_star",
+            },
+        )
     if kind == "service_box":
         return _box({**spec, "fy": 345}, Pu=1.0, lengths=_length(4000)), "axial", {"stiffness.elastic.GJ": "GJ_service"}
     if kind in {"wall_slender", "wall_stiffnesses"}:
         over = {"b": spec["b"], "allow_slender_plates": True} if kind == "wall_slender" else {"b": 200}
-        data = dict(section_name="MURO", material={"Fy": spec.get("fy", 345)}, Pu=1.0, lengths=_length(6000),
-                    composite={"kind": "wall", "concrete": _concrete(spec) if "wc" in spec else {"fc": spec["fc"], "wc": 2320, "lightweight": False},
-                               "wall": {"length": spec["L"], "tsc": spec["tsc"], "t": spec["t"], "tf": spec["tf"], "st": 200, "dtie": 25, **over}})
+        data = dict(
+            section_name="MURO",
+            material={"Fy": spec.get("fy", 345)},
+            Pu=1.0,
+            lengths=_length(6000),
+            composite={
+                "kind": "wall",
+                "concrete": _concrete(spec) if "wc" in spec else {"fc": spec["fc"], "wc": 2320, "lightweight": False},
+                "wall": {"length": spec["L"], "tsc": spec["tsc"], "t": spec["t"], "tf": spec["tf"], "st": 200, "dtie": 25, **over},
+            },
+        )
         if kind == "wall_slender":
             return SteelCase(tau_b=1.0, **data), "axial", {"modes.FB-x.Pno_kN": "Pno_kN"}
-        return SteelCase(tau_b=1.0, **data), "axial", {"modes.FB-x.EI_eff": "EI_eff", "stiffness.effective.(EA)eff": "EA_eff", "stiffness.effective.(GA)eff": "GA_eff"}
+        return (
+            SteelCase(tau_b=1.0, **data),
+            "axial",
+            {"modes.FB-x.EI_eff": "EI_eff", "stiffness.effective.(EA)eff": "EA_eff", "stiffness.effective.(GA)eff": "GA_eff"},
+        )
     if kind == "c_wall_case":
         mode, P = spec["mode"], spec.get("P", 0)
         wall_ = {k: spec[k] for k in ("L", "W", "tsc_w", "tsc_f", "tp")}
         wall_.update(b=200, st=200, dtie=25, minor_axis_compression="web" if mode == "web" else "flange_tips")
-        data = dict(section_name="MURO-C", material={"Fy": spec["fy"]}, composite={"kind": "c_wall", "concrete": _concrete(spec), "c_wall": wall_})
+        data = dict(
+            section_name="MURO-C", material={"Fy": spec["fy"]}, composite={"kind": "c_wall", "concrete": _concrete(spec), "c_wall": wall_}
+        )
         if mode == "major":
             return SteelCase(tau_b=1.0, **data, Mux=1.0), "flexure_x", {"Mn_kNm": "Mn_kNm", "modes.Y.C_mm": "C_mm"}
         if not P:
             return SteelCase(tau_b=1.0, **data, Muy=1.0), "flexure_y", {"Mn_kNm": "Mn_kNm", "modes.Y.C_mm": "C_mm"}
         lengths = {"lengths": _length(6000)} if P > 0 else {}
-        return SteelCase(tau_b=1.0, **data, Pu=P, Muy=1.0, **lengths), "interaction", {"modes.I5c.Mn_at_Pr_kNm": "Mn_kNm", "modes.I5c.C_mm": "C_mm"}
+        return (
+            SteelCase(tau_b=1.0, **data, Pu=P, Muy=1.0, **lengths),
+            "interaction",
+            {"modes.I5c.Mn_at_Pr_kNm": "Mn_kNm", "modes.I5c.C_mm": "C_mm"},
+        )
     if kind in {"coupling_flexure", "coupling_shear"}:
         data = dict(section_name="CB", material={"Fy": spec["fy"]},
                     composite={"kind": "coupling_beam", "concrete": {"fc": spec["fc"], "wc": 2320, "lightweight": False},
@@ -448,7 +511,11 @@ def _guide_case(spec):
         return SteelCase(tau_b=1.0, **data), "axial", {f"modes.FB.{k}": k for k in keys}
 
 
-GUIDE_CASE_IDS = sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"] in GUIDE_KINDS and not v["spec"]["kind"].startswith("diagram_") and v["spec"]["kind"] != "appendix_2_biaxial")
+GUIDE_CASE_IDS = sorted(
+    c
+    for c, v in REFERENCE.items()
+    if v["spec"]["kind"] in GUIDE_KINDS and not v["spec"]["kind"].startswith("diagram_") and v["spec"]["kind"] != "appendix_2_biaxial"
+)
 
 
 @pytest.mark.parametrize("case_id", GUIDE_CASE_IDS)
@@ -469,7 +536,9 @@ def test_fire_wall_reviews_of_the_guide_and_ratio_match_independent_calculation(
     ref = REFERENCE["fire-wall"]
     result = guides_engine.run(_guide_case(ref["spec"])[0])
     mode = result.check("fire").result["modes"]["FIRE"]
-    assert mode["R_hours"] == pytest.approx(float(ref["R_hours"]), rel=1e-9) and mode["Pn_kN"] == pytest.approx(float(ref["Pn_kN"]), rel=1e-9)
+    assert mode["R_hours"] == pytest.approx(float(ref["R_hours"]), rel=1e-9) and mode["Pn_kN"] == pytest.approx(
+        float(ref["Pn_kN"]), rel=1e-9
+    )
     assert result.check("axial").ratio == pytest.approx(float(ref["ratio"]), rel=1e-9)     # Pu/φPn(T) governs the oracle's max(...)
 
 
@@ -497,7 +566,10 @@ def test_appendix_2_does_not_cover_lightweight_or_round_members(guides_engine):
     data = box_25_fc(12, Vux=1.0)
     data["composite"]["concrete"]["lightweight"] = True
     assert guides_engine.run(SteelCase(tau_b=1.0, **data)).errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
-    assert guides_engine.run(SteelCase(tau_b=1.0, **filled_member("HSS16.000X0.250", 12, Vux=1.0))).errors[0]["code"] == "COMPOSITE_DOMAIN_BLOCKED"
+    assert (
+        guides_engine.run(SteelCase(tau_b=1.0, **filled_member("HSS16.000X0.250", 12, Vux=1.0))).errors[0]["code"]
+        == "COMPOSITE_DOMAIN_BLOCKED"
+    )
 
 
 def test_appendix_2_only_applies_above_the_limits_of_i13(guides_engine):

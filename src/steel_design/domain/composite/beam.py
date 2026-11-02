@@ -59,22 +59,44 @@ def _anchor_detailing_requirements(name, anchors, beam, concrete):
     if name == "studs":
         perpendicular = deck is not None and deck.orientation == "perpendicular"
         s_min = (4.0 if perpendicular else 6.0) * anchors.d
-        out.append(requirement_row(f"{name}_s_min", "I8.2d(d)", s >= s_min, "Separación longitudinal mínima de pernos.", s, f"≥ {s_min:g} mm"))
+        out.append(
+            requirement_row(f"{name}_s_min", "I8.2d(d)", s >= s_min, "Separación longitudinal mínima de pernos.", s, f"≥ {s_min:g} mm")
+        )
         if detail.transverse_spacing is not None:
             s_t = 4.0 * anchors.d
             out.append(requirement_row(f"{name}_s_transverse", "I8.2d(d)", detail.transverse_spacing >= s_t,
                                     "Separación transversal mínima de pernos.", detail.transverse_spacing, f"≥ {s_t:g} mm"))
     s_max = min(8.0 * (beam.tc + (deck.hr if deck else 0.0)), 900.0)
-    out.append(requirement_row(f"{name}_s_max", "I8.2d(e)", s <= s_max, f"Separación máxima de {label} (8 veces la losa total o 900 mm).", s, f"≤ {s_max:g} mm"))
+    out.append(
+        requirement_row(
+            f"{name}_s_max", "I8.2d(e)", s <= s_max, f"Separación máxima de {label} (8 veces la losa total o 900 mm).", s, f"≤ {s_max:g} mm"
+        )
+    )
     if deck is None:
         out.append(requirement_row(f"{name}_cover", "I8.2d(b)", detail.lateral_cover >= 25.0, f"Recubrimiento lateral de {label}.",
                                 detail.lateral_cover, "≥ 25 mm"))
     if detail.free_edge:
         edge = 250.0 if concrete.lightweight else 200.0
-        out.append(requirement_row(f"{name}_free_edge", "I8.2d(c)", detail.free_edge_distance >= edge,
-                                f"Distancia de {label} al borde libre en la dirección del cortante.", detail.free_edge_distance, f"≥ {edge:g} mm"))
-    out.append(requirement_row(f"{name}_distribution", "I8.2d(a)", True, f"Distribución de {label}.",
-                            "uniforme" if detail.distribution == "uniform" else "según documentos de diseño", "uniforme o según documentos de diseño"))
+        out.append(
+            requirement_row(
+                f"{name}_free_edge",
+                "I8.2d(c)",
+                detail.free_edge_distance >= edge,
+                f"Distancia de {label} al borde libre en la dirección del cortante.",
+                detail.free_edge_distance,
+                f"≥ {edge:g} mm",
+            )
+        )
+    out.append(
+        requirement_row(
+            f"{name}_distribution",
+            "I8.2d(a)",
+            True,
+            f"Distribución de {label}.",
+            "uniforme" if detail.distribution == "uniform" else "según documentos de diseño",
+            "uniforme o según documentos de diseño",
+        )
+    )
     return out
 
 
@@ -140,7 +162,10 @@ def beam_flexure(case, section):
         qn = eq.channel_strength(tf=c.tf, tw=c.tw, la=c.la, fc=concrete.fc, Ec=Ec)
         sum_qn += c.count * qn
         anchors["Qn_channel_kN"] = qn / 1000.0
-    crushing, steel = eq.beam_slab_crushing(fc=concrete.fc, b=b, tc=beam.tc), eq.beam_steel_yielding(Fy=Fy, As=section.area)   # ribs neglected (I3.2c)
+    crushing, steel = (
+        eq.beam_slab_crushing(fc=concrete.fc, b=b, tc=beam.tc),
+        eq.beam_steel_yielding(Fy=Fy, As=section.area),
+    )  # ribs neglected (I3.2c)
     C = min(crushing, steel, sum_qn)                                            # I3-1c
     a = eq.beam_block_depth(C=C, fc=concrete.fc, b=b)
     out = eq.beam_plastic_moment(C=C, a=a, Ycon=beam.tc + hr, Fy=Fy, As=section.area, d=section.d, bf=section.bf,
@@ -158,8 +183,13 @@ def beam_flexure(case, section):
         if kcb == 0.0:
             blocked("Tabla A-4.2.4: la resistencia de la viga compuesta se anula a 1100 °C del ala inferior.", section, T_C=hot["T_C"])
         at_temperature = a4.composite_beam_strength(Mn=out["Mn"], kcb=kcb)
-        mode.update(provision="I3.2a(a); Apéndice 4, 4.2.4d(f)", equation=at_temperature["equation"], Mn_ambient_kNm=out["Mn"] / 1e6, kcb=kcb,
-                    Mn_kNm=at_temperature["Mn"] / 1e6)
+        mode.update(
+            provision="I3.2a(a); Apéndice 4, 4.2.4d(f)",
+            equation=at_temperature["equation"],
+            Mn_ambient_kNm=out["Mn"] / 1e6,
+            kcb=kcb,
+            Mn_kNm=at_temperature["Mn"] / 1e6,
+        )
     # Commentary I3.2d: conditions under which slip capacity is not a concern.
     if not (beam.span <= 9100.0 or degree >= 0.5 or sum_qn / (beam.span / 2) >= 230.0):
         notes.append("I3.2d: revise la ductilidad de la conexión; no se cumple ninguna condición del Commentary "

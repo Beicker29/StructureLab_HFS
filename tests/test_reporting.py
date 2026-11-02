@@ -77,17 +77,44 @@ def test_number_format(value, expected):
     assert fmt(value) == expected
 
 
-CHAPTERS = ("## 1. Propiedades mecánicas de los materiales", "### 1.1 Acero estructural", "### 1.2 Concreto estructural",
-            "### 1.3 Acero de refuerzo", "## 2. Propiedades geométricas", "### 2.1 Geometría", "### 2.2 Rigideces elásticas",
-            "### 2.3 Rigideces efectivas", "### 2.4 Rigideces para método directo: rigideces efectivas (análisis de estabilidad, DAM)", "## 3. Solicitaciones", "### 3.1 Cargas últimas", "### 3.2 Cargas de construcción", "### 3.3 Cargas en condición de incendio", "### 3.4 Deflexiones",
-            "## 4. Revisión de requerimientos técnicos", "### 4.1 Propiedades mecánicas de los materiales", "### 4.2 Propiedades geométricas",
-            "## 5. Revisión de condiciones de funcionalidad y/o servicio", "### 5.1 Revisión de deflexiones", "### 5.2 Condición de construcción",
-            "## 6. Revisión de capacidad a carga de compresión", "## 7. Revisión de capacidad a carga de tracción",
-            "## 8. Revisión de capacidad a fuerza cortante", "### 8.1 Condiciones de construcción", "#### 8.1.1 Paralelo al eje X (Vuy)",
-            "#### 8.1.2 Paralelo al eje Y (Vux)", "### 8.2 Condiciones últimas", "### 8.3 Condiciones de incendio",
-            "## 9. Revisión de capacidad a momento flector", "### 9.1 Condiciones de construcción", "#### 9.1.1 Respecto del eje X (Mux, Mw)",
-            "#### 9.1.2 Respecto del eje Y (Muy, Mz)", "### 9.2 Condiciones últimas", "### 9.3 Condiciones de incendio",
-            "## 10. Revisión de capacidad a momento torsional", "## 11. Índices DCR")
+CHAPTERS = (
+    "## 1. Propiedades mecánicas de los materiales",
+    "### 1.1 Acero estructural",
+    "### 1.2 Concreto estructural",
+    "### 1.3 Acero de refuerzo",
+    "## 2. Propiedades geométricas",
+    "### 2.1 Geometría",
+    "### 2.2 Rigideces elásticas",
+    "### 2.3 Rigideces efectivas",
+    "### 2.4 Rigideces para método directo: rigideces efectivas (análisis de estabilidad, DAM)",
+    "## 3. Solicitaciones",
+    "### 3.1 Cargas últimas",
+    "### 3.2 Cargas de construcción",
+    "### 3.3 Cargas en condición de incendio",
+    "### 3.4 Deflexiones",
+    "## 4. Revisión de requerimientos técnicos",
+    "### 4.1 Propiedades mecánicas de los materiales",
+    "### 4.2 Propiedades geométricas",
+    "## 5. Revisión de condiciones de funcionalidad y/o servicio",
+    "### 5.1 Revisión de deflexiones",
+    "### 5.2 Condición de construcción",
+    "## 6. Revisión de capacidad a carga de compresión",
+    "## 7. Revisión de capacidad a carga de tracción",
+    "## 8. Revisión de capacidad a fuerza cortante",
+    "### 8.1 Condiciones de construcción",
+    "#### 8.1.1 Paralelo al eje X (Vuy)",
+    "#### 8.1.2 Paralelo al eje Y (Vux)",
+    "### 8.2 Condiciones últimas",
+    "### 8.3 Condiciones de incendio",
+    "## 9. Revisión de capacidad a momento flector",
+    "### 9.1 Condiciones de construcción",
+    "#### 9.1.1 Respecto del eje X (Mux, Mw)",
+    "#### 9.1.2 Respecto del eje Y (Muy, Mz)",
+    "### 9.2 Condiciones últimas",
+    "### 9.3 Condiciones de incendio",
+    "## 10. Revisión de capacidad a momento torsional",
+    "## 11. Índices DCR",
+)
 
 
 def example_documents():
@@ -200,7 +227,14 @@ def test_net_tension_uses_the_bare_steel(engine, sections):
 def test_reference_documents_of_composite_stiffnesses_are_stated(engine):
     case = _filled_case(Pu=100, lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000})
     text = calculation_report(case, engine.run(case))
-    for words in ("AISC Design Guide 6, Ec. 2-9", "no es norma", "I1.5(a), Ec. I2-12", "I1.5(a), C2.3: 0.8·τb·(EI)eff", "2.4 Rigideces para método directo", "Módulo de elasticidad del concreto (Ec)"):
+    for words in (
+        "AISC Design Guide 6, Ec. 2-9",
+        "no es norma",
+        "I1.5(a), Ec. I2-12",
+        "I1.5(a), C2.3: 0.8·τb·(EI)eff",
+        "2.4 Rigideces para método directo",
+        "Módulo de elasticidad del concreto (Ec)",
+    ):
         assert words in text
 
 
@@ -216,7 +250,11 @@ def test_one_report_per_member_however_many_load_cases(engine):
 
 def test_each_review_reports_the_case_with_the_largest_dcr(engine):
     groups, (text,) = member_text(engine, "w_shape.json")
-    ratios = {tag: result.check("flexure_x").ratio for tag, case, result in groups[0] if result.check("flexure_x") and case.condition == "ultimate"}
+    ratios = {
+        tag: result.check("flexure_x").ratio
+        for tag, case, result in groups[0]
+        if result.check("flexure_x") and case.condition == "ultimate"
+    }
     worst = max(ratios, key=ratios.get)
     assert f"Flexión respecto de x (Capítulo F); case gobernante: {worst}." in text
     table = next(b for b in report_blocks(groups[0]) if b["kind"] == "table" and "Case gobernante" in b["headers"])
@@ -244,8 +282,23 @@ def test_composite_beam_report_has_construction_and_deflections(engine):
     assert "Concrete pour" in construction and "Flexure and shear" not in construction
 
 
-FULL = ("w_shape", "channel", "circular_hss", "rectangular_hss", "rectangular_hss_slender", "double_angle", "single_angle", "solid_rectangular",
-        "composite_beam", "composite_filled", "composite_filled_bars", "composite_high_strength", "composite_method2", "composite_encased", "composite_box")
+FULL = (
+    "w_shape",
+    "channel",
+    "circular_hss",
+    "rectangular_hss",
+    "rectangular_hss_slender",
+    "double_angle",
+    "single_angle",
+    "solid_rectangular",
+    "composite_beam",
+    "composite_filled",
+    "composite_filled_bars",
+    "composite_high_strength",
+    "composite_method2",
+    "composite_encased",
+    "composite_box",
+)
 
 
 @pytest.mark.parametrize("stem", FULL)

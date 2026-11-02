@@ -24,7 +24,13 @@ def test_examples_run_in_memory(engine, example):
 
 
 def test_cli_uses_the_catalogs_of_the_package_from_any_folder(tmp_path):
-    run = subprocess.run([sys.executable, "-m", "steel_design.run", str(ROOT / "examples/channel.json")], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8")
+    run = subprocess.run(
+        [sys.executable, "-m", "steel_design.run", str(ROOT / "examples/channel.json")],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
     assert run.returncode == 0, run.stderr
     assert json.loads(run.stdout)["status"] == "PASS"
 

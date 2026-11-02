@@ -123,7 +123,8 @@ def filled_compression(case, section, geometry):
 
 
 def filled_fire_modes(case, section, hot):
-    """4.2.4d(c): I2-9 and I2-12 at temperature, A-4-11 and I2-4 (errata 2025). The classification stays at ambient temperature (Commentary)."""
+    """4.2.4d(c): I2-9 and I2-12 at temperature, A-4-11 and I2-4 (errata 2025). The classification stays at ambient temperature
+    (Commentary)."""
     geometry = filled_geometry(case, section)
     m = composite_materials(case, section)
     c = _axial_class(section, geometry, case.material.Fy)
@@ -132,7 +133,9 @@ def filled_fire_modes(case, section, hot):
     # I2-9b: Asr*Es/Ec with the Es of the bars and the Ec of the concrete, each at its own temperature (decision DA4-5).
     fc_Ac = m["fc"] * (geometry["Ac"] + (geometry["Asr"] * m["Es_bars"] / m["Ec"] if geometry["Asr"] else 0.0))
     Ec_Icx, Ec_Icy, Es_bars = m["Ec"] * geometry["Icx"], m["Ec"] * geometry["Icy"], m["Es_bars"]
-    pno = eq.pno_filled_of_concrete(cls=c["class"], shape=geometry["shape"], Fy=hot["Fy_T_mpa"], As=section.area, fc_Ac=fc_Ac, lam=c["lam"], limits=c["limits"])
+    pno = eq.pno_filled_of_concrete(
+        cls=c["class"], shape=geometry["shape"], Fy=hot["Fy_T_mpa"], As=section.area, fc_Ac=fc_Ac, lam=c["lam"], limits=c["limits"]
+    )
     coefficient = eq.c3_filled(As=section.area, Asr=geometry["Asr"], Ag=section.area + geometry["Afill"])
     modes = {}
     for axis, Is, Isr, Ec_Ic, K, L in (("x", section.ix, geometry["Isrx"], Ec_Icx, case.factors.Kx, case.lengths.Lx),
@@ -140,13 +143,29 @@ def filled_fire_modes(case, section, hot):
         ei = hot["E_T_mpa"] * Is + Es_bars * Isr + coefficient * Ec_Ic                 # I2-12 at temperature
         pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
         out = a4.filled_compression(Pno_T=pno["Pno"], Pe_T=pe)
-        modes[f"FB-{axis}"] = {"limit_state": "flexural_buckling", "provision": "I2.2b; Apéndice 4, 4.2.4d(c)", "applies": True, "equation": out["equation"], "Pn_equation": out["equation"],
-                               "Pno_T_kN": pno["Pno"] / 1000.0, "Pno_equation": pno["equation"], "C3": coefficient, "EI_eff_T": ei, "Lc_mm": K * L,
-                               "PC_kN": eq.point_c(fc=m["fc"], Ac=geometry["Ac"], c2=0.95 if geometry["shape"] == "round" else 0.85) / 1000.0,
-                               "Pe_T_kN": pe / 1000.0, "Pno_over_Pe": out["Pno_over_Pe"], "Pn_kN": out["Pn"] / 1000.0, "available_kN": eq.PHI_C * out["Pn"] / 1000.0}
+        modes[f"FB-{axis}"] = {
+            "limit_state": "flexural_buckling",
+            "provision": "I2.2b; Apéndice 4, 4.2.4d(c)",
+            "applies": True,
+            "equation": out["equation"],
+            "Pn_equation": out["equation"],
+            "Pno_T_kN": pno["Pno"] / 1000.0,
+            "Pno_equation": pno["equation"],
+            "C3": coefficient,
+            "EI_eff_T": ei,
+            "Lc_mm": K * L,
+            "PC_kN": eq.point_c(fc=m["fc"], Ac=geometry["Ac"], c2=0.95 if geometry["shape"] == "round" else 0.85) / 1000.0,
+            "Pe_T_kN": pe / 1000.0,
+            "Pno_over_Pe": out["Pno_over_Pe"],
+            "Pn_kN": out["Pn"] / 1000.0,
+            "available_kN": eq.PHI_C * out["Pn"] / 1000.0,
+        }
     row = {"element": "wall", "ratio": c["lam"], "lambda_p": c["limits"]["p"], "lambda_r": c["limits"]["r"], "class": c["class"]}
-    return modes, {"elements": [row], "slender": False, "reference": "Tabla I1.1a"}, filled_requirements(case, section, geometry, flexure=False)
-
+    return (
+        modes,
+        {"elements": [row], "slender": False, "reference": "Tabla I1.1a"},
+        filled_requirements(case, section, geometry, flexure=False),
+    )
 
 
 def tension_control(case, hn, h, bars, Fysr, pno, requirements, provision):
@@ -195,7 +214,9 @@ def _filled_flexure_strength(case, section, axis, hot):
             return flexure_output(case, section, mn_mode=mode, requirements=requirement, provisions=["I1", "I3.4"],
                                    classification=classification)
         # Noncompact (lambda_r = maximum permitted, so there is no slender round section): My by Design Guide 6 (DI-3).
-        yielding = dg06.round_yield_moment(Fy=m["Fy"], fc=fc, Ec=m["Ec"], D=geometry["D"], t=geometry["t"], Fysr=Fysr, bars=bars, Es=m["Es_bars"])
+        yielding = dg06.round_yield_moment(
+            Fy=m["Fy"], fc=fc, Ec=m["Ec"], D=geometry["D"], t=geometry["t"], Fysr=Fysr, bars=bars, Es=m["Es_bars"]
+        )
         mn = eq.noncompact_moment(Mp=out["Mp"], My=yielding["My"], lam=lam, limits=limits)
         mode = {"provision": "I3.4b(b)", "equation": "I3-5b", "Mp_kNm": out["Mp"] / 1e6, "My_kNm": yielding["My"] / 1e6,
                 "yn_mm": yielding["yn_mm"], "Mn_kNm": mn / 1e6}

@@ -407,7 +407,9 @@ def compression_strength(case: SteelCase, section: Section,
     if worst > 200:
         notes.append(f"Nota de E2: Lc/r = {worst:.1f} supera el valor preferible de 200 (recomendación, no límite de resistencia).")
     if family == "RECTANGULAR_HSS":
-        pending.append("Los anchos de pared b, h provienen del catálogo (dimensión exterior − 3·tdes, B4.1b(d) cuando no se conoce el radio interior).")
+        pending.append(
+            "Los anchos de pared b, h provienen del catálogo (dimensión exterior − 3·tdes, B4.1b(d) cuando no se conoce el radio interior)."
+        )
     if slender and family == "CIRCULAR_HSS" and modes[governing]["effective_area"]["bounded_to_Ag"]:
         pending.append("E7-7: Ae limitada a Ag (criterio ingenieril D-2, docs/chapter-e.md).")
     return with_fire({

@@ -30,12 +30,24 @@ def encased_requirements(case, section, geometry):
         clear.append(gap - bar.db / 2 >= max(1.5 * bar.db, 38.0))
     inside = all(abs(b.x) + b.db / 2 < e.B / 2 and abs(b.y) + b.db / 2 < e.H / 2 for b in e.bars)
     return [
-        requirement_row("As/Ag", "I2.1a(a)", section.area / Ag >= 0.01, "El núcleo de acero debe ser al menos 1 % de la sección.", section.area / Ag, "≥ 0.01"),
-        requirement_row("rho_sr", "I2.1a(c)", geometry["Asr"] / Ag >= 0.004, "La cuantía longitudinal mínima es 0.004.", geometry["Asr"] / Ag, "≥ 0.004"),
-        requirement_row("transverse", "I2.1a(b)", transverse and t.spacing <= 0.5 * min(e.B, e.H),
-                     "Refuerzo transversal: 10 mm a 300 mm o 13 mm a 400 mm, y separación ≤ 0.5 de la menor dimensión."),
-        requirement_row("bar_clearance", "I2.1e(a)", all(clear),
-                     "Separación libre entre núcleo y barras: al menos 1.5 db y 38 mm."),
+        requirement_row(
+            "As/Ag",
+            "I2.1a(a)",
+            section.area / Ag >= 0.01,
+            "El núcleo de acero debe ser al menos 1 % de la sección.",
+            section.area / Ag,
+            "≥ 0.01",
+        ),
+        requirement_row(
+            "rho_sr", "I2.1a(c)", geometry["Asr"] / Ag >= 0.004, "La cuantía longitudinal mínima es 0.004.", geometry["Asr"] / Ag, "≥ 0.004"
+        ),
+        requirement_row(
+            "transverse",
+            "I2.1a(b)",
+            transverse and t.spacing <= 0.5 * min(e.B, e.H),
+            "Refuerzo transversal: 10 mm a 300 mm o 13 mm a 400 mm, y separación ≤ 0.5 de la menor dimensión.",
+        ),
+        requirement_row("bar_clearance", "I2.1e(a)", all(clear), "Separación libre entre núcleo y barras: al menos 1.5 db y 38 mm."),
         requirement_row("bars_inside", "I2.1a(b)", inside, "Las barras deben quedar dentro del contorno de concreto."),
     ]
 

@@ -23,9 +23,21 @@ ROOT = Path(__file__).resolve().parents[2]
 PI = D("3.14159265358979323846264338327950288419716939937510")
 E, G = D(200000), D(77200)
 #        T     kE      kp      ky
-STEEL = (("20", "1", "1", "1"), ("93", "1", "1", "1"), ("200", "0.9", "0.8", "1"), ("320", "0.78", "0.58", "1"), ("400", "0.7", "0.42", "1"),
-         ("430", "0.67", "0.4", "0.94"), ("540", "0.49", "0.29", "0.66"), ("650", "0.22", "0.13", "0.35"), ("760", "0.11", "0.06", "0.16"),
-         ("870", "0.07", "0.04", "0.07"), ("980", "0.05", "0.03", "0.04"), ("1100", "0.02", "0.01", "0.02"), ("1200", "0", "0", "0"))
+STEEL = (
+    ("20", "1", "1", "1"),
+    ("93", "1", "1", "1"),
+    ("200", "0.9", "0.8", "1"),
+    ("320", "0.78", "0.58", "1"),
+    ("400", "0.7", "0.42", "1"),
+    ("430", "0.67", "0.4", "0.94"),
+    ("540", "0.49", "0.29", "0.66"),
+    ("650", "0.22", "0.13", "0.35"),
+    ("760", "0.11", "0.06", "0.16"),
+    ("870", "0.07", "0.04", "0.07"),
+    ("980", "0.05", "0.03", "0.04"),
+    ("1100", "0.02", "0.01", "0.02"),
+    ("1200", "0", "0", "0"),
+)
 #           T     kc      kEc (normal weight)
 CONCRETE = (("20", "1", "1"), ("93", "0.95", "0.93"), ("200", "0.9", "0.75"), ("290", "0.86", "0.61"), ("320", "0.83", "0.57"),
             ("430", "0.71", "0.38"), ("540", "0.54", "0.2"), ("650", "0.38", "0.092"), ("760", "0.21", "0.073"), ("870", "0.1", "0.055"),
@@ -153,15 +165,26 @@ def _filled_data(name, round_, bars):
         ic = PI * ri**4 / 4
         isr_x = sum((PI * D(str(db)) ** 4 / 64 + D(str(a)) * D(str(y)) ** 2 for a, db, x, y in bars), D(0))
         isr_y = sum((PI * D(str(db)) ** 4 / 64 + D(str(a)) * D(str(x)) ** 2 for a, db, x, y in bars), D(0))
-        return {"p": p, "afill": PI * ri**2, "Ac": PI * ri**2 - asr, "Icx": ic - isr_x, "Icy": ic - isr_y, "Asr": asr, "Isrx": isr_x, "Isry": isr_y,
-                "lam": p["OD"] / p["tdes"], "c2": D("0.95")}
+        return {
+            "p": p,
+            "afill": PI * ri**2,
+            "Ac": PI * ri**2 - asr,
+            "Icx": ic - isr_x,
+            "Icy": ic - isr_y,
+            "Asr": asr,
+            "Isrx": isr_x,
+            "Isry": isr_y,
+            "lam": p["OD"] / p["tdes"],
+            "c2": D("0.95"),
+        }
     g = chapter_i.filled_rect(name)
     return {"p": g["p"], "afill": g["Ac"], "Ac": g["Ac"], "Icx": g["Icx"], "Icy": g["Icy"], "Asr": D(0), "Isrx": D(0), "Isry": D(0),
             "lam": max(g["p"]["b"], g["p"]["h"]) / g["t"], "c2": D("0.85")}
 
 
 def _filled(name, fy, fc, wc, L, T, Tc, bars=(), bar_T=None, round_=False):
-    """4.2.4d(c): I2-9 to I2-13 at temperature, A-4-11, I2-4 (errata 2025). Asr*Es/Ec with the Es of the bars and the Ec of the concrete, each at its temperature (DA4-5)."""
+    """4.2.4d(c): I2-9 to I2-13 at temperature, A-4-11, I2-4 (errata 2025). Asr*Es/Ec with the Es of the bars and the Ec of the
+    concrete, each at its temperature (DA4-5)."""
     fy, fc, L = D(fy), D(fc), D(L)
     g = _filled_data(name, round_, bars)
     p, k = g["p"], steel(T)
@@ -212,7 +235,9 @@ def filled_flexure(name, fy, fc, T, Tc, axis):
 
 
 def filled_round_bars_flexure(name, fy, fc, wc, T, Tc, Fysr, bars, bar_T):
-    out = chapter_i.round_with_bars_flexure(name, steel(T)["ky"] * D(fy), table(CONCRETE, Tc, 1) * D(fc), wc, steel(bar_T)["ky"] * D(Fysr), bars)
+    out = chapter_i.round_with_bars_flexure(
+        name, steel(T)["ky"] * D(fy), table(CONCRETE, Tc, 1) * D(fc), wc, steel(bar_T)["ky"] * D(Fysr), bars
+    )
     return {"Mn_kNm": out["Mn_kNm"]}
 
 
@@ -288,7 +313,13 @@ def c_wall_major_profiles(fy, fc, L, W, tsc_w, tsc_f, tp, T, web, flange):
     pieces = [(steel_, D(0), L, 2 * tp)]
     for low, high in ((D(0), tp), (tscf - tp, tscf), (L - tscf, L - tscf + tp), (L - tp, L)):
         pieces.append((steel_, low, high, wc_))
-    pieces += [(steel_, D(0), tscf, tp), (steel_, L - tscf, L, tp), (conc_f, tp, tscf - tp, wc_), (conc_f, L - tscf + tp, L - tp, wc_), (conc_w, tscf, L - tscf, tcw)]
+    pieces += [
+        (steel_, D(0), tscf, tp),
+        (steel_, L - tscf, L, tp),
+        (conc_f, tp, tscf - tp, wc_),
+        (conc_f, L - tscf + tp, L - tp, wc_),
+        (conc_w, tscf, L - tscf, tcw),
+    ]
     assert tcf > 0
     return {"Mn_kNm": chapter_i.blocks(pieces, False, D(0), D(0))[1] / 10**6}
 
@@ -352,12 +383,35 @@ def beam(T, **member):
     return {"kcb": kcb, "Mn_kNm": kcb * mn, "phiMn_kNm": D("0.9") * kcb * mn}
 
 
-FUNCTIONS = {"tension": tension, "compression": compression, "ltb_compact_w": ltb_compact_w, "noncompact_w": noncompact_w, "minor_axis_w": minor_axis_w,
-             "shear_w": shear_w, "interaction": interaction, "filled_uniform": filled_uniform, "filled_round_bars": filled_round_bars, "wall_uniform": wall_uniform, "beam": beam,
-             "filled_tension": filled_tension, "filled_flexure": filled_flexure, "filled_round_bars_flexure": filled_round_bars_flexure, "filled_shear": filled_shear,
-             "filled_h1": filled_h1, "filled_m2s": filled_m2s, "c_wall_compression": c_wall_compression, "c_wall_tension": c_wall_tension, "c_wall_flexure": c_wall_flexure,
-             "c_wall_major_profiles": c_wall_major_profiles, "c_wall_shear": c_wall_shear, "wall_tension": wall_tension, "wall_flexure": wall_flexure, "wall_shear": wall_shear,
-             "coupling_m": coupling_m, "coupling_v": coupling_v}
+FUNCTIONS = {
+    "tension": tension,
+    "compression": compression,
+    "ltb_compact_w": ltb_compact_w,
+    "noncompact_w": noncompact_w,
+    "minor_axis_w": minor_axis_w,
+    "shear_w": shear_w,
+    "interaction": interaction,
+    "filled_uniform": filled_uniform,
+    "filled_round_bars": filled_round_bars,
+    "wall_uniform": wall_uniform,
+    "beam": beam,
+    "filled_tension": filled_tension,
+    "filled_flexure": filled_flexure,
+    "filled_round_bars_flexure": filled_round_bars_flexure,
+    "filled_shear": filled_shear,
+    "filled_h1": filled_h1,
+    "filled_m2s": filled_m2s,
+    "c_wall_compression": c_wall_compression,
+    "c_wall_tension": c_wall_tension,
+    "c_wall_flexure": c_wall_flexure,
+    "c_wall_major_profiles": c_wall_major_profiles,
+    "c_wall_shear": c_wall_shear,
+    "wall_tension": wall_tension,
+    "wall_flexure": wall_flexure,
+    "wall_shear": wall_shear,
+    "coupling_m": coupling_m,
+    "coupling_v": coupling_v,
+}
 BARS_ROUND = [(200, 16, 0, 55), (200, 16, 0, -55), (200, 16, 55, 0), (200, 16, -55, 0)]
 BEAM_MEMBER = dict(name="W21X50", fy=345, fc=28, wc=2320, span=13716, spacing=3048, tc=114, hr=0, n=44, d=19, Fu=450, Rg=1, Rp="0.75")
 CASES = {
@@ -384,7 +438,9 @@ CASES = {
     "F-T-bars": dict(kind="filled_tension", name='PTER8"X5.00MM', fy=345, T=500, Fysr=420, bars=BARS_ROUND, bar_T=350),
     "F-M-x": dict(kind="filled_flexure", name="PTE100X50X3MM", fy=345, fc=35, T=600, Tc=300, axis="x"),
     "F-M-y": dict(kind="filled_flexure", name="PTE100X50X3MM", fy=345, fc=35, T=450, Tc=500, axis="y"),
-    "F-M-bars": dict(kind="filled_round_bars_flexure", name='PTER8"X5.00MM', fy=345, fc=35, wc=2320, T=500, Tc=280, Fysr=420, bars=BARS_ROUND, bar_T=350),
+    "F-M-bars": dict(
+        kind="filled_round_bars_flexure", name='PTER8"X5.00MM', fy=345, fc=35, wc=2320, T=500, Tc=280, Fysr=420, bars=BARS_ROUND, bar_T=350
+    ),
     "F-V": dict(kind="filled_shear", name="PTE100X50X3MM", fy=345, fc=35, T=600, Tc=300, axis="x"),
     "F-H1": dict(kind="filled_h1", name="PTE100X50X3MM", fy=345, fc=35, wc=2320, L=2000, T=600, Tc=300, Pu=20, Mu=1),
     "F-M2S": dict(kind="filled_m2s", name="PTE100X50X3MM", fy=345, fc=35, wc=2320, L=2000, T=600, Tc=300, Pu=20, Mu=1),
@@ -392,17 +448,51 @@ CASES = {
     "W-M-uniform": dict(kind="wall_flexure", fy=345, fc=40, L=3300, tsc=600, t=14, tf=14, T=800, layers=((286, 250),)),
     "W-M-layers": dict(kind="wall_flexure", fy=345, fc=40, L=3300, tsc=600, t=14, tf=14, T=800, layers=((100, 600), (86, 300), (100, 100))),
     "W-I5c": dict(kind="wall_flexure", fy=345, fc=40, L=3300, tsc=600, t=14, tf=14, T=800, layers=((286, 250),), P=5000),
-    "W-V-layers": dict(kind="wall_shear", fy=345, fc=40, wc=2320, L=3300, tsc=600, t=14, tf=14, T=800, layers=((100, 600), (86, 300), (100, 100))),
-    "CW-C": dict(kind="c_wall_compression", fy=345, fc=35, wc=2320, height=5000, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, st=300, T=800,
-                 web=((84, 500), (100, 150)), flange=((100, 500), (134, 120))),
+    "W-V-layers": dict(
+        kind="wall_shear", fy=345, fc=40, wc=2320, L=3300, tsc=600, t=14, tf=14, T=800, layers=((100, 600), (86, 300), (100, 100))
+    ),
+    "CW-C": dict(
+        kind="c_wall_compression",
+        fy=345,
+        fc=35,
+        wc=2320,
+        height=5000,
+        L=6000,
+        W=2500,
+        tsc_w=400,
+        tsc_f=500,
+        tp=16,
+        st=300,
+        T=800,
+        web=((84, 500), (100, 150)),
+        flange=((100, 500), (134, 120)),
+    ),
     "CW-T": dict(kind="c_wall_tension", fy=345, L=6000, W=2500, tsc_f=500, tp=16, T=700),
-    "CW-M-tips": dict(kind="c_wall_flexure", fy=345, fc=35, wc=2320, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, T=700, Tc=250, mode="tips"),
-    "CW-M-major": dict(kind="c_wall_flexure", fy=345, fc=35, wc=2320, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, T=400, Tc=250, mode="major"),
-    "CW-M-profiles": dict(kind="c_wall_major_profiles", fy=345, fc=35, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, T=400, web=((84, 500), (100, 150)), flange=((100, 500), (134, 120))),
+    "CW-M-tips": dict(
+        kind="c_wall_flexure", fy=345, fc=35, wc=2320, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, T=700, Tc=250, mode="tips"
+    ),
+    "CW-M-major": dict(
+        kind="c_wall_flexure", fy=345, fc=35, wc=2320, L=6000, W=2500, tsc_w=400, tsc_f=500, tp=16, T=400, Tc=250, mode="major"
+    ),
+    "CW-M-profiles": dict(
+        kind="c_wall_major_profiles",
+        fy=345,
+        fc=35,
+        L=6000,
+        W=2500,
+        tsc_w=400,
+        tsc_f=500,
+        tp=16,
+        T=400,
+        web=((84, 500), (100, 150)),
+        flange=((100, 500), (134, 120)),
+    ),
     "CW-V": dict(kind="c_wall_shear", fy=345, fc=35, wc=2320, W=2500, tsc_f=500, tp=16, T=700, flange=((100, 500), (134, 120))),
     "CB-M": dict(kind="coupling_m", b=450, h=600, tf=20, tw=12, fy=345, fc=40, T=700, layers=((100, 400), (113, 150))),
     "CB-V": dict(kind="coupling_v", b=450, h=600, tf=20, tw=12, fy=345, fc=40, T=700, layers=((100, 400), (113, 150))),
-    "F-round-bars": dict(kind="filled_round_bars", name='PTER8"X5.00MM', fy=345, fc=35, wc=2320, L=3000, T=500, Tc=280, bars=BARS_ROUND, bar_T=350),
+    "F-round-bars": dict(
+        kind="filled_round_bars", name='PTER8"X5.00MM', fy=345, fc=35, wc=2320, L=3000, T=500, Tc=280, bars=BARS_ROUND, bar_T=350
+    ),
     "W-uniform": dict(kind="wall_uniform", fy=345, fc=40, wc=2320, height=5000, wall_length=3300, tsc=600, t=14, st=300, T=800, Tc=250),
     "B-650": dict(kind="beam", T=650, **BEAM_MEMBER),
     "B-250": dict(kind="beam", T=250, **BEAM_MEMBER),
@@ -412,8 +502,13 @@ CASES = {
 if __name__ == "__main__":
     target = ROOT / "tests/fixtures/chapter_a4/reference.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    cases = {cid: {"spec": spec, **FUNCTIONS[spec["kind"]](**{k: v for k, v in spec.items() if k != "kind"})} for cid, spec in CASES.items()}
-    payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) Appendix 4, 4.2.3b and 4.2.4d; errata 2025; catalog src/steel_design/data/sections.xlsx",
-               "generator": "tests/oracles/chapter_a4.py (Decimal; independent of steel_design)", "cases": _plain(cases)}
+    cases = {
+        cid: {"spec": spec, **FUNCTIONS[spec["kind"]](**{k: v for k, v in spec.items() if k != "kind"})} for cid, spec in CASES.items()
+    }
+    payload = {
+        "source": "ANSI/AISC 360-22 (a360-22w.pdf) Appendix 4, 4.2.3b and 4.2.4d; errata 2025; catalog src/steel_design/data/sections.xlsx",
+        "generator": "tests/oracles/chapter_a4.py (Decimal; independent of steel_design)",
+        "cases": _plain(cases),
+    }
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
     print(target)

@@ -235,8 +235,10 @@ class SteelDesignEngine:
                     check.result["notes"].append(f"Se pidió {case.composite.interaction}, pero el relleno tiene barras (Asr ≠ 0): "
                                                  "se usa H1.1 (DI-22).")
                 if uses_appendix_2(case, section) and check.result:
-                    check.result["notes"].append("Alta resistencia sin compresión: el Apéndice 2, 2.1.4, solo trata compresión con flexión; se usa H1.1 "
-                                                 "con la resistencia a flexión del Apéndice 2 (DI-22).")
+                    check.result["notes"].append(
+                        "Alta resistencia sin compresión: el Apéndice 2, 2.1.4, solo trata compresión con flexión; se usa H1.1 "
+                        "con la resistencia a flexión del Apéndice 2 (DI-22)."
+                    )
                 checks.append(check)
             else:
                 mode, provision, compute = {
@@ -246,7 +248,9 @@ class SteelDesignEngine:
                 obligations = [Obligation(id=mode, provision=provision, reason="Interacción de fuerza axial y flexión.")]
                 check = self._check("interaction", "I", 0.0, "–", obligations, lambda: compute(case, section, combined), section, [])
                 if method == "A2" and requested and check.result:
-                    check.result["notes"].append(f"Se pidió {requested}, pero rige el Apéndice 2 por los materiales de alta resistencia (DI-22).")
+                    check.result["notes"].append(
+                        f"Se pidió {requested}, pero rige el Apéndice 2 por los materiales de alta resistencia (DI-22)."
+                    )
                 checks.append(check)
         if case.composite.anchor and case.composite.anchor.Qrv + case.composite.anchor.Qrt > 0:
             obligations = [Obligation(id="V" if case.composite.anchor.type == "channel" else "Q", provision="I8.3",
@@ -256,19 +260,26 @@ class SteelDesignEngine:
         return checks
 
     def _fire_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
-        """Appendix 4, 4.2.4d. Each chapter applies the temperature; the demands of a composite member without a rule there stay INCOMPLETE."""
+        """Appendix 4, 4.2.4d. Each chapter applies the temperature; the demands of a composite member without a rule there stay
+        INCOMPLETE."""
         if case.composite is None:
             return self._steel_checks(case, section, inconsistent)
         uncovered = uncovered_demands(case)
         checks = self._composite_checks(case.model_copy(update=dict.fromkeys(uncovered, 0.0)), section, inconsistent)
         for name in uncovered:
             check_id, unit, demand = _FIRE_CHECKS[name]
-            error = {"code": "FIRE_NOT_COVERED", "provision": "Apéndice 4, 4.2.4d",
-                     "message": f"Sin método a más de 200 °C para {name} en composite.kind = {case.composite.kind} (Apéndice 4, 4.2.4d; decisión DA4-1)."}
+            error = {
+                "code": "FIRE_NOT_COVERED",
+                "provision": "Apéndice 4, 4.2.4d",
+                "message": f"Sin método a más de 200 °C para {name} en composite.kind = {case.composite.kind} (Apéndice 4, "
+                "4.2.4d; decisión DA4-1).",
+            }
             checks.append(Check(id=check_id, chapter="I", demand=abs(getattr(case, name)), unit=unit, status=Status.INCOMPLETE,
                                 obligations=composite_obligations(case, demand), errors=[error]))
         if case.composite.fire is not None:
-            obligations = [Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Revisiones opcionales del muro bajo incendio.")]
+            obligations = [
+                Obligation(id="FIRE", provision="AISC Design Guide 38, Cap. 6", reason="Revisiones opcionales del muro bajo incendio.")
+            ]
             checks.append(self._check("fire", "I", 0.0, "–", obligations, lambda: wall_fire(case, section), section, []))
         return checks
 
@@ -311,15 +322,30 @@ class SteelDesignEngine:
             status = Status.INCOMPLETE
         stiffness = ({"error": "Datos del catálogo incoherentes con su definición; revise el perfil."} if inconsistent
                      else member_stiffness(case, section, catalog=self._catalog))
-        return DesignResult(section=section.name, family=section.type, status=status, condition=case.condition, checks=checks, stiffness=stiffness,
-                            requirements=requirements, serviceability=deflection_checks(case.serviceability),
-                            interaction_diagrams=interaction_diagrams(case, section, checks),
-                            fire=fire_summary(case),
-                            section_data=section.model_dump(mode="json", exclude_none=True))
+        return DesignResult(
+            section=section.name,
+            family=section.type,
+            status=status,
+            condition=case.condition,
+            checks=checks,
+            stiffness=stiffness,
+            requirements=requirements,
+            serviceability=deflection_checks(case.serviceability),
+            interaction_diagrams=interaction_diagrams(case, section, checks),
+            fire=fire_summary(case),
+            section_data=section.model_dump(mode="json", exclude_none=True),
+        )
 
 
-_FIRE_CHECKS = {"Pu": ("axial", "kN", "axial"), "Mux": ("flexure_x", "kN·m", "flexure"), "Muy": ("flexure_y", "kN·m", "flexure"), "Mw": ("flexure_w", "kN·m", "flexure"),
-                "Mz": ("flexure_z", "kN·m", "flexure"), "Vux": ("shear_x", "kN", "shear"), "Vuy": ("shear_y", "kN", "shear")}
+_FIRE_CHECKS = {
+    "Pu": ("axial", "kN", "axial"),
+    "Mux": ("flexure_x", "kN·m", "flexure"),
+    "Muy": ("flexure_y", "kN·m", "flexure"),
+    "Mw": ("flexure_w", "kN·m", "flexure"),
+    "Mz": ("flexure_z", "kN·m", "flexure"),
+    "Vux": ("shear_x", "kN", "shear"),
+    "Vuy": ("shear_y", "kN", "shear"),
+}
 
 
 def _cb_note(factor: dict) -> str:

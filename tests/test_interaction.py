@@ -155,8 +155,17 @@ def test_h2_needs_principal_axis_moments(engine):
 
 
 def test_h2_keeps_a_missing_declaration_incomplete(engine):
-    result = engine.run(SteelCase(tau_b=1.0, section_name="L6X4X3/8", material={"Fy": 345}, Mw=1, Mz=1, lengths={"Lx": 1000, "Ly": 1000, "Lz": 1000},
-                                  angle_flexure={"toe": "tension"}))                # no leg_in_compression
+    result = engine.run(
+        SteelCase(
+            tau_b=1.0,
+            section_name="L6X4X3/8",
+            material={"Fy": 345},
+            Mw=1,
+            Mz=1,
+            lengths={"Lx": 1000, "Ly": 1000, "Lz": 1000},
+            angle_flexure={"toe": "tension"},
+        )
+    )                # no leg_in_compression
     assert result.check("interaction").errors[0]["code"] == "INTERACTION_COMPONENT_MISSING"
     assert result.status.value == "INCOMPLETE"
 

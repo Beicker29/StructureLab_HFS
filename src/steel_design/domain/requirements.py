@@ -38,10 +38,14 @@ def _absent(description, provision, status, reason):
 
 def _common_materials(case):
     E = case.material.E
-    rows = [_limit("Módulo de elasticidad del acero (E)", E, "= 200000 MPa", "I2.1b" if case.composite else "E3", abs(E - 200000.0) <= 1e-6)]
+    rows = [
+        _limit("Módulo de elasticidad del acero (E)", E, "= 200000 MPa", "I2.1b" if case.composite else "E3", abs(E - 200000.0) <= 1e-6)
+    ]
     description = "Acero estructural de una especificación ASTM aprobada"
     if case.material.name:
-        return rows + [_limit(description, case.material.name, "listado en la Tabla A3.1", "A3.1a", True)]   # every steel of Materiales.xlsx is listed there
+        return rows + [
+            _limit(description, case.material.name, "listado en la Tabla A3.1", "A3.1a", True)
+        ]  # every steel of Materiales.xlsx is listed there
     return rows + [_absent(description, "A3.1a", FALTA, "La entrada indicó valores, no la designación del material.")]
 
 
@@ -58,9 +62,11 @@ def _composite_materials(case, section):
     composite, Fy = case.composite, case.material.Fy
     concrete, fc = composite.concrete, composite.concrete.fc
     if uses_appendix_2(case, section):
-        rows = [_limit("Resistencia del concreto (f'c), Apéndice 2", fc, f"≤ {a2.FC_MAX:g} MPa", "Apéndice 2, 2.1.1(b)", fc <= a2.FC_MAX),
-                _limit("Fluencia del acero estructural (Fy), Apéndice 2", Fy, f"≤ {a2.FY_MAX:g} MPa", "Apéndice 2, 2.1.1(c)", Fy <= a2.FY_MAX),
-                _absent("Límites de materiales de I1.3", "I1.3", NO_APLICA, "Materiales por encima de I1.3: el diseño sigue el Apéndice 2.")]
+        rows = [
+            _limit("Resistencia del concreto (f'c), Apéndice 2", fc, f"≤ {a2.FC_MAX:g} MPa", "Apéndice 2, 2.1.1(b)", fc <= a2.FC_MAX),
+            _limit("Fluencia del acero estructural (Fy), Apéndice 2", Fy, f"≤ {a2.FY_MAX:g} MPa", "Apéndice 2, 2.1.1(c)", Fy <= a2.FY_MAX),
+            _absent("Límites de materiales de I1.3", "I1.3", NO_APLICA, "Materiales por encima de I1.3: el diseño sigue el Apéndice 2."),
+        ]
     else:
         maximum = 41.0 if concrete.lightweight else 69.0
         name = "liviano" if concrete.lightweight else "de peso normal"
@@ -96,7 +102,13 @@ def _filled_ratio_row(case, section, geometry):
     t, Fy = geometry["t"], case.material.Fy
     if geometry["shape"] == "round":
         limits = eq.filled_limits(shape="round", element="axial", Fy=Fy)
-        return _limit("Relación diámetro-espesor del tubo (D/t)", geometry["D"] / t, f"≤ {limits['max']:.1f}", "I1.4, Tabla I1.1a", geometry["D"] / t <= limits["max"])
+        return _limit(
+            "Relación diámetro-espesor del tubo (D/t)",
+            geometry["D"] / t,
+            f"≤ {limits['max']:.1f}",
+            "I1.4, Tabla I1.1a",
+            geometry["D"] / t <= limits["max"],
+        )
     ratio = max(section.b, section.h) / t
     maximum = 5.0 * math.sqrt(eq.E_STEEL / Fy)
     return _limit("Relación ancho-espesor de la pared (b/t, h/t)", ratio, f"≤ {maximum:.1f}",
@@ -150,7 +162,11 @@ def _composite_geometry(case, section):
             groups.append(filled_requirements(case, section, geometry, flexure=False))
         if moments:
             groups.append(filled_requirements(case, section, geometry, flexure=True))
-        rows = _from_section(_merged(*groups)) if demand else [_absent("Cuantías y separaciones de I2.2a e I3.4a", "I2.2a, I3.4a", NO_APLICA, only_shear)]
+        rows = (
+            _from_section(_merged(*groups))
+            if demand
+            else [_absent("Cuantías y separaciones de I2.2a e I3.4a", "I2.2a, I3.4a", NO_APLICA, only_shear)]
+        )
         return [_filled_ratio_row(case, section, geometry)] + rows + _filled_placement(case, section, geometry) + [aci]
     if kind == "encased":
         geometry = encased_geometry(case, section)
@@ -169,7 +185,15 @@ def _composite_geometry(case, section):
         if missing_fields:
             rows.append(_absent("Detallado de los conectores", "I8.2d", SIN_DATO, f"Indique {', '.join(missing_fields)}."))
         return rows + [aci]
-    return [_absent("Requisitos de la sección de la viga de acoplamiento", "AISC Design Guide 38", FALTA, "Sin requisitos implementados para este miembro."), aci]
+    return [
+        _absent(
+            "Requisitos de la sección de la viga de acoplamiento",
+            "AISC Design Guide 38",
+            FALTA,
+            "Sin requisitos implementados para este miembro.",
+        ),
+        aci,
+    ]
 
 
 def _tau_b_row(case):
@@ -188,7 +212,15 @@ def _tau_b_row(case):
         value, provision = 1.0, "I1.5(c), C2.3(c)"
     if case.tau_b is None:
         return _absent(description, provision, SIN_DATO, "Indique tau_b en la entrada: es un dato obligatorio.")
-    return _limit(description, case.tau_b, f"= {value:g}", provision, abs(case.tau_b - value) <= 1e-9, binding=False, qualifier="sin efecto en el estado")
+    return _limit(
+        description,
+        case.tau_b,
+        f"= {value:g}",
+        provision,
+        abs(case.tau_b - value) <= 1e-9,
+        binding=False,
+        qualifier="sin efecto en el estado",
+    )
 
 
 def _steel_geometry(case, section, checks):
@@ -198,19 +230,43 @@ def _steel_geometry(case, section, checks):
     result = (axial.result if axial else None) or {}
     modes = result.get("modes") or {}
     if case.Pu < 0 and case.tension:
-        rows.append(_limit("Área neta no mayor que el área bruta (An)", case.tension.An, f"≤ Ag = {section.area:.1f} mm²", "B4.3b", case.tension.An <= section.area))
+        rows.append(
+            _limit(
+                "Área neta no mayor que el área bruta (An)",
+                case.tension.An,
+                f"≤ Ag = {section.area:.1f} mm²",
+                "B4.3b",
+                case.tension.An <= section.area,
+            )
+        )
     else:
         rows.append(_absent("Área neta no mayor que el área bruta (An)", "B4.3b", NO_APLICA, "Sin tracción."))
     if case.tension and case.tension.fabricated_length and least_radius(section):
         ratio = case.tension.fabricated_length / least_radius(section)
-        rows.append(_limit("Esbeltez del miembro fabricado (L/r, recomendación)", ratio, "≤ 300", "Nota de D1", ratio <= 300.0, binding=False))
+        rows.append(
+            _limit("Esbeltez del miembro fabricado (L/r, recomendación)", ratio, "≤ 300", "Nota de D1", ratio <= 300.0, binding=False)
+        )
     else:
-        rows.append(_absent("Esbeltez del miembro fabricado (L/r, recomendación)", "Nota de D1", NO_APLICA, "No se indicó la longitud fabricada."))
+        rows.append(
+            _absent("Esbeltez del miembro fabricado (L/r, recomendación)", "Nota de D1", NO_APLICA, "No se indicó la longitud fabricada.")
+        )
     slenderness = [m["Lc_over_r"] for m in modes.values() if "Lc_over_r" in m]
     if "FB-E5" in modes:
-        rows.append(_limit("Esbeltez efectiva del ángulo simple (Lc/r)", modes["FB-E5"]["Lc_over_r"], "≤ 200", "E5(4)", modes["FB-E5"]["Lc_over_r"] <= 200.0))
+        rows.append(
+            _limit(
+                "Esbeltez efectiva del ángulo simple (Lc/r)",
+                modes["FB-E5"]["Lc_over_r"],
+                "≤ 200",
+                "E5(4)",
+                modes["FB-E5"]["Lc_over_r"] <= 200.0,
+            )
+        )
     elif slenderness:
-        rows.append(_limit("Esbeltez efectiva (Lc/r, recomendación)", max(slenderness), "≤ 200", "Nota de E2", max(slenderness) <= 200.0, binding=False))
+        rows.append(
+            _limit(
+                "Esbeltez efectiva (Lc/r, recomendación)", max(slenderness), "≤ 200", "Nota de E2", max(slenderness) <= 200.0, binding=False
+            )
+        )
     else:
         rows.append(_absent("Esbeltez efectiva (Lc/r, recomendación)", "Nota de E2", NO_APLICA, "Sin compresión calculada."))
     if family == "SINGLE_ANGLE" and case.single_angle_e5:
@@ -220,11 +276,27 @@ def _steel_geometry(case, section, checks):
                            "las tres condiciones", "E5(1), (2) y (3)", met))
     for req in result.get("requirements", []):
         if "a_over_ri" in req:
-            rows.append(_limit("Esbeltez del componente entre conectores (a/ri)", req["a_over_ri"], f"≤ {req['limit']:.1f}", "E6.2(a)", req["satisfied"]))
+            rows.append(
+                _limit(
+                    "Esbeltez del componente entre conectores (a/ri)",
+                    req["a_over_ri"],
+                    f"≤ {req['limit']:.1f}",
+                    "E6.2(a)",
+                    req["satisfied"],
+                )
+            )
     if family == "CIRCULAR_HSS" and section.d_t_ratio:
         maximum = 0.45 * case.material.E / case.material.Fy
         if case.Mux or case.Muy:
-            rows.append(_limit("Relación diámetro-espesor del tubo a flexión (D/t)", section.d_t_ratio, f"< {maximum:.1f}", "F8", section.d_t_ratio < maximum))
+            rows.append(
+                _limit(
+                    "Relación diámetro-espesor del tubo a flexión (D/t)",
+                    section.d_t_ratio,
+                    f"< {maximum:.1f}",
+                    "F8",
+                    section.d_t_ratio < maximum,
+                )
+            )
         else:
             rows.append(_absent("Relación diámetro-espesor del tubo a flexión (D/t)", "F8", NO_APLICA, "Sin flexión."))
     return rows

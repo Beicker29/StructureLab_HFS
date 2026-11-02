@@ -77,7 +77,10 @@ def test_unknown_and_ambiguous_sections(engine, sections):
         SteelDesignEngine(repo).run(steel_case("w14x90"))
 
 
-@pytest.mark.parametrize("statuses, expected", [(["PASS", "PASS"], "PASS"), (["PASS", "INCOMPLETE"], "INCOMPLETE"), (["PASS", "FAIL"], "FAIL"), (["INCOMPLETE", "FAIL"], "FAIL")])
+@pytest.mark.parametrize(
+    "statuses, expected",
+    [(["PASS", "PASS"], "PASS"), (["PASS", "INCOMPLETE"], "INCOMPLETE"), (["PASS", "FAIL"], "FAIL"), (["INCOMPLETE", "FAIL"], "FAIL")],
+)
 def test_a_known_failure_is_never_hidden_by_incompleteness(statuses, expected):
     assert worst_status(Status(s) for s in statuses).value == expected
     results = [DesignResult(section="W14X90", family="W", status=s) for s in statuses]

@@ -23,7 +23,9 @@ def _filled_points(case, section, geometry, axis):
         return "6-4", tables.table_6_4(Fy=Fy, fc=fc, d=geometry["D"], t=geometry["t"])
     bi, hi, H, Zs = ((geometry["bi"], geometry["hi"], section.h_out, section.zx) if axis == "x"
                      else (geometry["hi"], geometry["bi"], section.b_out, section.zy))
-    return "6-3", tables.table_6_3(Fy=Fy, fc=fc, As=section.area, Ac=geometry["Ac"], bi=bi, hi=hi, r=geometry["r"], H=H, t=geometry["t"], Zs=Zs)
+    return "6-3", tables.table_6_3(
+        Fy=Fy, fc=fc, As=section.area, Ac=geometry["Ac"], bi=bi, hi=hi, r=geometry["r"], H=H, t=geometry["t"], Zs=Zs
+    )
 
 
 def _encased_points(case, section, geometry, axis):
@@ -38,11 +40,38 @@ def _encased_points(case, section, geometry, axis):
     Asr_center = sum(bar.area for bar, v in zip(e.bars, distances) if v <= TOLERANCE_MM)
     if axis == "x":
         h1, h2 = e.B, e.H
-        return "6-2a", tables.table_6_2a(Fy=Fy, Fyr=e.Fysr, fc=fc, h1=h1, h2=h2, As=section.area, Asr=Asr, Asrs=Asr_center, c=h2 / 2 - outer,
-                                         Zs=section.zx, d=section.d, bf=section.bf, tf=section.tf, tw=section.tw)
+        return "6-2a", tables.table_6_2a(
+            Fy=Fy,
+            Fyr=e.Fysr,
+            fc=fc,
+            h1=h1,
+            h2=h2,
+            As=section.area,
+            Asr=Asr,
+            Asrs=Asr_center,
+            c=h2 / 2 - outer,
+            Zs=section.zx,
+            d=section.d,
+            bf=section.bf,
+            tf=section.tf,
+            tw=section.tw,
+        )
     h1, h2 = e.H, e.B
-    points = tables.table_6_2b(Fy=Fy, Fyr=e.Fysr, fc=fc, h1=h1, h2=h2, As=section.area, Asr=Asr, Asr_outer=Asr - Asr_center, c=h2 / 2 - outer,
-                               Zs=section.zy, bf=section.bf, tf=section.tf, tw=section.tw)
+    points = tables.table_6_2b(
+        Fy=Fy,
+        Fyr=e.Fysr,
+        fc=fc,
+        h1=h1,
+        h2=h2,
+        As=section.area,
+        Asr=Asr,
+        Asr_outer=Asr - Asr_center,
+        c=h2 / 2 - outer,
+        Zs=section.zy,
+        bf=section.bf,
+        tf=section.tf,
+        tw=section.tw,
+    )
     if points is None:
         return None, "el eje neutro plástico cae en el alma; la tabla no cubre ese caso."
     return "6-2b", points

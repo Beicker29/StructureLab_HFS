@@ -24,7 +24,12 @@ def requirement(result, group, words):
 
 
 def filled(name="PTE200X200X7MM", fc=35, fy=345, **demands):
-    return SteelCase(section_name=name, material={"Fy": fy}, composite={"kind": "filled", "pour_height": 3000, "concrete": {**CONCRETE, "fc": fc}}, **demands)
+    return SteelCase(
+        section_name=name,
+        material={"Fy": fy},
+        composite={"kind": "filled", "pour_height": 3000, "concrete": {**CONCRETE, "fc": fc}},
+        **demands,
+    )
 
 
 def declared(**demands):
@@ -82,11 +87,20 @@ def test_tau_b_and_c2_3_c_are_reported_in_the_direct_analysis_subchapter(engine)
     assert "C2.3(c): se permite τb = 1.0" in section and "0.001·Yi" in section
 
 
-@pytest.mark.parametrize("build, value, provision", [
-    (lambda tau: filled(Pu=100, lengths=LENGTHS, tau_b=tau), 0.8, "I1.5(d)"),
-    (lambda tau: filled(Pu=-10, tension={"An": 5000, "U": 1.0}, tau_b=tau), 1.0, "I1.5(c), C2.3(c)"),
-    (lambda tau: SteelCase(section_name="MURO", material={"Fy": 345}, Vux=1, tau_b=tau, composite={"kind": "wall", "concrete": CONCRETE, "wall": WALL}), 1.0, "I1.5(f)"),
-])
+@pytest.mark.parametrize(
+    "build, value, provision",
+    [
+        (lambda tau: filled(Pu=100, lengths=LENGTHS, tau_b=tau), 0.8, "I1.5(d)"),
+        (lambda tau: filled(Pu=-10, tension={"An": 5000, "U": 1.0}, tau_b=tau), 1.0, "I1.5(c), C2.3(c)"),
+        (
+            lambda tau: SteelCase(
+                section_name="MURO", material={"Fy": 345}, Vux=1, tau_b=tau, composite={"kind": "wall", "concrete": CONCRETE, "wall": WALL}
+            ),
+            1.0,
+            "I1.5(f)",
+        ),
+    ],
+)
 def test_tau_b_check_reports_compliance_and_does_not_change_the_status(engine, build, value, provision):
     good, bad = engine.run(build(value)), engine.run(build(0.5))
     row = requirement(good, "geometry", "τb")
@@ -101,7 +115,10 @@ def test_noncomposite_tau_b_check_is_always_met(engine):
 
 
 def test_entered_tau_b_is_applied_to_composite_members(engine):
-    rows, effective = rows_of(engine.run(filled(Pu=100, lengths=LENGTHS, tau_b=0.5)), "direct_analysis"), rows_of(engine.run(filled(Pu=100, lengths=LENGTHS, tau_b=0.5)), "effective")
+    rows, effective = (
+        rows_of(engine.run(filled(Pu=100, lengths=LENGTHS, tau_b=0.5)), "direct_analysis"),
+        rows_of(engine.run(filled(Pu=100, lengths=LENGTHS, tau_b=0.5)), "effective"),
+    )
     assert rows["EI*x"]["value"] == pytest.approx(0.8 * 0.5 * effective["(EI)eff,x"]["value"])
 
 
@@ -123,9 +140,18 @@ def test_effective_shear_stiffness_is_gc_ac_except_in_walls(engine, sections):
 
 def test_round_filled_reports_each_component_alone(engine, sections):
     section = sections['PTER6"X6.00MM']
-    case = SteelCase(section_name='PTER6"X6.00MM', material={"Fy": 345}, Pu=10, lengths=LENGTHS, tau_b=0.8, composite={"kind": "filled", "concrete": CONCRETE})
+    case = SteelCase(
+        section_name='PTER6"X6.00MM',
+        material={"Fy": 345},
+        Pu=10,
+        lengths=LENGTHS,
+        tau_b=0.8,
+        composite={"kind": "filled", "concrete": CONCRETE},
+    )
     elastic = rows_of(engine.run(case), "elastic")
-    assert "GA" not in elastic and elastic["GAs"]["value"] == pytest.approx(77200 * section.area) and elastic["GAc"]["status"] == "calculada"
+    assert (
+        "GA" not in elastic and elastic["GAs"]["value"] == pytest.approx(77200 * section.area) and elastic["GAc"]["status"] == "calculada"
+    )
 
 
 def test_composite_in_net_tension_uses_the_bare_steel_of_chapter_c(engine, sections):
@@ -199,7 +225,9 @@ def test_shear_only_does_not_apply_the_requirements_of_compression_and_flexure(e
 
 
 def test_tension_net_area_requirement(engine):
-    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345, "Fu": 450}, Pu=-10, tension={"An": 15000, "U": 0.9}))
+    result = engine.run(
+        SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345, "Fu": 450}, Pu=-10, tension={"An": 15000, "U": 0.9})
+    )
     assert requirement(result, "geometry", "Área neta")["status"] == "cumple"
     assert requirement(result, "materials", "Resistencia a tracción")["status"] == "cumple"
 

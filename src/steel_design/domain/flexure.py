@@ -19,7 +19,8 @@ from ..sections.models import Section, missing_properties
 from .fire import SLENDER_BLOCK, steel_at_temperature, with_fire
 
 _LIMITATIONS = (
-    "Lb sale de las longitudes (DF-13) y Cb es dato del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone que los apoyos "
+    "Lb sale de las longitudes (DF-13) y Cb es dato del usuario; Cb = 1.0 si no se indica (límite inferior de F1-1). Se supone "
+    "que los apoyos "
     "restringen la rotación respecto del eje longitudinal (F1(b)).",
     "Flexión respecto de un eje: la flexión biaxial y la combinación con carga axial se verifican en el chequeo de "
     "interacción (Capítulo H).",
@@ -103,9 +104,25 @@ def _i_major(case, section, basis, E, Fy):
     hot = steel_at_temperature(case)
     if hot and not channel and flange_class == "compacto":
         modes["Y"] = _evaluated("Y", "F2.1", a4.plastic_moment(Fy_T=Fy, Zx=section.zx))
-        modes["LTB"] = _evaluated("LTB", "F2.2", a4.ltb(
-            E_T=E, Fy=case.material.Fy, kp=hot["kp"], ky=hot["ky"], T=hot["T_C"], Sx=section.sx, Zx=section.zx, J=section.j, c=1.0, ho=section.ho,
-            rts=eq.f2_rts(Iy=section.iy, Cw=section.cw, Sx=section.sx), Lb=_lb(case, section, "x"), Cb=basis.Cb))
+        modes["LTB"] = _evaluated(
+            "LTB",
+            "F2.2",
+            a4.ltb(
+                E_T=E,
+                Fy=case.material.Fy,
+                kp=hot["kp"],
+                ky=hot["ky"],
+                T=hot["T_C"],
+                Sx=section.sx,
+                Zx=section.zx,
+                J=section.j,
+                c=1.0,
+                ho=section.ho,
+                rts=eq.f2_rts(Iy=section.iy, Cw=section.cw, Sx=section.sx),
+                Lb=_lb(case, section, "x"),
+                Cb=basis.Cb,
+            ),
+        )
     modes["TFR"] = _tension_flange(case, section, basis, Fy)
     return provision, rows, modes
 
@@ -398,7 +415,10 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
     notes = [f"Cb = {basis.Cb:g}" + (" (dato del usuario)." if case.flexure and "Cb" in case.flexure.model_fields_set
                                       else " (valor por defecto, límite inferior de F1-1).")]
     if hot and governing not in {"Y", "TFR"} and not gov["equation"].startswith("A-4"):
-        notes.append("Apéndice 4, 4.2.4d(e): Capítulo F con E(T) y Fy(T). El Commentary advierte que esas ecuaciones pueden sobrestimar los modos de inestabilidad (decisión DA4-3).")
+        notes.append(
+            "Apéndice 4, 4.2.4d(e): Capítulo F con E(T) y Fy(T). El Commentary advierte que esas ecuaciones pueden sobrestimar "
+            "los modos de inestabilidad (decisión DA4-3)."
+        )
     return with_fire({
         "chapter": "F", "code": "ANSI/AISC 360-22", "axis": axis,
         "section": section.name, "family": family,

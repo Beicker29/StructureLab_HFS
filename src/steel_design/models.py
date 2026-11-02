@@ -362,12 +362,20 @@ class ConcreteLayer(InputModel):
 
 
 class FireBasis(InputModel):
-    """Temperatures of a fire case (Appendix 4, 4.2.4d), from the user's heat transfer analysis (4.2.2), in deg C. Each material has its own."""
+    """Temperatures of a fire case (Appendix 4, 4.2.4d), from the user's heat transfer analysis (4.2.2), in deg C. Each material
+    has its own."""
+
     steel_temperature: float = Field(..., ge=20, lt=1200, description="Steel temperature, uniform; bottom flange in beams")
     concrete_temperature: float | None = Field(None, ge=20, lt=1200, description="Uniform concrete temperature")
-    concrete_layers: list[ConcreteLayer] | None = Field(None, min_length=1, description="Walls and coupling beams: profile from the plate to mid-thickness; adds up to half the concrete")
-    web_layers: list[ConcreteLayer] | None = Field(None, min_length=1, description="C-shaped walls: profile of the web, adds up to tsc_w/2 - tp")
-    flange_layers: list[ConcreteLayer] | None = Field(None, min_length=1, description="C-shaped walls: profile of the flanges, adds up to tsc_f/2 - tp")
+    concrete_layers: list[ConcreteLayer] | None = Field(
+        None, min_length=1, description="Walls and coupling beams: profile from the plate to mid-thickness; adds up to half the concrete"
+    )
+    web_layers: list[ConcreteLayer] | None = Field(
+        None, min_length=1, description="C-shaped walls: profile of the web, adds up to tsc_w/2 - tp"
+    )
+    flange_layers: list[ConcreteLayer] | None = Field(
+        None, min_length=1, description="C-shaped walls: profile of the flanges, adds up to tsc_f/2 - tp"
+    )
     bar_temperature: float | None = Field(None, ge=20, lt=1200, description="Temperature of the longitudinal bars")
 
     @model_validator(mode="after")
@@ -376,7 +384,9 @@ class FireBasis(InputModel):
         if panels and (self.web_layers is None or self.flange_layers is None):
             raise ValueError("Un muro en C por capas requiere web_layers y flange_layers.")
         if sum((self.concrete_temperature is not None, self.concrete_layers is not None, panels)) > 1:
-            raise ValueError("Indique una sola descripción del concreto: concrete_temperature, concrete_layers o web_layers con flange_layers.")
+            raise ValueError(
+                "Indique una sola descripción del concreto: concrete_temperature, concrete_layers o web_layers con flange_layers."
+            )
         return self
 
 
@@ -385,9 +395,11 @@ class CompositeBasis(InputModel):
     kind: Literal["filled", "encased", "beam", "wall", "c_wall", "coupling_beam"]
     concrete: Concrete
     interaction: Literal["H1", "I5", "M2", "M2S"] | None = Field(
-        None, description="Omitted, the rule of I5: H1.1 for encased and compact filled members; I5-1a/b for noncompact or slender filled "
-                          "members in compression with flexure about one axis, otherwise H1.1. It may be set to H1.1, I5-1 or Commentary I5 "
-                          "Method 2 (M2, M2S). Walls use I5(c)")
+        None,
+        description="Omitted, the rule of I5: H1.1 for encased and compact filled members; I5-1a/b for noncompact or slender filled "
+        "members in compression with flexure about one axis, otherwise H1.1. It may be set to H1.1, I5-1 or Commentary I5 "
+        "Method 2 (M2, M2S). Walls use I5(c)",
+    )
     encased: EncasedBasis | None = None
     filled: FilledBars | None = None
     beam: CompositeBeamBasis | None = None
@@ -410,20 +422,47 @@ class CompositeBasis(InputModel):
     def data_of_the_declared_kind(self):
         kind = self.kind
         rules = (
-            (self.pour_height is not None and kind not in {"filled", "wall"}, "composite.pour_height corresponde solo a kind = filled o wall."),
+            (
+                self.pour_height is not None and kind not in {"filled", "wall"},
+                "composite.pour_height corresponde solo a kind = filled o wall.",
+            ),
             (self.box is not None and kind != "filled", "composite.box corresponde solo a kind = filled."),
-            ((kind == "c_wall") != (self.c_wall is not None), "composite.c_wall corresponde solo a kind = c_wall, y es obligatorio en ese caso."),
-            ((kind == "coupling_beam") != (self.coupling_beam is not None), "composite.coupling_beam corresponde solo a kind = coupling_beam, y es obligatorio en ese caso."),
+            (
+                (kind == "c_wall") != (self.c_wall is not None),
+                "composite.c_wall corresponde solo a kind = c_wall, y es obligatorio en ese caso.",
+            ),
+            (
+                (kind == "coupling_beam") != (self.coupling_beam is not None),
+                "composite.coupling_beam corresponde solo a kind = coupling_beam, y es obligatorio en ese caso.",
+            ),
             (self.fire is not None and kind != "wall", "composite.fire corresponde solo a kind = wall (Guía 38, Capítulo 6)."),
-            (self.second_order is not None and kind not in {"filled", "encased", "wall"}, "composite.second_order se aplica a rellenos, embebidos y muros planos."),
-            (self.anchor is not None and kind in {"c_wall", "coupling_beam"}, "composite.anchor (I8.3) no está disponible para muros en C ni vigas de acoplamiento."),
-            (self.biaxial_shape_factor and self.interaction != "M2S", "composite.biaxial_shape_factor solo se aplica con interaction = M2S."),
-            (kind in {"c_wall", "coupling_beam"} and self.interaction is not None, "Muros en C y vigas de acoplamiento usan la distribución plástica; no indique composite.interaction."),
-            ((kind == "encased") != (self.encased is not None), "composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso."),
+            (
+                self.second_order is not None and kind not in {"filled", "encased", "wall"},
+                "composite.second_order se aplica a rellenos, embebidos y muros planos.",
+            ),
+            (
+                self.anchor is not None and kind in {"c_wall", "coupling_beam"},
+                "composite.anchor (I8.3) no está disponible para muros en C ni vigas de acoplamiento.",
+            ),
+            (
+                self.biaxial_shape_factor and self.interaction != "M2S",
+                "composite.biaxial_shape_factor solo se aplica con interaction = M2S.",
+            ),
+            (
+                kind in {"c_wall", "coupling_beam"} and self.interaction is not None,
+                "Muros en C y vigas de acoplamiento usan la distribución plástica; no indique composite.interaction.",
+            ),
+            (
+                (kind == "encased") != (self.encased is not None),
+                "composite.encased corresponde solo a kind = encased, y es obligatorio en ese caso.",
+            ),
             ((kind == "beam") != (self.beam is not None), "composite.beam corresponde solo a kind = beam, y es obligatorio en ese caso."),
             ((kind == "wall") != (self.wall is not None), "composite.wall corresponde solo a kind = wall, y es obligatorio en ese caso."),
             (self.filled is not None and kind != "filled", "composite.filled corresponde solo a kind = filled."),
-            (kind == "wall" and self.interaction is not None, "Los muros usan la distribución plástica de I5(c); no indique composite.interaction."),
+            (
+                kind == "wall" and self.interaction is not None,
+                "Los muros usan la distribución plástica de I5(c); no indique composite.interaction.",
+            ),
         )
         for failed, message in rules:
             if failed:
@@ -491,7 +530,9 @@ class SteelCase(InputModel):
     Vuy: FiniteNumber = Field(0.0, description="Required shear strength that accompanies Muy, parallel to x (kN), Chapter G")
     angle_flexure: AngleFlexure | None = None
     lengths: Lengths | None = Field(
-        None, description="Unbraced lengths of this case, or {ultimate, construction}: the one of its condition is taken (fire uses ultimate)")
+        None,
+        description="Unbraced lengths of this case, or {ultimate, construction}: the one of its condition is taken (fire uses ultimate)",
+    )
     fire: FireBasis | None = Field(None, description="Temperatures of a case with condition = fire (Appendix 4, 4.2.4d)")
     factors: Factors = Field(default_factory=Factors)
     single_angle_e5: SingleAngleE5Basis | None = None
@@ -500,8 +541,11 @@ class SteelCase(InputModel):
     flexure: FlexureBasis | None = None
     shear: ShearBasis | None = None
     tau_b: PositiveNumber | None = Field(
-        None, le=1, description="Stiffness reduction parameter of composite members for the direct analysis method, entered by the user; "
-                                "required, or the status is INCOMPLETE. Noncomposite members always use 1.0 (C2.3(c)): no other value is accepted")
+        None,
+        le=1,
+        description="Stiffness reduction parameter of composite members for the direct analysis method, entered by the user; "
+        "required, or the status is INCOMPLETE. Noncomposite members always use 1.0 (C2.3(c)): no other value is accepted",
+    )
     custom_section: CustomSection | None = None
     composite: CompositeBasis | None = None
 
@@ -552,7 +596,11 @@ class SteelCase(InputModel):
     def _temperatures_of_each_material(self):
         """Each material present has its temperature, always (user's decision DA4-9): the JSON states them, nothing is assumed."""
         fire, composite = self.fire, self.composite
-        concrete_given = {"uniform": fire.concrete_temperature is not None, "layers": fire.concrete_layers is not None, "panels": fire.web_layers is not None}
+        concrete_given = {
+            "uniform": fire.concrete_temperature is not None,
+            "layers": fire.concrete_layers is not None,
+            "panels": fire.web_layers is not None,
+        }
         if composite is None:
             if any(concrete_given.values()) or fire.bar_temperature is not None:
                 raise ValueError("Un miembro de acero solo lleva fire.steel_temperature.")
@@ -613,18 +661,25 @@ class DesignResult(BaseModel):
     family: str
     status: Status
     condition: str = "ultimate"
-    serviceability: list = Field(default_factory=list, description="Deflections against their limits; informative, they do not decide the status")
+    serviceability: list = Field(
+        default_factory=list, description="Deflections against their limits; informative, they do not decide the status"
+    )
     fire: dict | None = Field(None, description="Temperatures and retention factors of a fire case (Appendix 4)")
     section_data: dict = Field(default_factory=dict, description="Section properties used (mm units) and catalog provenance")
     checks: list[Check] = Field(default_factory=list)
-    stiffness: dict = Field(default_factory=dict, description="Elastic, effective and direct-analysis stiffnesses (N, mm), whatever the demands")
+    stiffness: dict = Field(
+        default_factory=dict, description="Elastic, effective and direct-analysis stiffnesses (N, mm), whatever the demands"
+    )
     requirements: dict = Field(default_factory=dict, description="Technical requirements by mechanical and geometric properties")
     interaction_diagrams: list = Field(default_factory=list, description="Interaction diagrams of Manual Tables 6-2a to 6-4; informative")
-    scope: str = ("Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
-                  "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
-                  "I5, I8.2 e I8.3; Apéndices 2, 4 (incendio, método simple) y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica cada chequeo: no "
-                  "es norma. Longitudes efectivas, análisis estructural, combinaciones de carga, conexiones, torsión y demás "
-                  "capítulos quedan fuera de este resultado.")
+    scope: str = (
+        "Resistencia del miembro según ANSI/AISC 360-22 (LRFD): Capítulos D (tracción), E (compresión), "
+        "F (flexión), G (cortante), H (interacción H1, H2 en ángulos simples y H4) e I (miembros compuestos: I2, I3, I4, "
+        "I5, I8.2 e I8.3; Apéndices 2, 4 (incendio, método simple) y 8.1). Lo calculado con AISC Design Guide 6 y 38 lo indica "
+        "cada chequeo: no "
+        "es norma. Longitudes efectivas, análisis estructural, combinaciones de carga, conexiones, torsión y demás "
+        "capítulos quedan fuera de este resultado."
+    )
 
     @computed_field
     @property

@@ -71,8 +71,12 @@ def composite_method2(case: SteelCase, section: Section, checks: list) -> dict:
     if not simplified:
         notes.append("AISC Design Guide 6 (2.ª ed., 2.3.2) excluye el punto D por posible error del lado inseguro; "
                      "considere interaction = M2S.")
-    return with_fire_extension(composite_result(case, section, modes={"M2": mode}, governing="M2", provisions=[mode["provision"]], ratio=mode["ratio"],
-                             notes=notes), steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case, section, modes={"M2": mode}, governing="M2", provisions=[mode["provision"]], ratio=mode["ratio"], notes=notes
+        ),
+        steel_at_temperature(case),
+    )
 
 
 
@@ -114,8 +118,11 @@ def composite_appendix_2_interaction(case: SteelCase, section: Section, checks: 
     modes = {"A2": candidates[0], **({"A2-otro": candidates[1]} if biaxial else {})}
     notes = ["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."]
     if biaxial:
-        notes.append("Extensión a dos ejes de I5-1a y I5-1b (Mrx/Mcx + Mry/Mcy), indicada por el usuario: el Apéndice 2 y la Guía 6 solo tratan un eje. "
-                     "Se evalúa con cp y cm de cada eje y gobierna el mayor (DI-22).")
+        notes.append(
+            "Extensión a dos ejes de I5-1a y I5-1b (Mrx/Mcx + Mry/Mcy), indicada por el usuario: el Apéndice 2 y la Guía 6 solo "
+            "tratan un eje. "
+            "Se evalúa con cp y cm de cada eje y gobierna el mayor (DI-22)."
+        )
     return composite_result(case, section, modes=modes, governing="A2", provisions=[provision], ratio=candidates[0]["ratio"], notes=notes)
 
 
@@ -124,7 +131,14 @@ def default_interaction(case: SteelCase, checks: list) -> str:
     """I5: H1.1 under I5(a); I5-1 under I5(b) where those equations apply (compression with flexure about one axis), otherwise H1.1."""
     flexures = [c for c in checks if c.id in {"flexure_x", "flexure_y"}]
     axial = next((c for c in checks if c.id == "axial"), None)
-    if case.composite.kind != "filled" or case.Pu <= 0 or len(flexures) != 1 or axial is None or axial.result is None or flexures[0].result is None:
+    if (
+        case.composite.kind != "filled"
+        or case.Pu <= 0
+        or len(flexures) != 1
+        or axial is None
+        or axial.result is None
+        or flexures[0].result is None
+    ):
         return "H1"
     classes = {row["class"] for c in (axial, flexures[0]) for row in c.result["classification"]["elements"]}
     return "I5" if classes - {"compact"} else "H1"

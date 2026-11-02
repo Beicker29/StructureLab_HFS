@@ -20,7 +20,18 @@ CONCRETE = ((20, 1.00, 1.00, 1.00), (93, 0.95, 1.00, 0.93), (200, 0.90, 1.00, 0.
             (760, 0.21, 0.45, 0.073), (870, 0.10, 0.31, 0.055), (980, 0.05, 0.18, 0.036), (1100, 0.01, 0.05, 0.018),
             (1200, 0.00, 0.00, 0.000))
 # T, kcb (Table A-4.2.4)
-COMPOSITE_BEAM = ((20, 1.00), (150, 0.98), (320, 0.95), (430, 0.89), (540, 0.71), (650, 0.49), (760, 0.26), (870, 0.12), (980, 0.05), (1100, 0.00))
+COMPOSITE_BEAM = (
+    (20, 1.00),
+    (150, 0.98),
+    (320, 0.95),
+    (430, 0.89),
+    (540, 0.71),
+    (650, 0.49),
+    (760, 0.26),
+    (870, 0.12),
+    (980, 0.05),
+    (1100, 0.00),
+)
 
 
 def _interpolate(table, T, column) -> float:
@@ -79,7 +90,14 @@ def wall_strip(*, Fy_T, E_T, fc, Ec, st, t, tsc, layers, Lc, lightweight) -> dic
         half_ei += 0.35 * factors["kEc"] * Ec * (st * thickness**3 / 12 + area * distance**2)   # I1-1
     pe = elastic_buckling_load(EI_eff=2 * half_ei, Lc=Lc)
     out = wall_compression(Pno_T=2 * half_pno, Pe_T=pe)
-    return {"Pno_T": 2 * half_pno, "EI_eff_T": 2 * half_ei, "Pe_T": pe, "Pn_T": out["Pn"], "Pno_over_Pe": out["Pno_over_Pe"], "equation": out["equation"]}
+    return {
+        "Pno_T": 2 * half_pno,
+        "EI_eff_T": 2 * half_ei,
+        "Pe_T": pe,
+        "Pn_T": out["Pn"],
+        "Pno_over_Pe": out["Pno_over_Pe"],
+        "equation": out["equation"],
+    }
 
 
 def composite_beam_strength(*, Mn, kcb) -> dict:

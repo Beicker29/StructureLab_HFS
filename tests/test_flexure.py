@@ -105,12 +105,19 @@ def test_blocked_or_inconsistent_domains_never_pass(engine, name, kwargs, code):
     assert result.status.value == "INCOMPLETE" and result.errors[0]["code"] == code
 
 
-@pytest.mark.parametrize("name, kwargs, field", [
-    ("2L4X4X1/4", {"Mux": 1}, "angle_flexure.web_legs"),
-    ("L4X4X1/4", {"Mux": 1, "angle_flexure": {"toe": "tension"}}, "flexure.lateral_torsional_restraint"),
-    ("L4X4X1/4", {"Mux": 1, "flexure": {"lateral_torsional_restraint": "none"}, "lengths": {"Lx": 1000, "Ly": 1000, "Lz": 1000}}, "angle_flexure.toe"),
-    ("L6X4X3/8", {"Mw": 1, "lengths": {"Lx": 1000, "Ly": 1000, "Lz": 1000}}, "angle_flexure.leg_in_compression"),
-])
+@pytest.mark.parametrize(
+    "name, kwargs, field",
+    [
+        ("2L4X4X1/4", {"Mux": 1}, "angle_flexure.web_legs"),
+        ("L4X4X1/4", {"Mux": 1, "angle_flexure": {"toe": "tension"}}, "flexure.lateral_torsional_restraint"),
+        (
+            "L4X4X1/4",
+            {"Mux": 1, "flexure": {"lateral_torsional_restraint": "none"}, "lengths": {"Lx": 1000, "Ly": 1000, "Lz": 1000}},
+            "angle_flexure.toe",
+        ),
+        ("L6X4X3/8", {"Mw": 1, "lengths": {"Lx": 1000, "Ly": 1000, "Lz": 1000}}, "angle_flexure.leg_in_compression"),
+    ],
+)
 def test_angle_data_must_be_explicit(engine, name, kwargs, field):
     kwargs.setdefault("lengths", {"Lx": 2000, "Ly": 2000, "Lz": 2000})
     check = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": 345}, **kwargs)).checks[0]
@@ -171,7 +178,12 @@ def test_formula_properties():
 def test_flexure_report(engine):
     case = flexure_case(REFERENCE["RHSS-F7-3-slender-flange"]["spec"])
     text = calculation_report(case, engine.run(case))
-    assert "#### 9.2.2 Respecto del eje Y (Muy, Mz)" in text and "Flexión respecto de y (Capítulo F); case gobernante: única." in text and "F7-3" in text and "be" in text
+    assert (
+        "#### 9.2.2 Respecto del eje Y (Muy, Mz)" in text
+        and "Flexión respecto de y (Capítulo F); case gobernante: única." in text
+        and "F7-3" in text
+        and "be" in text
+    )
     assert "φb·Mn = 0.90 · Mn" in text and "Obligaciones del Capítulo F" in text
 
 
@@ -182,7 +194,9 @@ def test_flexure_report(engine):
     ({"Lx": 6000, "Ly": 9000, "Lz": 4000}, "y", "Muy", 4000),
 ])
 def test_lb_comes_from_the_lengths(engine, lengths, axis, moment, expected):
-    case = SteelCase(tau_b=1.0, section_name="W18X50", material={"Fy": 345}, flexure={"tension_flange_holes": False}, lengths=lengths, **{moment: 10})
+    case = SteelCase(
+        tau_b=1.0, section_name="W18X50", material={"Fy": 345}, flexure={"tension_flange_holes": False}, lengths=lengths, **{moment: 10}
+    )
     assert engine.run(case).check(f"flexure_{axis}").result["inputs"]["Lb_mm"] == expected
 
 

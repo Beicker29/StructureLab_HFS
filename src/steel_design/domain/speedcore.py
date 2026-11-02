@@ -50,22 +50,54 @@ def _c_wall_slender_at_temperature(case, section):
 
 
 def _c_wall_fire_compression(case, section, hot):
-    """Design Guide 38, 6.2.2: one column of unit width per panel, with its thickness and its profile, added over its length (decision DA4-10).
+    """Design Guide 38, 6.2.2: one column of unit width per panel, with its thickness and its profile, added over its length
+    (decision DA4-10).
     The web has the full length L and each flange W - tsc_w, so the corners count once."""
     wall, _, props = _c_wall_data(case)
     _c_wall_slender_at_temperature(case, section)
     composite_materials(case, section, "web")                                             # the limits of 4.2.3b
     Lc = case.factors.Ky * case.lengths.Ly
     web = wall_strip_at_temperature(case, hot, st=wall.st, t=wall.tp, tsc=wall.tsc_w, layers=concrete_profile(case, section, "web"), Lc=Lc)
-    flange = wall_strip_at_temperature(case, hot, st=wall.st, t=wall.tp, tsc=wall.tsc_f, layers=concrete_profile(case, section, "flange"), Lc=Lc)
+    flange = wall_strip_at_temperature(
+        case, hot, st=wall.st, t=wall.tp, tsc=wall.tsc_f, layers=concrete_profile(case, section, "flange"), Lc=Lc
+    )
     pn = (web["Pn_T"] * wall.L + flange["Pn_T"] * 2 * (wall.W - wall.tsc_w)) / wall.st
-    mode = {"limit_state": "flexural_buckling", "provision": "I2.3a; Apéndice 4, 4.2.4d(d)", "applies": True, "equation": "A-4-12", "Pn_equation": "A-4-12", "st_mm": wall.st, "Lc_mm": Lc,
-            "Pno_T_web_kN": web["Pno_T"] / 1000.0, "Pn_T_web_kN": web["Pn_T"] / 1000.0, "Pno_T_flange_kN": flange["Pno_T"] / 1000.0, "Pn_T_flange_kN": flange["Pn_T"] / 1000.0,
-            "Pn_kN": pn / 1000.0, "available_kN": eq.PHI_C_WALL * pn / 1000.0}
-    modes = {"FB": mode, "LB": {"limit_state": "local_buckling", "provision": "I1.2", "applies": True, "equation": "No requerido en muros (I1.2)"}}
-    return with_fire(composite_result(case, section, modes=modes, governing="FB", provisions=["I1", "I2.3a"], requirements=_c_wall_requirements(case, props),
-                             notes=[_GUIDE_NOTE, "AISC Design Guide 38, 6.2.2: método de ancho unitario por panel, conservador."], Pn_kN=mode["Pn_kN"],
-                             phi_c=eq.PHI_C_WALL, available_kN=mode["available_kN"], y_mm=props["y"]), hot, "4.2.4d(d)")
+    mode = {
+        "limit_state": "flexural_buckling",
+        "provision": "I2.3a; Apéndice 4, 4.2.4d(d)",
+        "applies": True,
+        "equation": "A-4-12",
+        "Pn_equation": "A-4-12",
+        "st_mm": wall.st,
+        "Lc_mm": Lc,
+        "Pno_T_web_kN": web["Pno_T"] / 1000.0,
+        "Pn_T_web_kN": web["Pn_T"] / 1000.0,
+        "Pno_T_flange_kN": flange["Pno_T"] / 1000.0,
+        "Pn_T_flange_kN": flange["Pn_T"] / 1000.0,
+        "Pn_kN": pn / 1000.0,
+        "available_kN": eq.PHI_C_WALL * pn / 1000.0,
+    }
+    modes = {
+        "FB": mode,
+        "LB": {"limit_state": "local_buckling", "provision": "I1.2", "applies": True, "equation": "No requerido en muros (I1.2)"},
+    }
+    return with_fire(
+        composite_result(
+            case,
+            section,
+            modes=modes,
+            governing="FB",
+            provisions=["I1", "I2.3a"],
+            requirements=_c_wall_requirements(case, props),
+            notes=[_GUIDE_NOTE, "AISC Design Guide 38, 6.2.2: método de ancho unitario por panel, conservador."],
+            Pn_kN=mode["Pn_kN"],
+            phi_c=eq.PHI_C_WALL,
+            available_kN=mode["available_kN"],
+            y_mm=props["y"],
+        ),
+        hot,
+        "4.2.4d(d)",
+    )
 
 
 def c_wall_compression(case: SteelCase, section: Section) -> dict:
@@ -100,8 +132,20 @@ def c_wall_tension(case: SteelCase, section: Section) -> dict:
     pn = eq.tension_yielding(Fy=composite_materials(case, section, "web")["Fy"], As=props["As"])
     mode = {"limit_state": "tensile_yielding", "provision": "I2.3b", "applies": True, "equation": "I2-16", "Pn_kN": pn / 1000.0,
             "available_kN": eq.PHI_T * pn / 1000.0}
-    return with_fire_extension(composite_result(case, section, modes={"TY": mode}, governing="TY", provisions=["I1", "I2.3b"], notes=[_GUIDE_NOTE],
-                             Pn_kN=pn / 1000.0, phi_t=eq.PHI_T, available_kN=mode["available_kN"]), steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case,
+            section,
+            modes={"TY": mode},
+            governing="TY",
+            provisions=["I1", "I2.3b"],
+            notes=[_GUIDE_NOTE],
+            Pn_kN=pn / 1000.0,
+            phi_t=eq.PHI_T,
+            available_kN=mode["available_kN"],
+        ),
+        steel_at_temperature(case),
+    )
 
 
 def _c_wall_moment(case, section, axis, P_N, props):
@@ -109,8 +153,10 @@ def _c_wall_moment(case, section, axis, P_N, props):
     web, flange = composite_materials(case, section, "web"), composite_materials(case, section, "flange")
     _c_wall_slender_at_temperature(case, section)
     common = dict(L=wall.L, W=wall.W, tsc_w=wall.tsc_w, tsc_f=wall.tsc_f, tp=wall.tp, Fy=web["Fy"], fc=web["fc"], fc_f=flange["fc"])
-    if steel_at_temperature(case):                                 # the elastic centroid, with Ec/Es at temperature
-        props = dg38.c_wall_properties(L=wall.L, W=wall.W, tsc_w=wall.tsc_w, tsc_f=wall.tsc_f, tp=wall.tp, n=web["Ec"] / web["Es"], n_f=flange["Ec"] / flange["Es"])
+    if steel_at_temperature(case):  # the elastic centroid, with Ec/Es at temperature
+        props = dg38.c_wall_properties(
+            L=wall.L, W=wall.W, tsc_w=wall.tsc_w, tsc_f=wall.tsc_f, tp=wall.tp, n=web["Ec"] / web["Es"], n_f=flange["Ec"] / flange["Es"]
+        )
     if axis == "x":
         if P_N:
             blocked("Muro en C: la Guía 38 no da la flexión en el eje mayor con fuerza axial (A.2.6 es sin axial).", section)
@@ -141,9 +187,21 @@ def c_wall_flexure(case: SteelCase, section: Section, axis: str) -> dict:
     mn = out["Mp"] / 1e6
     mode = {"limit_state": "flexural_yielding", "provision": "I3.5", "applies": True, "equation": out["equation"],
             "C_mm": out["C"], "Mn_kNm": mn, "available_kNm": eq.PHI_B * mn}
-    return with_fire_extension(composite_result(case, section, modes={"Y": mode}, governing="Y", provisions=["I1", "I3.5"], Mn_kNm=mn, phi_b=eq.PHI_B,
-                             requirements=_c_wall_requirements(case, props), notes=[_GUIDE_NOTE], available_kNm=eq.PHI_B * mn),
-                     steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case,
+            section,
+            modes={"Y": mode},
+            governing="Y",
+            provisions=["I1", "I3.5"],
+            Mn_kNm=mn,
+            phi_b=eq.PHI_B,
+            requirements=_c_wall_requirements(case, props),
+            notes=[_GUIDE_NOTE],
+            available_kNm=eq.PHI_B * mn,
+        ),
+        steel_at_temperature(case),
+    )
 
 
 def c_wall_shear(case: SteelCase, section: Section, axis: str) -> dict:
@@ -157,8 +215,20 @@ def c_wall_shear(case: SteelCase, section: Section, axis: str) -> dict:
     vn = out["Vn"] / 1000.0
     mode = {"limit_state": "shear", "provision": "I4.4", "applies": True, "equation": "I4-2", "Asw_mm2": props["Asw"],
             "Ac_mm2": props["Acw"], "Vn_kN": vn, "available_kN": eq.PHI_V_WALL * vn}
-    return with_fire_extension(composite_result(case, section, modes={"V": mode}, governing="V", provisions=["I1", "I4.4"], notes=[_GUIDE_NOTE], Vn_kN=vn,
-                             phi_v=eq.PHI_V_WALL, available_kN=mode["available_kN"]), steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case,
+            section,
+            modes={"V": mode},
+            governing="V",
+            provisions=["I1", "I4.4"],
+            notes=[_GUIDE_NOTE],
+            Vn_kN=vn,
+            phi_v=eq.PHI_V_WALL,
+            available_kN=mode["available_kN"],
+        ),
+        steel_at_temperature(case),
+    )
 
 
 def c_wall_interaction(case: SteelCase, section: Section, checks: list) -> dict:
@@ -178,9 +248,18 @@ def c_wall_interaction(case: SteelCase, section: Section, checks: list) -> dict:
     mode = {"limit_state": "combined_flexure_axial", "provision": "I5(c)", "applies": True, "equation": out["equation"],
             "Pr_kN": case.Pu, "Mr_kNm": flexure.demand, "C_mm": out["C"], "Mn_at_Pr_kNm": out["Mp"] / 1e6, "Mc_at_Pr_kNm": capacity,
             "ratio": ratio}
-    return with_fire_extension(composite_result(case, section, modes={"I5c": mode}, governing="I5c", provisions=["I5(c)", "I1.2a"], ratio=ratio,
-                             notes=[_GUIDE_NOTE, "Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."]),
-                     steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case,
+            section,
+            modes={"I5c": mode},
+            governing="I5c",
+            provisions=["I5(c)", "I1.2a"],
+            ratio=ratio,
+            notes=[_GUIDE_NOTE, "Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."],
+        ),
+        steel_at_temperature(case),
+    )
 
 
 def _coupling_requirements(case, section):
@@ -211,9 +290,21 @@ def coupling_beam_flexure(case: SteelCase, section: Section, axis: str) -> dict:
     mn = out["Mp"] / 1e6
     mode = {"limit_state": "flexural_yielding", "provision": "I3.4b", "applies": True, "equation": out["equation"], "C_mm": out["C"],
             "Mn_kNm": mn, "available_kNm": eq.PHI_B * mn}
-    return with_fire_extension(composite_result(case, section, modes={"Y": mode}, governing="Y", provisions=["I1", "I3.4b"], Mn_kNm=mn, phi_b=eq.PHI_B,
-                             requirements=_coupling_requirements(case, section), notes=[_GUIDE_NOTE], available_kNm=eq.PHI_B * mn),
-                     steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case,
+            section,
+            modes={"Y": mode},
+            governing="Y",
+            provisions=["I1", "I3.4b"],
+            Mn_kNm=mn,
+            phi_b=eq.PHI_B,
+            requirements=_coupling_requirements(case, section),
+            notes=[_GUIDE_NOTE],
+            available_kNm=eq.PHI_B * mn,
+        ),
+        steel_at_temperature(case),
+    )
 
 
 def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
@@ -228,12 +319,25 @@ def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
     vn = eq.shear_filled(Av=Av, Fy=m["Fy"], Kc=1.0, Ac=Ac, fc=m["fc"]) / 1000.0
     mode = {"limit_state": "shear", "provision": "I4.2", "applies": True, "equation": "I4-1", "Av_mm2": Av, "Ac_mm2": Ac, "Kc": 1.0,
             "Vn_kN": vn, "available_kN": eq.PHI_V_FILLED * vn}
-    return with_fire_extension(composite_result(case, section, modes={"V": mode}, governing="V", provisions=["I1", "I4.2"], notes=[_GUIDE_NOTE], Vn_kN=vn,
-                             phi_v=eq.PHI_V_FILLED, available_kN=mode["available_kN"]), steel_at_temperature(case))
+    return with_fire_extension(
+        composite_result(
+            case,
+            section,
+            modes={"V": mode},
+            governing="V",
+            provisions=["I1", "I4.2"],
+            notes=[_GUIDE_NOTE],
+            Vn_kN=vn,
+            phi_v=eq.PHI_V_FILLED,
+            available_kN=mode["available_kN"],
+        ),
+        steel_at_temperature(case),
+    )
 
 
 def wall_fire(case: SteelCase, section: Section) -> dict:
-    """Optional reviews of Design Guide 38, Chapter 6, on the unit-width column (6.2.2): rating and vent holes. The strength is A-4-12 (domain/composite/wall.py)."""
+    """Optional reviews of Design Guide 38, Chapter 6, on the unit-width column (6.2.2): rating and vent holes. The strength is
+    A-4-12 (domain/composite/wall.py)."""
     check_family(case, section)
     if case.Pu <= 0 or case.lengths is None:
         incomplete("El incendio de la Guía 38 se calcula en compresión (Pu > 0) y con la longitud del miembro.", section,
@@ -254,8 +358,12 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
     ratio, requirements = 0.0, []
     if fire.required_rating_hours is not None:
         if not (L / tsc <= 20 and pu_unit / pn <= 0.2):
-            incomplete("La Ec. 6-5 de la Guía 38 exige L/tsc ≤ 20 y Pu/Pn ≤ 0.2; fuera de ellos omita required_rating_hours: la resistencia es A-4-12.",
-                        section, ["composite.fire.required_rating_hours"])
+            incomplete(
+                "La Ec. 6-5 de la Guía 38 exige L/tsc ≤ 20 y Pu/Pn ≤ 0.2; fuera de ellos omita required_rating_hours: la "
+                "resistencia es A-4-12.",
+                section,
+                ["composite.fire.required_rating_hours"],
+            )
         rating = dg38_fire.fire_resistance_rating(Pu_over_Pn=pu_unit / pn, L=L, tsc=tsc)
         mode["R_hours"] = rating
         ratio = fire.required_rating_hours / rating if rating > 0 else float("inf")
@@ -271,6 +379,16 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
             requirement_row("vent_d", "DG38 6.3.5", v.diameter >= required, "Diámetro de ventilación ≥ el requerido y ≥ 25 mm."),
             requirement_row("vent_s", "DG38 6.3.5", max(v.s1, v.s2) <= min(dg38_fire.VENT_MAX_SPACING, L),
                          "Separación de ventilación ≤ la altura de piso y ≤ 3.66 m.")]
-    return composite_result(case, section, modes={"FIRE": {**mode, "ratio": ratio}}, governing="FIRE", provisions=["AISC Design Guide 38, Cap. 6"],
-                   requirements=requirements, ratio=ratio,
-                   notes=["Fuera de la norma: AISC Design Guide 38, Capítulo 6, sobre la columna de ancho unitario (st); no da la resistencia, que es la de A-4-12."])
+    return composite_result(
+        case,
+        section,
+        modes={"FIRE": {**mode, "ratio": ratio}},
+        governing="FIRE",
+        provisions=["AISC Design Guide 38, Cap. 6"],
+        requirements=requirements,
+        ratio=ratio,
+        notes=[
+            "Fuera de la norma: AISC Design Guide 38, Capítulo 6, sobre la columna de ancho unitario (st); no da la resistencia, "
+            "que es la de A-4-12."
+        ],
+    )
