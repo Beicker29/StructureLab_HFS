@@ -1,10 +1,11 @@
 """Chapter I: what every composite member shares: material limits, properties at temperature, result format and errors."""
-from ...codes.aisc_360_22 import appendix_2 as a2, appendix_4 as a4, composite as eq
+from ...codes.aisc_360_22 import appendix_2 as a2
+from ...codes.aisc_360_22 import appendix_4 as a4
+from ...codes.aisc_360_22 import composite as eq
 from ...codes.aisc_360_22.constants import is_standard_modulus
 from ...errors import blocking_error, incomplete_error
 from ...sections.models import missing_properties
 from ..fire import steel_at_temperature
-
 
 _LIMITATIONS = (
     "Diafragmas (I7) y conexión ensayada (I8.4) no se comprueban. La transferencia de carga (I6) corresponde al diseño de conexiones y queda fuera.",

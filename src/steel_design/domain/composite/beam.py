@@ -1,9 +1,16 @@
 """Composite beams with steel anchors: I3.2 positive flexure, I8.2 anchors and their detailing; A-4-20 under fire."""
 import math
 
-from ...codes.aisc_360_22 import appendix_4 as a4, composite as eq
+from ...codes.aisc_360_22 import appendix_4 as a4
+from ...codes.aisc_360_22 import composite as eq
 from ..fire import steel_at_temperature, with_fire
-from .common import blocked, flexure_output, incomplete, require_properties, requirement_row
+from .common import (
+    blocked,
+    flexure_output,
+    incomplete,
+    require_properties,
+    requirement_row,
+)
 
 
 def _anchor_factors(beam, section):

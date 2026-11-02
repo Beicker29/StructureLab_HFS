@@ -8,9 +8,9 @@ Regenerates tests/fixtures/chapter_h/reference.json:
 
     python tests/oracles/chapter_h.py
 """
-from decimal import Decimal as D
 import json
 import sys
+from decimal import Decimal as D
 from pathlib import Path
 
 from _common import _plain

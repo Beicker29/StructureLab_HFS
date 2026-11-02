@@ -1,9 +1,9 @@
 from pydantic import ValidationError as PydanticValidationError
 
-from ..models import SteelCase
-from ..sections.models import Section
 from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..errors import ValidationError
+from ..models import SteelCase
+from ..sections.models import Section
 
 
 def validate_case(case: SteelCase) -> SteelCase:

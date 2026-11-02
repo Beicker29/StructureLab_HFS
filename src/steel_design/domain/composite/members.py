@@ -1,16 +1,35 @@
 """Chapter I by required strength: compression, tension, flexure and shear of each member; Appendix 8.1 demands."""
 import math
 
-from ...codes.aisc_360_22 import appendix_8 as a8, composite as eq
+from ...codes.aisc_360_22 import appendix_8 as a8
+from ...codes.aisc_360_22 import composite as eq
 from ...errors import IncompleteSectionDataError, RuleNotImplementedError
 from ...models import SteelCase
 from ...sections.models import Section
 from ..fire import steel_at_temperature, with_fire, with_fire_extension
 from .beam import beam_flexure
-from .common import blocked, check_family, composite_materials, composite_result, require_properties, uses_appendix_2
+from .common import (
+    blocked,
+    check_family,
+    composite_materials,
+    composite_result,
+    require_properties,
+    uses_appendix_2,
+)
 from .encased import encased_flexure, encased_geometry, encased_requirements
-from .filled import filled_compression, filled_fire_modes, filled_flexure, filled_geometry
-from .wall import wall_fire_modes, wall_flexure, wall_geometry, wall_is_slender, wall_requirements
+from .filled import (
+    filled_compression,
+    filled_fire_modes,
+    filled_flexure,
+    filled_geometry,
+)
+from .wall import (
+    wall_fire_modes,
+    wall_flexure,
+    wall_geometry,
+    wall_is_slender,
+    wall_requirements,
+)
 
 
 def compression_basis(case, section) -> dict:

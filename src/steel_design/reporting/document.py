@@ -1,11 +1,23 @@
 """The neutral document model of the report of one member."""
-from datetime import datetime, timezone
 import re
+from datetime import UTC, datetime
 from typing import NamedTuple
 
 from ..execution import overall_status
 from ..models import DesignResult, SteelCase
-from .glossary import (EQUATION_OF, FIXED_LITERALS, FLEXURE_STATES, LIMIT_STATES, MODE_NAMES, PARAMETERS, SECTION_PROPERTIES, STATUS_TEXT, STIFFNESS_NAMES, fmt, parameter_label)
+from .glossary import (
+    EQUATION_OF,
+    FIXED_LITERALS,
+    FLEXURE_STATES,
+    LIMIT_STATES,
+    MODE_NAMES,
+    PARAMETERS,
+    SECTION_PROPERTIES,
+    STATUS_TEXT,
+    STIFFNESS_NAMES,
+    fmt,
+    parameter_label,
+)
 
 # Mode keys shown in the mode table; other scalar keys of a mode are listed as intermediate values.
 _MODE_KEYS = {"limit_state", "provision", "axis", "Fe_equation", "Fe_mpa", "Fn_mpa", "Fn_equation",
@@ -191,7 +203,7 @@ def report_blocks(executions: list) -> list[dict]:
     blocks = [{"kind": "title", "member": result.section, "case": None, "status": overall_status(results).value,
                "action": action,
                "meta": [("Norma", f"ANSI/AISC 360-22, Capítulo{'s' if len(chapters) > 1 else ''} {', '.join(chapters)}{simple_method}"),
-                                                ("Método", "LRFD"), ("Cases de carga", str(len(executions))), ("Fecha", f"{datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"),
+                                                ("Método", "LRFD"), ("Cases de carga", str(len(executions))), ("Fecha", f"{datetime.now(UTC):%Y-%m-%d %H:%M} UTC"),
                         ("Programa", "StructureLab_HFS")],
                "ratio": ratio}]
     cards = []

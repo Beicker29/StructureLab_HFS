@@ -8,14 +8,14 @@ frozen file:
 
     python tests/oracles/chapter_e.py
 """
-from decimal import Decimal as D, getcontext
 import json
+import re
+from decimal import Decimal as D
+from decimal import getcontext
 from pathlib import Path
 
-from _common import _plain, sqrt
-import re
-
 import openpyxl
+from _common import _plain, sqrt
 
 getcontext().prec = 50
 ROOT = Path(__file__).resolve().parents[2]

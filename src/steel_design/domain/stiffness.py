@@ -6,7 +6,7 @@ carries out that analysis; tau_b is 1.0 in noncomposite members and a datum of t
 that the report can say which of the two it is.
 """
 import math
-from typing import Callable
+from collections.abc import Callable
 
 from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_360_22.constants import G_STEEL

@@ -3,9 +3,9 @@ import pytest
 from pydantic import ValidationError
 
 from steel_design.errors import SteelDesignError
+from steel_design.errors import ValidationError as DomainValidationError
 from steel_design.execution import prepare_cases
 from steel_design.materials import material_catalog
-from steel_design.errors import ValidationError as DomainValidationError
 from steel_design.models import SteelCase
 
 BASE = {"section_name": "W14X90", "material": {"Fy": 345}, "Pu": 100,

@@ -2,15 +2,14 @@
 import math
 
 import pytest
+from conftest import steel_case
 
 from steel_design.domain.coverage import discharge, required_obligations
-from steel_design.errors import AmbiguousSectionError, SectionNotFoundError
-from steel_design.sections.repository import SectionRepository
 from steel_design.engine import SteelDesignEngine
+from steel_design.errors import AmbiguousSectionError, SectionNotFoundError
 from steel_design.execution import overall_status
 from steel_design.models import DesignResult, Status, worst_status
-
-from conftest import steel_case
+from steel_design.sections.repository import SectionRepository
 
 
 def ids(obligations):

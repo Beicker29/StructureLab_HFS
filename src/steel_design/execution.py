@@ -4,10 +4,10 @@ No filesystem access; a future web API calls execute_payload directly.
 """
 import copy
 
-from .errors import ValidationError
 from .engine import SteelDesignEngine
+from .errors import ValidationError
 from .materials import material_by_name
-from .models import DesignResult, SteelCase, Status, worst_status
+from .models import DesignResult, Status, SteelCase, worst_status
 from .sections.loader import SECTIONS_CATALOG, load_sections_from_excel
 from .sections.repository import SectionRepository
 

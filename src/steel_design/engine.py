@@ -8,28 +8,68 @@ Section stiffnesses (domain/stiffness.py) are reported whatever the demands.
 """
 from .domain.composite.anchor import composite_anchor
 from .domain.composite.common import uses_appendix_2
-from .domain.composite.interaction import composite_appendix_2_interaction, composite_i5, composite_method2, interaction_method
-from .domain.composite.members import composite_compression, composite_flexure, composite_shear, composite_tension, second_order_demands
+from .domain.composite.interaction import (
+    composite_appendix_2_interaction,
+    composite_i5,
+    composite_method2,
+    interaction_method,
+)
+from .domain.composite.members import (
+    composite_compression,
+    composite_flexure,
+    composite_shear,
+    composite_tension,
+    second_order_demands,
+)
 from .domain.composite.wall import composite_wall_interaction
-from .domain.speedcore import (c_wall_compression, c_wall_flexure, c_wall_interaction, c_wall_shear, c_wall_tension,
-                               coupling_beam_axial, coupling_beam_flexure, coupling_beam_shear, wall_fire)
 from .domain.compression import compression_strength
-from .domain.coverage import (composite_obligations, discharge, flexure_obligations, interaction_obligations,
-                              required_obligations, shear_obligations)
+from .domain.coverage import (
+    composite_obligations,
+    discharge,
+    flexure_obligations,
+    interaction_obligations,
+    required_obligations,
+    shear_obligations,
+)
 from .domain.fire import fire_summary, is_elevated, uncovered_demands
 from .domain.flexure import flexure_strength
+from .domain.interaction import (
+    COMBINED,
+    amplified_cb_case,
+    combined_strength,
+    tension_cb_factor,
+)
 from .domain.interaction_diagram import interaction_diagrams
-from .domain.interaction import COMBINED, amplified_cb_case, combined_strength, tension_cb_factor
 from .domain.requirements import member_requirements, missing, unmet
 from .domain.serviceability import deflection_checks
 from .domain.shear import shear_strength
+from .domain.speedcore import (
+    c_wall_compression,
+    c_wall_flexure,
+    c_wall_interaction,
+    c_wall_shear,
+    c_wall_tension,
+    coupling_beam_axial,
+    coupling_beam_flexure,
+    coupling_beam_shear,
+    wall_fire,
+)
 from .domain.stiffness import member_stiffness
 from .domain.tension import tension_strength
 from .domain.validation import section_inconsistencies, validate_case, validate_section
-from .errors import IncompleteSectionDataError, RuleNotImplementedError, SectionNotFoundError
-from .models import Check, DesignResult, Obligation, SteelCase, Status, worst_status
-from .sections.geometry import (build_box_section, build_c_wall_section, build_coupling_beam_section, build_custom_section,
-                                build_wall_section)
+from .errors import (
+    IncompleteSectionDataError,
+    RuleNotImplementedError,
+    SectionNotFoundError,
+)
+from .models import Check, DesignResult, Obligation, Status, SteelCase, worst_status
+from .sections.geometry import (
+    build_box_section,
+    build_c_wall_section,
+    build_coupling_beam_section,
+    build_custom_section,
+    build_wall_section,
+)
 from .sections.models import Section
 from .sections.repository import SectionRepository
 

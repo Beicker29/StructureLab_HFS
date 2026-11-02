@@ -8,8 +8,6 @@ import math
 
 from ._checks import positive as _positive
 
-
-
 PHI_C = 0.90         # S22 E1, LRFD
 
 # Table B4.1a, members subjected to axial compression: case -> (coefficient, form)

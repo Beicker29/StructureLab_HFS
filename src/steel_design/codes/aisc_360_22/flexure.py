@@ -8,7 +8,6 @@ import math
 
 from ._checks import positive as _positive
 
-
 PHI_B = 0.90        # F1(a), LRFD
 
 # Table B4.1b (flexure): case -> (lambda_p coefficient, lambda_r coefficient, form)

@@ -6,14 +6,13 @@ Expected values: tests/fixtures/chapter_a4/reference.json from tests/oracles/cha
 import json
 
 import pytest
+from conftest import ROOT
 
 from steel_design.codes.aisc_360_22 import appendix_4 as a4
 from steel_design.execution import execute_payload, member_groups
 from steel_design.models import SteelCase
 from steel_design.reporting.document import report_blocks
 from steel_design.reporting.text import render_text
-
-from conftest import ROOT
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_a4/reference.json").read_text(encoding="utf-8"))["cases"]
 HOLES = {"tension_flange_holes": False}

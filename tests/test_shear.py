@@ -6,11 +6,10 @@ Expected values: tests/fixtures/chapter_g/reference.json from tests/oracles/chap
 import json
 
 import pytest
+from conftest import ROOT, calculation_report
 
 from steel_design.codes.aisc_360_22 import shear as eq
 from steel_design.models import SteelCase
-
-from conftest import ROOT, calculation_report
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_g/reference.json").read_text(encoding="utf-8"))["cases"]
 

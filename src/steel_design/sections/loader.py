@@ -8,7 +8,8 @@ from io import BytesIO
 from pathlib import Path
 
 import openpyxl
-from pydantic import TypeAdapter, ValidationError as PydanticValidationError
+from pydantic import TypeAdapter
+from pydantic import ValidationError as PydanticValidationError
 
 from ..errors import CatalogSchemaError
 from ..models import FiniteNumber
@@ -48,9 +49,9 @@ def _number(value, *, section, field, row, scale):
         if isinstance(value, bool):
             raise ValueError
         return _NUMBER.validate_python(float(value) * scale)
-    except (TypeError, ValueError, PydanticValidationError):
+    except (TypeError, ValueError, PydanticValidationError) as exc:
         raise CatalogSchemaError("El valor del catálogo debe ser un número finito.",
-                                 details={"section": section, "field": field, "value": repr(value), "row": row})
+                                 details={"section": section, "field": field, "value": repr(value), "row": row}) from exc
 
 
 def _derive_ratios(values: dict, family: str) -> None:

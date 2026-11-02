@@ -1,7 +1,7 @@
 """Solid custom sections (mm): area, moments of inertia, radii of gyration, elastic and plastic moduli."""
-from ..codes.aisc_dg06.members import box_torsional_constant
 import math
 
+from ..codes.aisc_dg06.members import box_torsional_constant
 from ..errors import ValidationError
 from ..models import CustomSectionType, SteelCase
 from .models import Section

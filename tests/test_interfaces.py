@@ -4,11 +4,10 @@ import subprocess
 import sys
 
 import pytest
+from conftest import CATALOG, ROOT
 
 from steel_design.errors import ValidationError
 from steel_design.execution import execute_payload, overall_status
-
-from conftest import CATALOG, ROOT
 
 EXAMPLES = sorted((ROOT / "examples").glob("*.json"))
 

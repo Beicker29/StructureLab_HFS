@@ -8,14 +8,13 @@ import json
 from pathlib import Path
 
 import pytest
+from test_composite import GUIDE_KINDS
+from test_design_examples import FT, FY50, IN, KIP, KIPFT, KSI, TOL, filled_member
 
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import SteelCase
 from steel_design.sections.models import Section
 from steel_design.sections.repository import SectionRepository
-
-from test_composite import GUIDE_KINDS
-from test_design_examples import FT, FY50, IN, KIP, KIPFT, KSI, TOL, filled_member
 
 WC = 2323.0        # 145 lb/ft3
 KIPIN = KIPFT / 12

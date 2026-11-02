@@ -6,16 +6,15 @@ Design Examples I.6 and I.11 and Design Guide 6, Example 2.4.
 import json
 
 import pytest
+from conftest import ROOT, calculation_report
+from test_design_examples import EXTRA, KIP, KIPFT, encased_member, filled_member
+from test_design_guides import encased_w14x211
 
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import SteelCase
 from steel_design.reporting.document import report_blocks
 from steel_design.reporting.pdf import pdf_bytes
 from steel_design.sections.repository import SectionRepository
-
-from conftest import ROOT, calculation_report
-from test_design_examples import EXTRA, KIP, KIPFT, encased_member, filled_member
-from test_design_guides import encased_w14x211
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_i/reference.json").read_text(encoding="utf-8"))["cases"]
 DIAGRAMS = sorted(c for c, v in REFERENCE.items() if v["spec"]["kind"].startswith("diagram_"))

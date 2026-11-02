@@ -1,5 +1,6 @@
 """Interaction of filled and encased members: I5, Commentary I5 Method 2 and Appendix 2."""
-from ...codes.aisc_360_22 import appendix_2 as a2, composite as eq
+from ...codes.aisc_360_22 import appendix_2 as a2
+from ...codes.aisc_360_22 import composite as eq
 from ...codes.aisc_dg06 import members as dg06_members
 from ...errors import IncompleteSectionDataError
 from ...models import SteelCase

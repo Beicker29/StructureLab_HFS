@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class SteelDesignError(Exception):
@@ -6,12 +6,12 @@ class SteelDesignError(Exception):
 
     default_code = "STEEL_DESIGN_ERROR"
 
-    def __init__(self, message: str, *, code: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, *, code: str | None = None, details: dict[str, Any] | None = None):
         super().__init__(message)
         self.code = code or self.default_code
         self.details = details or {}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "type": self.__class__.__name__,
             "code": self.code,

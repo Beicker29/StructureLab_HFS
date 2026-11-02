@@ -7,17 +7,16 @@ the governing mode is the lowest Pn (E1). Domains that need data or decisions
 not available here raise structured errors instead of returning a strength.
 """
 import math
-from typing import Callable
+from collections.abc import Callable
 
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import compression as eq
 from ..codes.aisc_360_22.constants import G_STEEL, is_standard_modulus
+from ..errors import blocking_error, incomplete_error
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section, missing_properties
-from ..errors import blocking_error, incomplete_error
 from .fire import steel_at_temperature, with_fire
-
 
 SUPPORTED_FAMILIES = ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE",
                       "SOLID_RECTANGULAR", "SOLID_CIRCULAR")

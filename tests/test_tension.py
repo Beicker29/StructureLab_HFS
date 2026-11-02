@@ -7,10 +7,9 @@ import json
 import math
 
 import pytest
+from conftest import ROOT, calculation_report
 
 from steel_design.models import SteelCase
-
-from conftest import ROOT, calculation_report
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_d/reference.json").read_text(encoding="utf-8"))["cases"]
 REL = 1e-12

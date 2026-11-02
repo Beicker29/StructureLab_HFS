@@ -5,13 +5,12 @@ steel_design. Regenerates tests/fixtures/chapter_d/reference.json:
 
     python tests/oracles/chapter_d.py
 """
-from decimal import Decimal as D
 import json
+from decimal import Decimal as D
 from pathlib import Path
 
-from _common import _plain
-
 import openpyxl
+from _common import _plain
 
 ROOT = Path(__file__).resolve().parents[2]
 SHEETS = {"W": "W_IPE_HEA_HEB", "CHANNEL": "C", "RECTANGULAR_HSS": "PTE_RECT", "CIRCULAR_HSS": "PTE_RED",

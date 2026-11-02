@@ -7,13 +7,12 @@ import json
 import math
 
 import pytest
+from conftest import ROOT, calculation_report
 
 from steel_design.codes.aisc_360_22 import flexure as eq
 from steel_design.domain.flexure import flexure_strength
 from steel_design.errors import IncompleteSectionDataError
 from steel_design.models import SteelCase
-
-from conftest import ROOT, calculation_report
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_f/reference.json").read_text(encoding="utf-8"))["cases"]
 REL = 1e-9

@@ -1,12 +1,20 @@
 """Planar composite plate shear walls: I1.6 requirements, I3.5 flexure, I5(c) interaction; 4.2.4d(d) under fire."""
 import math
 
-from ...codes.aisc_360_22 import appendix_4 as a4, composite as eq
+from ...codes.aisc_360_22 import appendix_4 as a4
+from ...codes.aisc_360_22 import composite as eq
 from ...errors import IncompleteSectionDataError
 from ...models import SteelCase
 from ...sections.models import Section
 from ..fire import SLENDER_BLOCK, steel_at_temperature, with_fire_extension
-from .common import blocked, composite_materials, composite_result, concrete_profile, flexure_output, requirement_row
+from .common import (
+    blocked,
+    composite_materials,
+    composite_result,
+    concrete_profile,
+    flexure_output,
+    requirement_row,
+)
 
 
 def wall_geometry(case):

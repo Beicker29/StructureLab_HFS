@@ -7,7 +7,7 @@ Every limit state of the selected section is reported, either evaluated or with 
 reason it does not apply; the governing one is the lowest Mn. Formulas live in
 codes/aisc_360_22/flexure.py. Missing data or decisions raise structured errors.
 """
-from typing import Callable
+from collections.abc import Callable
 
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import flexure as eq

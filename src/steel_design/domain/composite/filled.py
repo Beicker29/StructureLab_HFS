@@ -1,10 +1,21 @@
 """Filled rectangular and round HSS: geometry, I2.2 compression basis, I3.4 flexure; 4.2.4d(c) under fire."""
 import math
 
-from ...codes.aisc_360_22 import appendix_2 as a2, appendix_4 as a4, composite as eq
-from ...codes.aisc_dg06 import filled as dg06, members as dg06_members
+from ...codes.aisc_360_22 import appendix_2 as a2
+from ...codes.aisc_360_22 import appendix_4 as a4
+from ...codes.aisc_360_22 import composite as eq
+from ...codes.aisc_dg06 import filled as dg06
+from ...codes.aisc_dg06 import members as dg06_members
 from ..fire import SLENDER_BLOCK, steel_at_temperature, with_fire_extension
-from .common import blocked, composite_materials, flexure_output, incomplete, require_properties, requirement_row, uses_appendix_2
+from .common import (
+    blocked,
+    composite_materials,
+    flexure_output,
+    incomplete,
+    require_properties,
+    requirement_row,
+    uses_appendix_2,
+)
 
 
 def filled_geometry(case, section):

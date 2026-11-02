@@ -5,9 +5,10 @@ Regenerates tests/fixtures/chapter_a4/reference.json:
 
     python tests/oracles/chapter_a4.py
 """
-from decimal import Decimal as D, getcontext
 import json
 import sys
+from decimal import Decimal as D
+from decimal import getcontext
 from pathlib import Path
 
 from _common import _plain

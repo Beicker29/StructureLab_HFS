@@ -7,13 +7,13 @@ import json
 import math
 
 import pytest
+from conftest import ROOT
 
 from steel_design.codes.aisc_360_22 import compression as eq
 from steel_design.domain.compression import compression_strength
 from steel_design.errors import IncompleteSectionDataError, RuleNotImplementedError
 from steel_design.models import SteelCase
 
-from conftest import ROOT
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_e/reference.json").read_text(encoding="utf-8"))["cases"]
 REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 

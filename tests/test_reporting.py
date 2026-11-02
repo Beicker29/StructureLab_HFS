@@ -5,16 +5,16 @@ import subprocess
 import sys
 
 import pytest
+from conftest import CATALOG, ROOT, calculation_report, steel_case
 
 from steel_design.execution import execute_payload, load_engine, member_groups
 from steel_design.models import SteelCase
-from steel_design.reporting import document, pdf as pdf_module
+from steel_design.reporting import document
+from steel_design.reporting import pdf as pdf_module
 from steel_design.reporting.document import report_blocks
 from steel_design.reporting.glossary import fmt
 from steel_design.reporting.pdf import pdf_bytes
 from steel_design.reporting.text import render_text
-
-from conftest import CATALOG, ROOT, calculation_report, steel_case
 
 
 def test_report_shows_inputs_modes_and_governing_values(engine):
@@ -311,7 +311,7 @@ def test_pdf_columns_hold_their_longest_word(monkeypatch):
         return original(minimums, weights, total)
 
     monkeypatch.setattr(pdf_module, "_column_widths", recorded)
-    for name, group in example_documents():
+    for _name, group in example_documents():
         pdf_bytes([report_blocks(group)])
     assert tight == []
 

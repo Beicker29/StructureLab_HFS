@@ -1,4 +1,3 @@
-from typing import Dict, Optional, List
 
 from ..errors import AmbiguousSectionError
 from .identity import section_identity
@@ -13,9 +12,9 @@ class SectionRepository:
     """
 
     def __init__(self):
-        self._sections: Dict[str, List[Section]] = {}
+        self._sections: dict[str, list[Section]] = {}
 
-    def load(self, sections: List[Section]):
+    def load(self, sections: list[Section]):
         # Validate the entire batch before changing the index. Deep snapshots
         # prevent caller mutation from changing an identity or its evidence.
         batch = []
@@ -25,7 +24,7 @@ class SectionRepository:
         for identity, record in batch:
             self._sections.setdefault(identity, []).append(record)
 
-    def get(self, name: str) -> Optional[Section]:
+    def get(self, name: str) -> Section | None:
         identity = section_identity(name)
         records = self._sections.get(identity, [])
         if len(records) > 1:

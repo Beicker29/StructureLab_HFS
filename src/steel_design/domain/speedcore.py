@@ -8,7 +8,15 @@ from ..codes.aisc_dg38 import walls as dg38
 from ..errors import IncompleteSectionDataError
 from ..models import SteelCase
 from ..sections.models import Section
-from .composite.common import blocked, check_family, composite_materials, composite_result, concrete_profile, incomplete, requirement_row
+from .composite.common import (
+    blocked,
+    check_family,
+    composite_materials,
+    composite_result,
+    concrete_profile,
+    incomplete,
+    requirement_row,
+)
 from .composite.wall import wall_strip_at_temperature
 from .fire import SLENDER_BLOCK, steel_at_temperature, with_fire, with_fire_extension
 

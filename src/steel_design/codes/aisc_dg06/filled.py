@@ -7,7 +7,6 @@ import math
 from ..aisc_360_22.constants import E_STEEL
 
 
-
 def _segment(r, y):
     """Area, first moment and second moment about the center of the part of a circle above y."""
     if y >= r:
