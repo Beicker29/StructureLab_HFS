@@ -7,7 +7,7 @@ lowest Pn, because their resistance factors differ (D2). LRFD only. Formulas liv
 import math
 
 from ..codes.aisc_360_22 import tension as eq
-from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..errors import RuleNotImplementedError, incomplete_error
 from ..models import SteelCase
 from ..sections.models import Section
 from .fire import steel_at_temperature, with_fire
@@ -19,9 +19,7 @@ _LIMITATIONS = (
 )
 
 
-def _incomplete(reason, section, fields):
-    raise IncompleteSectionDataError(reason, code="TENSION_DATA_INCOMPLETE",
-                                     details={"section": section.name, "profile_type": section.type, "fields": fields})
+_incomplete = incomplete_error("TENSION_DATA_INCOMPLETE")
 
 
 def least_radius(section: Section) -> float | None:

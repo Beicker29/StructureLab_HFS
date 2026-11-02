@@ -14,9 +14,9 @@ from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..codes.aisc_dg06 import filled as dg06
 from ..codes.aisc_dg06 import members as dg06_members
-from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..errors import IncompleteSectionDataError, blocking_error, incomplete_error
 from ..models import SteelCase
-from ..sections.models import Section
+from ..sections.models import Section, missing_properties
 from .fire import EXTENSION, steel_at_temperature, with_fire
 
 _LIMITATIONS = (
@@ -27,18 +27,14 @@ _LIMITATIONS = (
 )
 
 
-def _blocked(reason, section, **details):
-    raise RuleNotImplementedError(reason, code="COMPOSITE_DOMAIN_BLOCKED",
-                                  details={"section": section.name, "profile_type": section.type, **details})
+_blocked = blocking_error("COMPOSITE_DOMAIN_BLOCKED")
 
 
-def _incomplete(reason, section, fields):
-    raise IncompleteSectionDataError(reason, code="COMPOSITE_DATA_INCOMPLETE",
-                                     details={"section": section.name, "fields": fields})
+_incomplete = incomplete_error("COMPOSITE_DATA_INCOMPLETE", with_type=False)
 
 
 def _require(section, *names):
-    missing = [n for n in names if not (isinstance(getattr(section, n), (int, float)) and getattr(section, n) > 0)]
+    missing = missing_properties(section, names)
     if missing:
         _incomplete("El Capítulo I requiere estas propiedades de la sección.", section,
                     ["section." + n for n in missing])

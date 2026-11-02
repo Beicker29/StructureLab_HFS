@@ -10,10 +10,10 @@ import math
 
 from ..codes.aisc_360_22 import shear as eq
 from ..codes.aisc_360_22.constants import is_standard_modulus
-from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..errors import IncompleteSectionDataError, blocking_error
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
-from ..sections.models import Section
+from ..sections.models import Section, missing_properties
 from .fire import steel_at_temperature, with_fire
 
 _LIMITATIONS = (
@@ -23,14 +23,11 @@ _LIMITATIONS = (
 )
 
 
-def _blocked(reason, section, **details):
-    raise RuleNotImplementedError(reason, code="SHEAR_DOMAIN_BLOCKED",
-                                  details={"section": section.name, "profile_type": section.type, **details})
+_blocked = blocking_error("SHEAR_DOMAIN_BLOCKED")
 
 
 def _require(section, *names):
-    missing = [n for n in names if not (isinstance(getattr(section, n), (int, float))
-                                        and math.isfinite(getattr(section, n)) and getattr(section, n) > 0)]
+    missing = missing_properties(section, names)
     if missing:
         raise IncompleteSectionDataError("El cortante requiere estas propiedades de la sección.",
                                          code="SHEAR_DATA_INCOMPLETE",

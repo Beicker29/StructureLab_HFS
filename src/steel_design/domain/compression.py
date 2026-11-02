@@ -14,8 +14,8 @@ from ..codes.aisc_360_22 import compression as eq
 from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
-from ..sections.models import Section
-from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..sections.models import Section, missing_properties
+from ..errors import blocking_error, incomplete_error
 from .fire import steel_at_temperature, with_fire
 
 
@@ -40,25 +40,16 @@ _GENERAL_LIMITATIONS = (
 )
 
 
-def _blocked(reason, section, **details):
-    raise RuleNotImplementedError(reason, code="COMPRESSION_DOMAIN_BLOCKED",
-                                  details={"section": section.name, "profile_type": section.type, **details})
+_blocked = blocking_error("COMPRESSION_DOMAIN_BLOCKED")
 
 
-def _incomplete(reason, section, fields):
-    raise IncompleteSectionDataError(reason, code="COMPRESSION_DATA_INCOMPLETE",
-                                     details={"section": section.name, "profile_type": section.type,
-                                              "fields": fields})
+_incomplete = incomplete_error("COMPRESSION_DATA_INCOMPLETE")
 
 
 def _require(section, *names):
-    missing = [name for name in names if not _positive(getattr(section, name))]
+    missing = missing_properties(section, names)
     if missing:
         _incomplete("La compresión requiere estas propiedades de la sección.", section, ["section." + n for n in missing])
-
-
-def _positive(value):
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
 
 
 def _angle_legs(section):

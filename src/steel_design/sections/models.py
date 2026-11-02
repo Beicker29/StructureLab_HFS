@@ -1,3 +1,4 @@
+import math
 from typing import Optional
 from pydantic import ConfigDict, Field
 from ..models import InputModel, NonNegativeNumber, NonBlankString, PositiveCount
@@ -73,3 +74,10 @@ class Section(InputModel):
     d_t_ratio: Optional[NonNegativeNumber] = Field(None, alias="D/t", description="D/t slenderness")
 
     model_config = ConfigDict(populate_by_name=True)
+
+
+def missing_properties(section: Section, names) -> list[str]:
+    """The names of the properties that the catalog does not give as finite positive numbers."""
+    def given(value):
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
+    return [name for name in names if not given(getattr(section, name))]

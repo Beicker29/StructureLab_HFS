@@ -13,10 +13,10 @@ from typing import Callable
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import flexure as eq
 from ..codes.aisc_360_22.constants import is_standard_modulus
-from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..errors import blocking_error, incomplete_error
 from ..models import FlexureBasis, SteelCase
 from ..sections.identity import double_angle_label
-from ..sections.models import Section
+from ..sections.models import Section, missing_properties
 from .fire import steel_at_temperature, with_fire
 
 _LIMITATIONS = (
@@ -27,19 +27,14 @@ _LIMITATIONS = (
 )
 
 
-def _blocked(reason, section, **details):
-    raise RuleNotImplementedError(reason, code="FLEXURE_DOMAIN_BLOCKED",
-                                  details={"section": section.name, "profile_type": section.type, **details})
+_blocked = blocking_error("FLEXURE_DOMAIN_BLOCKED")
 
 
-def _incomplete(reason, section, fields):
-    raise IncompleteSectionDataError(reason, code="FLEXURE_DATA_INCOMPLETE",
-                                     details={"section": section.name, "profile_type": section.type, "fields": fields})
+_incomplete = incomplete_error("FLEXURE_DATA_INCOMPLETE")
 
 
 def _require(section, *names):
-    missing = [n for n in names if not (isinstance(getattr(section, n), (int, float))
-                                        and math.isfinite(getattr(section, n)) and getattr(section, n) > 0)]
+    missing = missing_properties(section, names)
     if missing:
         _incomplete("La flexión requiere estas propiedades de la sección.", section, ["section." + n for n in missing])
 

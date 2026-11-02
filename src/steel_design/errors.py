@@ -54,3 +54,18 @@ class IncompleteSectionDataError(SteelDesignError):
     """Raised when a rule is applicable but required section properties are missing."""
 
     default_code = "INCOMPLETE_SECTION_DATA"
+
+
+def blocking_error(code: str):
+    """The raiser of one domain for what the program does not cover."""
+    def blocked(reason, section, **details):
+        raise RuleNotImplementedError(reason, code=code, details={"section": section.name, "profile_type": section.type, **details})
+    return blocked
+
+
+def incomplete_error(code: str, *, with_type: bool = True):
+    """The raiser of one domain for missing data."""
+    def incomplete(reason, section, fields):
+        details = {"section": section.name, "profile_type": section.type, "fields": fields} if with_type else {"section": section.name, "fields": fields}
+        raise IncompleteSectionDataError(reason, code=code, details=details)
+    return incomplete
