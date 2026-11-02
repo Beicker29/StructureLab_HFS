@@ -793,7 +793,11 @@ def diagram_round(name, fy, fc):
     pe = pa - fy_ * (d**2 - h**2) * (t2 - math.sin(t2)) / 4 - 0.95 * fc_ * h**2 * (t2 - math.sin(t2)) / 8
     me = fy_ * (d**3 - h**3) / 6 * math.sin(t2 / 2) + 0.95 * fc_ * h**3 / 6 * math.sin(t2 / 2) ** 3 / 2
     c = 0.95 * fc_ * Ac
-    return _points(A=(D(pa), D(0)), E=(D(pe), D(me)), C=(D(c), D(mb)), D=(D(c / 2), D(md)), B=(D(0), D(mb)))
+    def fixed(value):
+        """12 significant digits: the last bits of float trigonometry depend on the platform, and the reference must not."""
+        return D(f"{value:.12g}")
+
+    return _points(A=(fixed(pa), D(0)), E=(fixed(pe), fixed(me)), C=(fixed(c), fixed(mb)), D=(fixed(c / 2), fixed(md)), B=(D(0), fixed(mb)))
 
 
 def diagram_encased(name, fy, fc, H, B, Fysr, bars, axis="x"):
