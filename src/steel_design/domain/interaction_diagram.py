@@ -7,7 +7,9 @@ from ..codes.aisc_360_22 import composite as eq
 from ..codes.aisc_dg06 import interaction_tables as tables
 from ..models import Check, SteelCase
 from ..sections.models import Section
-from .composite import _encased_geometry, _filled_geometry, composite_materials, uses_appendix_2
+from .composite.common import composite_materials, uses_appendix_2
+from .composite.encased import encased_geometry
+from .composite.filled import filled_geometry
 
 TOLERANCE_MM = 1e-6
 TITLES = {"6-2a": "Tabla 6-2a del Manual (Guía 6, Fig. 2-7)", "6-2b": "Tabla 6-2b del Manual (Guía 6, Fig. 2-8)",
@@ -64,7 +66,7 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
         elif uses_appendix_2(case, section):
             reason = "materiales de alta resistencia: rige el Apéndice 2 (Guía 6, 2.6), sin tablas de diagrama."
         elif composite.kind == "filled":
-            geometry = _filled_geometry(case, section)
+            geometry = filled_geometry(case, section)
             classes = {row["class"] for c in (flexure, *([axial] if axial else [])) for row in c.result["classification"]["elements"]}
             if geometry["Asr"] > 0:
                 reason = "Asr ≠ 0: las Tablas 6-3 y 6-4 no incluyen barras."
@@ -73,7 +75,7 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
             else:
                 table, points = _filled_points(case, section, geometry, axis)
         else:
-            table, points = _encased_points(case, section, _encased_geometry(case, section), axis)
+            table, points = _encased_points(case, section, encased_geometry(case, section), axis)
             if table is None:
                 reason, points = points, None
         if reason:

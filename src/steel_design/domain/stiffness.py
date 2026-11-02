@@ -15,7 +15,9 @@ from ..errors import SteelDesignError
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section
-from .composite import _check_family, _compression_basis, _wall_geometry
+from .composite.common import check_family
+from .composite.members import compression_basis
+from .composite.wall import wall_geometry
 from .speedcore import _c_wall_data
 
 NO_APLICA, FALTA, SIN_DATO = "no_aplica", "falta_implementacion", "sin_dato"
@@ -86,7 +88,7 @@ def _filled_or_encased(case, section, catalog):
     """Elastic: Design Guide 6, 2.8. Effective: I2-5, I2-12; EA is the elastic one and (GA)eff = Gc*Ac (DI-20). Direct analysis: 0.8 on them."""
     kind = case.composite.kind
     Ec, Es = eq.concrete_modulus(wc=case.composite.concrete.wc, fc=case.composite.concrete.fc), eq.E_STEEL
-    basis = _compression_basis(case, section)
+    basis = compression_basis(case, section)
     g, C, Isrx, Isry = basis["geometry"], basis["coefficient"], basis["Isrx"], basis["Isry"]
     As, Ac, Asr = section.area, g["Ac"], g.get("Asr", 0.0)
     Gc = 0.4 * Ec
@@ -162,14 +164,14 @@ def _wall_rows(case, Is_x, Is_y, Ic_x, Ic_y, As, Asw, Ac, Ac_shear, Ec):
 
 def _composite(case, section, catalog):
     kind = case.composite.kind
-    _check_family(case, section)
+    check_family(case, section)
     Ec = eq.concrete_modulus(wc=case.composite.concrete.wc, fc=case.composite.concrete.fc)
     no_guide = [_absent("EA, EI, GA, GJ", FALTA, "La Guía 6, 2.8, trata columnas rellenas y embebidas; no hay expresión implementada "
                                                  "para este miembro.")]
     if kind in {"filled", "encased"}:
         return _filled_or_encased(case, section, catalog)
     if kind == "wall":
-        g = _wall_geometry(case)
+        g = wall_geometry(case)
         geometry = {"Ac_mm2": g["Ac"], "Icx_mm4": g["Icx"], "Icy_mm4": g["Icy"]}
         return (Ec, geometry, no_guide, *_wall_rows(case, section.ix, section.iy, g["Icx"], g["Icy"], section.area, g["Asw"], g["Ac"], g["Ac"], Ec))
     if kind == "c_wall":

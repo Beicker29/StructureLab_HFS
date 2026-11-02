@@ -12,8 +12,11 @@ from ..codes.aisc_dg38 import walls as dg38
 from ..errors import SteelDesignError
 from ..models import Check, SteelCase
 from ..sections.models import Section
-from .composite import (_beam_requirements, _encased_geometry, _encased_requirements, _filled_geometry, _filled_requirements,
-                        _wall_geometry, _wall_is_slender, _wall_requirements, missing_anchor_detailing, uses_appendix_2)
+from .composite.beam import beam_requirements, missing_anchor_detailing
+from .composite.common import uses_appendix_2
+from .composite.encased import encased_geometry, encased_requirements
+from .composite.filled import filled_geometry, filled_requirements
+from .composite.wall import wall_geometry, wall_is_slender, wall_requirements
 from .speedcore import _c_wall_data, _c_wall_requirements
 from .tension import least_radius
 
@@ -131,7 +134,7 @@ def _wall_placement(case):
     if Lp is None:
         return [_pour_height_missing(provision)]
     return [_limit("Altura de colado con placas que cumplen I1-4", Lp, f"≤ {dg38.WET_CONCRETE_POUR_HEIGHT:g} mm", provision,
-                   Lp <= dg38.WET_CONCRETE_POUR_HEIGHT and not _wall_is_slender(case), binding=False, qualifier=GUIDE_RECOMMENDATION)]
+                   Lp <= dg38.WET_CONCRETE_POUR_HEIGHT and not wall_is_slender(case), binding=False, qualifier=GUIDE_RECOMMENDATION)]
 
 
 def _composite_geometry(case, section):
@@ -141,27 +144,27 @@ def _composite_geometry(case, section):
     aci = _absent("Detallado del concreto y del refuerzo según ACI 318", "I1.1", FALTA, "El programa no revisa ACI 318.")
     only_shear = "Requisito de miembros con compresión o flexión; la combinación no las tiene."
     if kind == "filled":
-        geometry = _filled_geometry(case, section)
+        geometry = filled_geometry(case, section)
         groups = []
         if case.Pu > 0:
-            groups.append(_filled_requirements(case, section, geometry, flexure=False))
+            groups.append(filled_requirements(case, section, geometry, flexure=False))
         if moments:
-            groups.append(_filled_requirements(case, section, geometry, flexure=True))
+            groups.append(filled_requirements(case, section, geometry, flexure=True))
         rows = _from_section(_merged(*groups)) if demand else [_absent("Cuantías y separaciones de I2.2a e I3.4a", "I2.2a, I3.4a", NO_APLICA, only_shear)]
         return [_filled_ratio_row(case, section, geometry)] + rows + _filled_placement(case, section, geometry) + [aci]
     if kind == "encased":
-        geometry = _encased_geometry(case, section)
-        rows = _from_section(_encased_requirements(case, section, geometry)) if demand else [
+        geometry = encased_geometry(case, section)
+        rows = _from_section(encased_requirements(case, section, geometry)) if demand else [
             _absent("Cuantías y separaciones de I2.1a", "I2.1a", NO_APLICA, only_shear)]
         return rows + [aci]
     if kind == "wall":
-        geometry = _wall_geometry(case)
-        return _from_section(_wall_requirements(case, section, geometry, compression=case.Pu > 0)) + _wall_placement(case) + [aci]
+        geometry = wall_geometry(case)
+        return _from_section(wall_requirements(case, section, geometry, compression=case.Pu > 0)) + _wall_placement(case) + [aci]
     if kind == "c_wall":
         return _from_section(_c_wall_requirements(case, _c_wall_data(case)[2])) + [aci]
     if kind == "beam":
         beam = case.composite.beam
-        rows = _from_section(_beam_requirements(beam, section, case.composite.concrete))
+        rows = _from_section(beam_requirements(beam, section, case.composite.concrete))
         missing_fields = missing_anchor_detailing(beam) if beam.moment == "positive" else []
         if missing_fields:
             rows.append(_absent("Detallado de los conectores", "I8.2d", SIN_DATO, f"Indique {', '.join(missing_fields)}."))

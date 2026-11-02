@@ -6,9 +6,11 @@ and flexure acting together, or flexure about two axes, add the interaction chec
 case.composite sends each demand to Chapter I, which uses Chapters E, F and G where it refers to them.
 Section stiffnesses (domain/stiffness.py) are reported whatever the demands.
 """
-from .domain.composite import (default_interaction, requested_interaction_replaced, composite_anchor, composite_appendix_2_interaction, composite_compression, composite_flexure,
-                               composite_i5, composite_method2, composite_shear,
-                               composite_tension, composite_wall_interaction, second_order_demands, uses_appendix_2)
+from .domain.composite.anchor import composite_anchor
+from .domain.composite.common import uses_appendix_2
+from .domain.composite.interaction import composite_appendix_2_interaction, composite_i5, composite_method2, default_interaction, requested_interaction_replaced
+from .domain.composite.members import composite_compression, composite_flexure, composite_shear, composite_tension, second_order_demands
+from .domain.composite.wall import composite_wall_interaction
 from .domain.speedcore import (c_wall_compression, c_wall_flexure, c_wall_interaction, c_wall_shear, c_wall_tension,
                                coupling_beam_axial, coupling_beam_flexure, coupling_beam_shear, wall_fire)
 from .domain.compression import compression_strength
