@@ -12,6 +12,7 @@ from typing import Callable
 
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import flexure as eq
+from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import FlexureBasis, SteelCase
 from ..sections.identity import double_angle_label
@@ -371,7 +372,7 @@ def flexure_strength(case: SteelCase, section: Section, axis: str,
     family = section.type.upper()
     E, Fy = case.material.E, case.material.Fy
     basis = case.flexure or FlexureBasis()
-    if abs(E - eq.E_STEEL) > 1e-6:
+    if not is_standard_modulus(E):
         _incomplete("El Capítulo F usa E = 200000 MPa.", section, ["material.E"])
     hot = steel_at_temperature(case)
     if hot:                                  # The classification stays at ambient temperature (Commentary 4.2.4d): limits use case.material

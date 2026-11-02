@@ -6,7 +6,8 @@ equation identifier actually applied. F7 numbering follows errata E25-02
 """
 import math
 
-E_STEEL = 200000.0  # MPa
+from .constants import E_STEEL
+
 PHI_B = 0.90        # F1(a), LRFD
 
 # Table B4.1b (flexure): case -> (lambda_p coefficient, lambda_r coefficient, form)

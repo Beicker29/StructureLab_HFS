@@ -11,6 +11,7 @@ from ..codes.aisc_360_22 import appendix_2 as a2
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import appendix_8 as a8
 from ..codes.aisc_360_22 import composite as eq
+from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..codes.aisc_dg06 import filled as dg06
 from ..codes.aisc_dg06 import members as dg06_members
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
@@ -64,7 +65,7 @@ def _check_family(case, section):
     if family not in allowed:
         _blocked(f"composite.kind = {composite.kind} no se aplica a esta familia en el alcance implementado.", section,
                  kind=composite.kind)
-    if abs(case.material.E - eq.E_STEEL) > 1e-6:
+    if not is_standard_modulus(case.material.E):
         _incomplete("El Capítulo I usa Es = 200000 MPa.", section, ["material.E"])
     if uses_appendix_2(case, section):
         return

@@ -1,7 +1,8 @@
 """ANSI/AISC 360-22 Appendix 2: rectangular filled composite members with high-strength materials. Units N, mm, MPa. LRFD."""
 import math
 
-E_STEEL = 200000.0
+from .constants import E_STEEL
+
 FY_MAX = 690.0       # 2.1.1(c)
 FC_MAX = 100.0       # 2.1.1(b)
 FY_I13 = 525.0       # I1.3(b)

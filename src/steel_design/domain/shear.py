@@ -9,6 +9,7 @@ stiffeners. Formulas live in codes/aisc_360_22/shear.py. Missing data or decisio
 import math
 
 from ..codes.aisc_360_22 import shear as eq
+from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
@@ -143,7 +144,7 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
     """Nominal and design shear strength in one direction ("x": accompanies Mux; "y": accompanies Muy)."""
     family = section.type.upper()
     E, Fy = case.material.E, case.material.Fy
-    if abs(E - eq.E_STEEL) > 1e-6:
+    if not is_standard_modulus(E):
         raise IncompleteSectionDataError("El Capítulo G usa E = 200000 MPa.", code="SHEAR_DATA_INCOMPLETE",
                                          details={"section": section.name, "fields": ["material.E"]})
     if family in {"W", "CHANNEL"}:

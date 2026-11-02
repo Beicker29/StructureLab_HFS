@@ -1,5 +1,6 @@
 """AISC Design Guide 6, 2nd ed. (2025), member checks that ANSI/AISC 360-22 does not print. Not a standard. Units N, mm, MPa."""
-E_STEEL = 200000.0
+from ..aisc_360_22.constants import E_STEEL
+
 BIAXIAL_ALPHA = {"encased": 1.25, "rect": 1.5, "round": 2.0}     # Section 2.3.2 (Behnam and Denavit, 2021)
 
 

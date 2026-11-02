@@ -11,6 +11,7 @@ from typing import Callable
 
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import compression as eq
+from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..models import SteelCase
 from ..sections.identity import double_angle_label
 from ..sections.models import Section
@@ -365,7 +366,7 @@ def compression_strength(case: SteelCase, section: Section,
     """
     family = section.type.upper()
     E, Fy = case.material.E, case.material.Fy
-    if abs(E - eq.E_STEEL) > 1e-6:
+    if not is_standard_modulus(E):
         _incomplete("El Capítulo E define E = 200000 MPa.", section, ["material.E"])
     component = in_contact = None
     if family == "DOUBLE_ANGLE":

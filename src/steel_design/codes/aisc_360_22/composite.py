@@ -4,7 +4,8 @@ Stress blocks of filled rectangular sections: Commentary Fig. C-I3.8. Selection 
 """
 import math
 
-E_STEEL = 200000.0   # MPa, I2.1b
+from .constants import E_STEEL, G_STEEL
+
 PHI_C = 0.75         # I2.1b
 PHI_T = 0.90         # I2.1c, I2.2c
 PHI_B = 0.90         # I3.2a, I3.3a, I3.4b
@@ -14,7 +15,6 @@ PHI_V_WALL = 0.90    # I4.4
 PHI_STUD_V = 0.65    # I8.3a
 PHI_STUD_T = 0.75    # I8.3b
 PHI_CHANNEL = 0.75   # I8.3d
-G_STEEL = 77200.0    # MPa, I1.5
 
 
 def concrete_modulus(*, wc, fc) -> float:

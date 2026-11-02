@@ -4,7 +4,8 @@ Yield moment of a round filled section with internal bars (Example 2.7, Fig. 2-1
 """
 import math
 
-E_STEEL = 200000.0
+from ..aisc_360_22.constants import E_STEEL
+
 
 
 def _segment(r, y):

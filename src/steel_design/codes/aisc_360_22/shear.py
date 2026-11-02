@@ -5,7 +5,8 @@ stiffeners (G2.4) are not implemented. Selection lives in domain/shear.py.
 """
 import math
 
-E_STEEL = 200000.0     # MPa, as stated in G2.1(a)
+from .constants import E_STEEL
+
 PHI_V = 0.90          # G1(a)
 PHI_V_ROLLED = 1.00   # G2.1(a): webs of rolled I-shapes with h/tw <= 2.24*sqrt(E/Fy)
 KV_UNSTIFFENED = 5.34  # G2.1(b)(2)(i)

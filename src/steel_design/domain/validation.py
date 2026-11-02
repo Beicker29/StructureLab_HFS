@@ -2,6 +2,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from ..models import SteelCase
 from ..sections.models import Section
+from ..codes.aisc_360_22.constants import is_standard_modulus
 from ..errors import ValidationError
 
 
@@ -12,7 +13,7 @@ def validate_case(case: SteelCase) -> SteelCase:
     except PydanticValidationError as exc:
         raise ValidationError("Entrada del caso no válida.", details={"fields": exc.errors(
             include_url=False, include_context=False, include_input=False)}) from exc
-    if (case.Pu > 0 or case.Mux or case.Muy or case.Mw or case.Mz) and abs(case.material.E - 200000.0) > 1e-6:
+    if (case.Pu > 0 or case.Mux or case.Muy or case.Mw or case.Mz) and not is_standard_modulus(case.material.E):
         raise ValidationError("Los Capítulos E y F definen E = 200000 MPa.", details={"E_received": case.material.E})
     return case
 

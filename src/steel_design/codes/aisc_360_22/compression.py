@@ -7,8 +7,8 @@ actually applied. Units: N, mm, MPa. Selection lives in domain/compression.py.
 import math
 
 
-E_STEEL = 200000.0   # MPa, S22 E3 (definition of E)
-G_STEEL = 77200.0    # MPa, S22 E4 (definition of G)
+from .constants import E_STEEL, G_STEEL
+
 PHI_C = 0.90         # S22 E1, LRFD
 
 # Table B4.1a, members subjected to axial compression: case -> (coefficient, form)
