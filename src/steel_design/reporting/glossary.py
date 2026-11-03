@@ -83,6 +83,23 @@ PARAMETERS = {
     "note": ("Observación", "", "–"),
     "rts_mm": ("Radio de giro efectivo", "rts", "mm"),
     "t_mm": ("Espesor del elemento", "t", "mm"),
+    "kc": ("Coeficiente de pandeo del ala armada", "kc", "–"),
+    "FL_mpa": ("Esfuerzo nominal del ala comprimida desde el que rige el pandeo inelástico", "FL", "MPa"),
+    "rt_mm": ("Radio de giro efectivo para pandeo lateral-torsional", "rt", "mm"),
+    "aw": ("Relación entre el doble del área comprimida del alma y el área del ala comprimida", "aw", "–"),
+    "aw_Rpg": ("aw usado en Rpg, no mayor que 10", "aw", "–"),
+    "J_used_mm4": ("Constante torsional usada (0 si Iyc/Iy ≤ 0.23)", "J", "mm⁴"),
+    "Sxc": ("Módulo elástico referido al ala comprimida", "Sxc", "mm³"),
+    "Sxt": ("Módulo elástico referido al ala traccionada", "Sxt", "mm³"),
+    "Iyc_Iy": ("Relación entre la inercia del ala comprimida y la de la sección respecto de y", "Iyc/Iy", "–"),
+    "hc_mm": ("Doble de la distancia del centroide a la cara interior del ala comprimida", "hc", "mm"),
+    "Rpc": ("Factor de plastificación del alma (ala comprimida)", "Rpc", "–"),
+    "Rpt": ("Factor de plastificación del alma (ala traccionada)", "Rpt", "–"),
+    "Rpg": ("Factor de reducción de la resistencia a flexión", "Rpg", "–"),
+    "Mp_Rpc": ("Momento plástico, no mayor que 1.6·Fy·Sxc", "Mp", "N·mm"),
+    "Mp_Rpt": ("Momento plástico, no mayor que 1.6·Fy·Sxt", "Mp", "N·mm"),
+    "Myc": ("Momento de fluencia del ala comprimida", "Myc", "N·mm"),
+    "Myt": ("Momento de fluencia del ala traccionada", "Myt", "N·mm"),
     # Chapter G
     "Ag_mm2": ("Área bruta", "Ag", "mm²"),
     "Aw_mm2": ("Área del alma", "Aw", "mm²"),
@@ -95,6 +112,8 @@ PARAMETERS = {
     "Lv_mm": ("Distancia del cortante máximo al cortante nulo", "Lv", "mm"),
     "Vn_kN": ("Resistencia nominal a cortante", "Vn", "kN"),
     "Vn_per_flange_N": ("Resistencia nominal de un ala", "Vn", "N"),
+    "Vn_top_flange_N": ("Resistencia nominal del ala superior", "Vn", "N"),
+    "Vn_bottom_flange_N": ("Resistencia nominal del ala inferior", "Vn", "N"),
     "flanges": ("Alas que resisten", "", "–"),
     "h_mm": ("Ancho que resiste el cortante", "h", "mm"),
     "legs": ("Alas del ángulo que resisten", "", "–"),
@@ -221,7 +240,8 @@ LIMIT_STATES = {"tensile_yielding": "fluencia en la sección bruta", "tensile_ru
                 "constrained_axis_torsional_buckling": "pandeo torsional con arriostramiento desplazado"}
 FLEXURE_STATES = {"Y": "fluencia (momento plástico)", "LTB": "pandeo lateral-torsional", "FLB": "pandeo local del ala",
                   "WLB": "pandeo local del alma", "LB": "pandeo local", "TFR": "rotura del ala traccionada",
-                  "LLB": "pandeo local del ala del ángulo"}
+                  "LLB": "pandeo local del ala del ángulo", "CFY": "fluencia del ala comprimida",
+                  "TFY": "fluencia del ala traccionada"}
 
 EQUATION_OF = {
     "Ae_mm2": "Ae_equation",
@@ -239,6 +259,12 @@ EQUATION_OF = {
     "Fcr": "Fcr_equation",
     "Pno_kN": "Pno_equation",
     "Pno_T_kN": "Pno_equation",
+    "Rpc": "Rpc_equation",
+    "Rpt": "Rpt_equation",
+    "Rpg": "Rpg_equation",
+    "rt_mm": "rt_equation",
+    "FL_mpa": "FL_equation",
+    "Fcr_mpa": "Fcr_equation",
 }
 
 # Value key -> literal. Definitions printed in the text of a360-22w.pdf.
@@ -273,6 +299,8 @@ SECTION_PROPERTIES = {
     "b": ("Ancho plano de la pared o ancho del ala", "b"),
     "od": ("Diámetro exterior", "D"),
     "tf": ("Espesor del ala", "tf"),
+    "bf_bottom": ("Ancho del ala inferior", "bf,inf"),
+    "tf_bottom": ("Espesor del ala inferior", "tf,inf"),
     "t": ("Espesor nominal", "t"),
     "tdes": ("Espesor de diseño", "tdes"),
     "tw": ("Espesor del alma", "tw"),

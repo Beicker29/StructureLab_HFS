@@ -111,6 +111,9 @@ class FlexureBasis(InputModel):
     tension_cb_amplification: StrictBool = Field(
         False, description="H1.2: multiply Cb by sqrt(1 + Pr/Pey) when axial tension acts with flexure "
                            "(doubly symmetric members only)")
+    compression_flange: Literal["top", "bottom"] | None = Field(
+        None, description="I-shapes with unequal flanges (F4, F5), bending about x: flange in flexural compression in this "
+                          "combination; required, it is not deduced from the sign of Mux")
 
     @model_validator(mode="after")
     def holes_need_net_area(self):
@@ -473,6 +476,12 @@ class CompositeBasis(InputModel):
 class CustomSectionType(str, Enum):
     SOLID_CIRCULAR = "SOLID_CIRCULAR"
     SOLID_RECTANGULAR = "SOLID_RECTANGULAR"
+    I_BUILT_UP = "I_BUILT_UP"
+
+
+class FlangePlate(InputModel):
+    b: PositiveNumber = Field(..., description="Flange plate width (mm)")
+    t: PositiveNumber = Field(..., description="Flange plate thickness (mm)")
 
 
 class CustomSection(InputModel):
@@ -480,14 +489,18 @@ class CustomSection(InputModel):
     diameter: PositiveNumber | None = Field(None, description="Diameter of a solid circular section (mm)")
     H: PositiveNumber | None = Field(None, description="Height of a solid rectangular section (mm)")
     B: PositiveNumber | None = Field(None, description="Width of a solid rectangular section (mm)")
+    d: PositiveNumber | None = Field(None, description="Welded built-up I: total depth (mm)")
+    tw: PositiveNumber | None = Field(None, description="Welded built-up I: web thickness (mm)")
+    top_flange: FlangePlate | None = Field(None, description="Welded built-up I: top flange plate")
+    bottom_flange: FlangePlate | None = Field(None, description="Welded built-up I: bottom flange plate")
 
     @model_validator(mode="after")
     def validate_dimensions(self):
-        circular = self.type == CustomSectionType.SOLID_CIRCULAR
-        if circular and (self.diameter is None or self.H is not None or self.B is not None):
-            raise ValueError("SOLID_CIRCULAR requires diameter only.")
-        if not circular and (self.H is None or self.B is None or self.diameter is not None):
-            raise ValueError("SOLID_RECTANGULAR requires H and B only.")
+        given = {name for name in ("diameter", "H", "B", "d", "tw", "top_flange", "bottom_flange") if getattr(self, name) is not None}
+        needed = {CustomSectionType.SOLID_CIRCULAR: {"diameter"}, CustomSectionType.SOLID_RECTANGULAR: {"H", "B"},
+                  CustomSectionType.I_BUILT_UP: {"d", "tw", "top_flange", "bottom_flange"}}[self.type]
+        if given != needed:
+            raise ValueError(f"{self.type.value} requires {', '.join(sorted(needed))} only.")
         return self
 
 

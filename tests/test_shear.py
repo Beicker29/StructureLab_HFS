@@ -20,6 +20,10 @@ def shear_case(spec, shear=1.0):
         data.update(section_name="BAR", custom_section={"type": "SOLID_RECTANGULAR", "H": spec["H"], "B": spec["B"]})
     elif spec["kind"] == "round":
         data.update(section_name="ROUND", custom_section={"type": "SOLID_CIRCULAR", "diameter": spec["D_"]})
+    elif spec["kind"] == "bui":
+        data.update(section_name="PL", custom_section={
+            "type": "I_BUILT_UP", "d": spec["d"], "tw": spec["tw"], "top_flange": {"b": spec["top"][0], "t": spec["top"][1]},
+            "bottom_flange": {"b": spec["bottom"][0], "t": spec["bottom"][1]}})
     else:
         data["section_name"] = spec["name"]
     if spec.get("Lv"):
@@ -39,7 +43,7 @@ def test_catalog_profiles_match_independent_calculation(engine, case_id):
 
 def test_reference_bank_covers_every_section_and_coefficient():
     kinds = {c["spec"]["kind"] for c in REFERENCE.values()}
-    assert kinds == {"i", "rhss", "chss", "angle", "bar", "round"}
+    assert kinds == {"i", "rhss", "chss", "angle", "bar", "round", "bui"}
     assert {c["phi_v"] for c in REFERENCE.values()} == {"1.00", "0.90"}         # G2.1(a) and G1(a)
 
 

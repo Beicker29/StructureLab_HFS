@@ -1,7 +1,8 @@
 """Independent Chapter F hand calculations (ANSI/AISC 360-22, a360-22w.pdf pp.16.1-50..73, B4.1b), LRFD.
 
 Decimal arithmetic (50 digits); reads src/steel_design/data/sections.xlsx with openpyxl and its own unit
-scales; never imports steel_design. F7 LTB numbering per errata E25-02 (F7-8..F7-11).
+scales; never imports steel_design. Welded built-up I-shapes are computed from their plates (thin-walled J and Cw,
+DF-17). F7 LTB numbering per errata E25-02 (F7-8..F7-11).
 Regenerates tests/fixtures/chapter_f/reference.json:
 
     python tests/oracles/chapter_f.py
@@ -266,6 +267,133 @@ def single_angle_principal(name, fy, axis, Lb=None, Cb=1, leg=None, toe=None):
     return modes
 
 
+def plate_girder(d, tw, top, bottom, comp="top"):
+    """Welded I from its plates, flipped so that the compression flange is on top. Centroid measured up from the bottom."""
+    d, tw = D(d), D(tw)
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in ((top, bottom) if comp == "top" else (bottom, top))]
+    h = d - tt - tb
+    parts = [(bb * tb, tb / 2, bb, tb), (h * tw, tb + h / 2, tw, h), (bt * tt, d - tt / 2, bt, tt)]
+    A = sum(a for a, _, _, _ in parts)
+    ybar = sum(a * y for a, y, _, _ in parts) / A
+    Ix = sum(w * t**3 / 12 + a * (y - ybar) ** 2 for a, y, w, t in parts)
+    if A / 2 <= bb * tb:                                       # plastic neutral axis, up from the bottom
+        yp = A / 2 / bb
+    elif A / 2 <= bb * tb + h * tw:
+        yp = tb + (A / 2 - bb * tb) / tw
+    else:
+        yp = d - A / 2 / bt
+    Zx = D(0)
+    for _, y, w, t in parts:                                   # each plate split by the plastic neutral axis
+        lo, hi = y - t / 2, y + t / 2
+        below, above = max(min(hi, yp) - lo, D(0)), max(hi - max(lo, yp), D(0))
+        Zx += w * below * (yp - (lo + lo + below) / 2) + w * above * ((hi + hi - above) / 2 - yp)
+    It, Ib = tt * bt**3 / 12, tb * bb**3 / 12
+    ho = d - tt / 2 - tb / 2
+    c = d - ybar
+    return {"d": d, "tw": tw, "h": h, "bfc": bt, "tfc": tt, "bft": bb, "tft": tb, "A": A, "Ix": Ix, "Sxc": Ix / c, "Sxt": Ix / ybar,
+            "Zx": Zx, "hc": 2 * (c - tt), "hp": 2 * (d - yp - tt), "Iyc": It, "Iy": It + Ib + h * tw**3 / 12, "ho": ho,
+            "J": (bt * tt**3 + bb * tb**3 + h * tw**3) / 3, "Cw": ho**2 * It * Ib / (It + Ib), "singly": (bt, tt) != (bb, tb)}
+
+
+def built_up_i(d, tw, top, bottom, fy, Lb, Cb=1, comp="top"):
+    """F2/F3 for doubly symmetric compact webs; F4 or F5 otherwise. Table B4.1b cases 11, 15, 16; kc of note [a]."""
+    g, fy, Cb, Lb = plate_girder(d, tw, top, bottom, comp), D(fy), D(Cb), D(Lb)
+    root = sqrt(E / fy)
+    h_tw, hc_tw, lam_f = g["h"] / g["tw"], g["hc"] / g["tw"], g["bfc"] / (2 * g["tfc"])
+    mp_full = fy * g["Zx"]
+    if g["singly"]:                                                              # case 16
+        lrw = D("5.70") * root
+        lpw = lrw if g["hp"] <= 0 else min(g["hc"] / g["hp"] * root / (D("0.54") * mp_full / (fy * min(g["Sxc"], g["Sxt"]))
+                                                                        - D("0.09")) ** 2, lrw)
+        lam_w = hc_tw
+    else:                                                                        # case 15
+        lpw, lrw, lam_w = D("3.76") * root, D("5.70") * root, h_tw
+    kc = min(max(4 / sqrt(h_tw), D("0.35")), D("0.76"))
+    ratio_t = g["Sxt"] / g["Sxc"]
+    fl = D("0.7") * fy if ratio_t >= D("0.7") else max(fy * ratio_t, D("0.5") * fy)  # F4-6a, F4-6b
+    fl_class = D("0.7") * fy if lam_w > lrw else fl                             # note [b]
+    lpf, lrf = D("0.38") * root, D("0.95") * sqrt(kc * E / fl_class)             # case 11
+    modes = {}
+    if not g["singly"] and lam_w <= lpw:                                         # F2 / F3
+        sx, ry = g["Sxc"], sqrt(g["Iy"] / g["A"])
+        if lam_f <= lpf:
+            modes["Y"] = mp_full                                                 # F2-1
+        elif lam_f <= lrf:
+            modes["FLB"] = interp(mp_full, D("0.7") * fy * sx, lam_f, lpf, lrf)  # F3-1
+        else:
+            modes["FLB"] = D("0.9") * E * kc * sx / lam_f**2                     # F3-2
+        rts = sqrt(sqrt(g["Iy"] * g["Cw"]) / sx)                                 # F2-7
+        jc = g["J"] / (sx * g["ho"])
+        lp = D("1.76") * ry * root                                              # F2-5
+        lr = D("1.95") * rts * E / (D("0.7") * fy) * sqrt(jc + sqrt(jc**2 + D("6.76") * (D("0.7") * fy / E) ** 2))   # F2-6
+        if Lb > lr:
+            modes["LTB"] = min(Cb * PI**2 * E / (Lb / rts) ** 2 * sqrt(1 + D("0.078") * jc * (Lb / rts) ** 2) * sx, mp_full)
+        elif Lb > lp:
+            modes["LTB"] = min(Cb * interp(mp_full, D("0.7") * fy * sx, Lb, lp, lr), mp_full)
+        return modes
+    aw = g["hc"] * g["tw"] / (g["bfc"] * g["tfc"])                               # F4-12
+    rt = g["bfc"] / sqrt(12 * (1 + aw / 6))                                      # F4-11
+    lp = D("1.1") * rt * root                                                   # F4-7
+    iyc_iy = g["Iyc"] / g["Iy"]
+    if lam_w <= lrw:                                                             # F4
+        myc, myt = fy * g["Sxc"], fy * g["Sxt"]
+        mpc, mpt = min(mp_full, D("1.6") * myc), min(mp_full, D("1.6") * myt)    # Mp/Myc, Mp/Myt <= 1.6 (Commentary)
+        if iyc_iy <= D("0.23"):
+            rpc = rpt = D(1)                                                     # F4-10, F4-17
+        elif hc_tw <= lpw:
+            rpc, rpt = mpc / myc, mpt / myt                                      # F4-9a, F4-16a
+        else:
+            rpc = min(mpc / myc - (mpc / myc - 1) * (hc_tw - lpw) / (lrw - lpw), mpc / myc)   # F4-9b
+            rpt = min(mpt / myt - (mpt / myt - 1) * (h_tw - lpw) / (lrw - lpw), mpt / myt)    # F4-16b, lambda = h/tw (DF-15)
+        modes["CFY"] = rpc * myc                                                 # F4-1
+        j = D(0) if iyc_iy <= D("0.23") else g["J"]                              # F4-5 and F4-8 (DF-16)
+        jc = j / (g["Sxc"] * g["ho"])
+        lr = D("1.95") * rt * E / fl * sqrt(jc + sqrt(jc**2 + D("6.76") * (fl / E) ** 2))   # F4-8
+        if Lb > lr:
+            fcr = Cb * PI**2 * E / (Lb / rt) ** 2 * sqrt(1 + D("0.078") * jc * (Lb / rt) ** 2)   # F4-5
+            modes["LTB"] = min(fcr * g["Sxc"], rpc * myc)                        # F4-3
+        elif Lb > lp:
+            modes["LTB"] = min(Cb * (rpc * myc - (rpc * myc - fl * g["Sxc"]) * (Lb - lp) / (lr - lp)), rpc * myc)   # F4-2
+        if lpf < lam_f <= lrf:
+            modes["FLB"] = rpc * myc - (rpc * myc - fl * g["Sxc"]) * (lam_f - lpf) / (lrf - lpf)   # F4-13
+        elif lam_f > lrf:
+            modes["FLB"] = D("0.9") * E * kc * g["Sxc"] / lam_f**2               # F4-14
+        if g["Sxt"] < g["Sxc"]:
+            modes["TFY"] = rpt * myt                                             # F4-15
+        return modes
+    rpg = min(1 - min(aw, D(10)) / (1200 + 300 * min(aw, D(10))) * (hc_tw - D("5.7") * root), D(1))   # F5-6
+    modes["CFY"] = rpg * fy * g["Sxc"]                                           # F5-1
+    lr = PI * rt * sqrt(E / (D("0.7") * fy))                                     # F5-5
+    if Lb > lr:
+        modes["LTB"] = rpg * min(Cb * PI**2 * E / (Lb / rt) ** 2, fy) * g["Sxc"]   # F5-4, F5-2
+    elif Lb > lp:
+        modes["LTB"] = rpg * min(Cb * (fy - D("0.3") * fy * (Lb - lp) / (lr - lp)), fy) * g["Sxc"]   # F5-3, F5-2
+    if lpf < lam_f <= lrf:
+        modes["FLB"] = rpg * (fy - D("0.3") * fy * (lam_f - lpf) / (lrf - lpf)) * g["Sxc"]   # F5-8, F5-7
+    elif lam_f > lrf:
+        modes["FLB"] = rpg * D("0.9") * E * kc / lam_f**2 * g["Sxc"]               # F5-9, F5-7
+    if g["Sxt"] < g["Sxc"]:
+        modes["TFY"] = fy * g["Sxt"]                                             # F5-10
+    return modes
+
+
+def built_up_i_minor(d, tw, top, bottom, fy, axis="y"):
+    """F6 with the more slender flange (decision DF-19), Sy to the tip of the wider flange."""
+    d, tw, fy = D(d), D(tw), D(fy)
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (top, bottom)]
+    h = d - tt - tb
+    sy = (tt * bt**3 + tb * bb**3 + h * tw**3) / 12 / (max(bt, bb) / 2)
+    mp = min(fy * (tt * bt**2 + tb * bb**2 + h * tw**2) / 4, D("1.6") * fy * sy)   # F6-1
+    lam = max(bt / (2 * tt), bb / (2 * tb))
+    lp, lr = D("0.38") * sqrt(E / fy), sqrt(E / fy)                              # case 13
+    modes = {"Y": mp}
+    if lp < lam <= lr:
+        modes["FLB"] = interp(mp, D("0.7") * fy * sy, lam, lp, lr)               # F6-2
+    elif lam > lr:
+        modes["FLB"] = D("0.70") * E / lam**2 * sy                               # F6-3, F6-4
+    return modes
+
+
 def summarize(modes):
     gov = min(modes, key=modes.get)
     return {"modes_kNm": {k: v / 10**6 for k, v in modes.items()}, "governing": gov,
@@ -309,6 +437,19 @@ CASES = {
     "L-F10-w-long-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="long"),
     "L-F10-w-equal-Cb-capped": dict(kind="lp", name="L4X4X1/4", fy=345, axis="w", Lb=3000, Cb="1.8", leg="long"),
     "L-F10-z-toes-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="z", toe="compression"),
+    "BUI-F2-compact": dict(kind="bui", d=600, tw=10, top=(250, 20), bottom=(250, 20), fy=345, Lb=4000),
+    "BUI-F3-noncompact-flange": dict(kind="bui", d=600, tw=10, top=(300, 14), bottom=(300, 14), fy=345, Lb=3000),
+    "BUI-F4-wide-flange-compressed": dict(kind="bui", d=900, tw=8, top=(350, 22), bottom=(250, 16), fy=345, Lb=3000, comp="top"),
+    "BUI-F4-narrow-flange-compressed-J0": dict(kind="bui", d=900, tw=8, top=(350, 22), bottom=(250, 16), fy=345, Lb=9000,
+                                               comp="bottom"),
+    "BUI-F4-noncompact-web-and-flange": dict(kind="bui", d=1000, tw=9, top=(300, 16), bottom=(300, 16), fy=345, Lb=4000),
+    "BUI-F4-14-slender-flange": dict(kind="bui", d=1000, tw=9, top=(500, 12), bottom=(300, 25), fy=345, Lb=2500, Cb="1.2",
+                                     comp="top"),
+    "BUI-F4-9b-16b-noncompact-web": dict(kind="bui", d=1100, tw=7, top=(350, 22), bottom=(250, 18), fy=345, Lb=3000, comp="top"),
+    "BUI-F5-noncompact-flange": dict(kind="bui", d=1200, tw=8, top=(400, 20), bottom=(400, 20), fy=345, Lb=6000),
+    "BUI-F5-elastic-LTB": dict(kind="bui", d=1200, tw=8, top=(400, 20), bottom=(400, 20), fy=345, Lb=16000),
+    "BUI-F5-tension-flange-yielding": dict(kind="bui", d=1400, tw=8, top=(450, 25), bottom=(300, 16), fy=345, Lb=2000, comp="top"),
+    "BUI-F6-unequal-flanges": dict(kind="buiy", d=900, tw=8, top=(350, 22), bottom=(300, 10), fy=345, axis="y"),
 }
 
 
@@ -316,7 +457,8 @@ def build(spec):
     kind = spec["kind"]
     args = {k: v for k, v in spec.items() if k != "kind"}
     modes = {"w": w_or_channel, "rhss": rect_hss, "chss": round_hss, "bar": solid_rect, "round": solid_round,
-             "2l": double_angle, "lg": single_angle_geometric, "lp": single_angle_principal}[kind](**args)
+             "2l": double_angle, "lg": single_angle_geometric, "lp": single_angle_principal, "bui": built_up_i,
+             "buiy": built_up_i_minor}[kind](**args)
     return {"spec": spec, **summarize(modes)}
 
 

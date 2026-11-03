@@ -30,6 +30,30 @@ def limits(case: int, E: float, Fy: float) -> dict:
     return {"lambda_p": p * base, "lambda_r": r * base, "b4_case": case}
 
 
+def flange_kc(*, h_tw: float) -> float:
+    """kc = 4/sqrt(h/tw), between 0.35 and 0.76 (Table B4.1, note [a]; F3.2, F4.3, F5.3)."""
+    _positive(h_tw=h_tw)
+    return min(max(4 / math.sqrt(h_tw), 0.35), 0.76)
+
+
+def limits_built_up_flange(*, E: float, Fy: float, kc: float, FL: float) -> dict:
+    """Table B4.1b case 11, flanges of built-up I-shapes: 0.38*sqrt(E/Fy) and 0.95*sqrt(kc*E/FL) (notes [a], [b])."""
+    _positive(E=E, Fy=Fy, kc=kc, FL=FL)
+    return {"lambda_p": 0.38 * math.sqrt(E / Fy), "lambda_r": 0.95 * math.sqrt(kc * E / FL), "b4_case": 11, "kc": kc, "FL_mpa": FL}
+
+
+def limits_singly_symmetric_web(*, E: float, Fy: float, hc: float, hp: float, Mp: float, My: float) -> dict:
+    """Table B4.1b case 16, hc/tw: lambda_p = (hc/hp)*sqrt(E/Fy)/(0.54*Mp/My - 0.09)^2 <= lambda_r = 5.70*sqrt(E/Fy).
+
+    My at the extreme fiber that yields first, Mp = Fy*Zx (note [c]). With the plastic neutral axis in the compression
+    flange, hp <= 0 and the web is compact (Commentary F4, step 3): lambda_p = lambda_r.
+    """
+    _positive(E=E, Fy=Fy, hc=hc, Mp=Mp, My=My)
+    lr = 5.70 * math.sqrt(E / Fy)
+    lp = lr if hp <= 0 else min(hc / hp * math.sqrt(E / Fy) / (0.54 * Mp / My - 0.09) ** 2, lr)
+    return {"lambda_p": lp, "lambda_r": lr, "b4_case": 16}
+
+
 def classify(ratio: float, lim: dict) -> str:
     if ratio <= lim["lambda_p"]:
         return "compacto"
@@ -84,8 +108,111 @@ def f3_flb(*, E, Fy, Sx, Zx, bf_2tf, h_tw, lim: dict) -> dict:
     mp = Fy * Zx
     if bf_2tf <= lim["lambda_r"]:
         return {"Mn": _between(mp, 0.7 * Fy * Sx, bf_2tf, lim["lambda_p"], lim["lambda_r"]), "equation": "F3-1"}
-    kc = min(max(4 / math.sqrt(h_tw), 0.35), 0.76)
+    kc = flange_kc(h_tw=h_tw)
     return {"Mn": 0.9 * E * kc * Sx / bf_2tf**2, "kc": kc, "equation": "F3-2"}
+
+
+# --- F4 other I-shapes with compact or noncompact webs, F5 I-shapes with slender webs, major axis -------------
+
+def f4_fl(*, Fy, Sxc, Sxt) -> dict:
+    """F4-6a/F4-6b: stress above which the inelastic buckling limit states apply."""
+    _positive(Fy=Fy, Sxc=Sxc, Sxt=Sxt)
+    if Sxt / Sxc >= 0.7:
+        return {"FL_mpa": 0.7 * Fy, "equation": "F4-6a"}
+    return {"FL_mpa": max(Fy * Sxt / Sxc, 0.5 * Fy), "equation": "F4-6b"}
+
+
+def f4_rt(*, bfc, tfc, hc, tw) -> dict:
+    """F4-11 with aw from F4-12: I-shapes with a rectangular compression flange."""
+    _positive(bfc=bfc, tfc=tfc, hc=hc, tw=tw)
+    aw = hc * tw / (bfc * tfc)
+    return {"rt_mm": bfc / math.sqrt(12 * (1 + aw / 6)), "aw": aw, "rt_equation": "F4-11"}
+
+
+def _plastification(*, mp, my, branch, lam, lim, iyc_iy, equations):
+    """Web plastification factor: Mp/My, the transition to 1 over the noncompact web range, or 1 for a small compression flange."""
+    if iyc_iy <= 0.23:
+        return 1.0, equations[2]
+    if branch <= lim["lambda_p"]:
+        return mp / my, equations[0]
+    return min(mp / my - (mp / my - 1) * (lam - lim["lambda_p"]) / (lim["lambda_r"] - lim["lambda_p"]), mp / my), equations[1]
+
+
+def f4_rpc(*, Fy, Zx, Sxc, hc_tw, Iyc_Iy, lim: dict) -> dict:
+    """F4-9a, F4-9b or F4-10, with Mp = Fy*Zx <= 1.6*Fy*Sxc (Mp/Myc <= 1.6, Commentary F4)."""
+    _positive(Fy=Fy, Zx=Zx, Sxc=Sxc, hc_tw=hc_tw, Iyc_Iy=Iyc_Iy)
+    mp, myc = min(Fy * Zx, 1.6 * Fy * Sxc), Fy * Sxc
+    rpc, eqn = _plastification(mp=mp, my=myc, branch=hc_tw, lam=hc_tw, lim=lim, iyc_iy=Iyc_Iy, equations=("F4-9a", "F4-9b", "F4-10"))
+    return {"Rpc": rpc, "Rpc_equation": eqn, "Mp_Rpc": mp, "Myc": myc}
+
+
+def f4_rpt(*, Fy, Zx, Sxt, hc_tw, h_tw, Iyc_Iy, lim: dict) -> dict:
+    """F4-16a, F4-16b or F4-17, with Mp = Fy*Zx <= 1.6*Fy*Sxt (Mp/Myt <= 1.6, Commentary F4).
+
+    The branch follows hc/tw and F4-16b uses lambda = h/tw, as printed in F4.4 (user's decision DF-15).
+    """
+    _positive(Fy=Fy, Zx=Zx, Sxt=Sxt, hc_tw=hc_tw, h_tw=h_tw, Iyc_Iy=Iyc_Iy)
+    mp, myt = min(Fy * Zx, 1.6 * Fy * Sxt), Fy * Sxt
+    rpt, eqn = _plastification(mp=mp, my=myt, branch=hc_tw, lam=h_tw, lim=lim, iyc_iy=Iyc_Iy, equations=("F4-16a", "F4-16b", "F4-17"))
+    return {"Rpt": rpt, "Rpt_equation": eqn, "Mp_Rpt": mp, "Myt": myt}
+
+
+def f4_ltb(*, E, Fy, FL, Rpc, Sxc, rt, J, ho, Iyc_Iy, Lb, Cb) -> dict:
+    """F4-2, F4-3 with Fcr F4-5, Lp F4-7 and Lr F4-8. J = 0 when Iyc/Iy <= 0.23, in Fcr and in Lr (decision DF-16)."""
+    _positive(E=E, Fy=Fy, FL=FL, Rpc=Rpc, Sxc=Sxc, rt=rt, J=J, ho=ho, Iyc_Iy=Iyc_Iy, Lb=Lb, Cb=Cb)
+    top = Rpc * Fy * Sxc
+    j = 0.0 if Iyc_Iy <= 0.23 else J
+    jc = j / (Sxc * ho)
+    lp = 1.1 * rt * math.sqrt(E / Fy)                                           # F4-7
+    lr = 1.95 * rt * E / FL * math.sqrt(jc + math.sqrt(jc**2 + 6.76 * (FL / E) ** 2))   # F4-8
+    out = {"Lp_mm": lp, "Lr_mm": lr, "rt_mm": rt, "J_used_mm4": j, "FL_mpa": FL, "Lb_mm": Lb, "Cb": Cb}
+    if Lb <= lp:
+        return {**out, "applies": False, "reason": "Lb ≤ Lp: el pandeo lateral-torsional no aplica (F4.2(a))."}
+    if Lb <= lr:
+        return {**out, "applies": True, "Mn": min(Cb * _between(top, FL * Sxc, Lb, lp, lr), top), "equation": "F4-2"}
+    fcr = Cb * math.pi**2 * E / (Lb / rt) ** 2 * math.sqrt(1 + 0.078 * jc * (Lb / rt) ** 2)  # F4-5
+    return {**out, "applies": True, "Fcr_mpa": fcr, "Mn": min(fcr * Sxc, top), "equation": "F4-3"}
+
+
+def f4_flb(*, E, Fy, FL, Rpc, Sxc, kc, bfc_2tfc, lim: dict) -> dict:
+    """F4-13 (noncompact flange) or F4-14 (slender); the caller handles compact flanges."""
+    _positive(E=E, Fy=Fy, FL=FL, Rpc=Rpc, Sxc=Sxc, kc=kc, bfc_2tfc=bfc_2tfc)
+    if bfc_2tfc <= lim["lambda_r"]:
+        return {"Mn": _between(Rpc * Fy * Sxc, FL * Sxc, bfc_2tfc, lim["lambda_p"], lim["lambda_r"]), "FL_mpa": FL, "equation": "F4-13"}
+    return {"Mn": 0.9 * E * kc * Sxc / bfc_2tfc**2, "kc": kc, "equation": "F4-14"}
+
+
+def f5_rpg(*, aw, hc_tw, E, Fy) -> dict:
+    """F5-6: bending strength reduction factor, aw from F4-12 not taken greater than 10."""
+    _positive(aw=aw, hc_tw=hc_tw, E=E, Fy=Fy)
+    a = min(aw, 10.0)
+    rpg = 1 - a / (1200 + 300 * a) * (hc_tw - 5.7 * math.sqrt(E / Fy))
+    return {"Rpg": min(rpg, 1.0), "aw_Rpg": a, "Rpg_equation": "F5-6"}
+
+
+def f5_ltb(*, E, Fy, Rpg, Sxc, rt, Lb, Cb) -> dict:
+    """F5-2 with Fcr from F5-3 or F5-4; Lp F4-7, Lr F5-5."""
+    _positive(E=E, Fy=Fy, Rpg=Rpg, Sxc=Sxc, rt=rt, Lb=Lb, Cb=Cb)
+    lp = 1.1 * rt * math.sqrt(E / Fy)                                           # F4-7
+    lr = math.pi * rt * math.sqrt(E / (0.7 * Fy))                               # F5-5
+    out = {"Lp_mm": lp, "Lr_mm": lr, "rt_mm": rt, "Lb_mm": Lb, "Cb": Cb}
+    if Lb <= lp:
+        return {**out, "applies": False, "reason": "Lb ≤ Lp: el pandeo lateral-torsional no aplica (F5.2(a))."}
+    if Lb <= lr:
+        fcr, eqn = min(Cb * (Fy - 0.3 * Fy * (Lb - lp) / (lr - lp)), Fy), "F5-3"
+    else:
+        fcr, eqn = min(Cb * math.pi**2 * E / (Lb / rt) ** 2, Fy), "F5-4"
+    return {**out, "applies": True, "Fcr_mpa": fcr, "Fcr_equation": eqn, "Mn": Rpg * fcr * Sxc, "equation": "F5-2"}
+
+
+def f5_flb(*, E, Fy, Rpg, Sxc, kc, bfc_2tfc, lim: dict) -> dict:
+    """F5-7 with Fcr from F5-8 (noncompact flange) or F5-9 (slender); the caller handles compact flanges."""
+    _positive(E=E, Fy=Fy, Rpg=Rpg, Sxc=Sxc, kc=kc, bfc_2tfc=bfc_2tfc)
+    if bfc_2tfc <= lim["lambda_r"]:
+        fcr, eqn = Fy - 0.3 * Fy * (bfc_2tfc - lim["lambda_p"]) / (lim["lambda_r"] - lim["lambda_p"]), "F5-8"
+    else:
+        fcr, eqn = 0.9 * E * kc / bfc_2tfc**2, "F5-9"
+    return {"Fcr_mpa": fcr, "Fcr_equation": eqn, "kc": kc, "Mn": Rpg * fcr * Sxc, "equation": "F5-7"}
 
 
 # --- F6 I-shapes and channels, minor axis --------------------------------------------------------------

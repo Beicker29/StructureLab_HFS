@@ -9,7 +9,8 @@ LRFD: φb = 0,90 (F1(a)). Momentos en kN·m.
 
 | Familia | Eje x | Eje y | Estados límite (Tabla de Nota F1.1) |
 | --- | --- | --- | --- |
-| W / IPE / HEA / HEB | F2 (ala compacta) o F3 (ala no compacta/esbelta); F13.1 | F6 | Y, LTB, FLB, TFR / Y, FLB |
+| W / IPE / HEA / HEB | F2 (ala compacta) o F3 (ala no compacta/esbelta); F4 (alma no compacta) o F5 (alma esbelta); F13.1 | F6 | Y, LTB, FLB, TFR o CFY, LTB, FLB, TFY, TFR / Y, FLB |
+| I armada soldada (`custom_section` `I_BUILT_UP`) | Doble simetría y alma compacta: F2 o F3 (ala caso 11). Alma no compacta, o simetría simple con alma compacta o no compacta: F4. Alma esbelta: F5. F13.1 y F13.2 | F6 (ala más esbelta, DF-19) | CFY, LTB, FLB, TFY, TFR / Y, FLB |
 | Canal | F2 (solo compacto); F13.1 | F6 | Y, LTB, FLB, TFR / Y, FLB |
 | PTE rectangular | F7 | F7 | Y, FLB, WLB, LTB (LTB no aplica en eje menor ni en sección cuadrada, Nota de F7.4) |
 | PTE redondo | F8 (D/t < 0,45E/Fy) | F8 | Y, LB |
@@ -18,12 +19,48 @@ LRFD: φb = 0,90 (F1(a)). Momentos en kN·m.
 | Ángulo simple (F10) | F10.2(2) ejes geométricos (x, y) | — | Y, LTB, LLB |
 | Ángulo simple (F10), ejes principales | `Mw`: F10-4 | `Mz`: Y y LLB | Y, LTB, LLB / Y, LLB |
 
-Bloqueos con motivo (INCOMPLETO): alma no compacta o esbelta en I (F4/F5), canal
-con ala no compacta (sin sección aplicable en F), alma esbelta en PTE (F7-7) y
-D/t ≥ 0,45E/Fy en PTE redondo.
+Bloqueos con motivo (INCOMPLETO): canal con ala o alma no compacta (sin sección aplicable
+en F), alma esbelta en PTE (F7-7), D/t ≥ 0,45E/Fy en PTE redondo e I de alas distintas sin
+`flexure.compression_flange`.
 
 Cada estado límite de la sección elegida figura en el resultado: calculado o con el
 motivo por el que no aplica (p. ej. Lb ≤ Lp, ala compacta). Gobierna el menor Mn.
+
+## Perfiles I con F4 y F5
+
+**Secciones.** F4 y F5 se aplican a los W del catálogo con alma no compacta o esbelta (hoy
+ninguno a Fy ≤ 450 MPa: h/tw máx. 57,5) y a las I armadas soldadas de `custom_section`
+(`type: "I_BUILT_UP"`, `d`, `tw`, `top_flange: {b, t}`, `bottom_flange: {b, t}`, mm). De las placas, sin
+radios de soldadura, salen A, Ix, Iy, Sx (el menor), Sy, Zx (eje neutro plástico de áreas iguales), Zy, r,
+h = d − tf,sup − tf,inf (distancia libre, B4.1b(b)), ho, J, Cw, r̄o y H (DF-17).
+
+**Clasificación (B4.1b).** Alas de I armada: caso 11, λp = 0,38√(E/Fy), λr = 0,95√(kc·E/FL), con kc de
+la nota [a] y FL de la nota [b] (0,7Fy con alma esbelta; si no, F4-6a/F4-6b); λ = bfc/2tfc del ala
+comprimida. Laminados: caso 10. Alma de doble simetría: caso 15 con h/tw; de simetría simple: caso 16
+con hc/tw, λp = (hc/hp)√(E/Fy)/(0,54·Mp/My − 0,09)² ≤ λr (My en la fibra que fluye primero, Mp = Fy·Zx); si el
+eje neutro plástico cae en el ala comprimida, hp ≤ 0 y el alma es compacta (Commentary F4). La clasificación
+se hace a temperatura ambiente, como en todo el capítulo.
+
+**F4.** CFY (F4-1) con Rpc (F4-9a, F4-9b o F4-10, Mp ≤ 1,6·Fy·Sxc, DF-16b); LTB con rt (F4-11, aw de
+F4-12), Lp (F4-7), Lr (F4-8) y Fcr (F4-5), J = 0 si Iyc/Iy ≤ 0,23 (DF-16); FLB F4-13/F4-14; TFY F4-15 con
+Rpt (F4-16a, F4-16b o F4-17, Mp ≤ 1,6·Fy·Sxt) solo si Sxt < Sxc. Iyc = tfc·bfc³/12.
+
+**F5.** Rpg (F5-6, aw ≤ 10); CFY F5-1; LTB F5-2 con F5-3/F5-4, Lp (F4-7) y Lr (F5-5); FLB F5-7 con F5-8/F5-9;
+TFY F5-10 si Sxt < Sxc.
+
+**Ala comprimida.** En I de alas distintas, `flexure.compression_flange` (`top`/`bottom`) es obligatorio en
+cada combinación con `Mux` (DF-18); sin él la flexión queda INCOMPLETA. En F13.1, Afg es el ala
+traccionada y Sx el menor módulo elástico.
+
+**F13.2 (requisitos técnicos, obligatorios).** I de simetría simple con `Mux`: 0,1 ≤ Iyc/Iy ≤ 0,9 con
+cualquiera de las dos alas (F13-2). Alma esbelta sin rigidizadores: h/tw ≤ 0,40E/Fy (F13-4), h/tw ≤ 260 y
+aw ≤ 10. Uno incumplido da FAIL aunque las resistencias alcancen.
+
+**Otros capítulos.** E: alas caso 2 de B4.1a (0,64√(kc·E/Fy)), alma caso 5 u 8; doble simetría E4-2,
+simetría simple E4(b) con Fey y Fez ([chapter-e.md](chapter-e.md)). G: G2.1(b) siempre (G2.1(a) es solo para
+laminados) y G6 ala por ala ([chapter-g.md](chapter-g.md)). H1.2 amplifica Cb solo con doble simetría. En
+incendio, A-4-13 queda para los W laminados compactos; la I armada usa el Capítulo F con E(T) y Fy(T)
+(DA4-3) y con elementos esbeltos queda bloqueada (4.2.4d).
 
 ## Ángulos (etapa 2)
 
@@ -62,6 +99,8 @@ Puntos del catálogo: A = punta del ala corta, B = talón, C = punta del ala lar
 - `Mux`, `Muy` por combinación (kN·m). Una combinación con más de una demanda
   (Pu, Mux, Muy) se calcula por componente y se combina en el chequeo de interacción
   del Capítulo H ([chapter-h.md](chapter-h.md)); un FAIL conocido se informa siempre (DF-4).
+- `flexure.compression_flange` (`top`/`bottom`) en I de alas distintas con `Mux` (DF-18), y
+  `custom_section` `I_BUILT_UP` para las I armadas soldadas.
 - `lengths` del miembro, de las que sale Lb (DF-13; obligatorias cuando aplica el pandeo
   lateral-torsional), y `flexure`: `Cb` (1,0 si no se indica: límite inferior de F1-1, DF-2) y
   `tension_flange_holes` (obligatorio en I y canales sobre el eje x, F13.1) con
@@ -111,6 +150,17 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
 | L-F10-w-long-comp | L6X4X3/8, eje w, Lb=2000, ala larga comprimida | 345 | Y 32.76, LTB 22.33, LLB 28.18 | LTB | 20.093 |
 | L-F10-w-equal-Cb-capped | L4X4X1/4, eje w, Lb=3000, Cb=1.8 (se usa 1.5) | 345 | Y 14.90, LTB 10.38, LLB 12.74 | LTB | 9.346 |
 | L-F10-z-toes-comp | L6X4X3/8, eje z, punteras comprimidas | 345 | Y 11.13, LLB 20.35 | Y | 10.014 |
+| BUI-F2-compact | I 600, tw 10, alas 250x20, Lb=4000 | 345 | Y 1270.98, LTB 1107.02 | LTB | 996.317 |
+| BUI-F3-noncompact-flange | I 600, tw 10, alas 300x14, Lb=3000 | 345 | FLB 1069.32, LTB 1116.61 | FLB | 962.387 |
+| BUI-F4-wide-flange-compressed | I 900, tw 8, 350x22 / 250x16, ala superior comprimida, Lb=3000 | 345 | CFY 2145.10, LTB 2109.89, TFY 2145.10 | LTB | 1898.898 |
+| BUI-F4-narrow-flange-compressed-J0 | la misma, ala inferior comprimida (Iyc/Iy ≤ 0,23), Lb=9000 | 345 | CFY 1646.86, LTB 450.00 | LTB | 404.998 |
+| BUI-F4-noncompact-web-and-flange | I 1000, tw 9, alas 300x16, Lb=4000 | 345 | CFY 2253.39, LTB 1937.45, FLB 2230.26 | LTB | 1743.707 |
+| BUI-F4-14-slender-flange | I 1000, tw 9, 500x12 / 300x25, ala superior comprimida, Lb=2500, Cb=1.2 | 345 | CFY 2702.09, FLB 1182.71 | FLB | 1064.441 |
+| BUI-F4-9b-16b-noncompact-web | I 1100, tw 7, 350x22 / 250x18, ala superior comprimida, Lb=3000 | 345 | CFY 2826.17, LTB 2773.34, TFY 1998.54 | TFY | 1798.682 |
+| BUI-F5-noncompact-flange | I 1200, tw 8, alas 400x20, Lb=6000 | 345 | CFY 3779.07, LTB 3242.07, FLB 3641.77 | LTB | 2917.861 |
+| BUI-F5-elastic-LTB | la misma, Lb=16000 | 345 | CFY 3779.07, LTB 943.70, FLB 3641.77 | LTB | 849.326 |
+| BUI-F5-tension-flange-yielding | I 1400, tw 8, 450x25 / 300x16, ala superior comprimida, Lb=2000 | 345 | CFY 4650.15, TFY 2043.87 | TFY | 1839.483 |
+| BUI-F6-unequal-flanges | I 900, tw 8, 350x22 / 300x10, eje y | 345 | Y 314.86, FLB 246.16 | FLB | 221.544 |
 
 ## Decisiones
 
@@ -143,6 +193,21 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
 - **DF-14** F7.4 se revisa respecto del eje mayor de la sección, sea x o y: en un cajón con B > H ese eje es y, con Sy, Zy y rx. El pandeo lateral-torsional no se revisaba respecto de y; ningún resultado de perfiles del catálogo cambió.
 - **DF-13** Lb no es un dato (indicación del usuario, 2026-10-31): flexión respecto de x, Lb = min(Ly, Lz); respecto de y, Lb = min(Lx, Lz), con las
   longitudes de la condición del case. En ángulos simples, el eje principal w sigue la regla de x y z la de y.
+- **DF-15** F4.4 (indicación del usuario, 2026-11-03): en F4-16b, λ = h/tw como imprime la Specification, aunque
+  el Commentary y la edición 2016 usan hc/tw; la rama (F4-16a o F4-16b) sigue hc/tw, también como está impreso.
+  Solo cambia algo en I de alas distintas.
+- **DF-16** J = 0 cuando Iyc/Iy ≤ 0,23 (indicación del usuario, 2026-11-03): la Specification lo escribe junto a F4-5;
+  se aplica también a Lr (F4-8), que el Commentary deriva de F4-5 con Fcr = FL, para que Mn sea continuo en Lb = Lr.
+  **DF-16b** El tope «Mp = FyZx ≤ 1,6FySx» de F4-9 y F4-16 usa Sxc en Rpc y Sxt en Rpt (Mp/Myc ≤ 1,6 y
+  Mp/Myt ≤ 1,6, Commentary F4).
+- **DF-17** I armada (indicación del usuario, 2026-11-03): se ingresa por placas; las propiedades salen de ellas sin
+  radios de soldadura. J = Σb·t³/3 (alas con su ancho, alma con h); Cw = ho²·Iy,sup·Iy,inf/(Iy,sup + Iy,inf) y centro
+  de corte a ho·Iy,inf/(Iy,sup + Iy,inf) bajo el centroide del ala superior, con las inercias de las alas (pared delgada,
+  Commentary F4 y Design Guide 9). No es norma; la memoria lo indica.
+- **DF-18** Ala comprimida (indicación del usuario, 2026-11-03): `flexure.compression_flange` explícito por combinación,
+  obligatorio en I de alas distintas con `Mux`; no se deduce del signo del momento, como en DF-9.
+- **DF-19** F6 con alas distintas (indicación del usuario, 2026-11-03): se clasifican las dos alas y FLB usa el mayor
+  b/tf con Sy y Zy de la sección; F6 no dice qué ala usar.
 - **DF-12** |βw| (F10-4) se lee de la columna `βw` de la hoja L del catálogo, en mm (indicación del usuario,
   2026-10-31): sustituye al dato `flexure.beta_w`, que se retiró. Positivo con el ala corta comprimida y negativo con la
   larga (Commentary F10); 0 en alas iguales. Se contrastó con la Tabla C-F10.1 (promedios, diferencia máxima 1,8 %) y con
@@ -166,5 +231,7 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
   curvatura doble) no se evalúa: Cb es dato del usuario también para ángulos dobles.
 - Cada chequeo de flexión es respecto de un eje; la flexión biaxial y la carga axial se
   combinan en el chequeo de interacción (Capítulo H). El cortante es el Capítulo G.
-- F13.2 a F13.4 (proporciones de miembros armados y cubreplacas) no aplican a los
-  perfiles laminados del catálogo.
+- F13.2 se revisa sin rigidizadores transversales (F13-4); F13-3 (a/h ≤ 1,5), F13.3 (cubreplacas) y F13.4 no
+  se cubren. rt para alas con canal o cubreplaca (F4-11(ii)) tampoco: la entrada no admite esas secciones.
+- F1(d): en I de simetría simple con doble curvatura, el pandeo lateral-torsional se revisa con cada ala dando
+  una combinación por ala comprimida (`flexure.compression_flange`); el programa no las genera.

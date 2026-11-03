@@ -18,10 +18,15 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_e/reference.json").read_t
 REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 
 
-def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100, Mw=0):
+def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100, Mw=0, girder=None):
+    custom = None
+    if girder:
+        d, tw, top, bottom = girder
+        custom = {"type": "I_BUILT_UP", "d": d, "tw": tw, "top_flange": {"b": top[0], "t": top[1]},
+                  "bottom_flange": {"b": bottom[0], "t": bottom[1]}}
     return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu, Mw=Mw,
                      lengths={"Lx": Lx, "Ly": Ly or Lx, "Lz": Lz or Lx}, factors={"xa": xa, "ya": ya},
-                     single_angle_e5=e5, double_angle_e6=e6)
+                     single_angle_e5=e5, double_angle_e6=e6, custom_section=custom)
 
 
 def e6_basis(connectors, a):
@@ -41,7 +46,8 @@ def reference_case(ref):
                      Lz=float(ref["Lz"]), ya=float(ref["ya"]),
                      e5=e5_basis(e5[0], e5[1], float(e5[2])) if e5 else None,
                      e6=e6_basis(e6[0], float(e6[1])) if e6 else None,
-                     Mw=1 if ref["family"] == "SINGLE_ANGLE" and not e5 else 0)     # outside E5 only with H2 (DH-8)
+                     Mw=1 if ref["family"] == "SINGLE_ANGLE" and not e5 else 0,     # outside E5 only with H2 (DH-8)
+                     girder=ref.get("girder"))
 
 
 @pytest.mark.parametrize("case_id", sorted(REFERENCE))
@@ -63,12 +69,12 @@ def test_catalog_profiles_match_independent_calculation(engine, case_id):
 
 def test_reference_bank_covers_every_supported_catalog_family():
     assert {c["family"] for c in REFERENCE.values()} == {
-        "W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE"}
+        "W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE", "I_BUILT_UP"}
     governing = {(c["family"], c["governing_mode"]) for c in REFERENCE.values()}
     assert {("W", "TB"), ("CHANNEL", "FTB"), ("CHANNEL", "FB-y"), ("SINGLE_ANGLE", "FTB"),
-            ("DOUBLE_ANGLE", "FTB")} <= governing
+            ("DOUBLE_ANGLE", "FTB"), ("I_BUILT_UP", "FTB"), ("I_BUILT_UP", "TB")} <= governing
     assert all(any(c["family"] == f and c["slender"] for c in REFERENCE.values())
-               for f in ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE"))
+               for f in ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE", "I_BUILT_UP"))
 
 
 # --- Selection (Table User Note E1.1 checked against E3-E7) ---------------------------

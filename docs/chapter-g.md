@@ -21,6 +21,7 @@ verifica por separado (la interacción con torsión, H3, queda fuera del alcance
 | --- | --- | --- |
 | W / IPE / HEA / HEB (laminados) | G2.1(a) si h/tw ≤ 2,24√(E/Fy): φv = 1,00, Cv1 = 1; si no G2.1(b) con kv = 5,34 | G6: 2 alas, bf/2tf, kv = 1,2 |
 | Canal | G2.1(b), kv = 5,34 (G2.1(a) no se aplica a canales) | G6: 2 alas, bf/tf, kv = 1,2 |
+| I armada soldada (`I_BUILT_UP`) | G2.1(b), kv = 5,34, Aw = d·tw, h libre entre alas (G2.1(a) es solo para laminados) | G6: cada ala con su bf/2tf y su Cv2, sumadas |
 | PTE rectangular | G4: Aw = 2ht, kv = 5, h = ancho plano de las paredes de altura H | G4 con las paredes de ancho B |
 | PTE redondo | G5: Vn = Fcr·Ag/2 | igual |
 | Ángulo simple | G3 con el ala larga (paralela a y en el catálogo) | G3 con el ala corta |
@@ -60,6 +61,9 @@ tolerancia relativa 1e-9. Vn y φv·Vn en kN:
 | BAR-G4-G2-10 | Platina 650 x 10 mm, x (G2-10) | 345 | 1225.90 | 0.90 | 1103.31 |
 | BAR-G4-G2-11 | Platina 10 x 750 mm, y (G2-11) | 345 | 1208.00 | 0.90 | 1087.20 |
 | ROUND-G4 | Barra redonda D = 50 mm | 250 | 147.26 | 0.90 | 132.54 |
+| BUI-G2.1b-stocky-web | I armada 400, tw 12, 250x20 / 200x16, x | 345 | 993.60 | 0.90 | 894.24 |
+| BUI-G2.1b-Cv1 | I armada 1200, tw 8, alas 400x20, x (G2-4) | 345 | 838.77 | 0.90 | 754.89 |
+| BUI-G6-unequal | I armada 900, tw 8, 350x22 / 600x10, y | 345 | 2795.03 | 0.90 | 2515.52 |
 
 En los PTE redondos del catálogo (D/t ≤ 41) gobierna siempre 0,6Fy; las ramas G5-2a y
 G5-2b se prueban con las fórmulas. Contraste con los AISC Design Examples G.1B–G.7 en
@@ -69,7 +73,7 @@ G5-2b se prueban con las fórmulas. Contraste con los AISC Design Examples G.1B�
 
 - **DG-1** Almas sin rigidizadores transversales: kv = 5,34; el campo de tracción
   (G2.2, G2.3) y los rigidizadores (G2.4) quedan fuera (indicación del usuario,
-  2026-10-30; el catálogo no tiene perfiles armados).
+  2026-10-30). Rige también para las I armadas soldadas de la entrada.
 - **DG-2** G5: `Lv` es opcional. Con Lv, Fcr = máx(G5-2a, G5-2b) ≤ 0,6Fy; sin Lv, solo
   G5-2b, límite inferior conservador (indicación del usuario). La memoria lo indica.
 - **DG-3** Ángulos dobles: G3 se aplica a cada ángulo y se suman las dos alas

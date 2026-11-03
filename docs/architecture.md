@@ -8,7 +8,7 @@ src/steel_design/
 │                                models.py, repository.py, geometry.py (macizos), identity.py (nombres, AISC_Manual_Label 2L)
 ├── codes/aisc_360_22/
 │   ├── tension.py               fórmulas puras D2-1, D2-2, D3-1 y factores φt
-│   ├── flexure.py               fórmulas puras F2–F13.1, Se de F7 y límites λp/λr de B4.1b
+│   ├── flexure.py               fórmulas puras F2–F13.1 (con F4 y F5), Se de F7 y límites λp/λr de B4.1b
 │   ├── shear.py                 fórmulas puras G2-1…G6-1, Cv1/Cv2 y factores φv
 │   ├── interaction.py           fórmulas puras H1-1a/b, H1-2, H2-1 y H4-1
 │   ├── composite.py             fórmulas puras I1.6, I2, I3, I4, I5, I8.2, I8.3; Fig. C-I3.8 y Método 2 del Commentary
@@ -67,6 +67,7 @@ Un dominio sin datos o sin decisión ingenieril lanza `RuleNotImplementedError` 
 | Ecuaciones E3-2…E7-7, φc, λr | `codes/aisc_360_22/compression.py` |
 | Estados límite de tracción y modo gobernante | `domain/tension.py` |
 | Ecuaciones F2–F13.1, φb, λp/λr (B4.1b), Se de F7 | `codes/aisc_360_22/flexure.py` |
+| Propiedades de una I armada por placas (A, I, S, Z, J, Cw, centro de corte; hc, hp, Sxc, Sxt del ala comprimida) | `sections/geometry.py` |
 | Sección de F por familia y eje, estados límite de flexión | `domain/flexure.py` |
 | Ecuaciones G2-1…G6-1, Cv1, Cv2, φv | `codes/aisc_360_22/shear.py` |
 | Sección de G por familia y dirección del cortante | `domain/shear.py` |

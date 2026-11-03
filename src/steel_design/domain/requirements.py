@@ -11,7 +11,8 @@ from ..codes.aisc_dg06 import filled as dg6
 from ..codes.aisc_dg38 import walls as dg38
 from ..errors import SteelDesignError
 from ..models import Check, SteelCase
-from ..sections.models import Section
+from ..sections.geometry import i_major_properties, singly_symmetric_i
+from ..sections.models import Section, missing_properties
 from .composite.beam import beam_requirements, missing_anchor_detailing
 from .composite.common import uses_appendix_2
 from .composite.encased import encased_geometry, encased_requirements
@@ -223,6 +224,39 @@ def _tau_b_row(case):
     )
 
 
+def _proportioning_limits(case, section):
+    """F13.2, I-shapes bent about x: Iyc/Iy of singly symmetric members (F13-2); h/tw and aw of slender webs, without stiffeners."""
+    built_up, singly = section.type.upper() == "I_BUILT_UP", singly_symmetric_i(section)
+    E, Fy = case.material.E, case.material.Fy
+    slender = 5.70 * math.sqrt(E / Fy)                           # Table B4.1b cases 15 and 16
+    if not built_up and not (section.h_tw_ratio and section.h_tw_ratio > slender):
+        return []                                                # rolled shapes: only a slender web brings F13.2
+    if not case.Mux:
+        return [_absent("Proporciones de la sección I (F13.2)", "F13.2", NO_APLICA, "Sin flexión respecto de x.")]
+    rows = []
+    if singly:
+        ratios = [p["Iyc"] / p["Iy"] for p in (i_major_properties(section, "top"), i_major_properties(section, "bottom"))]
+        rows.append(_limit("Inercia del ala comprimida respecto de y (Iyc/Iy), con cualquiera de las dos alas",
+                           f"{ratios[0]:.3f} (superior), {ratios[1]:.3f} (inferior)", "0.1 ≤ Iyc/Iy ≤ 0.9", "F13.2 (F13-2)",
+                           all(0.1 <= r <= 0.9 for r in ratios)))
+    compression = case.flexure.compression_flange if case.flexure else None
+    if singly and compression is None:
+        return rows + [_absent("Proporciones del alma esbelta (h/tw, aw)", "F13.2", SIN_DATO,
+                               "Indique flexure.compression_flange para obtener hc y aw.")]
+    if not built_up and missing_properties(section, ("bf", "tf", "tw")):
+        return rows + [_absent("Proporciones del alma esbelta (h/tw, aw)", "F13.2", SIN_DATO, "El catálogo no da bf, tf o tw.")]
+    p = i_major_properties(section, compression)
+    if (p["hc"] if singly else p["h"]) / p["tw"] <= slender:
+        return rows + [_absent("Proporciones del alma esbelta (h/tw, aw)", "F13.2", NO_APLICA, "Alma no esbelta.")]
+    h_tw, aw = p["h"] / p["tw"], p["hc"] * p["tw"] / (p["bfc"] * p["tfc"])
+    return rows + [
+        _limit("Esbeltez del alma esbelta sin rigidizadores (h/tw)", h_tw, f"≤ 0.40E/Fy = {0.40 * E / Fy:.1f}", "F13.2 (F13-4)",
+               h_tw <= 0.40 * E / Fy),
+        _limit("Esbeltez del alma sin rigidizadores (h/tw)", h_tw, "≤ 260", "F13.2", h_tw <= 260.0),
+        _limit("Relación entre el área comprimida del alma y la del ala comprimida (aw)", aw, "≤ 10", "F13.2 (F4-12)", aw <= 10.0),
+    ]
+
+
 def _steel_geometry(case, section, checks):
     rows = []
     family = section.type.upper()
@@ -299,6 +333,8 @@ def _steel_geometry(case, section, checks):
             )
         else:
             rows.append(_absent("Relación diámetro-espesor del tubo a flexión (D/t)", "F8", NO_APLICA, "Sin flexión."))
+    if family in {"W", "I_BUILT_UP"}:
+        rows += _proportioning_limits(case, section)
     return rows
 
 

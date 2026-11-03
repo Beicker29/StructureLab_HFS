@@ -177,7 +177,7 @@ class SteelDesignEngine:
         for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
             if moment:
                 check = self._check(
-                    f"flexure_{axis}", "F", abs(moment), "kN·m", flexure_obligations(section, axis),
+                    f"flexure_{axis}", "F", abs(moment), "kN·m", flexure_obligations(case, section, axis),
                     lambda axis=axis: flexure_strength(flexure_case, section, axis, catalog=self._catalog),
                     section, inconsistent)
                 if cb_factor and check.result:
@@ -211,7 +211,7 @@ class SteelDesignEngine:
             if moment:
                 steel = lambda axis=axis: flexure_strength(flexure_case, section, axis, catalog=self._catalog)  # noqa: E731
                 negative = kind == "beam" and case.composite.beam.moment == "negative" and axis == "x"
-                obligations = flexure_obligations(section, axis) if negative else composite_obligations(case, "flexure")
+                obligations = flexure_obligations(case, section, axis) if negative else composite_obligations(case, "flexure")
                 checks.append(self._check(
                     f"flexure_{axis}", "F" if negative else "I", abs(moment), "kN·m", obligations,
                     lambda axis=axis, steel=steel: composite_flexure(flexure_case, section, axis, steel),

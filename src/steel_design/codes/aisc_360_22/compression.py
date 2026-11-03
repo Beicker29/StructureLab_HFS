@@ -16,6 +16,7 @@ _B41A = {
     3: (0.45, "sqrt"),   # legs of single angles, 2L with separators, other unstiffened
     5: (1.49, "sqrt"),   # webs of doubly symmetric I and channels
     6: (1.40, "sqrt"),   # walls of rectangular HSS
+    8: (1.49, "sqrt"),   # all other stiffened elements (webs of singly symmetric I)
     9: (0.11, "linear"), # round HSS, D/t
 }
 
@@ -28,6 +29,12 @@ def lambda_r(case: int, E: float, Fy: float) -> float:
     _positive(E=E, Fy=Fy)
     coefficient, form = _B41A[case]
     return coefficient * (E / Fy if form == "linear" else math.sqrt(E / Fy))
+
+
+def lambda_r_built_up_flange(*, kc: float, E: float, Fy: float) -> float:
+    """Table B4.1a case 2, flanges of built-up I-shaped sections: 0.64*sqrt(kc*E/Fy), kc from note [a]."""
+    _positive(kc=kc, E=E, Fy=Fy)
+    return 0.64 * math.sqrt(kc * E / Fy)
 
 
 def elastic_flexural_stress(E: float, Lc: float, r: float) -> float:

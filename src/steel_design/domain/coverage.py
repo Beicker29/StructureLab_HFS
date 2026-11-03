@@ -15,37 +15,49 @@ EXPECTED_ELEMENTS = {
     "W": {"flange", "web"}, "CHANNEL": {"flange", "web"},
     "RECTANGULAR_HSS": {"wall_b", "wall_h"}, "CIRCULAR_HSS": {"wall"},
     "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"long_leg", "short_leg"},
-    "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(),
+    "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(), "I_BUILT_UP": {"top_flange", "bottom_flange", "web"},
 }
 
 
 # B4.1b flexure elements expected per (family, axis), and limit states per Table User Note F1.1.
-FLEXURE_ELEMENTS = {"W": {"flange", "web"}, "CHANNEL": {"flange", "web"}, "RECTANGULAR_HSS": {"flange", "web"},
+FLEXURE_ELEMENTS = {"W": {"flange", "web"}, "CHANNEL": {"flange", "web"}, "I_BUILT_UP": {"flange", "web"},
+                    "RECTANGULAR_HSS": {"flange", "web"},
                     "CIRCULAR_HSS": {"wall"}, "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(),
                     "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"flange_legs", "web_legs"}}
 FLEXURE_STATES = {
     ("W", "x"): ("Y", "LTB", "FLB", "TFR"), ("CHANNEL", "x"): ("Y", "LTB", "FLB", "TFR"),
-    ("W", "y"): ("Y", "FLB"), ("CHANNEL", "y"): ("Y", "FLB"),
+    ("W", "y"): ("Y", "FLB"), ("CHANNEL", "y"): ("Y", "FLB"), ("I_BUILT_UP", "y"): ("Y", "FLB"),
     ("RECTANGULAR_HSS", "x"): ("Y", "FLB", "WLB", "LTB"), ("RECTANGULAR_HSS", "y"): ("Y", "FLB", "WLB", "LTB"),
     ("CIRCULAR_HSS", "x"): ("Y", "LB"), ("CIRCULAR_HSS", "y"): ("Y", "LB"),
 }
 _STATE_TEXT = {"Y": ("F1.1", "Fluencia (momento plástico)."), "LTB": ("F1.1", "Pandeo lateral-torsional."),
                "FLB": ("F1.1", "Pandeo local del ala comprimida."), "WLB": ("F1.1", "Pandeo local del alma."),
                "LB": ("F8", "Pandeo local de la pared."), "LLB": ("F10", "Pandeo local del ala del ángulo."),
-               "TFR": ("F13.1", "Rotura del ala traccionada si tiene agujeros (requiere declararlo).")}
+               "TFR": ("F13.1", "Rotura del ala traccionada si tiene agujeros (requiere declararlo)."),
+               "CFY": ("F4 / F5", "Fluencia del ala comprimida."), "TFY": ("F4 / F5", "Fluencia del ala traccionada.")}
+_F4_F5_STATES = ("CFY", "LTB", "FLB", "TFY", "TFR")
 
 
-def flexure_obligations(section: Section, axis: str) -> list[Obligation]:
+def _i_beyond_f2_f3(case: SteelCase, section: Section) -> bool:
+    """F2 and F3 cover doubly symmetric I-shapes with compact webs (Table B4.1b case 15); the rest is F4 or F5."""
+    if section.bf_bottom is not None and (section.bf_bottom, section.tf_bottom) != (section.bf, section.tf):
+        return True
+    return bool(section.h_tw_ratio) and section.h_tw_ratio > 3.76 * math.sqrt(case.material.E / case.material.Fy)
+
+
+def flexure_obligations(case: SteelCase, section: Section, axis: str) -> list[Obligation]:
     family = section.type.upper()
     states: tuple[str, ...]
-    if family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
+    if family in {"W", "I_BUILT_UP"} and axis == "x" and _i_beyond_f2_f3(case, section):
+        states = _F4_F5_STATES                    # Table User Note F1.1: CFY, LTB, FLB, TFY; plus F13.1
+    elif family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
         states = ("Y", "LTB")                     # F11
     elif family == "SINGLE_ANGLE":
         states = ("Y", "LTB", "LLB")              # F10
     elif family == "DOUBLE_ANGLE":
         states = ("Y", "LTB", "FLB", "WLB")       # F9
     else:
-        states = FLEXURE_STATES.get((family, axis), ("Y",))
+        states = FLEXURE_STATES.get((family if family != "I_BUILT_UP" else "W", axis), ("Y",))
     out = [Obligation(id="classification", provision="B4.1b",
                       reason="Todo elemento comprimido debe clasificarse en flexión (compacto/no compacto/esbelto).")]
     return out + [Obligation(id=k, provision=_STATE_TEXT[k][0], reason=_STATE_TEXT[k][1]) for k in states]
@@ -53,6 +65,7 @@ def flexure_obligations(section: Section, axis: str) -> list[Obligation]:
 
 # Chapter G section per family (shear accompanying Mux / Muy).
 SHEAR_PROVISIONS = {("W", "x"): "G2.1", ("CHANNEL", "x"): "G2.1", ("W", "y"): "G6", ("CHANNEL", "y"): "G6",
+                    ("I_BUILT_UP", "x"): "G2.1", ("I_BUILT_UP", "y"): "G6",
                     ("RECTANGULAR_HSS", "x"): "G4", ("RECTANGULAR_HSS", "y"): "G4",
                     ("CIRCULAR_HSS", "x"): "G5", ("CIRCULAR_HSS", "y"): "G5",
                     ("SINGLE_ANGLE", "x"): "G3", ("SINGLE_ANGLE", "y"): "G3",
@@ -100,7 +113,7 @@ def interaction_obligations(case: SteelCase, section: Section) -> list[Obligatio
     out = [Obligation(id="H1", provision="H1.1" if case.Pu >= 0 else "H1.2",
                       reason="Interacción de fuerza axial y flexión (H1-1a/H1-1b).")]
     flexure = case.flexure
-    if (section.type.upper() in {"W", "CHANNEL"} and case.Pu < 0 and case.Mux and flexure
+    if (section.type.upper() in {"W", "CHANNEL", "I_BUILT_UP"} and case.Pu < 0 and case.Mux and flexure
             and flexure.tension_flange_holes):
         out.append(Obligation(id="H4", provision="H4", reason="Rotura del ala traccionada con agujeros bajo tracción "
                                                               "y flexión (H4-1)."))
@@ -129,9 +142,10 @@ def required_obligations(case: SteelCase, section: Section) -> list[Obligation]:
     out += [Obligation(id="FB-x", provision="E3", reason="Pandeo por flexión respecto de x."),
             Obligation(id="FB-y", provision="E3", reason="Pandeo por flexión respecto de y.")]
     offsets = f.xa != 0 or f.ya != 0
-    if family in {"CHANNEL", "DOUBLE_ANGLE"}:
+    singly_i = family == "I_BUILT_UP" and (section.bf_bottom, section.tf_bottom) != (section.bf, section.tf)
+    if family in {"CHANNEL", "DOUBLE_ANGLE"} or singly_i:
         out.append(Obligation(id="FTB", provision="E4(b)", reason="Miembro con un eje de simetría: pandeo flexotorsional."))
-    elif family in {"W", "RECTANGULAR_HSS", "CIRCULAR_HSS"} and (offsets or ln.Lz > min(ln.Lx, ln.Ly)):
+    elif family in {"W", "I_BUILT_UP", "RECTANGULAR_HSS", "CIRCULAR_HSS"} and (offsets or ln.Lz > min(ln.Lx, ln.Ly)):
         out.append(Obligation(id="TB", provision="E4(a)/(d)/(e)/(f)",
                               reason="Miembro doblemente simétrico con longitud no arriostrada torsional mayor que la lateral, "
                                      "o arriostramiento lateral desplazado del centro de corte."))
@@ -149,6 +163,8 @@ def discharge(obligations: list[Obligation], section: Section, result: dict) -> 
     expected = (FLEXURE_ELEMENTS if result.get("chapter") == "F" else EXPECTED_ELEMENTS).get(family)
     if result.get("chapter") == "F" and family in {"W", "CHANNEL"} and result.get("axis") == "y":
         expected = {"flange"}
+    if result.get("chapter") == "F" and family == "I_BUILT_UP" and result.get("axis") == "y":
+        expected = {"top_flange", "bottom_flange"}
     for item in obligations:
         if item.id == "classification" and elements == expected:
             item.satisfied_by = "clasificación"

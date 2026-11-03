@@ -70,6 +70,15 @@ def i_shape(name, family, fy, axis):
     return 2 * D("0.6") * fy * p["bf"] * p["tf"] * cv2(ratio, D("1.2"), fy), D("0.90")   # G6-1, two flanges
 
 
+def built_up_i(d, tw, top, bottom, fy, axis):
+    """Welded I: G2.1(b) always (G2.1(a) is for rolled shapes), Aw = d*tw; G6 per flange with its own bf/2tf."""
+    d, tw, fy = D(d), D(tw), D(fy)
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (top, bottom)]
+    if axis == "x":
+        return D("0.6") * fy * d * tw * cv1((d - tt - tb) / tw, D("5.34"), fy), D("0.90")   # G2-1, G2-3/G2-4
+    return sum(D("0.6") * fy * b * t * cv2(b / (2 * t), D("1.2"), fy) for b, t in ((bt, tt), (bb, tb))), D("0.90")   # G6-1
+
+
 def rect_hss(name, fy, axis):
     p, fy = row("RECTANGULAR_HSS", name), D(fy)
     t = p["tdes"]
@@ -135,12 +144,15 @@ CASES = {
     "BAR-G4-G2-10": dict(kind="bar", H=650, B=10, fy=345, axis="x"),
     "BAR-G4-G2-11": dict(kind="bar", H=10, B=750, fy=345, axis="y"),
     "ROUND-G4": dict(kind="round", D_=50, fy=250),
+    "BUI-G2.1b-stocky-web": dict(kind="bui", d=400, tw=12, top=(250, 20), bottom=(200, 16), fy=345, axis="x"),
+    "BUI-G2.1b-Cv1": dict(kind="bui", d=1200, tw=8, top=(400, 20), bottom=(400, 20), fy=345, axis="x"),
+    "BUI-G6-unequal": dict(kind="bui", d=900, tw=8, top=(350, 22), bottom=(600, 10), fy=345, axis="y"),
 }
 
 
 def build(spec):
     args = {k: v for k, v in spec.items() if k != "kind"}
-    modes = {"i": i_shape, "rhss": rect_hss, "chss": round_hss, "angle": angle, "bar": bar, "round": solid_round}
+    modes = {"i": i_shape, "rhss": rect_hss, "chss": round_hss, "angle": angle, "bar": bar, "round": solid_round, "bui": built_up_i}
     vn, phi = modes[spec["kind"]](**args)
     return {"spec": spec, "Vn_kN": vn / 1000, "phi_v": phi, "phiVn_kN": phi * vn / 1000}
 

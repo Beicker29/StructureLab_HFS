@@ -11,8 +11,9 @@ from conftest import ROOT, calculation_report
 
 from steel_design.codes.aisc_360_22 import flexure as eq
 from steel_design.domain.flexure import flexure_strength
-from steel_design.errors import IncompleteSectionDataError
+from steel_design.errors import IncompleteSectionDataError, ValidationError
 from steel_design.models import SteelCase
+from steel_design.sections.geometry import built_up_i_properties, i_major_properties
 
 REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_f/reference.json").read_text(encoding="utf-8"))["cases"]
 REL = 1e-9
@@ -42,6 +43,12 @@ def flexure_case(spec, moment=1.0):
         data.update(section_name="BAR", custom_section={"type": "SOLID_RECTANGULAR", "H": spec["H"], "B": spec["B"]})
     elif kind == "round":
         data.update(section_name="ROUND", custom_section={"type": "SOLID_CIRCULAR", "diameter": spec["D_"]})
+    elif kind in {"bui", "buiy"}:
+        data.update(section_name="PL", custom_section={
+            "type": "I_BUILT_UP", "d": spec["d"], "tw": spec["tw"], "top_flange": {"b": spec["top"][0], "t": spec["top"][1]},
+            "bottom_flange": {"b": spec["bottom"][0], "t": spec["bottom"][1]}})
+        if spec.get("comp"):
+            flexure["compression_flange"] = spec["comp"]
     else:
         data["section_name"] = spec["name"]
     return SteelCase(tau_b=1.0, **data)
@@ -65,8 +72,8 @@ def test_catalog_profiles_match_independent_calculation(engine, case_id):
 def test_reference_bank_covers_sections_and_equations():
     families = {(c["spec"]["kind"], c["spec"].get("family")) for c in REFERENCE.values()}
     assert {("w", "W"), ("w", "CHANNEL"), ("rhss", None), ("chss", None), ("bar", None), ("round", None),
-            ("2l", None), ("lg", None), ("lp", None)} <= families
-    assert {c["governing"] for c in REFERENCE.values()} >= {"Y", "LTB", "FLB", "TFR", "LB", "LLB"}
+            ("2l", None), ("lg", None), ("lp", None), ("bui", None), ("buiy", None)} <= families
+    assert {c["governing"] for c in REFERENCE.values()} >= {"Y", "LTB", "FLB", "TFR", "LB", "LLB", "TFY"}
 
 
 def test_every_limit_state_is_reported_and_obligations_discharged(engine):
@@ -210,3 +217,106 @@ def test_ltb_with_lb_from_the_lengths_matches_independent_calculation(engine):
     case = SteelCase(tau_b=1.0, section_name="W18X50", material={"Fy": 345}, Mux=1, flexure={"tension_flange_holes": False},
                      lengths={"Lx": 12000, "Ly": 4000, "Lz": 9000})
     assert engine.run(case).check("flexure_x").capacity == pytest.approx(float(ref["phiMn_kNm"]), rel=REL)
+
+
+# --- Welded built-up I-shapes (F2 to F6, F13.2) -------------------------------------------------------------------------
+
+def girder(d, tw, top, bottom, flexure=None, lengths=None, **demands):
+    return SteelCase(section_name="PL", material={"Fy": 345, "Fu": 450}, lengths=lengths or {"Lx": 3000, "Ly": 3000, "Lz": 3000},
+                     custom_section={"type": "I_BUILT_UP", "d": d, "tw": tw, "top_flange": {"b": top[0], "t": top[1]},
+                                     "bottom_flange": {"b": bottom[0], "t": bottom[1]}},
+                     flexure={"tension_flange_holes": False, **(flexure or {})}, **demands)
+
+
+def test_plate_properties_of_a_doubly_symmetric_girder():
+    p = built_up_i_properties(d=600, tw=10, bf_top=250, tf_top=20, bf_bottom=250, tf_bottom=20)
+    assert p["area"] == pytest.approx(2 * 250 * 20 + 560 * 10)
+    assert p["ix"] == pytest.approx(10 * 560**3 / 12 + 2 * (250 * 20**3 / 12 + 250 * 20 * 290**2))
+    assert p["zx"] == pytest.approx(2 * 250 * 20 * 290 + 10 * 560**2 / 4)
+    assert p["cw"] == pytest.approx((2 * 20 * 250**3 / 12) * 580**2 / 4)          # Iy(flanges)*ho^2/4
+    assert p["j"] == pytest.approx((2 * 250 * 20**3 + 560 * 10**3) / 3)
+    assert p["yo"] == pytest.approx(0, abs=1e-9) and p["H"] == pytest.approx(1)
+
+
+def test_the_compression_flange_swaps_sxc_and_sxt(engine):
+    section = engine.section_for(girder(900, 8, (350, 22), (250, 16), Mux=1))
+    top, bottom = i_major_properties(section, "top"), i_major_properties(section, "bottom")
+    assert top["Sxc"] == pytest.approx(bottom["Sxt"]) and top["Sxt"] == pytest.approx(bottom["Sxc"])
+    assert top["Sxc"] > top["Sxt"] and top["hc"] < bottom["hc"]
+    assert section.sx == pytest.approx(min(top["Sxc"], top["Sxt"]))                     # F13.1: minimum Sx
+
+
+def test_unequal_flanges_need_the_compression_flange(engine):
+    result = engine.run(girder(900, 8, (350, 22), (250, 16), Mux=100))
+    check = result.check("flexure_x")
+    assert check.status.value == "INCOMPLETE" and check.errors[0]["details"]["fields"] == ["flexure.compression_flange"]
+
+
+@pytest.mark.parametrize("flange, provision, states", [
+    ("top", "F4", {"CFY", "LTB", "TFY"}), ("bottom", "F4", {"CFY", "LTB"}),
+])
+def test_singly_symmetric_girders_use_f4_and_discharge_its_obligations(engine, flange, provision, states):
+    check = engine.run(girder(900, 8, (350, 22), (250, 16), flexure={"compression_flange": flange}, Mux=100)).check("flexure_x")
+    assert check.result["provisions"] == ["F1", provision, "F13.1"] and check.status.value == "PASS"
+    assert {k for k, m in check.result["modes"].items() if m["applies"]} == states
+    assert set(check.result["modes"]) == {"CFY", "LTB", "FLB", "TFY", "TFR"}
+    assert all(o.satisfied_by for o in check.obligations)
+
+
+def test_a_rolled_shape_with_a_noncompact_web_goes_to_f4(sections):
+    section = sections["W18X50"].model_copy(update={"h_tw_ratio": 110.0})               # 3.76 < 110/sqrt(E/Fy) < 5.70
+    case = SteelCase(section_name="W18X50", material={"Fy": 345}, Mux=1, lengths={"Lx": 1000, "Ly": 1000, "Lz": 1000},
+                     flexure={"tension_flange_holes": False})
+    out = flexure_strength(case, section, "x")
+    rpc = out["modes"]["CFY"]
+    assert out["provisions"][1] == "F4" and rpc["Rpc_equation"] == "F4-9b"
+    assert 1 < rpc["Rpc"] < section.zx / section.sx and not out["modes"]["TFY"]["applies"]    # Sxt = Sxc
+
+
+def test_slender_web_girder_uses_f5_with_rpg(engine):
+    check = engine.run(girder(1200, 8, (400, 20), (400, 20), lengths={"Lx": 6000, "Ly": 6000, "Lz": 6000}, Mux=100)).check("flexure_x")
+    modes = check.result["modes"]
+    assert check.result["provisions"][1] == "F5" and modes["CFY"]["Rpg"] < 1
+    assert modes["FLB"]["Fcr_equation"] == "F5-8" and modes["LTB"]["Fcr_equation"] == "F5-3"
+
+
+def test_f13_2_limits_of_slender_webs_decide_the_status(engine):
+    result = engine.run(girder(1500, 5, (400, 25), (400, 25), Mux=10))
+    assert result.check("flexure_x").status.value == "PASS"
+    failed = [e for e in result.errors if e["code"] == "TECHNICAL_REQUIREMENT_NOT_MET"]
+    assert result.status.value == "FAIL" and {e["provision"] for e in failed} == {"F13.2 (F13-4)", "F13.2"}
+
+
+def test_f13_2_limits_iyc_over_iy_of_singly_symmetric_girders(engine):
+    result = engine.run(girder(900, 10, (500, 25), (150, 10), flexure={"compression_flange": "top"}, Mux=10))
+    assert result.status.value == "FAIL"
+    assert any(e["provision"] == "F13.2 (F13-2)" for e in result.errors)
+
+
+@pytest.mark.parametrize("custom", [
+    {"type": "I_BUILT_UP", "d": 600, "tw": 10, "top_flange": {"b": 250, "t": 20}},                         # bottom flange missing
+    {"type": "I_BUILT_UP", "d": 600, "tw": 10, "H": 5, "top_flange": {"b": 250, "t": 20}, "bottom_flange": {"b": 250, "t": 20}},
+    {"type": "SOLID_RECTANGULAR", "H": 100, "B": 20, "tw": 5},
+])
+def test_built_up_input_must_be_complete_and_exclusive(custom):
+    with pytest.raises(ValueError):
+        SteelCase(section_name="PL", material={"Fy": 345}, Mux=1, custom_section=custom)
+
+
+def test_flanges_must_leave_a_web(engine):
+    with pytest.raises(ValidationError):
+        engine.run(girder(40, 10, (250, 20), (250, 20), Mux=1))
+
+
+def test_built_up_girders_in_fire_use_chapter_f_not_a_4_13(engine):
+    case = girder(600, 10, (250, 20), (250, 20), Mux=10).model_copy(
+        update={"condition": "fire", "fire": {"steel_temperature": 500}})
+    ltb = engine.run(case).check("flexure_x").result["modes"]["LTB"]
+    assert ltb["equation"] == "F2-2" and "4.2.4d(e)" in ltb["provision"]
+
+
+def test_cb_is_amplified_only_for_doubly_symmetric_girders(engine):
+    def factor(top, bottom):
+        case = girder(900, 10, top, bottom, flexure={"tension_cb_amplification": True, "compression_flange": "top"}, Pu=-200, Mux=10)
+        return engine.run(case).check("flexure_x").result["inputs"]["H1_2_Cb_factor"]
+    assert factor((300, 20), (300, 20)) > 1 and factor((350, 22), (250, 16)) is None

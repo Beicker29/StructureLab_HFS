@@ -2,7 +2,7 @@
 
 Axis convention: "x" is the shear that accompanies bending about x (parallel to y, resisted by the
 web of I-shapes and channels, the H walls of rectangular HSS and the legs parallel to y of angles);
-"y" accompanies bending about y. Families: rolled I-shapes and channels (G2.1, G6), single and
+"y" accompanies bending about y. Families: rolled and welded built-up I-shapes and channels (G2.1, G6), single and
 double angles (G3), rectangular HSS and solid bars (G4), round HSS (G5). Webs without transverse
 stiffeners. Formulas live in codes/aisc_360_22/shear.py. Missing data or decisions raise structured errors.
 """
@@ -40,11 +40,10 @@ def _element(name, ratio, cv, kv):
 
 
 def _i_web(section, E, Fy):
-    """G2.1, shear parallel to the web of a rolled I-shape or channel."""
+    """G2.1, shear parallel to the web of an I-shape or channel; G2.1(a) only for rolled I-shapes."""
     _require(section, "d", "tw", "h_tw_ratio")
-    channel = section.type.upper() == "CHANNEL"
     h_tw, aw = section.h_tw_ratio, section.d * section.tw
-    if not channel and h_tw <= eq.rolled_web_limit(E=E, Fy=Fy):
+    if section.type.upper() == "W" and h_tw <= eq.rolled_web_limit(E=E, Fy=Fy):
         cv = {"Cv": 1.0, "equation": "G2-2", "limit": eq.rolled_web_limit(E=E, Fy=Fy)}
         phi, provision, kv = eq.PHI_V_ROLLED, "G2.1(a)", None
     else:
@@ -56,8 +55,23 @@ def _i_web(section, E, Fy):
                                                             "Cv_equation": cv["equation"]}
 
 
+def _built_up_flanges(section, E, Fy):
+    """G6 for a built-up I: each flange with its own bf/2tf and Cv2."""
+    _require(section, "bf", "tf", "bf_bottom", "tf_bottom")
+    rows, out = [], {"Vn": 0.0, "equation": "G6-1 (2 alas)", "flanges": 2}
+    for name, bf, tf in (("top_flange", section.bf, section.tf), ("bottom_flange", section.bf_bottom, section.tf_bottom)):
+        cv = eq.cv2(h_tw=bf / (2 * tf), kv=eq.KV_LEG, E=E, Fy=Fy)
+        rows.append(_element(name, bf / (2 * tf), cv, eq.KV_LEG))
+        one = eq.flange_strength(Fy=Fy, bf=bf, tf=tf, Cv=cv["Cv"])["Vn"]
+        out[f"Vn_{name}_N"] = one
+        out["Vn"] += one
+    return "G6", eq.PHI_V, rows, out
+
+
 def _i_flanges(section, E, Fy):
     """G6, minor-axis shear: both flanges resist (G6-1 per flange)."""
+    if section.type.upper() == "I_BUILT_UP":
+        return _built_up_flanges(section, E, Fy)
     _require(section, "bf", "tf")
     channel = section.type.upper() == "CHANNEL"
     ratio = section.bf / section.tf if channel else section.bf / (2 * section.tf)
@@ -137,7 +151,8 @@ def _yielding_at_temperature(section, rows, out, ky):
             "alternativo.",
             section,
         )
-    return {**out, **{key: ky * out[key] for key in ("Vn", "Vn_per_flange_N", "Fcr") if key in out}}
+    scaled = ("Vn", "Vn_per_flange_N", "Vn_top_flange_N", "Vn_bottom_flange_N", "Fcr")
+    return {**out, **{key: ky * out[key] for key in scaled if key in out}}
 
 
 def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
@@ -147,7 +162,7 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
     if not is_standard_modulus(E):
         raise IncompleteSectionDataError("El Capítulo G usa E = 200000 MPa.", code="SHEAR_DATA_INCOMPLETE",
                                          details={"section": section.name, "fields": ["material.E"]})
-    if family in {"W", "CHANNEL"}:
+    if family in {"W", "CHANNEL", "I_BUILT_UP"}:
         provision, phi, rows, out = _i_web(section, E, Fy) if axis == "x" else _i_flanges(section, E, Fy)
     elif family == "RECTANGULAR_HSS":
         provision, phi, rows, out = _rect_hss(section, E, Fy, axis)

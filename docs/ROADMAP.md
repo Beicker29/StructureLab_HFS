@@ -16,6 +16,8 @@ ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no
 - Capítulo F, etapa 1: W/I, canal compacto, PTE rectangular y redondo, barras
   (F2, F3, F6, F7, F8, F11, F13.1), verificado con cálculos independientes
   ([detalle](chapter-f.md)). Resultado por comprobación (axial, flexión x, flexión y).
+- Capítulo F, F4 y F5: perfiles I con alma no compacta o esbelta y de simetría simple, con la entrada de I
+  armadas soldadas (`custom_section` `I_BUILT_UP`) y los límites de F13.2.
 - Capítulo F, etapa 2: F9 ángulos dobles (eje x) y F10 ángulos simples en ejes
   geométricos y principales (`Mw`, `Mz`), verificado con cálculos independientes.
 - Capítulo G (cortante): G2.1 sin rigidizadores, G3, G4, G5 y G6, verificado con

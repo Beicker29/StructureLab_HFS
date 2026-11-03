@@ -111,8 +111,27 @@ def be_e7(b, t, lam_r, fn, fy, c1):
     return b * (1 - c1 * sqrt(fel / fn)) * sqrt(fel / fn)
 
 
-def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None):
-    p = row(family, name)
+def plate_i(d, tw, top, bottom):
+    """Welded I from its plates (no weld radii): catalog-like keys. Thin-walled J, Cw and shear center (DF-17)."""
+    d, tw = D(d), D(tw)
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (top, bottom)]
+    h = d - tt - tb
+    parts = [(bb * tb, tb / 2, bb, tb), (h * tw, tb + h / 2, tw, h), (bt * tt, d - tt / 2, bt, tt)]   # (A, y up, width, depth)
+    ag = sum(a for a, _, _, _ in parts)
+    ybar = sum(a * y for a, y, _, _ in parts) / ag
+    ix = sum(w * t**3 / 12 + a * (y - ybar) ** 2 for a, y, w, t in parts)
+    it, ib = tt * bt**3 / 12, tb * bb**3 / 12
+    iy = it + ib + h * tw**3 / 12
+    ho = d - tt / 2 - tb / 2
+    yo = tb / 2 + ho * it / (it + ib) - ybar                    # shear center above the bottom flange centroid
+    ro2 = yo**2 + (ix + iy) / ag                                 # E4-9, xo = 0
+    return {"A": ag, "Ix": ix, "Iy": iy, "rx": sqrt(ix / ag), "ry": sqrt(iy / ag), "J": (bt * tt**3 + bb * tb**3 + h * tw**3) / 3,
+            "Cw": ho**2 * it * ib / (it + ib), "ro": sqrt(ro2), "H": 1 - yo**2 / ro2, "h": h, "tw": tw, "bt": bt, "tt": tt,
+            "bb": bb, "tb": tb, "singly": (bt, tt) != (bb, tb)}
+
+
+def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=None):
+    p = plate_i(*girder) if family == "I_BUILT_UP" else row(family, name)
     fy, Lx = D(fy), D(Lx)
     Ly = D(Ly) if Ly is not None else Lx
     Lz = D(Lz) if Lz is not None else Lx
@@ -129,6 +148,17 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None):
         if ya:
             ro2 = p["rx"]**2 + p["ry"]**2 + ya**2           # E4-11
             modes["TB"] = (PI**2 * E * p["Iy"] / Lz**2 * (p["ho"]**2 / 4 + ya**2) + G * p["J"]) / (ag * ro2)  # E4-10
+        else:
+            modes["TB"] = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
+    elif family == "I_BUILT_UP":
+        kc = min(max(4 / sqrt(p["h"] / p["tw"]), D("0.35")), D("0.76"))
+        lr_f, lr_w = D("0.64") * sqrt(kc * E / fy), D("1.49") * rt  # B4.1a case 2 (note [a]) and case 5 or 8
+        plates = [(p["bt"] / 2, p["tt"], lr_f, D("0.22"), 2), (p["bb"] / 2, p["tb"], lr_f, D("0.22"), 2),
+                  (p["h"], p["tw"], lr_w, D("0.18"), 1)]
+        modes["FB-x"], modes["FB-y"] = fe_flex(Lx, p["rx"]), fe_flex(Ly, p["ry"])
+        if p["singly"]:                                          # E4(b): y is the axis of symmetry
+            fez = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
+            modes["FTB"] = e4_3(modes["FB-y"], fez, p["H"])
         else:
             modes["TB"] = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
     elif family == "CHANNEL":
@@ -220,7 +250,7 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None):
         out[mode] = {"Fe_mpa": fe, "Fn_mpa": fn, "A_mm2": ae, "Pn_kN": pn / 1000}
     gov = min(out, key=lambda k: out[k]["Pn_kN"])
     pn = out[gov]["Pn_kN"]
-    return {"family": family, "section": name, "Fy": fy, "Lx": Lx, "Ly": Ly, "Lz": Lz, "ya": ya, "e5": e5,
+    return {"family": family, "section": name, "girder": girder, "Fy": fy, "Lx": Lx, "Ly": Ly, "Lz": Lz, "ya": ya, "e5": e5,
             "e6": e6, "slender": slender, "modes": out, "governing_mode": gov, "Pn_kN": pn,
             "LRFD_kN": D("0.90") * pn}
 
@@ -251,6 +281,11 @@ CASES = {
     "2L-contact-welded": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Lx=2000, e6=("welded", 500)),
     "2L-separated-snug": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4X3/4", fy=345, Lx=2000, e6=("snug_tight", 800)),
     "2L-LLBB-pretensioned": dict(family="DOUBLE_ANGLE", name="2L8X4X1/2LLBB", fy=345, Lx=3000, e6=("pretensioned", 1500)),
+    "BUI-singly-FTB-slender-web": dict(family="I_BUILT_UP", name="PL900", girder=(900, 8, (350, 22), (250, 16)), fy=345, Lx=9000,
+                                       Ly=3000, Lz=3000),
+    "BUI-singly-nonslender": dict(family="I_BUILT_UP", name="PL400", girder=(400, 12, (250, 20), (200, 16)), fy=345, Lx=6000),
+    "BUI-doubly-TB-slender-flange": dict(family="I_BUILT_UP", name="PL500", girder=(500, 10, (300, 10), (300, 10)), fy=345,
+                                         Lx=4000, Ly=2000, Lz=4000),
 }
 
 

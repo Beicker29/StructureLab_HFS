@@ -13,14 +13,16 @@ from typing import Any
 from ..codes.aisc_360_22 import appendix_4 as a4
 from ..codes.aisc_360_22 import compression as eq
 from ..codes.aisc_360_22.constants import G_STEEL, is_standard_modulus
+from ..codes.aisc_360_22.flexure import flange_kc
 from ..errors import blocking_error, incomplete_error
 from ..models import SteelCase
+from ..sections.geometry import singly_symmetric_i
 from ..sections.identity import double_angle_label
 from ..sections.models import Section, missing_properties
 from .fire import steel_at_temperature, with_fire
 
 SUPPORTED_FAMILIES = ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE",
-                      "SOLID_RECTANGULAR", "SOLID_CIRCULAR")
+                      "SOLID_RECTANGULAR", "SOLID_CIRCULAR", "I_BUILT_UP")
 SOLIDS = ("SOLID_RECTANGULAR", "SOLID_CIRCULAR")
 
 # B4.1a element inventory: (element, ratio source, B4.1a case, thickness field, count, Table E7.1 kind)
@@ -78,6 +80,11 @@ def classify_elements(section: Section, E: float, Fy: float, *, in_contact: bool
         case = 1 if in_contact else 3
         layout = [("long_leg", long_leg / section.t, case, "t", 2, "UNSTIFFENED"),
                   ("short_leg", short_leg / section.t, case, "t", 2, "UNSTIFFENED")]
+    elif family == "I_BUILT_UP":   # B4.1a(a): b = bf/2; the web is case 5 when doubly symmetric, case 8 otherwise
+        _require(section, "bf", "tf", "bf_bottom", "tf_bottom", "h_tw_ratio")
+        layout = [("top_flange", section.bf / (2 * section.tf), 2, "tf", 2, "UNSTIFFENED"),
+                  ("bottom_flange", section.bf_bottom / (2 * section.tf_bottom), 2, "tf_bottom", 2, "UNSTIFFENED"),
+                  ("web", section.h_tw_ratio, 8 if singly_symmetric_i(section) else 5, "tw", 1, "STIFFENED")]
     elif family in _ELEMENTS:
         layout = []
         for element, source, case, thickness, count, kind in _ELEMENTS[family]:
@@ -86,7 +93,7 @@ def classify_elements(section: Section, E: float, Fy: float, *, in_contact: bool
     else:
         _blocked("No hay inventario de elementos B4.1a implementado para esta familia.", section)
     for element, ratio, case, thickness, count, kind in layout:
-        limit = eq.lambda_r(case, E, Fy)
+        limit = eq.lambda_r_built_up_flange(kc=flange_kc(h_tw=section.h_tw_ratio), E=E, Fy=Fy) if case == 2 else eq.lambda_r(case, E, Fy)
         rows.append({"element": element, "b4_case": case, "ratio": ratio, "lambda_r": limit,
                      "slender": ratio > limit, "t_field": thickness, "count": count, "e7_kind": kind})
     return {"elements": rows, "slender": any(row["slender"] for row in rows),
@@ -112,7 +119,9 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
              "FB-y": _flexural_mode("y", E, f.Ky, ln.Ly, section.ry)}
     lcz = f.Kz * ln.Lz
 
-    if family == "W":
+    if family == "I_BUILT_UP" and singly_symmetric_i(section):
+        modes["FTB"] = _singly_symmetric_i_ftb(case, section, modes["FB-y"]["Fe_mpa"], lcz, offsets)
+    elif family in {"W", "I_BUILT_UP"}:
         # Table User Note E1.1 lists TB for doubly symmetric I; evaluated in every case.
         if offsets:
             _require(section, "j", "ix", "iy", "ho")
@@ -171,6 +180,21 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
         else:
             notes.append("E4 no aplica: Lz no supera la longitud no arriostrada lateral (alcance de E4).")
     return modes, notes
+
+
+def _singly_symmetric_i_ftb(case: SteelCase, section: Section, fey: float, lcz: float, offsets: bool) -> dict:
+    """E4(b) for an I symmetric about y only: E4-3 with Fey and Fez (E4-7); ro and H of the thin-walled section (DF-17)."""
+    if offsets:
+        _blocked("E4(f): un arriostramiento desplazado en una I de alas distintas requiere un análisis de pandeo elástico.",
+                 section, xa=case.factors.xa, ya=case.factors.ya)
+    _require(section, "j", "ro", "H")
+    if section.cw is None:
+        _incomplete("E4-7 requiere la constante de alabeo Cw.", section, ["section.cw"])
+    fez = eq.torsional_stress(E=case.material.E, G=G_STEEL, Cw=section.cw, J=section.j, Lcz=lcz, Ag=section.area, ro=section.ro)
+    return {"limit_state": "flexural_torsional_buckling", "provision": "E4(b)", "axis": "y+z", "Fe_equation": "E4-3",
+            "symmetry_axis": "y", "Fey_mpa": fey, "Fez_mpa": fez, "Fez_equation": "E4-7", "Lcz_mm": lcz, "Cw_mm6": section.cw,
+            "J_mm4": section.j, "ro_mm": section.ro, "H": section.H,
+            "Fe_mpa": eq.flexural_torsional_stress_singly_symmetric(fey, fez, section.H)}
 
 
 def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
@@ -407,6 +431,9 @@ def compression_strength(case: SteelCase, section: Section,
     worst = max(m["Lc_over_r"] for m in modes.values() if "Lc_over_r" in m)
     if worst > 200:
         notes.append(f"Nota de E2: Lc/r = {worst:.1f} supera el valor preferible de 200 (recomendación, no límite de resistencia).")
+    if family == "I_BUILT_UP":
+        notes.append("I armada soldada: propiedades de las placas sin radios de soldadura; J, Cw y centro de corte de pared delgada "
+                     "(decisión DF-17).")
     if family == "RECTANGULAR_HSS":
         pending.append(
             "Los anchos de pared b, h provienen del catálogo (dimensión exterior − 3·tdes, B4.1b(d) cuando no se conoce el radio interior)."

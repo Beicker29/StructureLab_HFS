@@ -28,7 +28,8 @@ _SECTION_UNITS = {"area": "mm²", "ix": "mm⁴", "iy": "mm⁴", "iw": "mm⁴", "
                   "sz_a": "mm³", "sz_b": "mm³", "sz_c": "mm³", "H": "–", "tan_alpha": "–"}
 _ELEMENTS = {"flange": "ala", "web": "alma", "wall_b": "pared b", "wall_h": "pared h", "wall": "pared",
              "long_leg": "ala larga", "short_leg": "ala corta", "flange_legs": "alas horizontales",
-             "web_legs": "alas verticales", "walls": "paredes paralelas al cortante", "bar": "barra"}
+             "web_legs": "alas verticales", "walls": "paredes paralelas al cortante", "bar": "barra",
+             "top_flange": "ala superior", "bottom_flange": "ala inferior"}
 
 
 CHECK_TITLES = {"axial": None, "flexure_x": "Flexión respecto de x", "flexure_y": "Flexión respecto de y",

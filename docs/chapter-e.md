@@ -19,6 +19,7 @@ obligatorio de E3–E7.
 | Ángulo simple con `Mw` o `Mz`, fuera de E5 (D-14) | ambas alas caso 3 | E3 respecto de z; E4 si b/t > 0,71√(E/Fy) | FB: E7 con Fn de E3; FTB: E4-1 con Ag | Verificado |
 | Ángulo doble (`2L`) | alas caso 1(3) en contacto o 3(2) con separadores (D-11) | E3 (x); E3 + E6 (y); E4(b) FTB con E6 (E4-3) | E7 con Fn de cada modo | Verificado |
 | Barra maciza (entrada) | ninguno | E3 | — | Verificado |
+| I armada soldada (entrada `I_BUILT_UP`) | alas caso 2 (bf/2tf, 0,64√(kc·E/Fy)), alma caso 5 (doble simetría) u 8 (h/tw) | E3 (x, y); E4-2 TB con doble simetría; E4(b) FTB (E4-3 con Fey) con simetría simple; J, Cw, r̄o y H de pared delgada (DF-17 de [chapter-f.md](chapter-f.md)) | E7 con Fn de cada modo (alas c1 = 0,22) | Verificado |
 
 “Verificado” significa contrastado con cálculos independientes en los casos de
 la tabla siguiente, sin condiciones obligatorias abiertas dentro del dominio
@@ -57,6 +58,9 @@ indicación:
 | 2L-contact-welded | 2L4X4X1/4, L=2000, soldado, a=500 | 345 | sí | FTB | 536.70 | 483.03 |
 | 2L-separated-snug | 2L4X4X1/4X3/4, L=2000, snug-tight, a=800 | 345 | sí | FTB | 458.05 | 412.24 |
 | 2L-LLBB-pretensioned | 2L8X4X1/2LLBB, pretensado, a=1500 | 345 | sí | FTB | 1151.19 | 1036.07 |
+| BUI-singly-FTB-slender-web | I 900, tw 8, 350x22 / 250x16, Lx=9000, Ly=Lz=3000 | 345 | sí | FTB | 4165.06 | 3748.56 |
+| BUI-singly-nonslender | I 400, tw 12, 250x20 / 200x16, L=6000 | 345 | no | FTB | 1665.86 | 1499.27 |
+| BUI-doubly-TB-slender-flange | I 500, tw 10, alas 300x10, Lx=Lz=4000, Ly=2000 | 345 | sí | TB | 2741.32 | 2467.19 |
 
 El software coincide con todos los modos (Fe, Fn, área, Pn) y con φc·Pn (LRFD) con
 tolerancia relativa 1e-9. El programa trabaja solo con LRFD (φc = 0,90).

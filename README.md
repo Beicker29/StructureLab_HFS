@@ -134,11 +134,11 @@ símbolos escritos en letras.
 | `condition` | Condición del case: `ultimate` (por defecto), `construction` (acero solo; solo Mu y Vu) o `fire` (con `fire`) |
 | `fire` | Temperaturas de un case de incendio, en °C (Apéndice 4, 4.2.4d): `steel_temperature` y, según el miembro, `concrete_temperature` o su perfil (`concrete_layers`, `web_layers` con `flange_layers`) y `bar_temperature`; cada material presente es obligatorio ([detalle](docs/appendix-4.md)) |
 | `serviceability` | Deflexiones: `actual_span`, `effective_span` (L de los límites), `deflections` y `limit_divisors` con `live_short`, `dead_short`, `total_long`. Exceder L/n se reporta y no cambia el estado |
-| `flexure` | Flexión: `Cb` (1.0 si se omite; Lb sale de `lengths`: eje x, min(Ly, Lz); eje y, min(Lx, Lz)), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos); `tension_cb_amplification` (H1.2, opcional) |
+| `flexure` | Flexión: `Cb` (1.0 si se omite; Lb sale de `lengths`: eje x, min(Ly, Lz); eje y, min(Lx, Lz)), `tension_flange_holes` (obligatorio en I y canales, eje x), `Afn` (mm²); `compression_flange` (`top`/`bottom`, obligatorio en I de alas distintas con `Mux`); en ángulos simples `lateral_torsional_restraint` (`none`, `at_max_moment`, `continuous`; ejes geométricos); `tension_cb_amplification` (H1.2, opcional) |
 | `tau_b` | Solo miembros compuestos: τb para las rigideces de método directo (0 < τb ≤ 1), dato obligatorio que el programa no calcula; sin él, el estado es INCOMPLETO. El capítulo 4 de la memoria lo compara con I1.5(d) y (f) (0.8 en rellenos y embebidos, 1.0 en muros); una diferencia se informa y no cambia el estado. En miembros no compuestos τb es siempre 1.0 (C2.3(c)) y otro valor se rechaza |
 | `shear` | Cortante: `Lv` (mm, PTE redondos, G5-2a; opcional) |
 | `angle_flexure` | Por combinación: `web_legs` (2L: alas verticales en `tension`/`compression`), `toe` (L: punta en `compression`/`tension`), `leg_in_compression` (L, eje w: `long`/`short`). En H2 fijan el signo de las tensiones en A, B y C |
-| `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`) o `SOLID_CIRCULAR` (`diameter`) |
+| `custom_section` | `SOLID_RECTANGULAR` (`H`, `B`), `SOLID_CIRCULAR` (`diameter`) o `I_BUILT_UP`: I armada soldada con `d`, `tw`, `top_flange` y `bottom_flange` (`b`, `t`); sus propiedades salen de las placas ([F4 y F5](docs/chapter-f.md)) |
 | `composite` | Capítulo I: `kind` (`filled`, `encased`, `beam`, `wall`, `c_wall`, `coupling_beam`), `concrete` (`fc`, `wc`, `lightweight`), `pour_height` (rellenos y muros), `interaction` (`H1`, `I5`, `M2`, `M2S`), `filled`, `box`, `encased`, `beam`, `wall`, `c_wall` o `coupling_beam` según el tipo, `anchor` (I8.3), `second_order` (Apéndice 8.1), y `fire` (revisiones opcionales de muros), `biaxial_shape_factor` y `flexural_member` de las Design Guides ([detalle](docs/chapter-i.md), [guías](docs/design-guides.md)) |
 
 **Un archivo por miembro.** Los campos de nivel superior describen el miembro (perfil,
@@ -147,7 +147,7 @@ carga; cada combinación aporta su demanda y puede sobrescribir cualquier dato. 
 trae un resultado por combinación, el estado global y la combinación `governing` (mayor
 relación demanda/capacidad). Cada combinación lleva sus demandas simultáneas (Pu, Mu, Vu);
 Pr y Mr deben venir de un análisis de segundo orden (Capítulo C, decisión DH-3).
-Ver `examples/` (un archivo por familia y `multi_member.json` con varios perfiles).
+Ver `examples/` (un archivo por familia, `multi_member.json` con varios perfiles y `built_up_i.json` con I armadas en F4 y F5).
 
 ### Salida
 

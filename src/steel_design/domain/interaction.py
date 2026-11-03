@@ -8,6 +8,7 @@ from ..codes.aisc_360_22 import interaction as eq
 from ..codes.aisc_360_22.flexure import PHI_B
 from ..errors import IncompleteSectionDataError, RuleNotImplementedError
 from ..models import Check, SteelCase
+from ..sections.geometry import singly_symmetric_i
 from ..sections.models import Section
 from .fire import steel_at_temperature, with_fire
 from .flexure import unbraced_length
@@ -29,7 +30,7 @@ def _incomplete(reason, section, code, **details):
 def tension_cb_factor(case: SteelCase, section: Section) -> dict:
     """H1.2: factor sqrt(1 + alpha*Pr/Pey) on Cb, only for doubly symmetric members in axial tension."""
     family = section.type.upper()
-    if family not in DOUBLY_SYMMETRIC:
+    if family not in DOUBLY_SYMMETRIC and not (family == "I_BUILT_UP" and not singly_symmetric_i(section)):
         return {"applies": False, "reason": "H1.2 solo permite amplificar Cb en miembros doblemente simétricos; "
                                             "se usa Cb sin amplificar."}
     lb = unbraced_length(case, "x")
@@ -91,7 +92,7 @@ def _h1_h4_modes(case, section, by_id):
     modes = {"H1": {"limit_state": "combined_flexure_axial", "provision": "H1.1" if case.Pu >= 0 else "H1.2",
                     "applies": True, **terms, **h1, "axial": sense}}
     flexure = case.flexure
-    if family in {"W", "CHANNEL"} and case.Pu < 0 and fx and flexure and flexure.tension_flange_holes:
+    if family in {"W", "CHANNEL", "I_BUILT_UP"} and case.Pu < 0 and fx and flexure and flexure.tension_flange_holes:
         rupture = axial.result["modes"]["TR"]
         tfr = fx.result["modes"]["TFR"]
         if tfr["applies"]:
