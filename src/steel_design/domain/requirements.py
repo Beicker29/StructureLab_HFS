@@ -225,7 +225,7 @@ def _tau_b_row(case):
 
 
 def _proportioning_limits(case, section):
-    """F13.2, I-shapes bent about x: Iyc/Iy of singly symmetric members (F13-2); h/tw and aw of slender webs, without stiffeners."""
+    """F13.2, I-shapes bent about x: Iyc/Iy of singly symmetric members (F13-2); h/tw (F13-3 or F13-4) and aw of slender webs."""
     built_up, singly = section.type.upper() == "I_BUILT_UP", singly_symmetric_i(section)
     E, Fy = case.material.E, case.material.Fy
     slender = 5.70 * math.sqrt(E / Fy)                           # Table B4.1b cases 15 and 16
@@ -246,10 +246,17 @@ def _proportioning_limits(case, section):
     if (p["hc"] if singly else p["h"]) / p["tw"] <= slender:
         return rows + [_absent("Proporciones del alma esbelta (h/tw, aw)", "F13.2", NO_APLICA, "Alma no esbelta.")]
     h_tw, aw = p["h"] / p["tw"], p["hc"] * p["tw"] / (p["bfc"] * p["tfc"])
+    stiffeners = case.stiffeners
+    if stiffeners and stiffeners.a / p["h"] <= 1.5:
+        limit = 12.0 * math.sqrt(E / Fy)
+        rows.append(_limit("Esbeltez del alma esbelta con rigidizadores, a/h ≤ 1.5 (h/tw)", h_tw, f"≤ 12.0√(E/Fy) = {limit:.1f}",
+                           "F13.2 (F13-3)", h_tw <= limit))
+    else:
+        rows.append(_limit("Esbeltez del alma esbelta" + (", a/h > 1.5" if stiffeners else " sin rigidizadores") + " (h/tw)", h_tw,
+                           f"≤ 0.40E/Fy = {0.40 * E / Fy:.1f}", "F13.2 (F13-4)", h_tw <= 0.40 * E / Fy))
+    if not stiffeners:                                            # F13.2: the 260 limit is for unstiffened girders
+        rows.append(_limit("Esbeltez del alma sin rigidizadores (h/tw)", h_tw, "≤ 260", "F13.2", h_tw <= 260.0))
     return rows + [
-        _limit("Esbeltez del alma esbelta sin rigidizadores (h/tw)", h_tw, f"≤ 0.40E/Fy = {0.40 * E / Fy:.1f}", "F13.2 (F13-4)",
-               h_tw <= 0.40 * E / Fy),
-        _limit("Esbeltez del alma sin rigidizadores (h/tw)", h_tw, "≤ 260", "F13.2", h_tw <= 260.0),
         _limit("Relación entre el área comprimida del alma y la del ala comprimida (aw)", aw, "≤ 10", "F13.2 (F4-12)", aw <= 10.0),
     ]
 

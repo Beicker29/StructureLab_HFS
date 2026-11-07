@@ -31,6 +31,9 @@ def _case(data: dict) -> SteelCase:
     """A JSON input names its material; Fy and Fu come from src/steel_design/data/Materiales.xlsx."""
     if "material" in data:
         data = {**data, "material": material_by_name(data["material"])}
+    stiffeners = data.get("stiffeners")
+    if isinstance(stiffeners, dict) and "material" in stiffeners:
+        data = {**data, "stiffeners": {**stiffeners, "material": material_by_name(stiffeners["material"])}}
     return SteelCase(**data)
 
 

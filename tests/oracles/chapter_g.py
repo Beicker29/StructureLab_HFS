@@ -122,6 +122,83 @@ def solid_round(D_, fy):
     return D("0.6") * D(fy) * (PI * D(D_) ** 2 / 4) / 2, D("0.90")              # G4-1, Aw = Ag/2, Cv2 = 1 (DG-4)
 
 
+def tee_plastic_moment(bf, tf, tw, de, fy):
+    """Mpf (G2.3): flange bf x tf with a web stem tw x de, one yield stress, about the axis parallel to the flange."""
+    area = bf * tf + tw * de
+    if area / 2 <= bf * tf:                                     # plastic neutral axis in the flange, y from its free face
+        y = area / 2 / bf
+        return fy * (bf * y**2 / 2 + bf * (tf - y) ** 2 / 2 + tw * de * (tf - y + de / 2))
+    y = tf + (area / 2 - bf * tf) / tw                          # in the stem
+    return fy * (bf * tf * (y - tf / 2) + tw * (y - tf) ** 2 / 2 + tw * (tf + de - y) ** 2 / 2)
+
+
+def stiffener_plastic_moment(width, tst, fyst, tw, fyw, e, de):
+    """Mpst (G2.3, Fig. C-G2.3): web strip [0, e + de] (tw, Fyw) and stiffener plates [e - tst, e] (width, Fyst), measured from
+    the end of the beam; the axis balances the forces (bisection)."""
+    pieces = [(D(0), e + de, tw * fyw), (e - tst, e, width * fyst)]
+
+    def force(s):                                               # force between the end of the beam and s
+        return sum(rate * max(min(s, s1) - s0, D(0)) for s0, s1, rate in pieces)
+
+    total = force(e + de)
+    lo, hi = D(0), e + de
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if force(mid) < total / 2 else (lo, mid)
+    sp = (lo + hi) / 2
+    moment = D(0)
+    for s0, s1, rate in pieces:
+        for a, b in ((s0, min(s1, sp)), (max(s0, sp), s1)):
+            if b > a:
+                moment += rate * (b - a) * abs((a + b) / 2 - sp)
+    return moment
+
+
+def stiffened_web(fy, d, tw, h, flanges, a, panel, stiff, fyst, rolled_ok=False, end=None):
+    """G2.1 with kv of G2-5 and, with a/h <= 3, the tension field of G2.2 (interior) or G2.3 (end); the larger Vn governs."""
+    fy, d, tw, h, a, fyst = D(fy), D(d), D(tw), D(h), D(a), D(fyst)
+    aw, ah, htw = d * tw, a / h, h / tw
+    kv = D(5) + 5 / ah**2 if ah <= 3 else D("5.34")            # G2-5
+    out = {"kv": kv}
+    vn = D("0.6") * fy * aw * cv1(htw, kv, fy)                  # G2-1 with G2-3/G2-4
+    out["Vn_G2_1"] = vn
+    if ah <= 3:
+        c2 = cv2(htw, kv, fy)
+        (b1, t1), (b2, t2) = [(D(b), D(t)) for b, t in flanges]
+        if panel == "interior":
+            if htw <= D("1.10") * sqrt(kv * E / fy):
+                tf_vn = D("0.6") * fy * aw                            # G2-6
+            elif 2 * aw / (b1 * t1 + b2 * t2) <= D("2.5") and h / b1 <= 6 and h / b2 <= 6:
+                tf_vn = D("0.6") * fy * aw * (c2 + (1 - c2) / (D("1.15") * sqrt(1 + ah**2)))            # G2-7
+            else:
+                tf_vn = D("0.6") * fy * aw * (c2 + (1 - c2) / (D("1.15") * (ah + sqrt(1 + ah**2))))     # G2-8
+        else:
+            de = 35 * tw * (D("0.8") - c2) ** 2 if c2 <= D("0.8") else D(0)                            # G2-14, G2-15
+            width = (2 if end["arrangement"] == "pair" else 1) * D(end["b"])
+            e = min(D(end["e"]), D("0.84") * tw * sqrt(E / fy))
+            mpf = tee_plastic_moment(b1, t1, tw, de, fy)
+            mpst = stiffener_plastic_moment(width, D(end["t"]), fyst, tw, fy, e, de)
+            mpm = min(mpf, mpst)
+            beta = min(D("2.8") * (sqrt(mpf + mpm) + sqrt(mpst + mpm)) / (h * sqrt(fy * tw * (1 - c2))), D(1))   # G2-13
+            tf_vn = D("0.6") * fy * aw * (c2 + beta * (1 - c2) / (D("1.15") * sqrt(1 + ah**2)))                # G2-12
+            out.update(beta_v=beta, Mpf=mpf, Mpst=mpst)
+        out["Vn_tension_field"] = tf_vn
+        vn = max(vn, tf_vn)
+    b, t = D(stiff["b"]), D(stiff["t"])
+    rho = max(fy / fyst, D(1))
+    out.update(b_t_max=D("0.56") * sqrt(E / fyst), Ist1=h**4 * rho ** D("1.3") / 40 * (fy / E) ** D("1.5"),          # G2-16, G2-18
+               Ist=t * ((2 * b + tw) ** 3 - tw**3) / 12 if stiff["arrangement"] == "pair" else t * b**3 / 3)
+    return vn, D("0.90"), out
+
+
+def stiffened(fy, a, panel, stiff, fyst, name=None, d=None, tw=None, plus2=None, minus2=None, end=None):
+    if name:                                                    # rolled W of the catalog: h from h/tw
+        p = row("W", name)
+        return stiffened_web(fy, p["d"], p["tw"], p["h/tw"] * p["tw"], [(p["bf"], p["tf"])] * 2, a, panel, stiff, fyst, end=end)
+    h = D(d) - D(plus2[1]) - D(minus2[1])
+    return stiffened_web(fy, d, tw, h, [plus2, minus2], a, panel, stiff, fyst, end=end)
+
+
 CASES = {
     "W-G2.1a": dict(kind="i", name="W24X62", family="W", fy=345, axis="y_2"),
     "W-G2.1b": dict(kind="i", name="W24X55", family="W", fy=345, axis="y_2"),
@@ -147,11 +224,30 @@ CASES = {
     "BUI-G2.1b-stocky-web": dict(kind="bui", d=400, tw=12, plus2=(250, 20), minus2=(200, 16), fy=345, axis="y_2"),
     "BUI-G2.1b-Cv1": dict(kind="bui", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, axis="y_2"),
     "BUI-G6-unequal": dict(kind="bui", d=900, tw=8, plus2=(350, 22), minus2=(600, 10), fy=345, axis="x_3"),
+    "ST-G2.2-G2-7": dict(kind="stiff", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, a=1500, panel="interior",
+                         stiff={"b": 120, "t": 12, "arrangement": "pair"}, fyst=345),
+    "ST-G2.2-G2-8": dict(kind="stiff", d=1200, tw=10, plus2=(200, 12), minus2=(200, 12), fy=345, a=1000, panel="interior",
+                         stiff={"b": 120, "t": 12, "arrangement": "pair"}, fyst=250),
+    "ST-G2.2-G2-6": dict(kind="stiff", d=600, tw=10, plus2=(250, 20), minus2=(250, 20), fy=345, a=600, panel="interior",
+                         stiff={"b": 100, "t": 10, "arrangement": "single"}, fyst=345),
+    "ST-G2.3-end": dict(kind="stiff", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, a=1500, panel="end",
+                        stiff={"b": 120, "t": 12, "arrangement": "pair"}, fyst=345,
+                        end={"b": 150, "t": 20, "arrangement": "pair", "e": 100}),
+    "ST-G2.3-end-e-capped": dict(kind="stiff", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, a=1000, panel="end",
+                                 stiff={"b": 120, "t": 12, "arrangement": "pair"}, fyst=250,
+                                 end={"b": 150, "t": 20, "arrangement": "single", "e": 400}),
+    "ST-G2.1-a-over-h-3": dict(kind="stiff", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, a=4000, panel="interior",
+                               stiff={"b": 120, "t": 12, "arrangement": "pair"}, fyst=345),
+    "ST-W-G2.2": dict(kind="stiff", name="W24X55", fy=345, a=900, panel="interior", stiff={"b": 80, "t": 8, "arrangement": "pair"},
+                      fyst=345),
 }
 
 
 def build(spec):
     args = {k: v for k, v in spec.items() if k != "kind"}
+    if spec["kind"] == "stiff":
+        vn, phi, extra = stiffened(**args)
+        return {"spec": spec, "Vn_kN": vn / 1000, "phi_v": phi, "phiVn_kN": phi * vn / 1000, "stiffened": extra}
     modes = {"i": i_shape, "rhss": rect_hss, "chss": round_hss, "angle": angle, "bar": bar, "round": solid_round, "bui": built_up_i}
     vn, phi = modes[spec["kind"]](**args)
     return {"spec": spec, "Vn_kN": vn / 1000, "phi_v": phi, "phiVn_kN": phi * vn / 1000}

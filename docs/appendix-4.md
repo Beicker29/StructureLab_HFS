@@ -68,6 +68,9 @@ de 0.6Fy (User Note de 4.2.4d(g)); vigas compuestas desde 1100 °C (kcb = 0). La
   guía, la revisión queda `INCOMPLETE`, igual que a temperatura ambiente.
 - **DA4-9** Temperaturas (indicación del usuario, 2026-11-01): uniformes por material y siempre obligatorias: una para el acero, una para el concreto y una para las barras donde las haya, también a
   200 °C o menos, aunque entonces no intervengan. Solo muros y vigas de acople admiten perfil de concreto. La viga por gradiente, pendiente, será la excepción.
+- **DA4-11** Cortante con campo de tensión (indicación del usuario, 2026-11-07): sobre 200 °C, G2.2 y G2.3 se usan con Fy(T) y los Cv de
+  temperatura ambiente; todos sus términos son proporcionales a Fy, así que Vn(T) = ky·Vn. Extrapola 4.2.4d(g), que solo trata la
+  fluencia; G2.1 sigue exigiendo Cv1 = 1.
 - **DA4-10** Compresión de muros en C (indicación del usuario, 2026-11-01): Guía 38, 6.2.2, una columna unitaria por panel con su espesor y su perfil, y A-4-12 en cada una; el alma cuenta L y
   cada ala W − tsc_w, para no duplicar esquinas.
 

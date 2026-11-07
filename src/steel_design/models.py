@@ -131,6 +131,25 @@ class ShearBasis(InputModel):
     Lv: PositiveNumber | None = Field(
         None, description="Round HSS (G5-2a): distance from maximum to zero shear force (mm); "
                           "without it only G5-2b is used (lower bound)")
+    panel: Literal["interior", "end"] | None = Field(
+        None, description="Web with transverse stiffeners: panel this combination checks, interior (G2.2) or end (G2.3)")
+
+
+class StiffenerPlates(InputModel):
+    b: PositiveNumber = Field(..., description="Width of each stiffener plate, from the web face (mm)")
+    t: PositiveNumber = Field(..., description="Thickness of the stiffener plates (mm)")
+    arrangement: Literal["pair", "single"] = Field(..., description="A plate on each side of the web, or on one side only")
+
+
+class EndStiffener(StiffenerPlates):
+    e: PositiveNumber = Field(..., description="G2.3: distance from the inside face of the end stiffener to the end of the beam (mm)")
+
+
+class TransverseStiffeners(StiffenerPlates):
+    """Intermediate transverse stiffeners of an I-shape or channel web (G2.1(b)(2), G2.2, G2.3, G2.4), uniform spacing."""
+    a: PositiveNumber = Field(..., description="Clear distance between transverse stiffeners (mm)")
+    material: Material = Field(..., description="Steel of the stiffeners: a JSON input gives the name in Materiales.xlsx")
+    end: EndStiffener | None = Field(None, description="End (bearing) stiffener, required by an end panel with tension field (G2.3)")
 
 
 class AngleHeel(InputModel):
@@ -550,6 +569,7 @@ class SteelCase(InputModel):
     tension: TensionBasis | None = None
     flexure: FlexureBasis | None = None
     shear: ShearBasis | None = None
+    stiffeners: TransverseStiffeners | None = Field(None, description="Transverse stiffeners of the web (Chapter G)")
     tau_b: PositiveNumber | None = Field(
         None,
         le=1,

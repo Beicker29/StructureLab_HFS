@@ -1056,12 +1056,30 @@ def _shear_blocks(case: SteelCase, check, c: dict) -> list[dict]:
         blocks += [{"kind": "h2", "text": "Coeficiente de cortante"},
                    {"kind": "table", "headers": ["Elemento", "Relación ancho-espesor (h/t)", "Coeficiente de pandeo por cortante (kv)",
                                                  "Límite de la relación h/t", "Coeficiente de cortante (Cv)", "Literal"], "rows": rows}]
+    stiff = case.stiffeners if check.id == "shear_y_2" else None
+    if stiff:
+        rows = [["Separación libre (a)", stiff.a, "mm", "Dato del usuario; G2.1(b)(2)"],
+                ["Ancho de cada placa (b)", stiff.b, "mm", "Dato del usuario; G2.4"],
+                ["Espesor de las placas (tst)", stiff.t, "mm", "Dato del usuario; G2.4"],
+                ["Disposición", "par" if stiff.arrangement == "pair" else "una cara", "–", "Dato del usuario; G2.4(e)"],
+                ["Fluencia del rigidizador (Fyst)", stiff.material.Fy, "MPa", stiff.material.name or "Dato del usuario"],
+                ["Panel revisado", {"interior": "interior", "end": "extremo"}.get((case.shear.panel if case.shear else None) or "",
+                                                                                  "no indicado"), "–", "Dato del usuario; G2.2, G2.3"]]
+        if stiff.end:
+            rows += [["Rigidizador extremo: b, tst", f"{fmt(stiff.end.b)}, {fmt(stiff.end.t)}", "mm", "Dato del usuario; G2.3"],
+                     ["Rigidizador extremo: distancia al extremo de la viga (e)", stiff.end.e, "mm", "Dato del usuario; G2.3"]]
+        blocks += [{"kind": "h2", "text": "Rigidizadores transversales"}, _property_table(rows)]
     m = c["modes"]["V"]
     table: dict[str, Any] = _parameters(m, _SHEAR_KEYS)
     items = [("Resistencia nominal a cortante (Vn)", f"{fmt(m['Vn_kN'])} kN ({m['provision']}, Ec. {m['equation']})"),
              (f"Resistencia de diseño ({m['provision']})", f"φv·Vn = {m['phi_v']:.2f} · Vn = {fmt(c['available_kN'])} kN"),
              _verification(check)]
     blocks += [{"kind": "h2", "text": "Resistencia"}, table, {"kind": "kv", "items": items}]
+    if c["requirements"]:
+        blocks += [{"kind": "h2", "text": "Requisitos de los rigidizadores (G2.3, G2.4)"},
+                   {"kind": "table", "headers": ["Requisito", "Disposición", "Valor", "Límite", "Cumple"],
+                    "rows": [[r["message"], r["provision"], r["value"], r["limit"], "sí" if r["satisfied"] else "NO"]
+                             for r in c["requirements"]]}]
     return blocks
 
 

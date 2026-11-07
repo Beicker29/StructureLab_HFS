@@ -231,7 +231,7 @@ los estados límite con tolerancia relativa 1e-9. Mn en kN·m:
   curvatura doble) no se evalúa: Cb es dato del usuario también para ángulos dobles.
 - Cada chequeo de flexión es respecto de un eje; la flexión biaxial y la carga axial se
   combinan en el chequeo de interacción (Capítulo H). El cortante es el Capítulo G.
-- F13.2 se revisa sin rigidizadores transversales (F13-4); F13-3 (a/h ≤ 1,5), F13.3 (cubreplacas) y F13.4 no
+- F13.2: con `stiffeners` y a/h ≤ 1,5, h/tw ≤ 12,0√(E/Fy) (F13-3); si no, F13-4; el límite h/tw ≤ 260 solo sin rigidizadores. F13.3 (cubreplacas) y F13.4 no
   se cubren. rt para alas con canal o cubreplaca (F4-11(ii)) tampoco: la entrada no admite esas secciones.
 - F1(d): en I de simetría simple con doble curvatura, el pandeo lateral-torsional se revisa con cada ala dando
   una combinación con cada signo de `Mx_3`; el programa no las genera.

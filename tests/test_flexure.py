@@ -348,3 +348,11 @@ def test_cb_is_amplified_only_for_doubly_symmetric_girders(engine):
         case = girder(900, 10, plus2, minus2, flexure={"tension_cb_amplification": True}, P=200, Mx_3=10)
         return engine.run(case).check("flexure_x_3").result["inputs"]["H1_2_Cb_factor"]
     assert factor((300, 20), (300, 20)) > 1 and factor((350, 22), (250, 16)) is None
+
+
+def test_f13_3_replaces_f13_4_with_stiffeners_at_a_over_h_up_to_1_5(engine):
+    stiffeners = {"a": 1500, "b": 120, "t": 12, "arrangement": "pair", "material": {"Fy": 345}}
+    # h/tw = 1450/6 = 241.7: within 12.0*sqrt(E/Fy) = 288.9 (F13-3), beyond 0.40E/Fy = 231.9 (F13-4)
+    rows = engine.run(girder(1500, 6, (400, 25), (400, 25), Mx_3=10, stiffeners=stiffeners)).requirements["geometry"]
+    provisions = {r["provision"]: r for r in rows if r["provision"].startswith("F13.2")}
+    assert provisions["F13.2 (F13-3)"]["status"] == "cumple" and "F13.2" not in provisions        # 260 is for unstiffened girders

@@ -16,8 +16,8 @@ from ..sections.models import Section, missing_properties
 from .fire import steel_at_temperature, with_fire
 
 _LIMITATIONS = (
-    "Almas sin rigidizadores transversales (kv = 5.34); el campo de tracción (G2.2, G2.3) y los rigidizadores "
-    "(G2.4) quedan fuera de este cálculo.",
+    "Rigidizadores transversales: G2.4(b) y (c) (terminación de las soldaduras, separación de pernos y soldaduras intermitentes, "
+    "torsión del ala comprimida) y los rigidizadores de apoyo (J10.8) no se verifican.",
     "Cortante sin torsión; la interacción de cortante con torsión (H3) no está cubierta.",
 )
 
@@ -39,20 +39,94 @@ def _element(name, ratio, cv, kv):
             "Cv_equation": cv["equation"]}
 
 
-def _i_web(section, E, Fy):
-    """G2.1, shear parallel to the web of an I-shape or channel; G2.1(a) only for rolled I-shapes."""
+def _incomplete(reason, section, fields):
+    raise IncompleteSectionDataError(reason, code="SHEAR_DATA_INCOMPLETE",
+                                     details={"section": section.name, "profile_type": section.type, "fields": fields})
+
+
+def _flanges(section):
+    """(bf, tf) of the +2 and -2 flanges; rolled shapes and channels have two equal flanges."""
+    _require(section, "bf", "tf")
+    return (section.bf, section.tf), (section.bf_minus2 or section.bf, section.tf_minus2 or section.tf)
+
+
+def _tension_field(case, section, E, Fy, aw, h, kv):
+    """G2.2 (interior panel) or G2.3 (end panel, I-shapes with equal flange areas), a/h <= 3."""
+    stiff, h_tw = case.stiffeners, section.h_tw_ratio
+    panel = case.shear.panel if case.shear else None
+    if panel is None:
+        _incomplete("Alma con rigidizadores y a/h ≤ 3: indique el panel de esta combinación (shear.panel: interior o end).",
+                    section, ["shear.panel"])
+    (b1, t1), (b2, t2) = _flanges(section)
+    row = _element("web", h_tw, eq.cv2(h_tw=h_tw, kv=kv, E=E, Fy=Fy), kv)
+    if panel == "interior":
+        out = eq.tension_field_interior(Fy=Fy, E=E, Aw=aw, h_tw=h_tw, kv=kv, a_h=stiff.a / h, Afc=b1 * t1, Aft=b2 * t2,
+                                        h_bfc=h / b1, h_bft=h / b2)
+        return "G2.2", [row], out
+    if section.type.upper() == "CHANNEL":
+        _blocked("G2.3(a) da el panel extremo con campo de tensión para perfiles I; en canales no está cubierto.", section)
+    if abs(b1 * t1 - b2 * t2) > 1e-9 * b1 * t1:
+        _blocked("G2.3(b): con alas de áreas distintas la resistencia del panel extremo se determina por análisis.", section,
+                 Af_plus2=b1 * t1, Af_minus2=b2 * t2)
+    end = stiff.end
+    if end is None:
+        _incomplete("El panel extremo con campo de tensión (G2.3) requiere el rigidizador extremo (stiffeners.end).", section,
+                    ["stiffeners.end"])
+    if end.e < end.t:
+        _blocked("stiffeners.end.e va de la cara interior del rigidizador al extremo de la viga: no puede ser menor que su espesor.",
+                 section, e=end.e, t=end.t)
+    width = 2 * end.b if end.arrangement == "pair" else end.b
+    out = eq.tension_field_end(Fyw=Fy, E=E, Fy=Fy, Aw=aw, h=h, tw=section.tw, h_tw=h_tw, kv=kv, a_h=stiff.a / h, bf=b1, tf=t1,
+                               Fyf=Fy, stiffener_width=width, tst=end.t, Fyst=stiff.material.Fy, e=end.e)
+    return "G2.3", [row], out
+
+
+def _i_web(case, section, E, Fy, hot):
+    """G2.1, shear along the web of an I-shape or channel; G2.1(a) only for rolled I-shapes. With transverse stiffeners and
+    a/h <= 3, the tension field of G2.2 or G2.3 is an alternative and the larger strength is taken (decision DG-6)."""
     _require(section, "d", "tw", "h_tw_ratio")
     h_tw, aw = section.h_tw_ratio, section.d * section.tw
     if section.type.upper() == "W" and h_tw <= eq.rolled_web_limit(E=E, Fy=Fy):
         cv = {"Cv": 1.0, "equation": "G2-2", "limit": eq.rolled_web_limit(E=E, Fy=Fy)}
-        phi, provision, kv = eq.PHI_V_ROLLED, "G2.1(a)", None
-    else:
-        kv = eq.KV_UNSTIFFENED
-        cv = eq.cv1(h_tw=h_tw, kv=kv, E=E, Fy=Fy)
-        phi, provision = eq.PHI_V, "G2.1(b)"
-    out = eq.web_strength(Fy=Fy, Aw=aw, Cv=cv["Cv"], equation="G2-1")
-    return provision, phi, [_element("web", h_tw, cv, kv)], {**out, "Aw_mm2": aw, "Cv1": cv["Cv"],
-                                                            "Cv_equation": cv["equation"]}
+        out = eq.web_strength(Fy=Fy, Aw=aw, Cv=cv["Cv"], equation="G2-1")
+        return "G2.1(a)", eq.PHI_V_ROLLED, [_element("web", h_tw, cv, None)], {
+            **out, "Aw_mm2": aw, "Cv1": cv["Cv"], "Cv_equation": cv["equation"]}
+    stiff, h = case.stiffeners, h_tw * section.tw
+    kv_info = eq.kv_stiffened(a_h=stiff.a / h) if stiff else {"kv": eq.KV_UNSTIFFENED, "kv_equation": "G2.1(b)(2)(i)"}
+    kv = kv_info["kv"]
+    cv = eq.cv1(h_tw=h_tw, kv=kv, E=E, Fy=Fy)
+    web = {**eq.web_strength(Fy=Fy, Aw=aw, Cv=cv["Cv"], equation="G2-1"), "Aw_mm2": aw, "Cv1": cv["Cv"],
+           "Cv_equation": cv["equation"], **kv_info}
+    if stiff:
+        web["a_h"] = stiff.a / h
+    candidates = [("G2.1(b)", [_element("web", h_tw, cv, kv)], web, False)]
+    if stiff and stiff.a / h <= 3.0:
+        provision, rows, field = _tension_field(case, section, E, Fy, aw, h, kv)
+        candidates.append((provision, rows, {**field, "Aw_mm2": aw, "a_h": stiff.a / h, **kv_info}, True))
+    if hot:     # 4.2.4d(g): G2.1 only while the web yields; the tension field is used with Fy(T) (decision DA4-11)
+        candidates = [c for c in candidates if c[3] or all(r["Cv"] >= 1.0 for r in c[1])] or candidates[:1]
+    provision, rows, out, tension_field = max(candidates, key=lambda c: c[2]["Vn"])
+    if len(candidates) > 1:
+        out = {**out, "Vn_G2_1_N": candidates[0][2]["Vn"], "Vn_tension_field_N": candidates[1][2]["Vn"]}
+    return provision, eq.PHI_V, rows, {**out, "tension_field": tension_field}
+
+
+def _stiffener_requirements(case, section, E, Fy, Fy_hot):
+    """G2.4(d) and (e) for the intermediate stiffeners, with Ist >= Ist1 (decision DG-7); the tension flange limit of G2.3."""
+    stiff = case.stiffeners
+    h = section.h_tw_ratio * section.tw
+    lim = eq.stiffener_limits(E=E, Fyst=stiff.material.Fy, Fyw=Fy, b=stiff.b, t=stiff.t, h=h, tw=section.tw,
+                              pair=stiff.arrangement == "pair")
+    out = [{"id": "G2-16", "provision": "G2.4(d)", "message": "Relación ancho-espesor del rigidizador, (b/t)st ≤ 0.56·√(E/Fyst)",
+            "value": lim["b_t"], "limit": lim["b_t_max"], "satisfied": lim["b_t"] <= lim["b_t_max"]},
+           {"id": "G2-17", "provision": "G2.4(e)", "message": "Inercia del rigidizador, Ist ≥ Ist1 (G2-18; User Note de G2.4)",
+            "value": lim["Ist_mm4"], "limit": lim["Ist1_mm4"], "satisfied": lim["Ist_mm4"] >= lim["Ist1_mm4"]}]
+    if case.shear and case.shear.panel == "end" and stiff.a / h <= 3.0:
+        _require(section, "sx")
+        stress = abs(case.Mx_3) * 1e6 / section.sx            # alpha = 1.0 (LRFD); equal flange areas: Sxt = Sx
+        out.append({"id": "G2.3", "provision": "G2.3(a)", "message": "Esfuerzo en el ala traccionada del panel extremo, αMr/Sxt ≤ 0.35Fy",
+                    "value": stress, "limit": 0.35 * Fy_hot, "satisfied": stress <= 0.35 * Fy_hot})
+    return out, lim
 
 
 def _built_up_flanges(section, E, Fy):
@@ -162,8 +236,15 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
     if not is_standard_modulus(E):
         raise IncompleteSectionDataError("El Capítulo G usa E = 200000 MPa.", code="SHEAR_DATA_INCOMPLETE",
                                          details={"section": section.name, "fields": ["material.E"]})
+    hot = steel_at_temperature(case)
+    requirements, notes = [], []
     if family in {"W", "CHANNEL", "I_BUILT_UP"}:
-        provision, phi, rows, out = _i_web(section, E, Fy) if axis == "y_2" else _i_flanges(section, E, Fy)
+        provision, phi, rows, out = _i_web(case, section, E, Fy, bool(hot)) if axis == "y_2" else _i_flanges(section, E, Fy)
+        if axis == "y_2" and case.stiffeners:
+            requirements, lim = _stiffener_requirements(case, section, E, Fy, hot["Fy_T_mpa"] if hot else Fy)
+            out = {**out, "Ist_mm4": lim["Ist_mm4"], "Ist1_mm4": lim["Ist1_mm4"], "rho_st": lim["rho_st"]}
+            if section.h_tw_ratio <= 2.46 * (E / Fy) ** 0.5:
+                notes.append("G2.4(a): con h/tw ≤ 2.46·√(E/Fy) los rigidizadores transversales no son necesarios.")
     elif family == "RECTANGULAR_HSS":
         provision, phi, rows, out = _rect_hss(section, E, Fy, axis)
     elif family == "CIRCULAR_HSS":
@@ -176,14 +257,21 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
         provision, phi, rows, out = _solid(section, E, Fy, axis)
     else:
         _blocked("Familia sin disposición de cortante en este cálculo.", section)
-    hot = steel_at_temperature(case)
-    if hot:
+    if hot and out.get("tension_field"):
+        # Decision DA4-11: the tension field with Fy(T) and the Cv of ambient temperature; every term is proportional to Fy
+        out = {**out, **{key: hot["ky"] * out[key] for key in ("Vn", "Vn_G2_1_N", "Vn_tension_field_N", "Mpf_Nmm", "Mpst_Nmm",
+                                                                "Mpm_Nmm") if key in out}}
+        provision = f"{provision}; Apéndice 4, 4.2.4d(g), decisión DA4-11"
+        notes.append("Campo de tensión a temperatura con Fy(T) y los Cv de temperatura ambiente: extrapola 4.2.4d(g), que solo "
+                     "trata la fluencia (decisión DA4-11).")
+    elif hot:
         out = _yielding_at_temperature(section, rows, out, hot["ky"])
         provision = f"{provision}; Apéndice 4, 4.2.4d(g)"
+    if out.get("tension_field") is not None:
+        out = {k: val for k, val in out.items() if k != "tension_field"}
 
     mode = {"limit_state": "shear", "provision": provision, "applies": True, **out, "Vn_kN": out["Vn"] / 1000.0,
             "phi_v": phi, "available_kN": eq.design_strength(out["Vn"], phi)}
-    notes = []
     if family == "CIRCULAR_HSS" and out["Lv_mm"] is None:
         notes.append("Lv no indicado: Fcr con G5-2b solamente (límite inferior de G5, conservador; decisión DG-2).")
     if family == "SOLID_CIRCULAR":
@@ -191,7 +279,9 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
                      "Aw = 0.5·Ag y Cv2 = 1, criterio del usuario (decisión DG-4).")
     return with_fire({
         "chapter": "G", "code": "ANSI/AISC 360-22", "axis": axis, "section": section.name, "family": family,
-        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lv_mm": case.shear.Lv if case.shear else None},
+        "inputs": {"Fy_mpa": Fy, "E_mpa": E, "Lv_mm": case.shear.Lv if case.shear else None,
+                   **({"stiffeners": case.stiffeners.model_dump(exclude={"material"}), "Fyst_mpa": case.stiffeners.material.Fy,
+                       "panel": case.shear.panel if case.shear else None} if case.stiffeners and axis == "y_2" else {})},
         "classification": {"elements": rows, "reference": "G2.1 / G2.2 (Cv)"},
         "provisions": ["G1", provision],
         "modes": {"V": mode},
@@ -200,7 +290,7 @@ def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
         "Vn_kN": mode["Vn_kN"],
         "phi_v": phi,
         "available_kN": mode["available_kN"],
-        "requirements": [],
+        "requirements": requirements,
         "notes": notes,
         "limitations": list(_LIMITATIONS),
     }, hot, "4.2.4d(g)")

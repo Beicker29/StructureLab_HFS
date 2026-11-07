@@ -83,6 +83,96 @@
       "flexure": {
         "tension_flange_holes": false
       }
+    },
+    {
+      "name": "PL1200 con rigidizadores a = 1500 — panel interior (G2.2)",
+      "section_name": "PL1200-400x20",
+      "custom_section": {
+        "type": "I_BUILT_UP",
+        "d": 1200,
+        "tw": 8,
+        "flange_plus2": {
+          "b": 400,
+          "t": 20
+        },
+        "flange_minus2": {
+          "b": 400,
+          "t": 20
+        }
+      },
+      "lengths": {
+        "ultimate": {
+          "Lx_3": 12000,
+          "Ly_2": 6000,
+          "Lz_1": 6000
+        }
+      },
+      "flexure": {
+        "tension_flange_holes": false
+      },
+      "Mx_3": 2500,
+      "Vy_2": 1100,
+      "stiffeners": {
+        "a": 1500,
+        "b": 120,
+        "t": 12,
+        "arrangement": "pair",
+        "material": "ASTM A572 Gr 50",
+        "end": {
+          "b": 150,
+          "t": 20,
+          "arrangement": "pair",
+          "e": 100
+        }
+      },
+      "shear": {
+        "panel": "interior"
+      }
+    },
+    {
+      "name": "PL1200 con rigidizadores a = 1500 — panel extremo (G2.3)",
+      "section_name": "PL1200-400x20",
+      "custom_section": {
+        "type": "I_BUILT_UP",
+        "d": 1200,
+        "tw": 8,
+        "flange_plus2": {
+          "b": 400,
+          "t": 20
+        },
+        "flange_minus2": {
+          "b": 400,
+          "t": 20
+        }
+      },
+      "lengths": {
+        "ultimate": {
+          "Lx_3": 12000,
+          "Ly_2": 6000,
+          "Lz_1": 6000
+        }
+      },
+      "flexure": {
+        "tension_flange_holes": false
+      },
+      "Mx_3": 300,
+      "Vy_2": 950,
+      "stiffeners": {
+        "a": 1500,
+        "b": 120,
+        "t": 12,
+        "arrangement": "pair",
+        "material": "ASTM A572 Gr 50",
+        "end": {
+          "b": 150,
+          "t": 20,
+          "arrangement": "pair",
+          "e": 100
+        }
+      },
+      "shear": {
+        "panel": "end"
+      }
     }
   ]
 }

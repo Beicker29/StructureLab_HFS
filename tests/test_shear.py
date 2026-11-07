@@ -20,7 +20,7 @@ def shear_case(spec, shear=1.0):
         data.update(section_name="BAR", custom_section={"type": "SOLID_RECTANGULAR", "H": spec["H"], "B": spec["B"]})
     elif spec["kind"] == "round":
         data.update(section_name="ROUND", custom_section={"type": "SOLID_CIRCULAR", "diameter": spec["D_"]})
-    elif spec["kind"] == "bui":
+    elif spec["kind"] == "bui" or (spec["kind"] == "stiff" and not spec.get("name")):
         data.update(section_name="PL", custom_section={
             "type": "I_BUILT_UP", "d": spec["d"], "tw": spec["tw"], "flange_plus2": {"b": spec["plus2"][0], "t": spec["plus2"][1]},
             "flange_minus2": {"b": spec["minus2"][0], "t": spec["minus2"][1]}})
@@ -28,6 +28,10 @@ def shear_case(spec, shear=1.0):
         data["section_name"] = spec["name"]
     if spec.get("Lv"):
         data["shear"] = {"Lv": spec["Lv"]}
+    if spec["kind"] == "stiff":
+        data["stiffeners"] = {"a": spec["a"], **spec["stiff"], "material": {"Fy": spec["fyst"]},
+                              **({"end": spec["end"]} if spec.get("end") else {})}
+        data["shear"] = {"panel": spec["panel"]}
     return SteelCase(tau_b=1.0, **data)
 
 
@@ -39,11 +43,26 @@ def test_catalog_profiles_match_independent_calculation(engine, case_id):
     assert check.result["Vn_kN"] == pytest.approx(float(ref["Vn_kN"]), rel=1e-9)
     assert check.result["phi_v"] == float(ref["phi_v"])
     assert check.capacity == pytest.approx(float(ref["phiVn_kN"]), rel=1e-9)
+    if "stiffened" in ref:                      # G2.4: the stiffener limits, and both strengths of G2.1 and the tension field
+        oracle, mode = ref["stiffened"], check.result["modes"]["V"]
+        assert mode["kv"] == pytest.approx(float(oracle["kv"]), rel=1e-12)
+        limits = {r["id"]: r for r in check.result["requirements"]}
+        assert limits["G2-16"]["limit"] == pytest.approx(float(oracle["b_t_max"]), rel=1e-12)
+        assert limits["G2-17"]["value"] == pytest.approx(float(oracle["Ist"]), rel=1e-12)
+        assert limits["G2-17"]["limit"] == pytest.approx(float(oracle["Ist1"]), rel=1e-12)
+        if "Vn_tension_field" in oracle:
+            assert mode["Vn_G2_1_N"] == pytest.approx(float(oracle["Vn_G2_1"]), rel=1e-9)
+            assert mode["Vn_tension_field_N"] == pytest.approx(float(oracle["Vn_tension_field"]), rel=1e-9)
+        if "beta_v" in oracle:
+            assert mode["beta_v"] == pytest.approx(float(oracle["beta_v"]), rel=1e-9)
+            assert mode["Mpf_Nmm"] == pytest.approx(float(oracle["Mpf"]), rel=1e-9)
+            assert mode["Mpst_Nmm"] == pytest.approx(float(oracle["Mpst"]), rel=1e-9)
 
 
 def test_reference_bank_covers_every_section_and_coefficient():
     kinds = {c["spec"]["kind"] for c in REFERENCE.values()}
-    assert kinds == {"i", "rhss", "chss", "angle", "bar", "round", "bui"}
+    assert kinds == {"i", "rhss", "chss", "angle", "bar", "round", "bui", "stiff"}
+    assert {c["spec"].get("panel") for c in REFERENCE.values()} >= {"interior", "end"}
     assert {c["phi_v"] for c in REFERENCE.values()} == {"1.00", "0.90"}         # G2.1(a) and G1(a)
 
 
@@ -120,3 +139,64 @@ def test_shear_report(engine):
     text = calculation_report(case, engine.run(case))
     assert "Cortante a lo largo de y, eje 2 (Vy_2) (Capítulo G)" in text and "G2-2" in text
     assert "φv·Vn = 1.00 · Vn" in text
+
+
+
+def stiffened(panel="interior", a=1500, end=True, **extra):
+    stiff = {"a": a, "b": 120, "t": 12, "arrangement": "pair", "material": {"Fy": 345, "name": "ASTM A572 Gr 50"}}
+    if end:
+        stiff["end"] = {"b": 150, "t": 20, "arrangement": "pair", "e": 100}
+    data = dict(section_name="PL", material={"Fy": 345}, Vy_2=1,
+                custom_section={"type": "I_BUILT_UP", "d": 1200, "tw": 8, "flange_plus2": {"b": 400, "t": 20},
+                                "flange_minus2": {"b": 400, "t": 20}}, stiffeners=stiff, shear={"panel": panel} if panel else None)
+    return SteelCase(tau_b=1.0, **{**data, **extra})
+
+
+@pytest.mark.parametrize("case, field", [
+    (stiffened(panel=None), "shear.panel"),                     # a/h <= 3: the panel decides G2.2 or G2.3
+    (stiffened(panel="end", end=False), "stiffeners.end"),     # G2.3 needs the end stiffener
+])
+def test_stiffened_webs_need_the_panel_data(engine, case, field):
+    check = engine.run(case).check("shear_y_2")
+    assert check.status.value == "INCOMPLETE" and check.errors[0]["details"]["fields"] == [field]
+
+
+def test_end_panel_of_unequal_flanges_is_by_analysis(engine):
+    case = stiffened(panel="end", custom_section={"type": "I_BUILT_UP", "d": 1200, "tw": 8, "flange_plus2": {"b": 400, "t": 20},
+                                                  "flange_minus2": {"b": 300, "t": 20}})
+    check = engine.run(case).check("shear_y_2")
+    assert check.status.value == "INCOMPLETE" and "G2.3(b)" in check.errors[0]["message"]
+
+
+def test_the_larger_of_g2_1_and_the_tension_field_governs(engine):
+    mode = engine.run(stiffened()).check("shear_y_2").result["modes"]["V"]
+    assert mode["Vn"] == max(mode["Vn_G2_1_N"], mode["Vn_tension_field_N"]) and mode["equation"] == "G2-7"
+
+
+def test_a_failed_stiffener_limit_fails_the_member(engine):
+    case = stiffened(stiffeners={"a": 1500, "b": 60, "t": 4, "arrangement": "single", "material": {"Fy": 345}})
+    check = engine.run(case).check("shear_y_2")
+    failed = {r["id"] for r in check.result["requirements"] if not r["satisfied"]}
+    assert failed == {"G2-16", "G2-17"} and check.status.value == "FAIL"
+
+
+def test_end_panel_limits_the_tension_flange_stress(engine):
+    check = engine.run(stiffened(panel="end", Mx_3=3000, flexure={"tension_flange_holes": False},
+                                 lengths={"Lx_3": 1000, "Ly_2": 1000, "Lz_1": 1000})).check("shear_y_2")
+    limit = next(r for r in check.result["requirements"] if r["id"] == "G2.3")
+    assert not limit["satisfied"] and limit["limit"] == pytest.approx(0.35 * 345) and check.status.value == "FAIL"
+
+
+def test_tension_field_in_fire_uses_fy_at_temperature(engine):
+    ambient = engine.run(stiffened()).check("shear_y_2").result["modes"]["V"]["Vn"]
+    hot = engine.run(stiffened(condition="fire", fire={"steel_temperature": 500})).check("shear_y_2").result
+    assert hot["modes"]["V"]["Vn"] == pytest.approx(ambient * hot["fire"]["ky"], rel=1e-12)
+    assert any("DA4-11" in n for n in hot["notes"])
+
+
+def test_stiffener_material_comes_from_the_catalog():
+    from steel_design.execution import prepare_cases
+    payload = {"section_name": "W14X90", "material": "ASTM A36", "Vy_2": 10,
+               "stiffeners": {"a": 600, "b": 100, "t": 10, "arrangement": "pair", "material": "ASTM A572 Gr 50"}}
+    case = prepare_cases(payload)[0][1]
+    assert case.stiffeners.material.Fy == 345 and case.stiffeners.material.name == "ASTM A572 Gr 50"
