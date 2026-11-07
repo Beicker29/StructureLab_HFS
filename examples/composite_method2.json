@@ -3,21 +3,77 @@
   "section_name": "PTE100X50X3MM",
   "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
-    "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
-    "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}
+    "ultimate": {
+      "Lx_3": 2000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    },
+    "construction": {
+      "Lx_3": 2000,
+      "Ly_2": 1000,
+      "Lz_1": 1000
+    }
   },
   "serviceability": {
     "actual_span": 2000,
     "effective_span": 2000,
-    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 4.0,
+      "dead_short": 5.0,
+      "total_long": 6.7
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
-  "composite": {"kind": "filled", "pour_height": 2000, "second_order": null, "concrete": {"fc": 35, "wc": 2320, "lightweight": false}},
+  "composite": {
+    "kind": "filled",
+    "pour_height": 2000,
+    "second_order": null,
+    "concrete": {
+      "fc": 35,
+      "wc": 2320,
+      "lightweight": false
+    }
+  },
   "cases": [
-    {"name": "Method 2 simplified", "Pu": 60, "Mux": 6,
-     "composite": {"kind": "filled", "pour_height": 2000, "interaction": "M2S", "concrete": {"fc": 35, "wc": 2320, "lightweight": false}}},
-    {"name": "Method 2", "Pu": 40, "Mux": 7,
-     "composite": {"kind": "filled", "pour_height": 2000, "interaction": "M2", "concrete": {"fc": 35, "wc": 2320, "lightweight": false}}},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 2.3, "Vux": 9.5}
+    {
+      "name": "Method 2 simplified",
+      "P": -60,
+      "Mx_3": 6,
+      "composite": {
+        "kind": "filled",
+        "pour_height": 2000,
+        "interaction": "M2S",
+        "concrete": {
+          "fc": 35,
+          "wc": 2320,
+          "lightweight": false
+        }
+      }
+    },
+    {
+      "name": "Method 2",
+      "P": -40,
+      "Mx_3": 7,
+      "composite": {
+        "kind": "filled",
+        "pour_height": 2000,
+        "interaction": "M2",
+        "concrete": {
+          "fc": 35,
+          "wc": 2320,
+          "lightweight": false
+        }
+      }
+    },
+    {
+      "name": "Concrete pour",
+      "condition": "construction",
+      "Mx_3": 2.3,
+      "Vy_2": 9.5
+    }
   ]
 }

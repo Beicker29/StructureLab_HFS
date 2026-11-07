@@ -2,35 +2,64 @@
   "section_name": "PTER4\"X3.00MM",
   "material": "ASTM A500 Gr C (SRED)",
   "lengths": {
-    "ultimate": {"Lx": 2500, "Ly": 2500, "Lz": 2500},
-    "construction": {"Lx": 2500, "Ly": 1250, "Lz": 1250}
+    "ultimate": {
+      "Lx_3": 2500,
+      "Ly_2": 2500,
+      "Lz_1": 2500
+    },
+    "construction": {
+      "Lx_3": 2500,
+      "Ly_2": 1250,
+      "Lz_1": 1250
+    }
   },
   "serviceability": {
     "actual_span": 2500,
     "effective_span": 2500,
-    "deflections": {"live_short": 5.0, "dead_short": 6.2, "total_long": 8.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 5.0,
+      "dead_short": 6.2,
+      "total_long": 8.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "tension": {
     "An": 950,
     "U": 0.87,
     "fabricated_length": 2500
   },
-  "flexure": {},
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 200
+      "P": -200
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -250
+      "P": 250
     },
     {
       "name": "Combinación 3 — flexión",
-      "Mux": 8
+      "Mx_3": 8
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 3.2, "Vux": 9.1},
-    {"name": "Incendio a 500 °C", "condition": "fire", "fire": {"steel_temperature": 500}, "Pu": 40, "Mux": 2, "Vux": 5}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 3.2,
+      "Vy_2": 9.1
+    },
+    {
+      "name": "Incendio a 500 °C",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 500
+      },
+      "P": -40,
+      "Mx_3": 2,
+      "Vy_2": 5
+    }
   ]
 }

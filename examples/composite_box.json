@@ -3,24 +3,61 @@
   "section_name": "CAJON-400X300X12",
   "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
-    "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
-    "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}
+    "ultimate": {
+      "Lx_3": 4000,
+      "Ly_2": 4000,
+      "Lz_1": 4000
+    },
+    "construction": {
+      "Lx_3": 4000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    }
   },
   "serviceability": {
     "actual_span": 4000,
     "effective_span": 4000,
-    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 8.0,
+      "dead_short": 10.0,
+      "total_long": 13.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "composite": {
-    "kind": "filled", "pour_height": 4000, "second_order": null,
-    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
-    "box": {"B": 400, "H": 300, "t": 12},
+    "kind": "filled",
+    "pour_height": 4000,
+    "second_order": null,
+    "concrete": {
+      "fc": 35,
+      "wc": 2320,
+      "lightweight": false
+    },
+    "box": {
+      "B": 400,
+      "H": 300,
+      "t": 12
+    },
     "interaction": "M2S",
     "biaxial_shape_factor": true
   },
   "cases": [
-    {"name": "Biaxial flexure with the shape factor", "Pu": 1500, "Mux": 150, "Muy": 120, "Vux": 200},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 160, "Vux": 120}
+    {
+      "name": "Biaxial flexure with the shape factor",
+      "P": -1500,
+      "Mx_3": 150,
+      "My_2": 120,
+      "Vy_2": 200
+    },
+    {
+      "name": "Concrete pour",
+      "condition": "construction",
+      "Mx_3": 160,
+      "Vy_2": 120
+    }
   ]
 }

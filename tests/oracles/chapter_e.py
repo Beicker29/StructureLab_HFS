@@ -130,12 +130,12 @@ def plate_i(d, tw, top, bottom):
             "bb": bb, "tb": tb, "singly": (bt, tt) != (bb, tb)}
 
 
-def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=None):
+def case(family, name, fy, Lx_3, Ly_2=None, Lz_1=None, ya_2=0, e5=None, e6=None, girder=None):
     p = plate_i(*girder) if family == "I_BUILT_UP" else row(family, name)
-    fy, Lx = D(fy), D(Lx)
-    Ly = D(Ly) if Ly is not None else Lx
-    Lz = D(Lz) if Lz is not None else Lx
-    ya = D(ya)
+    fy, Lx_3 = D(fy), D(Lx_3)
+    Ly_2 = D(Ly_2) if Ly_2 is not None else Lx_3
+    Lz_1 = D(Lz_1) if Lz_1 is not None else Lx_3
+    ya_2 = D(ya_2)
     ag = p["A"]
     rt = sqrt(E / fy)
     modes, gross_only = {}, set()
@@ -144,48 +144,48 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=
         lr_f, lr_w = D("0.56") * rt, D("1.49") * rt          # B4.1a cases 1 and 5
         plates = [(p["bf/2tf"] * p["tf"], p["tf"], lr_f, D("0.22"), 4),
                   (p["h/tw"] * p["tw"], p["tw"], lr_w, D("0.18"), 1)]
-        modes["FB-x"], modes["FB-y"] = fe_flex(Lx, p["rx"]), fe_flex(Ly, p["ry"])
-        if ya:
-            ro2 = p["rx"]**2 + p["ry"]**2 + ya**2           # E4-11
-            modes["TB"] = (PI**2 * E * p["Iy"] / Lz**2 * (p["ho"]**2 / 4 + ya**2) + G * p["J"]) / (ag * ro2)  # E4-10
+        modes["FB-x_3"], modes["FB-y_2"] = fe_flex(Lx_3, p["rx"]), fe_flex(Ly_2, p["ry"])
+        if ya_2:
+            ro2 = p["rx"]**2 + p["ry"]**2 + ya_2**2           # E4-11
+            modes["TB"] = (PI**2 * E * p["Iy"] / Lz_1**2 * (p["ho"]**2 / 4 + ya_2**2) + G * p["J"]) / (ag * ro2)  # E4-10
         else:
-            modes["TB"] = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
+            modes["TB"] = (PI**2 * E * p["Cw"] / Lz_1**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
     elif family == "I_BUILT_UP":
         kc = min(max(4 / sqrt(p["h"] / p["tw"]), D("0.35")), D("0.76"))
         lr_f, lr_w = D("0.64") * sqrt(kc * E / fy), D("1.49") * rt  # B4.1a case 2 (note [a]) and case 5 or 8
         plates = [(p["bt"] / 2, p["tt"], lr_f, D("0.22"), 2), (p["bb"] / 2, p["tb"], lr_f, D("0.22"), 2),
                   (p["h"], p["tw"], lr_w, D("0.18"), 1)]
-        modes["FB-x"], modes["FB-y"] = fe_flex(Lx, p["rx"]), fe_flex(Ly, p["ry"])
+        modes["FB-x_3"], modes["FB-y_2"] = fe_flex(Lx_3, p["rx"]), fe_flex(Ly_2, p["ry"])
         if p["singly"]:                                          # E4(b): y is the axis of symmetry
-            fez = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
-            modes["FTB"] = e4_3(modes["FB-y"], fez, p["H"])
+            fez = (PI**2 * E * p["Cw"] / Lz_1**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
+            modes["FTB"] = e4_3(modes["FB-y_2"], fez, p["H"])
         else:
-            modes["TB"] = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
+            modes["TB"] = (PI**2 * E * p["Cw"] / Lz_1**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
     elif family == "CHANNEL":
         lr_f, lr_w = D("0.56") * rt, D("1.49") * rt
         plates = [(p["b/t"] * p["tf"], p["tf"], lr_f, D("0.22"), 2),   # B4.1a(b): full flange width
                   (p["h/tw"] * p["tw"], p["tw"], lr_w, D("0.18"), 1)]
-        fex, fey = fe_flex(Lx, p["rx"]), fe_flex(Ly, p["ry"])
-        fez = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
+        fex, fey = fe_flex(Lx_3, p["rx"]), fe_flex(Ly_2, p["ry"])
+        fez = (PI**2 * E * p["Cw"] / Lz_1**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
         # E4-3 with Fey replaced by Fex (User Note: x is the axis of symmetry of channels)
-        modes.update({"FB-x": fex, "FB-y": fey, "FTB": e4_3(fex, fez, p["H"])})
+        modes.update({"FB-x_3": fex, "FB-y_2": fey, "FTB": e4_3(fex, fez, p["H"])})
     elif family == "RECTANGULAR_HSS":
         lr = D("1.40") * rt                                      # B4.1a case 6
         plates = [(p["b"], p["tdes"], lr, D("0.20"), 2), (p["h"], p["tdes"], lr, D("0.20"), 2)]
-        modes["FB-x"], modes["FB-y"] = fe_flex(Lx, p["rx"]), fe_flex(Ly, p["ry"])
-        if Lz > min(Lx, Ly):
+        modes["FB-x_3"], modes["FB-y_2"] = fe_flex(Lx_3, p["rx"]), fe_flex(Ly_2, p["ry"])
+        if Lz_1 > min(Lx_3, Ly_2):
             modes["TB"] = G * p["J"] / (p["Ix"] + p["Iy"])       # E4-2 with the Cw term omitted (D-7)
     elif family == "CIRCULAR_HSS":
-        modes["FB-x"], modes["FB-y"] = fe_flex(Lx, p["rx"]), fe_flex(Ly, p["ry"])
-        if Lz > min(Lx, Ly):
-            modes["TB"] = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
+        modes["FB-x_3"], modes["FB-y_2"] = fe_flex(Lx_3, p["rx"]), fe_flex(Ly_2, p["ry"])
+        if Lz_1 > min(Lx_3, Ly_2):
+            modes["TB"] = (PI**2 * E * p["Cw"] / Lz_1**2 + G * p["J"]) / (p["Ix"] + p["Iy"])  # E4-2
     elif family == "SINGLE_ANGLE":
         bs, bl = sorted([p["d"], p["b"]])
         t = p["t"]
         lr = D("0.45") * rt                                      # B4.1a case 3
         plates = [(bl, t, lr, D("0.22"), 1), (bs, t, lr, D("0.22"), 1)]
         if e5 is None:                                           # outside E5: E3 about z, eccentricity in H2 (DH-8)
-            modes["FB-z"] = fe_flex(Lx, p["rz"])
+            modes["FB-z"] = fe_flex(Lx_3, p["rz"])
         else:
             config, leg, length = e5
             length = D(length)
@@ -202,9 +202,9 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=
             assert lcr <= 200
             modes["FB-E5"] = PI**2 * E / lcr**2
         if bl / t > D("0.71") * rt:                              # E5: flexural-torsional per E4
-            assert Lx == Ly
-            few, fe_z = fe_flex(Lx, sqrt(p["Iw"] / ag)), fe_flex(Lx, p["rz"])
-            fet = (PI**2 * E * p["Cw"] / Lz**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
+            assert Lx_3 == Ly_2
+            few, fe_z = fe_flex(Lx_3, sqrt(p["Iw"] / ag)), fe_flex(Lx_3, p["rz"])
+            fet = (PI**2 * E * p["Cw"] / Lz_1**2 + G * p["J"]) / (ag * p["ro"]**2)  # E4-7
             if bl == bs:
                 modes["FTB"] = e4_3(few, fet, p["H"])           # w is the axis of symmetry
             else:
@@ -223,7 +223,7 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=
         plates = [(bl, t, lr, D("0.22"), 2), (bs, t, lr, D("0.22"), 2)]
         connectors, a = e6
         a, ri = D(a), comp["rz"]
-        lr_o = Ly / p["ry"]
+        lr_o = Ly_2 / p["ry"]
         if connectors == "snug_tight":
             lr_m = sqrt(lr_o**2 + (a / ri) ** 2)                 # E6-1
         elif a / ri <= 40:
@@ -232,7 +232,7 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=
             lr_m = sqrt(lr_o**2 + (D("0.5") * a / ri) ** 2)      # E6-2b, Ki = 0.50
         fey = PI**2 * E / lr_m**2
         fez = G * 2 * comp["J"] / (ag * p["ro"]**2)              # E4-7, Cw omitted, J of both angles
-        modes.update({"FB-x": fe_flex(Lx, p["rx"]), "FB-y": fey, "FTB": e4_3(fey, fez, p["H"])})
+        modes.update({"FB-x_3": fe_flex(Lx_3, p["rx"]), "FB-y_2": fey, "FTB": e4_3(fey, fez, p["H"])})
     slender = any(b / t > lam_r for b, t, lam_r, _, _ in plates)
     if family == "CIRCULAR_HSS":
         dt = p["OD"] / p["tdes"]
@@ -250,42 +250,42 @@ def case(family, name, fy, Lx, Ly=None, Lz=None, ya=0, e5=None, e6=None, girder=
         out[mode] = {"Fe_mpa": fe, "Fn_mpa": fn, "A_mm2": ae, "Pn_kN": pn / 1000}
     gov = min(out, key=lambda k: out[k]["Pn_kN"])
     pn = out[gov]["Pn_kN"]
-    return {"family": family, "section": name, "girder": girder, "Fy": fy, "Lx": Lx, "Ly": Ly, "Lz": Lz, "ya": ya, "e5": e5,
+    return {"family": family, "section": name, "girder": girder, "Fy": fy, "Lx_3": Lx_3, "Ly_2": Ly_2, "Lz_1": Lz_1, "ya_2": ya_2, "e5": e5,
             "e6": e6, "slender": slender, "modes": out, "governing_mode": gov, "Pn_kN": pn,
             "LRFD_kN": D("0.90") * pn}
 
 
 CASES = {
-    "RHSS-nonslender": dict(family="RECTANGULAR_HSS", name="PTE100X100X4MM", fy=345, Lx=3000),
-    "RHSS-slender": dict(family="RECTANGULAR_HSS", name="PTE120X60X2MM", fy=345, Lx=1500),
-    "RHSS-torsional-length-E4-2": dict(family="RECTANGULAR_HSS", name="PTE150X50X3MM", fy=345, Lx=1000, Lz=6000),
-    "C-flexural": dict(family="CHANNEL", name="C15X50", fy=345, Lx=3000),
-    "C-flexural-torsional": dict(family="CHANNEL", name="C15X50", fy=345, Lx=1000),
-    "C-FTB-governs": dict(family="CHANNEL", name="C15X50", fy=345, Lx=4000, Ly=1000, Lz=4000),
-    "C-slender": dict(family="CHANNEL", name="C12X20.7", fy=450, Lx=1500),
-    "W-torsional": dict(family="W", name="W14X90", fy=345, Lx=3000),
-    "W-slender-web": dict(family="W", name="W8X10", fy=345, Lx=3000),
-    "W-bracing-offset-E4-10": dict(family="W", name="W14X90", fy=345, Lx=6000, ya=200),
-    "CHSS-nonslender": dict(family="CIRCULAR_HSS", name='PTER4"X3.00MM', fy=345, Lx=2500),
-    "CHSS-torsional-length": dict(family="CIRCULAR_HSS", name='PTER4"X3.00MM', fy=345, Lx=2500, Lz=5000),
-    "CHSS-slender-E7-7": dict(family="CIRCULAR_HSS", name='PTER24"X12.70MM', fy=450, Lx=8000),
-    "L-E5a-equal": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=250, Lx=2000, e5=("a", "long", 2000)),
-    "L-E5b-short-leg": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=250, Lx=2500, e5=("b", "short", 2500)),
-    "L-E5a-slender-leg": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=345, Lx=600, e5=("a", "long", 600)),
-    "L-E4-3-equal-legs": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=450, Lx=2000, e5=("a", "long", 2000)),
-    "L-E4-3-governs": dict(family="SINGLE_ANGLE", name="L6X6X5/16", fy=450, Lx=600, Lz=3000, e5=("b", "long", 600)),
-    "L-E4-4-unequal-legs": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=450, Lx=2000, e5=("a", "short", 2000)),
-    "L-H2-FBz-slender": dict(family="SINGLE_ANGLE", name="L8X4X1/2", fy=345, Lx=1524),
-    "L-H2-FTB-equal": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=450, Lx=2000),
-    "L-H2-FTB-unequal": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=450, Lx=2000),
-    "2L-contact-welded": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Lx=2000, e6=("welded", 500)),
-    "2L-separated-snug": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4X3/4", fy=345, Lx=2000, e6=("snug_tight", 800)),
-    "2L-LLBB-pretensioned": dict(family="DOUBLE_ANGLE", name="2L8X4X1/2LLBB", fy=345, Lx=3000, e6=("pretensioned", 1500)),
-    "BUI-singly-FTB-slender-web": dict(family="I_BUILT_UP", name="PL900", girder=(900, 8, (350, 22), (250, 16)), fy=345, Lx=9000,
-                                       Ly=3000, Lz=3000),
-    "BUI-singly-nonslender": dict(family="I_BUILT_UP", name="PL400", girder=(400, 12, (250, 20), (200, 16)), fy=345, Lx=6000),
+    "RHSS-nonslender": dict(family="RECTANGULAR_HSS", name="PTE100X100X4MM", fy=345, Lx_3=3000),
+    "RHSS-slender": dict(family="RECTANGULAR_HSS", name="PTE120X60X2MM", fy=345, Lx_3=1500),
+    "RHSS-torsional-length-E4-2": dict(family="RECTANGULAR_HSS", name="PTE150X50X3MM", fy=345, Lx_3=1000, Lz_1=6000),
+    "C-flexural": dict(family="CHANNEL", name="C15X50", fy=345, Lx_3=3000),
+    "C-flexural-torsional": dict(family="CHANNEL", name="C15X50", fy=345, Lx_3=1000),
+    "C-FTB-governs": dict(family="CHANNEL", name="C15X50", fy=345, Lx_3=4000, Ly_2=1000, Lz_1=4000),
+    "C-slender": dict(family="CHANNEL", name="C12X20.7", fy=450, Lx_3=1500),
+    "W-torsional": dict(family="W", name="W14X90", fy=345, Lx_3=3000),
+    "W-slender-web": dict(family="W", name="W8X10", fy=345, Lx_3=3000),
+    "W-bracing-offset-E4-10": dict(family="W", name="W14X90", fy=345, Lx_3=6000, ya_2=200),
+    "CHSS-nonslender": dict(family="CIRCULAR_HSS", name='PTER4"X3.00MM', fy=345, Lx_3=2500),
+    "CHSS-torsional-length": dict(family="CIRCULAR_HSS", name='PTER4"X3.00MM', fy=345, Lx_3=2500, Lz_1=5000),
+    "CHSS-slender-E7-7": dict(family="CIRCULAR_HSS", name='PTER24"X12.70MM', fy=450, Lx_3=8000),
+    "L-E5a-equal": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=250, Lx_3=2000, e5=("a", "long", 2000)),
+    "L-E5b-short-leg": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=250, Lx_3=2500, e5=("b", "short", 2500)),
+    "L-E5a-slender-leg": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=345, Lx_3=600, e5=("a", "long", 600)),
+    "L-E4-3-equal-legs": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=450, Lx_3=2000, e5=("a", "long", 2000)),
+    "L-E4-3-governs": dict(family="SINGLE_ANGLE", name="L6X6X5/16", fy=450, Lx_3=600, Lz_1=3000, e5=("b", "long", 600)),
+    "L-E4-4-unequal-legs": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=450, Lx_3=2000, e5=("a", "short", 2000)),
+    "L-H2-FBz-slender": dict(family="SINGLE_ANGLE", name="L8X4X1/2", fy=345, Lx_3=1524),
+    "L-H2-FTB-equal": dict(family="SINGLE_ANGLE", name="L4X4X1/4", fy=450, Lx_3=2000),
+    "L-H2-FTB-unequal": dict(family="SINGLE_ANGLE", name="L6X4X3/8", fy=450, Lx_3=2000),
+    "2L-contact-welded": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Lx_3=2000, e6=("welded", 500)),
+    "2L-separated-snug": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4X3/4", fy=345, Lx_3=2000, e6=("snug_tight", 800)),
+    "2L-LLBB-pretensioned": dict(family="DOUBLE_ANGLE", name="2L8X4X1/2LLBB", fy=345, Lx_3=3000, e6=("pretensioned", 1500)),
+    "BUI-singly-FTB-slender-web": dict(family="I_BUILT_UP", name="PL900", girder=(900, 8, (350, 22), (250, 16)), fy=345, Lx_3=9000,
+                                       Ly_2=3000, Lz_1=3000),
+    "BUI-singly-nonslender": dict(family="I_BUILT_UP", name="PL400", girder=(400, 12, (250, 20), (200, 16)), fy=345, Lx_3=6000),
     "BUI-doubly-TB-slender-flange": dict(family="I_BUILT_UP", name="PL500", girder=(500, 10, (300, 10), (300, 10)), fy=345,
-                                         Lx=4000, Ly=2000, Lz=4000),
+                                         Lx_3=4000, Ly_2=2000, Lz_1=4000),
 }
 
 

@@ -43,8 +43,8 @@ def _bare_steel(case, section, catalog):
     E, j = case.material.E, section.j
     if section.type.upper() == "DOUBLE_ANGLE":
         j = 2 * catalog(double_angle_label(section.name)["component"]).j     # both angles, as in E6 and F9
-    rows = [_value("EA", "EA", _times(E, section.area), "E·Ag; E de E3"), _value("EIx", "EI", _times(E, section.ix), "E·Ix; E de E3"),
-            _value("EIy", "EI", _times(E, section.iy), "E·Iy; E de E3")]
+    rows = [_value("EA", "EA", _times(E, section.area), "E·Ag; E de E3"), _value("EIx_3", "EI", _times(E, section.ix), "E·Ix; E de E3"),
+            _value("EIy_2", "EI", _times(E, section.iy), "E·Iy; E de E3")]
     if section.type.upper() == "SINGLE_ANGLE":
         rows += [_value("EIw", "EI", _times(E, section.iw), "E·Iw; E de E3"), _value("EIz", "EI", _times(E, section.iz), "E·Iz; E de E3")]
     return rows + [_absent("GA", FALTA, "El programa no define el área de cortante para la rigidez elástica."),
@@ -94,13 +94,13 @@ def _filled_or_encased(case, section, catalog):
     g, C, Isrx, Isry = basis["geometry"], basis["coefficient"], basis["Isrx"], basis["Isry"]
     As, Ac, Asr = section.area, g["Ac"], g.get("Asr", 0.0)
     Gc = 0.4 * Ec
-    P_over_Pno = max(case.Pu, 0.0) * 1000.0 / basis["pno"]["Pno"]
+    P_over_Pno = max(-case.P, 0.0) * 1000.0 / basis["pno"]["Pno"]           # compression only
     equations = {"encased": "2-7" if P_over_Pno < 0.1 else "2-8", "filled": "2-9" if P_over_Pno < 0.1 else "2-10"}[kind]
     service = {axis: dg06_members.service_stiffness(kind=kind, EsIs=Es * Is, EsIsr=Es * Isr, EcIc=Ec * Ic, C=C, P_over_Pno=P_over_Pno)
-               for axis, Is, Isr, Ic in (("x", section.ix, Isrx, g["Icx"]), ("y", section.iy, Isry, g["Icy"]))}
+               for axis, Is, Isr, Ic in (("x_3", section.ix, Isrx, g["Icx"]), ("y_2", section.iy, Isry, g["Icy"]))}
     EA = dg06_members.axial_stiffness(EsAs=Es * As, EsAsr=Es * Asr, EcAc=Ec * Ac)
-    elastic = [_value("EA", "EA", EA, "Guía 6, Ec. 2-1"), _value("EIx", "EI", service["x"], f"Guía 6, Ec. {equations}"),
-               _value("EIy", "EI", service["y"], f"Guía 6, Ec. {equations}")]
+    elastic = [_value("EA", "EA", EA, "Guía 6, Ec. 2-1"), _value("EIx_3", "EI", service["x_3"], f"Guía 6, Ec. {equations}"),
+               _value("EIy_2", "EI", service["y_2"], f"Guía 6, Ec. {equations}")]
     rect = kind == "filled" and g["shape"] == "rect"
     GAc = Gc * Ac
     alone = "Guía 6, 2.8: sin expresión para la sección, se reporta el componente solo"
@@ -130,22 +130,22 @@ def _filled_or_encased(case, section, catalog):
         torsion.append(_value("GJ", "GJ", GJ, source))
     elastic += torsion
 
-    if case.Pu < 0:                                                           # I1.5(c)
+    if case.P > 0:                                                           # I1.5(c)
         steel = _bare_steel(case, section, catalog)
-        effective = [{**row, "source": "I1.5(c): acero solo"} for row in steel if row["symbol"] in {"EA", "EIx", "EIy"}]
+        effective = [{**row, "source": "I1.5(c): acero solo"} for row in steel if row["symbol"] in {"EA", "EIx_3", "EIy_2"}]
         direct = _direct_steel(case, steel, prefix="I1.5(c); ")
     else:
         equation = "I2-5" if kind == "encased" else "I2-12"
         EIx = eq.effective_stiffness(Is=section.ix, Isr=Isrx, C=C, Ec=Ec, Ic=g["Icx"])
         EIy = eq.effective_stiffness(Is=section.iy, Isr=Isry, C=C, Ec=Ec, Ic=g["Icy"])
-        effective = [_value("(EA)eff", "EA", EA, "I1.5(b): EA elástica"), _value("(EI)eff,x", "EI", EIx, f"I1.5(a), Ec. {equation}"),
-                     _value("(EI)eff,y", "EI", EIy, f"I1.5(a), Ec. {equation}"),
+        effective = [_value("(EA)eff", "EA", EA, "I1.5(b): EA elástica"), _value("(EI)eff,x_3", "EI", EIx, f"I1.5(a), Ec. {equation}"),
+                     _value("(EI)eff,y_2", "EI", EIy, f"I1.5(a), Ec. {equation}"),
                      _value("(GA)eff", "GA", GAc, "Gc·Ac; indicación del usuario (DI-20)")] + torsion
         direct = [
             _tau_row(case, "I1.5(d)"),
             _value("EA*", "EA", C2_FACTOR * EA, "I1.5, Nota: 0.8·(EA)eff"),
-            _flexural_star(case.tau_b, "EI*x", EIx, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
-            _flexural_star(case.tau_b, "EI*y", EIy, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
+            _flexural_star(case.tau_b, "EI*x_3", EIx, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
+            _flexural_star(case.tau_b, "EI*y_2", EIy, "I1.5(a), C2.3: 0.8·τb·(EI)eff"),
             _value("GA*", "GA", C2_FACTOR * GAc, "C2.3(a): 0.8·(GA)eff (DI-20)"),
         ]
         for row in torsion:
@@ -160,12 +160,12 @@ def _wall_rows(case, Is_x, Is_y, Ic_x, Ic_y, As, Asw, Ac, Ac_shear, Ec):
     """I1.5(e) with I1-1, I1-2 and I1-3; C2.3 with the tau_b entered by the user."""
     EIx, EIy = eq.wall_stiffness(Is=Is_x, Ec=Ec, Ic=Ic_x), eq.wall_stiffness(Is=Is_y, Ec=Ec, Ic=Ic_y)
     EA, GA = eq.wall_axial_stiffness(As=As, Ec=Ec, Ac=Ac), eq.wall_shear_stiffness(Asw=Asw, Ec=Ec, Ac=Ac_shear)
-    effective = [_value("(EI)eff,x", "EI", EIx, "I1.5(e), Ec. I1-1"), _value("(EI)eff,y", "EI", EIy, "I1.5(e), Ec. I1-1"),
+    effective = [_value("(EI)eff,x_3", "EI", EIx, "I1.5(e), Ec. I1-1"), _value("(EI)eff,y_2", "EI", EIy, "I1.5(e), Ec. I1-1"),
                  _value("(EA)eff", "EA", EA, "I1.5(e), Ec. I1-2"), _value("(GA)eff", "GA", GA, "I1.5(e), Ec. I1-3")]
     direct = [
         _tau_row(case, "I1.5(f)"),
-        _flexural_star(case.tau_b, "EI*x", EIx, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
-        _flexural_star(case.tau_b, "EI*y", EIy, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
+        _flexural_star(case.tau_b, "EI*x_3", EIx, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
+        _flexural_star(case.tau_b, "EI*y_2", EIy, "I1.5(f), C2.3(a), (b): 0.8·τb·(EI)eff"),
         _value("EA*", "EA", C2_FACTOR * EA, "C2.3(a): 0.8·(EA)eff"),
         _value("GA*", "GA", C2_FACTOR * GA, "C2.3(a): 0.8·(GA)eff"),
         _absent("GJ*", FALTA, "I1.5 no define la rigidez torsional de muros de placas."),

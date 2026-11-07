@@ -3,44 +3,151 @@
   "section_name": "W10X45",
   "material": "ASTM A572 Gr 50",
   "lengths": {
-    "ultimate": {"Lx": 4267, "Ly": 4267, "Lz": 4267},
-    "construction": {"Lx": 4267, "Ly": 2133.5, "Lz": 2133.5}
+    "ultimate": {
+      "Lx_3": 4267,
+      "Ly_2": 4267,
+      "Lz_1": 4267
+    },
+    "construction": {
+      "Lx_3": 4267,
+      "Ly_2": 2133.5,
+      "Lz_1": 2133.5
+    }
   },
   "serviceability": {
     "actual_span": 4267,
     "effective_span": 4267,
-    "deflections": {"live_short": 8.5, "dead_short": 10.7, "total_long": 14.2},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 8.5,
+      "dead_short": 10.7,
+      "total_long": 14.2
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
-  "flexure": {"tension_flange_holes": false},
   "composite": {
-    "kind": "encased", "interaction": null, "second_order": null,
-    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "kind": "encased",
+    "interaction": null,
+    "second_order": null,
+    "concrete": {
+      "fc": 35,
+      "wc": 2320,
+      "lightweight": false
+    },
     "encased": {
-      "H": 610, "B": 610, "Fysr": 420,
+      "H": 610,
+      "B": 610,
+      "Fysr": 420,
       "bars": [
-        {"area": 510, "db": 25.4, "x": 241.3, "y": 241.3}, {"area": 510, "db": 25.4, "x": 241.3, "y": -241.3},
-        {"area": 510, "db": 25.4, "x": -241.3, "y": 241.3}, {"area": 510, "db": 25.4, "x": -241.3, "y": -241.3},
-        {"area": 510, "db": 25.4, "x": 241.3, "y": 0}, {"area": 510, "db": 25.4, "x": -241.3, "y": 0},
-        {"area": 510, "db": 25.4, "x": 0, "y": 241.3}, {"area": 510, "db": 25.4, "x": 0, "y": -241.3}
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": 241.3,
+          "y": 241.3
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": 241.3,
+          "y": -241.3
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": -241.3,
+          "y": 241.3
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": -241.3,
+          "y": -241.3
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": 241.3,
+          "y": 0
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": -241.3,
+          "y": 0
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": 0,
+          "y": 241.3
+        },
+        {
+          "area": 510,
+          "db": 25.4,
+          "x": 0,
+          "y": -241.3
+        }
       ],
-      "transverse": {"db": 10, "spacing": 300},
+      "transverse": {
+        "db": 10,
+        "spacing": 300
+      },
       "flexure_method": "composite",
       "anchors_provided": true
     }
   },
+  "flexure": {
+    "tension_flange_holes": false
+  },
   "cases": [
-    {"name": "Compression and flexure", "Pu": 3000, "Mux": 300},
+    {
+      "name": "Compression and flexure",
+      "P": -3000,
+      "Mx_3": 300
+    },
     {
       "name": "Stud under shear and tension, I8.3",
       "composite": {
         "anchor": {
-          "type": "stud", "Qrv": 40, "Qrt": 60, "spacing": 500, "d": 19, "Fu": 450, "height": 160, "head_diameter": 32,
-          "breakout_in_shear": false, "base_thickness": 15.6
+          "type": "stud",
+          "Qrv": 40,
+          "Qrt": 60,
+          "spacing": 500,
+          "d": 19,
+          "Fu": 450,
+          "height": 160,
+          "head_diameter": 32,
+          "breakout_in_shear": false,
+          "base_thickness": 15.6
         }
       }
     },
-    {"name": "First-order loads, Appendix 8.1", "composite": {"second_order": {"axis": "x", "Mnt": 150, "Mlt": 100, "Pnt": 2000, "Plt": 300, "M1_M2": -0.5, "Pstory": 60000, "Pmf": 20000, "H": 2000, "L": 4000, "drift": 10}}},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 84, "Vux": 47}
+    {
+      "name": "First-order loads, Appendix 8.1",
+      "composite": {
+        "second_order": {
+          "axis": "x_3",
+          "Mnt": 150,
+          "Mlt": 100,
+          "Pnt": -2000,
+          "Plt": -300,
+          "M1_M2": -0.5,
+          "Pstory": 60000,
+          "Pmf": 20000,
+          "H": 2000,
+          "L": 4000,
+          "drift": 10
+        }
+      }
+    },
+    {
+      "name": "Concrete pour",
+      "condition": "construction",
+      "Mx_3": 84,
+      "Vy_2": 47
+    }
   ]
 }

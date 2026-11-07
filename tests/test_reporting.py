@@ -18,7 +18,7 @@ from steel_design.reporting.text import render_text
 
 
 def test_report_shows_inputs_modes_and_governing_values(engine):
-    case = steel_case("C15X50", Pu=300, L=4000, Ly=1000)
+    case = steel_case("C15X50", P=-300, L=4000, Ly_2=1000)
     result = engine.run(case)
     text = calculation_report(case, result)
     c = result.compression
@@ -102,14 +102,14 @@ CHAPTERS = (
     "## 7. Revisión de capacidad a carga de tracción",
     "## 8. Revisión de capacidad a fuerza cortante",
     "### 8.1 Condiciones de construcción",
-    "#### 8.1.1 Paralelo al eje X (Vuy)",
-    "#### 8.1.2 Paralelo al eje Y (Vux)",
+    "#### 8.1.1 A lo largo de x, eje 3 (Vx_3)",
+    "#### 8.1.2 A lo largo de y, eje 2 (Vy_2)",
     "### 8.2 Condiciones últimas",
     "### 8.3 Condiciones de incendio",
     "## 9. Revisión de capacidad a momento flector",
     "### 9.1 Condiciones de construcción",
-    "#### 9.1.1 Respecto del eje X (Mux, Mw)",
-    "#### 9.1.2 Respecto del eje Y (Muy, Mz)",
+    "#### 9.1.1 Respecto de x, eje 3 (Mx_3; en ángulos simples, eje principal w)",
+    "#### 9.1.2 Respecto de y, eje 2 (My_2; en ángulos simples, eje principal z)",
     "### 9.2 Condiciones últimas",
     "### 9.3 Condiciones de incendio",
     "## 10. Revisión de capacidad a momento torsional",
@@ -133,13 +133,13 @@ def test_every_report_has_its_eleven_chapters_in_order():
 
 
 def test_what_does_not_apply_or_is_missing_is_said_explicitly(engine):
-    tension_only = SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345, "Fu": 450}, Pu=-100, tension={"An": 15000, "U": 0.9})
+    tension_only = SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345, "Fu": 450}, P=100, tension={"An": 15000, "U": 0.9})
     text = calculation_report(tension_only, engine.run(tension_only))
     for sentence in ("No aplica: miembro sin concreto.", "No aplica: miembro sin barras de refuerzo.",
-                     "No aplica: ningún case tiene carga de compresión", "No aplica: ningún case en condiciones últimas tiene Vux",
-                     "No aplica: ningún case en condiciones últimas tiene Mux ni Mw", "No aplica: ningún case combina",
+                     "No aplica: ningún case tiene carga de compresión", "No aplica: ningún case en condiciones últimas tiene Vx_3",
+                     "No aplica: ningún case en condiciones últimas tiene Mx_3", "No aplica: ningún case combina",
                      "No aplica: la entrada no indica deflexiones", "No aplica: ningún case de construcción",
-                     "No aplica: ningún case en condiciones de incendio tiene Vux", "No aplica: ningún case de incendio.",
+                     "No aplica: ningún case en condiciones de incendio tiene Vx_3", "No aplica: ningún case de incendio.",
                      "Falta implementación: la entrada no admite momento torsional"):
         assert sentence in text
     assert "### 7.1 Tracción (Capítulo D); case gobernante: única" in text
@@ -148,9 +148,9 @@ def test_what_does_not_apply_or_is_missing_is_said_explicitly(engine):
 def test_symbols_are_named_in_words(engine):
     case = steel_case("W14X90", L=4000)
     text = calculation_report(case, engine.run(case))
-    for words in ("Área bruta (Ag)", "Momento de inercia respecto de x (Ix)", "Esfuerzo de fluencia mínimo especificado (Fy)",
-                  "Lx: para pandeo por flexión respecto del eje x", "Ly: para pandeo por flexión respecto del eje y",
-                  "Lz: para pandeo torsional respecto del eje longitudinal", "Esfuerzo de pandeo elástico, Fe (MPa)"):
+    for words in ("Área bruta (Ag)", "Momento de inercia respecto de x (eje 3) (Ix)", "Esfuerzo de fluencia mínimo especificado (Fy)",
+                  "Lx_3: para pandeo por flexión respecto de x, eje 3", "Ly_2: para pandeo por flexión respecto de y, eje 2",
+                  "Lz_1: para pandeo torsional respecto del eje 1", "Esfuerzo de pandeo elástico, Fe (MPa)"):
         assert words in text
 
 
@@ -176,15 +176,15 @@ def test_literals_come_from_the_equation_applied(engine):
 
 def test_elastic_stiffness_of_bare_steel_by_hand(engine):
     # W14X90: E*Ix = 200000*4.16e8 N*mm2 = 83200 kN*m2; G*J = 77200*1.69e6 N*mm2 = 130.468 kN*m2
-    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Vux=1))
+    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Vy_2=1))
     rows = {r["symbol"]: r for r in result.stiffness["elastic"]}
-    assert rows["EIx"]["value"] == pytest.approx(83200e9) and rows["GJ"]["value"] == pytest.approx(130.468e9)
+    assert rows["EIx_3"]["value"] == pytest.approx(83200e9) and rows["GJ"]["value"] == pytest.approx(130.468e9)
     assert rows["EA"]["value"] == pytest.approx(200000 * 17100) and rows["GA"]["status"] == "falta_implementacion"
     assert result.stiffness["effective"] == result.stiffness["elastic"]
 
 
 def test_report_of_a_noncomposite_member_repeats_the_elastic_stiffness_as_effective(engine):
-    case = SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Vux=1)
+    case = SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Vy_2=1)
     blocks = report_blocks([(None, case, engine.run(case))])
     start = next(i for i, b in enumerate(blocks) if b.get("text") == "2.2 Rigideces elásticas")
     end = next(i for i, b in enumerate(blocks) if b.get("text") == "2.3 Rigideces efectivas")
@@ -195,13 +195,13 @@ def test_report_of_a_noncomposite_member_repeats_the_elastic_stiffness_as_effect
 
 
 def test_double_angle_stiffness_uses_both_angles(engine, sections):
-    result = engine.run(SteelCase(tau_b=1.0, section_name="2L4X4X1/4", material={"Fy": 345}, Vux=1))
+    result = engine.run(SteelCase(tau_b=1.0, section_name="2L4X4X1/4", material={"Fy": 345}, Vy_2=1))
     gj = next(r for r in result.stiffness["elastic"] if r["symbol"] == "GJ")
     assert gj["value"] == pytest.approx(77200 * 2 * sections["L4X4X1/4"].j)
 
 
 def test_inconsistent_catalog_data_give_no_stiffness(engine):
-    case = SteelCase(tau_b=1.0, section_name="IPE 80", material={"Fy": 345}, Vux=1)
+    case = SteelCase(tau_b=1.0, section_name="IPE 80", material={"Fy": 345}, Vy_2=1)
     result = engine.run(case)
     assert "error" in result.stiffness and "No calculadas" in calculation_report(case, result)
 
@@ -212,20 +212,20 @@ def _filled_case(**demands):
 
 
 def test_composite_stiffness_does_not_need_compression(engine):
-    rows = {r["symbol"]: r for r in engine.run(_filled_case(Mux=1)).stiffness["effective"]}
-    direct = {r["symbol"]: r for r in engine.run(_filled_case(Mux=1)).stiffness["direct_analysis"]}
-    assert direct["EI*x"]["value"] == pytest.approx(0.64 * rows["(EI)eff,x"]["value"])
+    rows = {r["symbol"]: r for r in engine.run(_filled_case(Mx_3=1)).stiffness["effective"]}
+    direct = {r["symbol"]: r for r in engine.run(_filled_case(Mx_3=1)).stiffness["direct_analysis"]}
+    assert direct["EI*x_3"]["value"] == pytest.approx(0.64 * rows["(EI)eff,x_3"]["value"])
     assert direct["EA*"]["value"] == pytest.approx(0.8 * rows["(EA)eff"]["value"])
 
 
 def test_net_tension_uses_the_bare_steel(engine, sections):
     # I1.5(c)
-    rows = {r["symbol"]: r for r in engine.run(_filled_case(Pu=-10, tension={"An": 5000, "U": 1.0})).stiffness["effective"]}
-    assert rows["EIx"]["value"] == pytest.approx(200000 * sections["PTE200X200X7MM"].ix)
+    rows = {r["symbol"]: r for r in engine.run(_filled_case(P=10, tension={"An": 5000, "U": 1.0})).stiffness["effective"]}
+    assert rows["EIx_3"]["value"] == pytest.approx(200000 * sections["PTE200X200X7MM"].ix)
 
 
 def test_reference_documents_of_composite_stiffnesses_are_stated(engine):
-    case = _filled_case(Pu=100, lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000})
+    case = _filled_case(P=-100, lengths={"Lx_3": 3000, "Ly_2": 3000, "Lz_1": 3000})
     text = calculation_report(case, engine.run(case))
     for words in (
         "AISC Design Guide 6, Ec. 2-9",
@@ -251,12 +251,12 @@ def test_one_report_per_member_however_many_load_cases(engine):
 def test_each_review_reports_the_case_with_the_largest_dcr(engine):
     groups, (text,) = member_text(engine, "w_shape.json")
     ratios = {
-        tag: result.check("flexure_x").ratio
+        tag: result.check("flexure_x_3").ratio
         for tag, case, result in groups[0]
-        if result.check("flexure_x") and case.condition == "ultimate"
+        if result.check("flexure_x_3") and case.condition == "ultimate"
     }
     worst = max(ratios, key=ratios.get)
-    assert f"Flexión respecto de x (Capítulo F); case gobernante: {worst}." in text
+    assert f"Flexión respecto de x (eje 3) (Capítulo F); case gobernante: {worst}." in text
     table = next(b for b in report_blocks(groups[0]) if b["kind"] == "table" and "Case gobernante" in b["headers"])
     row = next(r for r in table["rows"] if r[0] == "Últimas" and r[1].startswith("Flexión respecto de x"))
     assert row[2] == worst and row[5] == ratios[worst]
@@ -266,17 +266,17 @@ def test_each_review_reports_the_case_with_the_largest_dcr(engine):
 
 def test_a_load_case_without_strength_is_not_hidden_by_a_larger_dcr(engine):
     data = {"section_name": "W14X90", "material": "ASTM A572 Gr 50", "flexure": {"tension_flange_holes": False}, "cases": [
-        {"name": "Con datos", "Mux": 100, "lengths": {"Lx": 3000, "Ly": 3000, "Lz": 3000}},
-        {"name": "Sin datos", "Mux": 10}]}
+        {"name": "Con datos", "Mx_3": 100, "lengths": {"Lx_3": 3000, "Ly_2": 3000, "Lz_1": 3000}},
+        {"name": "Sin datos", "Mx_3": 10}]}
     group = member_groups(execute_payload(data, engine))[0]
-    assert "Flexión respecto de x (Capítulo F); case gobernante: Sin datos." in render_text(report_blocks(group))
+    assert "Flexión respecto de x (eje 3) (Capítulo F); case gobernante: Sin datos." in render_text(report_blocks(group))
 
 
 def test_composite_beam_report_has_construction_and_deflections(engine):
     _, (text,) = member_text(engine, "composite_beam.json")
     for sentence in ("Luz efectiva (deflexiones), L", "Carga viva a corto plazo", "38.100", "Carga viva + muerta a largo plazo", "57.150",
-                     "558.900 kN·m", "Flexión respecto de x (Capítulo F); case gobernante: Concrete pour.",
-                     "Flexión respecto de x (Capítulo I); case gobernante: Flexure and shear."):
+                     "558.900 kN·m", "Flexión respecto de x (eje 3) (Capítulo F); case gobernante: Concrete pour.",
+                     "Flexión respecto de x (eje 3) (Capítulo I); case gobernante: Flexure and shear."):
         assert sentence in text
     construction = text[text.index("### 9.1 Condiciones de construcción"):text.index("### 9.2 Condiciones últimas")]
     assert "Concrete pour" in construction and "Flexure and shear" not in construction
@@ -416,14 +416,14 @@ def test_summary_cards_show_the_strength_and_the_dcr_on_their_own_lines(engine):
     groups, _ = member_text(engine, "w_shape.json")
     blocks = report_blocks(groups[0])
     items = dict(next(b for b in blocks if b["kind"] == "summary")["items"])
-    check = next(r for _, c, r in groups[0] if c.condition == "construction").check("flexure_x")
+    check = next(r for _, c, r in groups[0] if c.condition == "construction").check("flexure_x_3")
     assert items["Construcción, Flexión respecto de x:"] == [f"φb·Mn={check.capacity:.3f} kN·m", f"DCR={check.ratio:.3f}"]
 
 
 def test_summary_card_of_an_interaction_has_only_the_dcr(engine):
     case = SteelCase(
-        tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345}, Mw=1, Mz=1, lengths={"Lx": 1500, "Ly": 1500, "Lz": 1500},
-        angle_flexure={"toe": "compression"})
+        tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345}, Mx_3=1, My_2=0.5, heel={"axis_2": "-", "axis_3": "-"},
+        lengths={"Lx_3": 1500, "Ly_2": 1500, "Lz_1": 1500})
     result = engine.run(case)
     items = next(b for b in report_blocks([(None, case, result)]) if b["kind"] == "summary")["items"]
     title, lines = next(item for item in items if item[0].startswith("Interacción"))

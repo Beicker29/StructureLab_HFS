@@ -75,7 +75,7 @@ def wall_fire_modes(case, section, hot):
     if wall_is_slender(case):
         blocked(SLENDER_BLOCK, section, b_t=wall.b / wall.t)
     composite_materials(case, section)                                                    # the limits of 4.2.3b
-    Lc = case.factors.Ky * case.lengths.Ly
+    Lc = case.factors.Ky_2 * case.lengths.Ly_2
     strip = wall_strip_at_temperature(case, hot, st=wall.st, t=wall.t, tsc=wall.tsc, layers=concrete_profile(case, section), Lc=Lc)
     pn = strip["Pn_T"] * wall.length / wall.st
     modes = {
@@ -132,8 +132,8 @@ def composite_wall_interaction(case: SteelCase, section: Section, checks: list) 
         raise IncompleteSectionDataError("La interacción necesita la resistencia de diseño de cada componente.",
                                          code="INTERACTION_COMPONENT_MISSING",
                                          details={"section": section.name, "checks": missing})
-    flexure = by_id["flexure_x"]
-    P_N = case.Pu * 1000.0
+    flexure = by_id["flexure_x_3"]
+    P_N = -case.P * 1000.0                          # compression positive, as in I1.2a
     out = _wall_moment(case, section, P_N)
     if out["within_section"]:
         capacity = eq.PHI_B * out["Mp"] / 1e6
@@ -142,7 +142,7 @@ def composite_wall_interaction(case: SteelCase, section: Section, checks: list) 
         limit = out["P_max_N"] if P_N > 0 else out["P_min_N"]
         capacity, ratio = 0.0, P_N / limit
     mode = {"limit_state": "combined_flexure_axial", "provision": "I5(c)", "applies": True, "equation": "I1.2a",
-            "Pr_kN": case.Pu, "Mr_kNm": flexure.demand, "a_mm": out["a_mm"], "Mc_at_Pr_kNm": capacity, "ratio": ratio}
+            "P_kN": case.P, "Mr_kNm": flexure.demand, "a_mm": out["a_mm"], "Mc_at_Pr_kNm": capacity, "ratio": ratio}
     return with_fire_extension(
         composite_result(
             case,

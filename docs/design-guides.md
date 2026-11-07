@@ -16,18 +16,18 @@ Resistencias de diseño en kip, kip-ft o kip-in según el caso; las razones no t
 | --- | --- | --- | --- | --- |
 | DG6-2.4-Pc | W14X211 embebido, Lc = 15 ft | 9900 | 9935 | +0.36 % |
 | DG6-2.4-Mcy | W14X211 embebido, eje y, I3.3a(3), 6 barras | 3330 | 3326 | -0.11 % |
-| DG6-2.4-M2S | Pu = 1000 kips, Muy = 3160 kip-ft, C-I5-1a | 0.949 | 0.950 | +0.10 % |
+| DG6-2.4-M2S | P=−1000 kips, My_2 = 3160 kip-ft, C-I5-1a | 0.949 | 0.950 | +0.10 % |
 | DG6-2.4-Vcy | Cortante del acero, eje menor (G6) | 1330 | 1329 | -0.07 % |
 | DG6-2.5-Pc | Cajón soldado 25 x 25 x 1/2 in, f'c = 6 ksi, Lc = 30 ft | 3540 | 3547 | +0.20 % |
 | DG6-2.5-Mc | Igual, flexión compacta | 1980 | 1986 | +0.28 % |
-| DG6-2.5-M2S | Pu = 1500 kips, Mux = 1800 kip-ft, C-I5-1a | 0.909 | 0.907 | -0.27 % |
+| DG6-2.5-M2S | P=−1500 kips, Mx_3 = 1800 kip-ft, C-I5-1a | 0.909 | 0.907 | -0.27 % |
 | DG6-2.5-Vc | Igual, cortante I4-1, Av = 2·H·t | 751 | 751.2 | +0.03 % |
 | DG6-2.6-Pc | Cajón, f'c = 12 ksi, Lc = 30 ft (Apéndice 2) | 5030 | 5053 | +0.46 % |
 | DG6-2.6-Mc | Igual, 90 % de la distribución | 1840 | 1837 | -0.18 % |
-| DG6-2.6-A2 | Pu = 2750 kips, Mux = 740 kip-ft, I5-1a con A-2-3 y A-2-4 | 0.757 | 0.756 | -0.13 % |
+| DG6-2.6-A2 | P=−2750 kips, Mx_3 = 740 kip-ft, I5-1a con A-2-3 y A-2-4 | 0.757 | 0.756 | -0.13 % |
 | DG6-2.7-Pc | HSS16.000X0.250 con 4 barras No. 7, Lc = 20 ft | 1230 | 1235 | +0.37 % |
 | DG6-2.7-Mc | Igual, no compacta, Mp y My (I3-5b) | 318 | 318.4 | +0.12 % |
-| DG6-2.7-I5 | Pu = 680 kips, Mux = 264 kip-ft, I5-1a | 0.994 | 0.991 | -0.29 % |
+| DG6-2.7-I5 | P=−680 kips, Mx_3 = 264 kip-ft, I5-1a | 0.994 | 0.991 | -0.29 % |
 | DG6-2.7-Vb | Igual, cortante con el concreto neto de barras | 226 | 226.3 | +0.11 % |
 | DG6-2.7-Vc | HSS16.000X0.250 relleno sin barras, cortante I4-1 | 226 | 226.6 | +0.27 % |
 | DG38-2.1-Mc | Muro L = 300, tsc = 18, t = 1/2 in, flexión | 1 590 000 | 1 594 100 | +0.26 % |
@@ -53,7 +53,7 @@ Contenidos añadidos, contrastados con los mismos ejemplos:
 | --- | --- | --- | --- | --- |
 | DG6 2.4, Apéndice 8 | B2 | 1.11 | 1.109 | -0.12 % |
 | | Pestory (kip), columna ASD; ver notas | 20 400 | 20 410 | +0.05 % |
-| | Muy (kip-ft) | 3160 | 3160 | -0.01 % |
+| | My_2 (kip-ft) | 3160 | 3160 | -0.01 % |
 | | Razón C-I5-1a con esas demandas | 0.949 | 0.950 | +0.09 % |
 | DG6 2.4, sección controlada por tracción | εt | 0.00695 | 0.00690 | -0.74 % |
 | | φRn apoyo, adherencia (kip) | 138, 7.19 | dentro de ±1,5 % | prueba |
@@ -106,7 +106,7 @@ Sin ejemplo en las guías, solo con oráculo independiente: factor de forma α (
 | 5 | Cajones soldados | `composite.box` | DG6 2.5 | `sections/geometry.py` | Una sola placa de espesor t |
 | 6 | Factor de forma α biaxial | `composite.biaxial_shape_factor` | DG6 2.3.2 | `aisc_dg06/members.py` | Solo `M2S`, con flexión en dos ejes |
 | 7 | Rigideces de servicio | `stiffness.elastic` del resultado | DG6 2.8 | `aisc_dg06/members.py` | Jc de rectangulares (2-14) y Js de cajones no vienen de la guía (DI-16); donde no da expresión, acero solo y concreto solo (DI-20) |
-| 8 | Muros en C | `composite.kind = c_wall` | DG38 A.2 | `aisc_dg38/walls.py` | Sin Mux con axial, sin Vux; una sola combinación de lado comprimido por signo de Pu |
+| 8 | Muros en C | `composite.kind = c_wall` | DG38 A.2 | `aisc_dg38/walls.py` | Sin Mx_3 con axial, sin Vy_2; una sola combinación de lado comprimido por signo de P; lado del alma en `web_side` |
 | 9 | Vigas de acoplamiento | `composite.kind = coupling_beam` | DG38 2.3.3, A.3 | `aisc_dg38/walls.py` | Compactas; sin fuerza axial |
 | 10 | Placas esbeltas | `wall.allow_slender_plates` | Commentary I1.6a; DG38 2.2.1 | `aisc_360_22/composite.py` | Solo compresión; flexión y cortante siguen exigiendo I1-4 |
 | 11 | Rigideces efectivas de muros | `stiffness.effective` del resultado | I1-1 a I1-3 | `aisc_360_22/composite.py` | |

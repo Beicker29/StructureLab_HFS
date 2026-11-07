@@ -1,15 +1,34 @@
 {
   "section_name": "2L4X4X1/4",
   "material": "ASTM A572 Gr 50",
+  "heel": {
+    "axis_2": "+"
+  },
   "lengths": {
-    "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
-    "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}
+    "ultimate": {
+      "Lx_3": 2000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    },
+    "construction": {
+      "Lx_3": 2000,
+      "Ly_2": 1000,
+      "Lz_1": 1000
+    }
   },
   "serviceability": {
     "actual_span": 2000,
     "effective_span": 2000,
-    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 4.0,
+      "dead_short": 5.0,
+      "total_long": 6.7
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "double_angle_e6": {
     "connectors": "welded",
@@ -24,26 +43,25 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 100
+      "P": -100
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -600
+      "P": 600
     },
     {
       "name": "Combinación 3 — flexión x (alas verticales en tracción)",
-      "Mux": 10,
-      "angle_flexure": {
-        "web_legs": "tension"
-      }
+      "Mx_3": 10
     },
     {
       "name": "Combinación 4 — flexión x (alas verticales en compresión)",
-      "Mux": 8,
-      "angle_flexure": {
-        "web_legs": "compression"
-      }
+      "Mx_3": -8
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 5, "Vux": 24, "angle_flexure": {"web_legs": "tension"}}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 5,
+      "Vy_2": 24
+    }
   ]
 }

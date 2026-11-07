@@ -6,10 +6,11 @@ salvo G2.1(a). Fuerzas en kN.
 
 ## Entrada
 
-- `Vux`: cortante requerido que acompaña a `Mux`, paralelo a y (alma de perfiles I y
-  canales, paredes de altura H de los PTE, alas paralelas a y de los ángulos).
-- `Vuy`: cortante requerido que acompaña a `Muy`, paralelo a x (alas de I y canales,
-  paredes de ancho B de los PTE, alas paralelas a x de los ángulos).
+- `Vy_2`: cortante requerido a lo largo de y (eje 2), que acompaña a `Mx_3` (alma de perfiles I y
+  canales, paredes de altura H de los PTE, alas paralelas al eje 2 de los ángulos).
+- `Vx_3`: cortante requerido a lo largo de x (eje 3), que acompaña a `My_2` (alas de I y canales,
+  paredes de ancho B de los PTE, alas paralelas al eje 3 de los ángulos).
+- El signo del cortante no interviene ([axes.md](axes.md)); el chequeo se llama `shear_y_2` o `shear_x_3`.
 - `shear.Lv` (mm, opcional): distancia del cortante máximo al cortante nulo en PTE redondos (G5).
 
 El cortante no interviene en la interacción de H1; un caso con flexión y cortante se
@@ -17,7 +18,7 @@ verifica por separado (la interacción con torsión, H3, queda fuera del alcance
 
 ## Matriz de familias
 
-| Familia | `Vux` | `Vuy` |
+| Familia | `Vy_2` | `Vx_3` |
 | --- | --- | --- |
 | W / IPE / HEA / HEB (laminados) | G2.1(a) si h/tw ≤ 2,24√(E/Fy): φv = 1,00, Cv1 = 1; si no G2.1(b) con kv = 5,34 | G6: 2 alas, bf/2tf, kv = 1,2 |
 | Canal | G2.1(b), kv = 5,34 (G2.1(a) no se aplica a canales) | G6: 2 alas, bf/tf, kv = 1,2 |
@@ -38,32 +39,32 @@ oráculo lo recalcula de las columnas hi y ri_1.
 `tests/oracles/chapter_g.py` (Decimal, sin importar el paquete). Coincidencia con
 tolerancia relativa 1e-9. Vn y φv·Vn en kN:
 
-| Caso | Perfil y eje | Fy | Vn | φv | φv·Vn |
+| Caso | Perfil y eje del cortante | Fy | Vn | φv | φv·Vn |
 | --- | --- | --- | --- | --- | --- |
-| W-G2.1a | W24X62, x | 345 | 1358.29 | 1.00 | 1358.29 |
-| W-G2.1b | W24X55, x (h/tw > 2,24√(E/Fy)) | 345 | 1239.93 | 0.90 | 1115.94 |
-| W-G2.1b-Cv1 | W16X26, x (G2-4) | 450 | 645.41 | 0.90 | 580.87 |
-| C-G2.1b | C15X33.9, x | 345 | 804.44 | 0.90 | 724.00 |
-| W-G6 | W21X48, y | 345 | 934.11 | 0.90 | 840.70 |
-| C-G6 | C9X20, y | 345 | 292.55 | 0.90 | 263.30 |
-| RHSS-G4-x | PTE100X50X3MM, x | 345 | 105.84 | 0.90 | 95.25 |
-| RHSS-G4-y | PTE100X50X3MM, y | 345 | 48.09 | 0.90 | 43.28 |
-| RHSS-G4-slender | PTE100X40X1.5MM, x (G2-10) | 345 | 47.71 | 0.90 | 42.94 |
+| W-G2.1a | W24X62, y_2 | 345 | 1358.29 | 1.00 | 1358.29 |
+| W-G2.1b | W24X55, y_2 (h/tw > 2,24√(E/Fy)) | 345 | 1239.93 | 0.90 | 1115.94 |
+| W-G2.1b-Cv1 | W16X26, y_2 (G2-4) | 450 | 645.41 | 0.90 | 580.87 |
+| C-G2.1b | C15X33.9, y_2 | 345 | 804.44 | 0.90 | 724.00 |
+| W-G6 | W21X48, x_3 | 345 | 934.11 | 0.90 | 840.70 |
+| C-G6 | C9X20, x_3 | 345 | 292.55 | 0.90 | 263.30 |
+| RHSS-G4-y_2 | PTE100X50X3MM, y_2 | 345 | 105.84 | 0.90 | 95.25 |
+| RHSS-G4-x_3 | PTE100X50X3MM, x_3 | 345 | 48.09 | 0.90 | 43.28 |
+| RHSS-G4-slender | PTE100X40X1.5MM, y_2 (G2-10) | 345 | 47.71 | 0.90 | 42.94 |
 | CHSS-G5-no-Lv | PTER4"X3.00MM | 345 | 101.16 | 0.90 | 91.04 |
 | CHSS-G5-Lv | PTER4"X3.00MM, Lv = 1000 | 345 | 101.16 | 0.90 | 91.04 |
-| L-G3-long | L5X3X1/4, x | 345 | 166.94 | 0.90 | 150.24 |
-| L-G3-short | L5X3X1/4, y | 345 | 100.16 | 0.90 | 90.14 |
-| 2L-G3-LLBB-x | 2L4X3-1/2X3/8LLBB, x | 345 | 402.43 | 0.90 | 362.19 |
-| 2L-G3-SLBB-x | 2L4X3-1/2X3/8SLBB, x | 345 | 350.75 | 0.90 | 315.67 |
-| 2L-G3-LLBB-y | 2L4X3-1/2X3/8LLBB, y | 345 | 350.75 | 0.90 | 315.67 |
-| BAR-G4-x | Barra 100 x 20 mm, x | 345 | 414.00 | 0.90 | 372.60 |
-| BAR-G4-y | Barra 100 x 20 mm, y | 345 | 414.00 | 0.90 | 372.60 |
-| BAR-G4-G2-10 | Platina 650 x 10 mm, x (G2-10) | 345 | 1225.90 | 0.90 | 1103.31 |
-| BAR-G4-G2-11 | Platina 10 x 750 mm, y (G2-11) | 345 | 1208.00 | 0.90 | 1087.20 |
+| L-G3-long | L5X3X1/4, y_2 | 345 | 166.94 | 0.90 | 150.24 |
+| L-G3-short | L5X3X1/4, x_3 | 345 | 100.16 | 0.90 | 90.14 |
+| 2L-G3-LLBB-y_2 | 2L4X3-1/2X3/8LLBB, y_2 | 345 | 402.43 | 0.90 | 362.19 |
+| 2L-G3-SLBB-y_2 | 2L4X3-1/2X3/8SLBB, y_2 | 345 | 350.75 | 0.90 | 315.67 |
+| 2L-G3-LLBB-x_3 | 2L4X3-1/2X3/8LLBB, x_3 | 345 | 350.75 | 0.90 | 315.67 |
+| BAR-G4-y_2 | Barra 100 x 20 mm, y_2 | 345 | 414.00 | 0.90 | 372.60 |
+| BAR-G4-x_3 | Barra 100 x 20 mm, x_3 | 345 | 414.00 | 0.90 | 372.60 |
+| BAR-G4-G2-10 | Platina 650 x 10 mm, y_2 (G2-10) | 345 | 1225.90 | 0.90 | 1103.31 |
+| BAR-G4-G2-11 | Platina 10 x 750 mm, x_3 (G2-11) | 345 | 1208.00 | 0.90 | 1087.20 |
 | ROUND-G4 | Barra redonda D = 50 mm | 250 | 147.26 | 0.90 | 132.54 |
-| BUI-G2.1b-stocky-web | I armada 400, tw 12, 250x20 / 200x16, x | 345 | 993.60 | 0.90 | 894.24 |
-| BUI-G2.1b-Cv1 | I armada 1200, tw 8, alas 400x20, x (G2-4) | 345 | 838.77 | 0.90 | 754.89 |
-| BUI-G6-unequal | I armada 900, tw 8, 350x22 / 600x10, y | 345 | 2795.03 | 0.90 | 2515.52 |
+| BUI-G2.1b-stocky-web | I armada 400, tw 12, 250x20 / 200x16, y_2 | 345 | 993.60 | 0.90 | 894.24 |
+| BUI-G2.1b-Cv1 | I armada 1200, tw 8, alas 400x20, y_2 (G2-4) | 345 | 838.77 | 0.90 | 754.89 |
+| BUI-G6-unequal | I armada 900, tw 8, 350x22 / 600x10, x_3 | 345 | 2795.03 | 0.90 | 2515.52 |
 
 En los PTE redondos del catálogo (D/t ≤ 41) gobierna siempre 0,6Fy; las ramas G5-2a y
 G5-2b se prueban con las fórmulas. Contraste con los AISC Design Examples G.1B–G.7 en
@@ -86,8 +87,9 @@ G5-2b se prueban con las fórmulas. Contraste con los AISC Design Examples G.1B�
   no tiene espesor de alma; se usa la mitad del área bruta, Aw = 0,5·Ag (indicación del
   usuario, 2026-10-30), y Cv2 = 1 (lectura de la implementación: sin alma, no hay h/t con
   el que evaluar G2.2). La memoria lo indica.
-- **DG-5** Convención `Vux`/`Vuy`: el cortante se nombra por el momento al que acompaña,
-  no por la dirección de la fuerza.
+- **DG-5** Convención de ETABS (indicación del usuario, 2026-11-06): el cortante se nombra por la dirección de la fuerza,
+  `Vy_2` a lo largo de y (eje 2), que acompaña a `Mx_3`, y `Vx_3` a lo largo de x (eje 3). Antes se nombraba por el momento al
+  que acompaña (`Vux`, `Vuy`).
 
 ## Limitaciones
 

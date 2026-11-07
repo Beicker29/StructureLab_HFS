@@ -2,14 +2,30 @@
   "section_name": "W14X90",
   "material": "ASTM A572 Gr 50",
   "lengths": {
-    "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
-    "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}
+    "ultimate": {
+      "Lx_3": 4000,
+      "Ly_2": 4000,
+      "Lz_1": 4000
+    },
+    "construction": {
+      "Lx_3": 4000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    }
   },
   "serviceability": {
     "actual_span": 4000,
     "effective_span": 4000,
-    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 8.0,
+      "dead_short": 10.0,
+      "total_long": 13.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "tension": {
     "An": 15000,
@@ -23,36 +39,67 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 2500
+      "P": -2500
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -2000
+      "P": 2000
     },
     {
       "name": "Combinación 3 — flexión x",
-      "Mux": 400
+      "Mx_3": 400
     },
     {
       "name": "Combinación 4 — flexión y",
-      "Muy": 150
+      "My_2": 150
     },
     {
       "name": "Combinación 5 — flexocompresión biaxial y cortante",
-      "Pu": 1200,
-      "Mux": 300,
-      "Muy": 60,
-      "Vux": 350
+      "P": -1200,
+      "Mx_3": 300,
+      "My_2": 60,
+      "Vy_2": 350
     },
     {
       "name": "Combinación 6 — tracción y flexión",
-      "Pu": -1000,
-      "Mux": 350,
-      "Vux": 250
+      "P": 1000,
+      "Mx_3": 350,
+      "Vy_2": 250
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 230, "Vux": 83},
-    {"name": "Incendio a 550 °C — flexocompresión", "condition": "fire", "fire": {"steel_temperature": 550}, "Pu": 500, "Mux": 80, "Vux": 60},
-    {"name": "Incendio a 550 °C — tracción", "condition": "fire", "fire": {"steel_temperature": 550}, "Pu": -800},
-    {"name": "Incendio a 180 °C — sin efecto de temperatura", "condition": "fire", "fire": {"steel_temperature": 180}, "Pu": 1200, "Mux": 300, "Muy": 60, "Vux": 350}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 230,
+      "Vy_2": 83
+    },
+    {
+      "name": "Incendio a 550 °C — flexocompresión",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 550
+      },
+      "P": -500,
+      "Mx_3": 80,
+      "Vy_2": 60
+    },
+    {
+      "name": "Incendio a 550 °C — tracción",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 550
+      },
+      "P": 800
+    },
+    {
+      "name": "Incendio a 180 °C — sin efecto de temperatura",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 180
+      },
+      "P": -1200,
+      "Mx_3": 300,
+      "My_2": 60,
+      "Vy_2": 350
+    }
   ]
 }

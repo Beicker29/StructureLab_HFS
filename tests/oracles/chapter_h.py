@@ -3,7 +3,9 @@
 Component strengths come from the independent oracles of Chapters D, E and F (same folder);
 H1-1a/H1-1b, H1-2, H4-1 and H2-1 are written here. Decimal arithmetic; never imports steel_design.
 H2: the sense of the stress at A, B and C comes from the coordinates of the points in principal
-axes (x, y, tan(alpha) of the catalog), not from a table.
+axes (x, y, tan(alpha) of the catalog), not from a table. Inputs carry the ETABS axes and signs (P > 0 tension,
+Mx_3 > 0 compresses +2); a single-angle case states its principal moments and the compressed parts, and the input of the
+program (Mx_3, My_2 with the heel) comes from the inverse rotation of the Chapter F oracle.
 Regenerates tests/fixtures/chapter_h/reference.json:
 
     python tests/oracles/chapter_h.py
@@ -34,9 +36,9 @@ def phi_mn(spec):
     return chapter_f.build(spec)["phiMn_kNm"]
 
 
-def case(family, name, fy, Pu=0, Mux=0, Muy=0, L=None, Lb=None, Cb=1, tension=None, holes=None, e6=None,
-         web_legs=None, cb_amplification=False):
-    fy, pu, mux, muy = D(fy), D(Pu), D(Mux), D(Muy)
+def case(family, name, fy, P=0, Mx_3=0, My_2=0, L=None, Lb=None, Cb=1, tension=None, holes=None, e6=None,
+         heel=None, cb_amplification=False):
+    fy, pu, mux, muy = D(fy), -D(P), abs(D(Mx_3)), abs(D(My_2))              # pu: compression positive
     pc = None
     if pu > 0:
         pc = chapter_e.case(family, name, fy, L, e6=e6)["LRFD_kN"]
@@ -55,12 +57,13 @@ def case(family, name, fy, Pu=0, Mux=0, Muy=0, L=None, Lb=None, Cb=1, tension=No
         base["family"] = family
     mcx = mcy = None
     if mux:
-        spec = {**base, "axis": "x", "Lb": Lb, "Cb": cb} if kind != "2l" else {**base, "Lb": Lb, "web_legs": web_legs}
+        spec = ({**base, "axis": "x_3", "Lb": Lb, "Cb": cb} if kind != "2l"
+                else {**base, "Lb": Lb, "Mx_3": D(Mx_3), "heel": heel})
         if holes is not None:                                                   # F13.1 is a Chapter F limit state
             spec.update(holes=holes, Fu=tension["Fu"])
         mcx = phi_mn(spec)
     if muy:
-        mcy = phi_mn({**base, "axis": "y", **({"Lb": Lb} if kind == "rhss" else {})})
+        mcy = phi_mn({**base, "axis": "y_2", **({"Lb": Lb} if kind == "rhss" else {})})
     ratio, equation = h1(abs(pu), pc, mux, mcx, muy, mcy)
     out = {"Pc_kN": pc, "Mcx_kNm": mcx, "Mcy_kNm": mcy, "Cb_factor": factor, "H1": ratio, "H1_equation": equation}
     if holes is not None:                                                        # H4-1 for the tension flange
@@ -97,17 +100,17 @@ def _sign(value):
     return D(0) if abs(value) < D("1e-9") else D(1 if value > 0 else -1)
 
 
-def h2_case(name, fy, Pu=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, leg="long", toe=None, tension=None):
-    p, fy, pu, mw, mz = chapter_f.row("SINGLE_ANGLE", name), D(fy), D(Pu), D(Mw), D(Mz)
+def h2_case(name, fy, heel, P=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, leg="long", toe=None, tension=None):
+    p, fy, pu, mw, mz = chapter_f.row("SINGLE_ANGLE", name), D(fy), -D(P), D(Mw), D(Mz)
     pc = mcw = mcz = None
     if pu > 0:
         pc = chapter_e.case("SINGLE_ANGLE", name, fy, L)["LRFD_kN"]
     elif pu < 0:
         pc = chapter_d.case("SINGLE_ANGLE", name, fy, tension["Fu"], tension["An"], tension["U"])["LRFD_kN"]
     if mw:
-        mcw = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "w", "Lb": Lb, "Cb": Cb, "leg": leg})
+        mcw = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "w", "Lb": Lb, "Cb": Cb, "leg": leg, "heel": heel})
     if mz:
-        mcz = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "z", "toe": toe})
+        mcz = phi_mn({"kind": "lp", "name": name, "fy": fy, "axis": "z", "toe": toe, "heel": heel})
     points = angle_points(p)
     compressed_w = _sign(points["C" if leg == "long" else "A"][0])              # side of w in compression
     toe_side = _sign(points["C"][1])
@@ -123,33 +126,42 @@ def h2_case(name, fy, Pu=0, Mw=0, Mz=0, L=None, Lb=None, Cb=1, leg="long", toe=N
             "ratio": ratios[governing]}
 
 
+def h2_spec(spec):
+    """The case as the program reads it: the geometric moments of the stated principal moments, with the heel."""
+    return {**spec, **chapter_f.angle_principal_input(spec["name"], spec["heel"], mw=spec.get("Mw", 0), leg=spec.get("leg", "long"),
+                                                     mz=spec.get("Mz", 0), toe=spec.get("toe"))}
+
+
 TENSION = {"Fu": 450, "An": 15000, "U": "0.9"}
 H2_CASES = {
-    "L-H2-comp-long-toe": dict(name="L6X4X3/8", fy=345, Pu=100, Mw=5, Mz=2, L=2000, Lb=2000, leg="long",
+    "L-H2-comp-long-toe": dict(name="L6X4X3/8", heel={"axis_2": "-", "axis_3": "-"}, fy=345, P=-100, Mw=5, Mz=2, L=2000, Lb=2000,
+                               leg="long",
                                toe="tension"),
-    "L-H2-comp-short-toe": dict(name="L6X4X3/8", fy=345, Pu=100, Mw=5, Mz=2, L=2000, Lb=2000, leg="short",
+    "L-H2-comp-short-toe": dict(name="L6X4X3/8", heel={"axis_2": "+", "axis_3": "-"}, fy=345, P=-100, Mw=5, Mz=2, L=2000, Lb=2000,
+                                leg="short",
                                 toe="compression"),
-    "L-H2-comp-axial-Mw": dict(name="L8X4X1/2", fy=345, Pu=300, Mw=20, L=1524, Lb=1524, leg="long"),
-    "L-H2-comp-heel-governs": dict(name="L8X4X1/2", fy=345, Pu=150, Mz=5, L=1524, toe="tension"),
-    "L-H2-comp-FAIL": dict(name="L4X4X1/4", fy=450, Pu=120, Mz=4, L=2000, toe="compression"),
-    "L-H2-tension": dict(name="L6X4X3/8", fy=345, Pu=-300, Mw=8, Mz=3, Lb=2000, leg="short", toe="tension",
+    "L-H2-comp-axial-Mw": dict(name="L8X4X1/2", heel={"axis_2": "-", "axis_3": "+"}, fy=345, P=-300, Mw=20, L=1524, Lb=1524, leg="long"),
+    "L-H2-comp-heel-governs": dict(name="L8X4X1/2", heel={"axis_2": "+", "axis_3": "+"}, fy=345, P=-150, Mz=5, L=1524, toe="tension"),
+    "L-H2-comp-FAIL": dict(name="L4X4X1/4", heel={"axis_2": "-", "axis_3": "-"}, fy=450, P=-120, Mz=4, L=2000, toe="compression"),
+    "L-H2-tension": dict(name="L6X4X3/8", heel={"axis_2": "+", "axis_3": "-"}, fy=345, P=300, Mw=8, Mz=3, Lb=2000, leg="short",
+                         toe="tension",
                          tension={"Fu": 450, "An": 1900, "U": "0.85"}),
-    "L-H2-biaxial-equal": dict(name="L4X4X1/4", fy=345, Mw=3, Mz=3, Lb=3000, toe="compression"),
+    "L-H2-biaxial-equal": dict(name="L4X4X1/4", heel={"axis_2": "-", "axis_3": "+"}, fy=345, Mw=3, Mz=3, Lb=3000, toe="compression"),
 }
 CASES = {
-    "W-H1-1a": dict(family="W", name="W14X90", fy=345, Pu=1500, Mux=200, Muy=50, L=4000, Lb=4000),
-    "W-H1-1b": dict(family="W", name="W14X90", fy=345, Pu=300, Mux=200, Muy=50, L=4000, Lb=4000),
-    "W-biaxial-no-axial": dict(family="W", name="W14X90", fy=345, Mux=300, Muy=100, Lb=3000),
-    "W-H1.2-tension": dict(family="W", name="W14X90", fy=345, Pu=-800, Mux=400, Muy=50, Lb=8000, Cb="1.14",
+    "W-H1-1a": dict(family="W", name="W14X90", fy=345, P=-1500, Mx_3=200, My_2=50, L=4000, Lb=4000),
+    "W-H1-1b": dict(family="W", name="W14X90", fy=345, P=-300, Mx_3=200, My_2=50, L=4000, Lb=4000),
+    "W-biaxial-no-axial": dict(family="W", name="W14X90", fy=345, Mx_3=300, My_2=100, Lb=3000),
+    "W-H1.2-tension": dict(family="W", name="W14X90", fy=345, P=800, Mx_3=400, My_2=50, Lb=8000, Cb="1.14",
                            tension=TENSION),
-    "W-H1.2-Cb-amplified": dict(family="W", name="W14X90", fy=345, Pu=-800, Mux=400, Muy=50, Lb=8000, Cb="1.14",
+    "W-H1.2-Cb-amplified": dict(family="W", name="W14X90", fy=345, P=800, Mx_3=400, My_2=50, Lb=8000, Cb="1.14",
                                 tension=TENSION, cb_amplification=True),
-    "W-H4-holes": dict(family="W", name="W14X90", fy=345, Pu=-1500, Mux=300, Lb=3000, tension=TENSION, holes=4500),
-    "C-H1-1a": dict(family="CHANNEL", name="C15X50", fy=345, Pu=800, Mux=100, L=3000, Lb=3000),
-    "RHSS-H1-1a": dict(family="RECTANGULAR_HSS", name="PTE100X100X4MM", fy=345, Pu=200, Mux=5, Muy=3, L=3000,
+    "W-H4-holes": dict(family="W", name="W14X90", fy=345, P=1500, Mx_3=300, Lb=3000, tension=TENSION, holes=4500),
+    "C-H1-1a": dict(family="CHANNEL", name="C15X50", fy=345, P=-800, Mx_3=100, L=3000, Lb=3000),
+    "RHSS-H1-1a": dict(family="RECTANGULAR_HSS", name="PTE100X100X4MM", fy=345, P=-200, Mx_3=5, My_2=3, L=3000,
                        Lb=3000),
-    "2L-H1-1b": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, Pu=40, Mux=5, L=2000, Lb=2000,
-                     e6=("welded", 500), web_legs="tension"),
+    "2L-H1-1b": dict(family="DOUBLE_ANGLE", name="2L4X4X1/4", fy=345, P=-40, Mx_3=5, L=2000, Lb=2000,
+                     e6=("welded", 500), heel={"axis_2": "+"}),
 }
 
 
@@ -159,6 +171,6 @@ if __name__ == "__main__":
     payload = {"source": "ANSI/AISC 360-22 (a360-22w.pdf) H1, H2, H4; components from the D, E and F oracles",
                "generator": "tests/oracles/chapter_h.py (Decimal; independent of steel_design)",
                "cases": _plain({cid: {"spec": spec, **case(**spec)} for cid, spec in CASES.items()}),
-               "h2_cases": _plain({cid: {"spec": spec, **h2_case(**spec)} for cid, spec in H2_CASES.items()})}
+               "h2_cases": _plain({cid: {"spec": h2_spec(spec), **h2_case(**spec)} for cid, spec in H2_CASES.items()})}
     target.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
     print(target)

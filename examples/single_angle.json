@@ -1,15 +1,35 @@
 {
   "section_name": "L4X4X1/4",
   "material": "ASTM A36",
+  "heel": {
+    "axis_2": "-",
+    "axis_3": "-"
+  },
   "lengths": {
-    "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
-    "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}
+    "ultimate": {
+      "Lx_3": 2000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    },
+    "construction": {
+      "Lx_3": 2000,
+      "Ly_2": 1000,
+      "Lz_1": 1000
+    }
   },
   "serviceability": {
     "actual_span": 2000,
     "effective_span": 2000,
-    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 4.0,
+      "dead_short": 5.0,
+      "total_long": 6.7
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "single_angle_e5": {
     "configuration": "a",
@@ -30,26 +50,26 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 100
+      "P": -100
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -150
+      "P": 150
     },
     {
       "name": "Combinación 3 — flexión x (puntera comprimida)",
-      "Mux": 3,
-      "angle_flexure": {
-        "toe": "compression"
-      }
+      "Mx_3": 3
     },
     {
       "name": "Combinación 4 — flexión eje principal w",
-      "Mw": 5,
-      "angle_flexure": {
-        "leg_in_compression": "long"
-      }
+      "Mx_3": 3.5355339059327378,
+      "My_2": -3.5355339059327378
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 1.2, "Vux": 8.7, "angle_flexure": {"toe": "compression"}}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 1.2,
+      "Vy_2": 8.7
+    }
   ]
 }

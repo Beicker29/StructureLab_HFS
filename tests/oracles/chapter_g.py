@@ -62,7 +62,7 @@ def cv2(htw, kv, fy):
 
 def i_shape(name, family, fy, axis):
     p, fy = row(family, name), D(fy)
-    if axis == "x":
+    if axis == "y_2":
         if family == "W" and p["h/tw"] <= D("2.24") * sqrt(E / fy):            # G2.1(a)
             return D("0.6") * fy * p["d"] * p["tw"], D("1.00")                 # G2-1, G2-2
         return D("0.6") * fy * p["d"] * p["tw"] * cv1(p["h/tw"], D("5.34"), fy), D("0.90")
@@ -70,11 +70,11 @@ def i_shape(name, family, fy, axis):
     return 2 * D("0.6") * fy * p["bf"] * p["tf"] * cv2(ratio, D("1.2"), fy), D("0.90")   # G6-1, two flanges
 
 
-def built_up_i(d, tw, top, bottom, fy, axis):
+def built_up_i(d, tw, plus2, minus2, fy, axis):
     """Welded I: G2.1(b) always (G2.1(a) is for rolled shapes), Aw = d*tw; G6 per flange with its own bf/2tf."""
     d, tw, fy = D(d), D(tw), D(fy)
-    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (top, bottom)]
-    if axis == "x":
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (plus2, minus2)]
+    if axis == "y_2":
         return D("0.6") * fy * d * tw * cv1((d - tt - tb) / tw, D("5.34"), fy), D("0.90")   # G2-1, G2-3/G2-4
     return sum(D("0.6") * fy * b * t * cv2(b / (2 * t), D("1.2"), fy) for b, t in ((bt, tt), (bb, tb))), D("0.90")   # G6-1
 
@@ -82,7 +82,7 @@ def built_up_i(d, tw, top, bottom, fy, axis):
 def rect_hss(name, fy, axis):
     p, fy = row("RECTANGULAR_HSS", name), D(fy)
     t = p["tdes"]
-    h = (p["hi"] if axis == "x" else p["bi"]) - 2 * p["ri_1"]                  # G4
+    h = (p["hi"] if axis == "y_2" else p["bi"]) - 2 * p["ri_1"]                  # G4
     return D("0.6") * fy * 2 * h * t * cv2(h / t, D(5), fy), D("0.90")         # G4-1
 
 
@@ -105,16 +105,16 @@ def angle(name, fy, axis):
         suffix = re.search(r"(LLBB|SLBB)$", name)
         vertical = short if suffix and suffix[1] == "SLBB" else long_           # legs in the plane of symmetry
         horizontal = long_ if vertical == short else short
-        b, n = (vertical if axis == "x" else horizontal), 2
+        b, n = (vertical if axis == "y_2" else horizontal), 2
     else:
-        b, n = (long_ if axis == "x" else short), 1                              # catalog: long leg parallel to y
+        b, n = (long_ if axis == "y_2" else short), 1                              # catalog: long leg parallel to y
     t = p["t"]
     return n * D("0.6") * fy * b * t * cv2(b / t, D("1.2"), fy), D("0.90")      # G3-1
 
 
 def bar(H, B, fy, axis):
     fy = D(fy)
-    d, t = (D(H), D(B)) if axis == "x" else (D(B), D(H))                        # d parallel to the shear
+    d, t = (D(H), D(B)) if axis == "y_2" else (D(B), D(H))                        # d parallel to the shear
     return D("0.6") * fy * d * t * cv2(d / t, D(5), fy), D("0.90")              # G4-1
 
 
@@ -123,30 +123,30 @@ def solid_round(D_, fy):
 
 
 CASES = {
-    "W-G2.1a": dict(kind="i", name="W24X62", family="W", fy=345, axis="x"),
-    "W-G2.1b": dict(kind="i", name="W24X55", family="W", fy=345, axis="x"),
-    "W-G2.1b-Cv1": dict(kind="i", name="W16X26", family="W", fy=450, axis="x"),
-    "C-G2.1b": dict(kind="i", name="C15X33.9", family="CHANNEL", fy=345, axis="x"),
-    "W-G6": dict(kind="i", name="W21X48", family="W", fy=345, axis="y"),
-    "C-G6": dict(kind="i", name="C9X20", family="CHANNEL", fy=345, axis="y"),
-    "RHSS-G4-x": dict(kind="rhss", name="PTE100X50X3MM", fy=345, axis="x"),
-    "RHSS-G4-y": dict(kind="rhss", name="PTE100X50X3MM", fy=345, axis="y"),
-    "RHSS-G4-slender": dict(kind="rhss", name="PTE100X40X1.5MM", fy=345, axis="x"),
+    "W-G2.1a": dict(kind="i", name="W24X62", family="W", fy=345, axis="y_2"),
+    "W-G2.1b": dict(kind="i", name="W24X55", family="W", fy=345, axis="y_2"),
+    "W-G2.1b-Cv1": dict(kind="i", name="W16X26", family="W", fy=450, axis="y_2"),
+    "C-G2.1b": dict(kind="i", name="C15X33.9", family="CHANNEL", fy=345, axis="y_2"),
+    "W-G6": dict(kind="i", name="W21X48", family="W", fy=345, axis="x_3"),
+    "C-G6": dict(kind="i", name="C9X20", family="CHANNEL", fy=345, axis="x_3"),
+    "RHSS-G4-y_2": dict(kind="rhss", name="PTE100X50X3MM", fy=345, axis="y_2"),
+    "RHSS-G4-x_3": dict(kind="rhss", name="PTE100X50X3MM", fy=345, axis="x_3"),
+    "RHSS-G4-slender": dict(kind="rhss", name="PTE100X40X1.5MM", fy=345, axis="y_2"),
     "CHSS-G5-no-Lv": dict(kind="chss", name='PTER4"X3.00MM', fy=345),
     "CHSS-G5-Lv": dict(kind="chss", name='PTER4"X3.00MM', fy=345, Lv=1000),
-    "L-G3-long": dict(kind="angle", name="L5X3X1/4", fy=345, axis="x"),
-    "L-G3-short": dict(kind="angle", name="L5X3X1/4", fy=345, axis="y"),
-    "2L-G3-LLBB-x": dict(kind="angle", name="2L4X3-1/2X3/8LLBB", fy=345, axis="x"),
-    "2L-G3-SLBB-x": dict(kind="angle", name="2L4X3-1/2X3/8SLBB", fy=345, axis="x"),
-    "2L-G3-LLBB-y": dict(kind="angle", name="2L4X3-1/2X3/8LLBB", fy=345, axis="y"),
-    "BAR-G4-x": dict(kind="bar", H=100, B=20, fy=345, axis="x"),
-    "BAR-G4-y": dict(kind="bar", H=100, B=20, fy=345, axis="y"),
-    "BAR-G4-G2-10": dict(kind="bar", H=650, B=10, fy=345, axis="x"),
-    "BAR-G4-G2-11": dict(kind="bar", H=10, B=750, fy=345, axis="y"),
+    "L-G3-long": dict(kind="angle", name="L5X3X1/4", fy=345, axis="y_2"),
+    "L-G3-short": dict(kind="angle", name="L5X3X1/4", fy=345, axis="x_3"),
+    "2L-G3-LLBB-y_2": dict(kind="angle", name="2L4X3-1/2X3/8LLBB", fy=345, axis="y_2"),
+    "2L-G3-SLBB-y_2": dict(kind="angle", name="2L4X3-1/2X3/8SLBB", fy=345, axis="y_2"),
+    "2L-G3-LLBB-x_3": dict(kind="angle", name="2L4X3-1/2X3/8LLBB", fy=345, axis="x_3"),
+    "BAR-G4-y_2": dict(kind="bar", H=100, B=20, fy=345, axis="y_2"),
+    "BAR-G4-x_3": dict(kind="bar", H=100, B=20, fy=345, axis="x_3"),
+    "BAR-G4-G2-10": dict(kind="bar", H=650, B=10, fy=345, axis="y_2"),
+    "BAR-G4-G2-11": dict(kind="bar", H=10, B=750, fy=345, axis="x_3"),
     "ROUND-G4": dict(kind="round", D_=50, fy=250),
-    "BUI-G2.1b-stocky-web": dict(kind="bui", d=400, tw=12, top=(250, 20), bottom=(200, 16), fy=345, axis="x"),
-    "BUI-G2.1b-Cv1": dict(kind="bui", d=1200, tw=8, top=(400, 20), bottom=(400, 20), fy=345, axis="x"),
-    "BUI-G6-unequal": dict(kind="bui", d=900, tw=8, top=(350, 22), bottom=(600, 10), fy=345, axis="y"),
+    "BUI-G2.1b-stocky-web": dict(kind="bui", d=400, tw=12, plus2=(250, 20), minus2=(200, 16), fy=345, axis="y_2"),
+    "BUI-G2.1b-Cv1": dict(kind="bui", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, axis="y_2"),
+    "BUI-G6-unequal": dict(kind="bui", d=900, tw=8, plus2=(350, 22), minus2=(600, 10), fy=345, axis="x_3"),
 }
 
 

@@ -7,14 +7,30 @@
   },
   "material": "ASTM A36",
   "lengths": {
-    "ultimate": {"Lx": 1000, "Ly": 1000, "Lz": 1000},
-    "construction": {"Lx": 1000, "Ly": 500, "Lz": 500}
+    "ultimate": {
+      "Lx_3": 1000,
+      "Ly_2": 1000,
+      "Lz_1": 1000
+    },
+    "construction": {
+      "Lx_3": 1000,
+      "Ly_2": 500,
+      "Lz_1": 500
+    }
   },
   "serviceability": {
     "actual_span": 1000,
     "effective_span": 1000,
-    "deflections": {"live_short": 2.0, "dead_short": 2.5, "total_long": 3.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 2.0,
+      "dead_short": 2.5,
+      "total_long": 3.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "tension": {
     "An": 2000,
@@ -24,17 +40,31 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 50
+      "P": -50
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -400
+      "P": 400
     },
     {
       "name": "Combinación 3 — flexión x",
-      "Mux": 8
+      "Mx_3": 8
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 3.3, "Vux": 27},
-    {"name": "Incendio a 500 °C", "condition": "fire", "fire": {"steel_temperature": 500}, "Pu": 10, "Mux": 2, "Vux": 10}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 3.3,
+      "Vy_2": 27
+    },
+    {
+      "name": "Incendio a 500 °C",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 500
+      },
+      "P": -10,
+      "Mx_3": 2,
+      "Vy_2": 10
+    }
   ]
 }

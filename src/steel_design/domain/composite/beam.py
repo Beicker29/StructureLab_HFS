@@ -101,7 +101,7 @@ def _anchor_detailing_requirements(name, anchors, beam, concrete):
 
 
 
-def beam_requirements(beam, section, concrete):
+def beam_requirements(beam, section, concrete, positive):
     """I3.2c and I8.1 to I8.2: the geometric limits that the input declares."""
     out = []
     deck, studs = beam.deck, beam.studs
@@ -120,7 +120,7 @@ def beam_requirements(beam, section, concrete):
                                  "El perno debe sobresalir al menos 38 mm del deck."),
                     requirement_row("stud_cover", "I3.2c.1(b)", deck.hr + beam.tc - studs.length >= 13.0,
                                  "Recubrimiento sobre el perno ≥ 13 mm.")]
-    if beam.moment == "positive" and not missing_anchor_detailing(beam):
+    if positive and not missing_anchor_detailing(beam):
         for name, anchors in _beam_anchors(beam):
             out += _anchor_detailing_requirements(name, anchors, beam, concrete)
     return out
@@ -130,7 +130,7 @@ def beam_requirements(beam, section, concrete):
 def beam_flexure(case, section):
     """I3.2a(a) positive flexure; I3.2b steel section alone for negative flexure (Chapter F)."""
     beam, Fy = case.composite.beam, case.material.Fy
-    if beam.moment == "negative":
+    if case.Mx_3 < 0:                    # the slab is on the +2 face: Mx_3 < 0 is negative flexure
         return None
     require_properties(section, "area", "d", "bf", "tf", "tw", "h_tw_ratio")
     if section.h_tw_ratio > 3.76 * math.sqrt(eq.E_STEEL / Fy):
@@ -176,13 +176,13 @@ def beam_flexure(case, section):
             "Vp_crushing_kN": crushing / 1000.0, "Vp_steel_kN": steel / 1000.0, "SumQn_kN": sum_qn / 1000.0,
             "C_kN": C / 1000.0, "a_mm": a, "PNA": out["pna"], "x_mm": out["x_mm"], "degree_of_composite_action": degree,
             **anchors, "Mn_kNm": out["Mn"] / 1e6}
-    requirements = beam_requirements(beam, section, concrete)
+    requirements = beam_requirements(beam, section, concrete, case.Mx_3 >= 0)
     notes = []
     hot = steel_at_temperature(case)
     if hot:
         kcb = a4.composite_beam_factor(hot["T_C"])
         if kcb == 0.0:
-            blocked("Tabla A-4.2.4: la resistencia de la viga compuesta se anula a 1100 °C del ala inferior.", section, T_C=hot["T_C"])
+            blocked("Tabla A-4.2.4: la resistencia de la viga compuesta se anula a 1100 °C del ala de la cara −2.", section, T_C=hot["T_C"])
         at_temperature = a4.composite_beam_strength(Mn=out["Mn"], kcb=kcb)
         mode.update(
             provision="I3.2a(a); Apéndice 4, 4.2.4d(f)",

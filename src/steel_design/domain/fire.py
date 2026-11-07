@@ -21,7 +21,7 @@ EXTENSION = (
     "de 4.2.3b, como indica en general el Commentary de 4.2.4d. Es una decisión de ingeniería (DA4-8)."
 )
 SLENDER_BLOCK = "Apéndice 4, 4.2.4d: el método simple solo se aplica a secciones no esbeltas."
-_DEMANDS = ("Pu", "Mux", "Muy", "Mw", "Mz", "Vux", "Vuy")
+_DEMANDS = ("P", "Mx_3", "My_2", "Vy_2", "Vx_3")
 
 
 def is_elevated(case: SteelCase) -> bool:
@@ -72,7 +72,7 @@ def uncovered_demands(case: SteelCase) -> list[str]:
     demands = [name for name in _DEMANDS if getattr(case, name)]
     if case.composite.kind == "encased":
         return demands
-    return ["Pu"] if case.composite.kind == "beam" and case.Pu else []
+    return ["P"] if case.composite.kind == "beam" and case.P else []
 
 
 def fire_summary(case: SteelCase) -> dict | None:

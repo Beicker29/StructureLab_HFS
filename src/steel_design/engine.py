@@ -1,8 +1,8 @@
 """Design of one member for one LRFD load combination: one check per required strength, their interaction, status.
 
-Pu > 0: compression (Chapter E); Pu < 0: tension (Chapter D); Mux, Muy (and Mw, Mz for single
-angles about their principal axes): flexure (Chapter F); Vux, Vuy: shear (Chapter G). Axial force
-and flexure acting together, or flexure about two axes, add the interaction check (Chapter H).
+Axes and signs of ETABS (docs/axes.md). P < 0: compression (Chapter E); P > 0: tension (Chapter D); Mx_3, My_2: flexure
+(Chapter F), resolved on the principal axes w, z of single angles when F10 needs them; Vy_2, Vx_3: shear (Chapter G). Axial
+force and flexure acting together, or flexure about two axes, add the interaction check (Chapter H).
 case.composite sends each demand to Chapter I, which uses Chapters E, F and G where it refers to them.
 Section stiffnesses (domain/stiffness.py) are reported whatever the demands.
 """
@@ -32,7 +32,7 @@ from .domain.coverage import (
     shear_obligations,
 )
 from .domain.fire import fire_summary, is_elevated, uncovered_demands
-from .domain.flexure import flexure_strength
+from .domain.flexure import flexure_demands, flexure_strength
 from .domain.interaction import (
     COMBINED,
     amplified_cb_case,
@@ -123,7 +123,7 @@ class SteelDesignEngine:
 
     def _flexure_case(self, case: SteelCase, section: Section) -> tuple[SteelCase, dict | None]:
         """H1.2: Cb amplified by axial tension when the user asks for it."""
-        if not (case.Pu < 0 and case.flexure and case.flexure.tension_cb_amplification):
+        if not (case.P > 0 and case.flexure and case.flexure.tension_cb_amplification):
             return case, None
         if is_elevated(case):                # Decision DA4-6: Appendix 4 does not define Pey(T); without amplification it is conservative
             return case, {"applies": False, "reason": "en incendio no se amplifica Cb (decisión DA4-6)."}
@@ -154,7 +154,7 @@ class SteelDesignEngine:
                 failed = Check(id="axial", chapter="I", demand=0.0, unit="kN", status=Status.INCOMPLETE, errors=[exc.to_dict()])
                 return self._result(case, section, [failed], inconsistent)
             composite_checks = self._composite_checks(case, section, inconsistent)
-            note = (f"Apéndice 8.1: B1 = {info['B1']:.3f}, B2 = {info['B2']:.3f}; Pr = {info['Pr_kN']:.1f} kN, "
+            note = (f"Apéndice 8.1: B1 = {info['B1']:.3f}, B2 = {info['B2']:.3f}; P = {info['P_kN']:.1f} kN, "
                     f"Mr = {info['Mr_kNm']:.1f} kN·m (A-8-1, A-8-2).")
             for check in composite_checks:
                 if check.result:
@@ -167,24 +167,30 @@ class SteelDesignEngine:
 
     def _steel_checks(self, case: SteelCase, section: Section, inconsistent) -> list[Check]:
         checks = []
-        if case.Pu:
-            chapter = "E" if case.Pu > 0 else "D"
+        if case.P:
+            chapter = "E" if case.P < 0 else "D"
             compute = ((lambda: compression_strength(case, section, catalog=self._catalog)) if chapter == "E"
                        else (lambda: tension_strength(case, section)))
-            checks.append(self._check("axial", chapter, abs(case.Pu), "kN", required_obligations(case, section),
+            checks.append(self._check("axial", chapter, abs(case.P), "kN", required_obligations(case, section),
                                       compute, section, inconsistent))
         flexure_case, cb_factor = self._flexure_case(case, section)
-        for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
+        try:
+            demands = flexure_demands(case, section)
+        except (RuleNotImplementedError, IncompleteSectionDataError) as exc:
+            demands = []
+            checks += [Check(id=f"flexure_{axis}", chapter="F", demand=abs(moment), unit="kN·m", status=Status.INCOMPLETE,
+                             errors=[exc.to_dict()]) for axis, moment in (("x_3", case.Mx_3), ("y_2", case.My_2)) if moment]
+        for axis, moment in demands:
             if moment:
                 check = self._check(
-                    f"flexure_{axis}", "F", abs(moment), "kN·m", flexure_obligations(case, section, axis),
+                    f"flexure_{axis}", "F", moment, "kN·m", flexure_obligations(case, section, axis),
                     lambda axis=axis: flexure_strength(flexure_case, section, axis, catalog=self._catalog),
                     section, inconsistent)
                 if cb_factor and check.result:
                     check.result["notes"].append(_cb_note(cb_factor))
                     check.result["inputs"]["H1_2_Cb_factor"] = cb_factor.get("factor")
                 checks.append(check)
-        for axis, shear in (("x", case.Vux), ("y", case.Vuy)):
+        for axis, shear in (("y_2", case.Vy_2), ("x_3", case.Vx_3)):
             if shear:
                 checks.append(self._check(f"shear_{axis}", "G", abs(shear), "kN", shear_obligations(section, axis),
                                           lambda axis=axis: shear_strength(case, section, axis),
@@ -201,22 +207,22 @@ class SteelDesignEngine:
         kind = case.composite.kind
         if kind in {"c_wall", "coupling_beam"}:
             return self._guide_member_checks(case, section, inconsistent)
-        if case.Pu:
+        if case.P:
             compute = ((lambda: composite_compression(case, section, lambda: compression_strength(
-                case, section, catalog=self._catalog))) if case.Pu > 0 else (lambda: composite_tension(case, section)))
-            checks.append(self._check("axial", "I", abs(case.Pu), "kN", composite_obligations(case, "axial"), compute,
+                case, section, catalog=self._catalog))) if case.P < 0 else (lambda: composite_tension(case, section)))
+            checks.append(self._check("axial", "I", abs(case.P), "kN", composite_obligations(case, "axial"), compute,
                                       section, inconsistent))
         flexure_case, _ = self._flexure_case(case, section)
-        for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
+        for axis, moment in (("x_3", case.Mx_3), ("y_2", case.My_2)):
             if moment:
                 steel = lambda axis=axis: flexure_strength(flexure_case, section, axis, catalog=self._catalog)  # noqa: E731
-                negative = kind == "beam" and case.composite.beam.moment == "negative" and axis == "x"
+                negative = kind == "beam" and case.Mx_3 < 0 and axis == "x_3"     # the slab is on the +2 face
                 obligations = flexure_obligations(case, section, axis) if negative else composite_obligations(case, "flexure")
                 checks.append(self._check(
                     f"flexure_{axis}", "F" if negative else "I", abs(moment), "kN·m", obligations,
                     lambda axis=axis, steel=steel: composite_flexure(flexure_case, section, axis, steel),
                     section, inconsistent))
-        for axis, shear in (("x", case.Vux), ("y", case.Vuy)):
+        for axis, shear in (("y_2", case.Vy_2), ("x_3", case.Vx_3)):
             if shear:
                 steel = lambda axis=axis: shear_strength(case, section, axis)  # noqa: E731
                 chapter_i = kind in {"filled", "wall"}
@@ -290,17 +296,17 @@ class SteelDesignEngine:
         checks = []
         wall = case.composite.kind == "c_wall"
         flexure, shear = (c_wall_flexure, c_wall_shear) if wall else (coupling_beam_flexure, coupling_beam_shear)
-        if case.Pu:
-            compute = (lambda: c_wall_compression(case, section)) if case.Pu > 0 else (lambda: c_wall_tension(case, section))
+        if case.P:
+            compute = (lambda: c_wall_compression(case, section)) if case.P < 0 else (lambda: c_wall_tension(case, section))
             if not wall:
                 compute = lambda: coupling_beam_axial(case, section)  # noqa: E731
-            checks.append(self._check("axial", "I", abs(case.Pu), "kN", composite_obligations(case, "axial"), compute,
+            checks.append(self._check("axial", "I", abs(case.P), "kN", composite_obligations(case, "axial"), compute,
                                       section, inconsistent))
-        for axis, moment in (("x", case.Mux), ("y", case.Muy), ("w", case.Mw), ("z", case.Mz)):
+        for axis, moment in (("x_3", case.Mx_3), ("y_2", case.My_2)):
             if moment:
                 checks.append(self._check(f"flexure_{axis}", "I", abs(moment), "kN·m", composite_obligations(case, "flexure"),
                                           lambda axis=axis: flexure(case, section, axis), section, inconsistent))
-        for axis, value in (("x", case.Vux), ("y", case.Vuy)):
+        for axis, value in (("y_2", case.Vy_2), ("x_3", case.Vx_3)):
             if value:
                 checks.append(self._check(f"shear_{axis}", "I", abs(value), "kN", composite_obligations(case, "shear"),
                                           lambda axis=axis: shear(case, section, axis), section, inconsistent))
@@ -340,13 +346,11 @@ class SteelDesignEngine:
 
 
 _FIRE_CHECKS = {
-    "Pu": ("axial", "kN", "axial"),
-    "Mux": ("flexure_x", "kN·m", "flexure"),
-    "Muy": ("flexure_y", "kN·m", "flexure"),
-    "Mw": ("flexure_w", "kN·m", "flexure"),
-    "Mz": ("flexure_z", "kN·m", "flexure"),
-    "Vux": ("shear_x", "kN", "shear"),
-    "Vuy": ("shear_y", "kN", "shear"),
+    "P": ("axial", "kN", "axial"),
+    "Mx_3": ("flexure_x_3", "kN·m", "flexure"),
+    "My_2": ("flexure_y_2", "kN·m", "flexure"),
+    "Vy_2": ("shear_y_2", "kN", "shear"),
+    "Vx_3": ("shear_x_3", "kN", "shear"),
 }
 
 

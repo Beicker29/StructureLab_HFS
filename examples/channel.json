@@ -2,14 +2,30 @@
   "section_name": "C15X50",
   "material": "ASTM A572 Gr 50",
   "lengths": {
-    "ultimate": {"Lx": 4000, "Ly": 1000, "Lz": 4000},
-    "construction": {"Lx": 4000, "Ly": 500, "Lz": 2000}
+    "ultimate": {
+      "Lx_3": 4000,
+      "Ly_2": 1000,
+      "Lz_1": 4000
+    },
+    "construction": {
+      "Lx_3": 4000,
+      "Ly_2": 500,
+      "Lz_1": 2000
+    }
   },
   "serviceability": {
     "actual_span": 4000,
     "effective_span": 4000,
-    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 8.0,
+      "dead_short": 10.0,
+      "total_long": 13.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "tension": {
     "An": 8600,
@@ -22,21 +38,35 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 300
+      "P": -300
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -1500
+      "P": 1500
     },
     {
       "name": "Combinación 3 — flexión x",
-      "Mux": 150
+      "Mx_3": 150
     },
     {
       "name": "Combinación 4 — flexión y",
-      "Muy": 15
+      "My_2": 15
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 100, "Vux": 130},
-    {"name": "Incendio a 500 °C", "condition": "fire", "fire": {"steel_temperature": 500}, "Pu": 100, "Mux": 50, "Vux": 50}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 100,
+      "Vy_2": 130
+    },
+    {
+      "name": "Incendio a 500 °C",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 500
+      },
+      "P": -100,
+      "Mx_3": 50,
+      "Vy_2": 50
+    }
   ]
 }

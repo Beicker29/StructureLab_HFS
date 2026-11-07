@@ -3,20 +3,84 @@
   "section_name": "PTE100X50X3MM",
   "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
-    "ultimate": {"Lx": 2000, "Ly": 2000, "Lz": 2000},
-    "construction": {"Lx": 2000, "Ly": 1000, "Lz": 1000}
+    "ultimate": {
+      "Lx_3": 2000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    },
+    "construction": {
+      "Lx_3": 2000,
+      "Ly_2": 1000,
+      "Lz_1": 1000
+    }
   },
   "serviceability": {
     "actual_span": 2000,
     "effective_span": 2000,
-    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 4.0,
+      "dead_short": 5.0,
+      "total_long": 6.7
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
-  "composite": {"kind": "filled", "pour_height": 2000, "interaction": null, "second_order": null, "concrete": {"fc": 35, "wc": 2320, "lightweight": false}},
+  "composite": {
+    "kind": "filled",
+    "pour_height": 2000,
+    "interaction": null,
+    "second_order": null,
+    "concrete": {
+      "fc": 35,
+      "wc": 2320,
+      "lightweight": false
+    }
+  },
   "cases": [
-    {"name": "Compression, flexure and shear", "Pu": 60, "Mux": 3, "Muy": 1, "Vux": 40},
-    {"name": "First-order loads, Appendix 8.1", "composite": {"second_order": {"axis": "x", "Mnt": 1.5, "Mlt": 1, "Pnt": 40, "Plt": 10, "M1_M2": -0.5, "Pstory": 20000, "Pmf": 8000, "H": 500, "L": 2000, "drift": 10}}},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 2.3, "Vux": 9.5},
-    {"name": "Incendio, concreto uniforme", "condition": "fire", "fire": {"steel_temperature": 600, "concrete_temperature": 300}, "Pu": 15, "Mux": 1, "Vux": 10}
+    {
+      "name": "Compression, flexure and shear",
+      "P": -60,
+      "Mx_3": 3,
+      "My_2": 1,
+      "Vy_2": 40
+    },
+    {
+      "name": "First-order loads, Appendix 8.1",
+      "composite": {
+        "second_order": {
+          "axis": "x_3",
+          "Mnt": 1.5,
+          "Mlt": 1,
+          "Pnt": -40,
+          "Plt": -10,
+          "M1_M2": -0.5,
+          "Pstory": 20000,
+          "Pmf": 8000,
+          "H": 500,
+          "L": 2000,
+          "drift": 10
+        }
+      }
+    },
+    {
+      "name": "Concrete pour",
+      "condition": "construction",
+      "Mx_3": 2.3,
+      "Vy_2": 9.5
+    },
+    {
+      "name": "Incendio, concreto uniforme",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 600,
+        "concrete_temperature": 300
+      },
+      "P": -15,
+      "Mx_3": 1,
+      "Vy_2": 10
+    }
   ]
 }

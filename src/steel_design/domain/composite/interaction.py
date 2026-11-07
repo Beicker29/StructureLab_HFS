@@ -16,7 +16,7 @@ def composite_method2(case: SteelCase, section: Section, checks: list) -> dict:
     composite, simplified = case.composite, case.composite.interaction == "M2S"
     if composite.kind not in {"filled", "encased"}:
         blocked("El Método 2 se aplica a miembros embebidos y rellenos compactos.", section, kind=composite.kind)
-    if case.Pu < 0:
+    if case.P > 0:
         blocked("El Método 2 del Commentary cubre compresión con flexión; use interaction = H1 con tracción.", section)
     missing = [c.id for c in checks if c.capacity is None]
     if missing:
@@ -26,16 +26,16 @@ def composite_method2(case: SteelCase, section: Section, checks: list) -> dict:
     axial = by_id.get("axial")
     if axial is None and not simplified:
         blocked("El Método 2 requiere fuerza axial; use interaction = M2S o H1 para flexión biaxial.", section)
-    if case.Mux and case.Muy and not simplified:
+    if case.Mx_3 and case.My_2 and not simplified:
         blocked("El Método 2 con puntos A, B, C y D es para flexión en un eje; use interaction = M2S (C-I5-1).", section)
-    flexures = [by_id[i] for i in ("flexure_x", "flexure_y") if i in by_id]
+    flexures = [by_id[i] for i in ("flexure_x_3", "flexure_y_2") if i in by_id]
     classes = {row["class"] for c in [*flexures, *([axial] if axial else [])] for row in c.result["classification"]["elements"]}
     if classes - {"compact"}:
         blocked("El Método 2 exige una sección rellena compacta (Commentary I5); use H1 o I5.", section)
     if any("Md_kNm" not in f.result["modes"]["Y"] for f in flexures):
         blocked("El Método 2 usa la distribución plástica compuesta: indique flexure_method = composite.", section)
 
-    fx, fy = by_id.get("flexure_x"), by_id.get("flexure_y")
+    fx, fy = by_id.get("flexure_x_3"), by_id.get("flexure_y_2")
     Pr = axial.demand if axial else 0.0
     A = axial.result["modes"][axial.result["governing_mode"]] if axial else None
     pno = A.get("Pno_kN", A.get("Pno_T_kN")) if A else None          # at temperature, the Pno of the case (user's decision)
@@ -93,7 +93,7 @@ def composite_appendix_2_interaction(case: SteelCase, section: Section, checks: 
                                          code="INTERACTION_COMPONENT_MISSING",
                                          details={"section": section.name, "checks": missing})
     axial = by_id["axial"]
-    flexures = [by_id[i] for i in ("flexure_x", "flexure_y") if i in by_id]
+    flexures = [by_id[i] for i in ("flexure_x_3", "flexure_y_2") if i in by_id]
     A = axial.result["modes"][axial.result["governing_mode"]]
     Fy, fc = case.material.Fy, case.composite.concrete.fc
     t = section.tdes
@@ -109,11 +109,11 @@ def composite_appendix_2_interaction(case: SteelCase, section: Section, checks: 
     provision = "Apéndice 2, 2.1.4" + (", extendida a dos ejes (DI-22)" if biaxial else "")
     candidates = []
     for flexure in flexures:
-        B, H = (section.b_out, section.h_out) if flexure.id == "flexure_x" else (section.h_out, section.b_out)
+        B, H = (section.b_out, section.h_out) if flexure.id == "flexure_x_3" else (section.h_out, section.b_out)
         coefficients = a2.interaction_coefficients(B=B, H=H, lam=lam, Pn=A["Pn_kN"], Pno=A["Pno_kN"], fc=fc, Fy=Fy)
         out = eq.i5_interaction(Pr_Pc=axial.demand / axial.capacity, Mr_Mc=Mr_Mc, **coefficients)
         candidates.append({"limit_state": "combined_flexure_axial", "provision": provision, "applies": True, **coefficients, **terms, **out,
-                           **({"coefficients_axis": flexure.id[-1]} if biaxial else {})})
+                           **({"coefficients_axis": flexure.id.removeprefix("flexure_")} if biaxial else {})})
     candidates.sort(key=lambda mode: -mode["ratio"])
     modes = {"A2": candidates[0], **({"A2-otro": candidates[1]} if biaxial else {})}
     notes = ["Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3)."]
@@ -129,11 +129,11 @@ def composite_appendix_2_interaction(case: SteelCase, section: Section, checks: 
 
 def default_interaction(case: SteelCase, checks: list) -> str:
     """I5: H1.1 under I5(a); I5-1 under I5(b) where those equations apply (compression with flexure about one axis), otherwise H1.1."""
-    flexures = [c for c in checks if c.id in {"flexure_x", "flexure_y"}]
+    flexures = [c for c in checks if c.id in {"flexure_x_3", "flexure_y_2"}]
     axial = next((c for c in checks if c.id == "axial"), None)
     if (
         case.composite.kind != "filled"
-        or case.Pu <= 0
+        or case.P >= 0
         or len(flexures) != 1
         or axial is None
         or axial.result is None
@@ -157,14 +157,14 @@ def composite_i5(case: SteelCase, section: Section, checks: list) -> dict:
     composite = case.composite
     if composite.kind != "filled":
         blocked("Las ecuaciones I5-1 solo se aplican a miembros rellenos.", section, kind=composite.kind)
-    if case.Pu < 0 or (case.Mux and case.Muy):
+    if case.P > 0 or (case.Mx_3 and case.My_2):
         blocked("Las ecuaciones I5-1 cubren compresión con flexión en un eje; use interaction = H1.", section)
     missing = [c.id for c in checks if c.capacity is None]
     if missing:
         raise IncompleteSectionDataError("La interacción necesita la resistencia de diseño de cada componente.",
                                          code="INTERACTION_COMPONENT_MISSING",
                                          details={"section": section.name, "checks": missing})
-    flexure = by_id.get("flexure_x") or by_id.get("flexure_y")
+    flexure = by_id.get("flexure_x_3") or by_id.get("flexure_y_2")
     axial = by_id["axial"]
     classes = {row["class"] for c in (axial, flexure) for row in c.result["classification"]["elements"]}
     if classes == {"compact"}:
@@ -184,7 +184,7 @@ def composite_i5(case: SteelCase, section: Section, checks: list) -> dict:
 def interaction_method(case: SteelCase, section: Section, checks: list) -> tuple[str, bool]:
     """The method of a composite member, and whether a requested Method 2 had to be replaced by H1.1 (DI-22)."""
     method = "wall" if case.composite.kind == "wall" else (case.composite.interaction or default_interaction(case, checks))
-    if uses_appendix_2(case, section) and case.Pu > 0:
+    if uses_appendix_2(case, section) and case.P < 0:
         method = "A2"
     replaced = method in {"M2", "M2S"} and requested_interaction_replaced(case)
     return ("H1" if replaced else method), replaced

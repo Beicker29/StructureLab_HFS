@@ -47,8 +47,8 @@ def test_cli_prints_json_and_writes_nothing_by_default(tmp_path):
 
 def test_single_case_payload_prints_one_result(tmp_path):
     source = tmp_path / "one.json"
-    source.write_text(json.dumps({"section_name": "W14X90", "material": "ASTM A572 Gr 50", "Pu": 100, "tau_b": 1.0,
-                                  "lengths": {"Lx": 3000, "Ly": 3000, "Lz": 3000}}), encoding="utf-8")
+    source.write_text(json.dumps({"section_name": "W14X90", "material": "ASTM A572 Gr 50", "P": -100, "tau_b": 1.0,
+                                  "lengths": {"Lx_3": 3000, "Ly_2": 3000, "Lz_1": 3000}}), encoding="utf-8")
     output = json.loads(cli(source, cwd=tmp_path).stdout)
     assert output["checks"][0]["chapter"] == "E" and output["status"] == "PASS"
 
@@ -64,12 +64,12 @@ def test_cli_optional_output_file(tmp_path):
 
 def test_cli_structured_errors(tmp_path):
     bad = tmp_path / "bad.json"
-    bad.write_text('{"section_name": "W14X90", "Pu": -1}', encoding="utf-8")
+    bad.write_text('{"section_name": "W14X90", "P": 1}', encoding="utf-8")
     run = cli(bad, cwd=tmp_path)
     assert run.returncode == 1 and not run.stdout
     assert json.loads(run.stderr)["error"]["code"] == "VALIDATION_ERROR"
     duplicate = tmp_path / "duplicate.json"
-    duplicate.write_text('{"Pu": 1, "Pu": 2}', encoding="utf-8")
+    duplicate.write_text('{"P": -1, "P": -2}', encoding="utf-8")
     assert json.loads(cli(duplicate, cwd=tmp_path).stderr)["error"]["stage"] == "parse_input"
 
 

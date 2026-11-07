@@ -69,8 +69,8 @@ def _require_construction_case(group: list) -> None:
         return
     for _, case, result in group:
         unshored = case.composite and case.composite.kind == "beam" and not case.composite.beam.shored
-        check = result.check("flexure_x")
-        if unshored and case.composite.beam.moment == "positive" and check:
+        check = result.check("flexure_x_3")
+        if unshored and case.Mx_3 > 0 and check:                 # positive flexure: the slab is on the +2 face
             check.errors.append({"code": "COMPOSITE_DATA_INCOMPLETE", "provision": "I3.1b",
                                  "message": "Viga sin apuntalar: agregue un case con condition = construction (I3.1b)."})
             if check.status != Status.FAIL:

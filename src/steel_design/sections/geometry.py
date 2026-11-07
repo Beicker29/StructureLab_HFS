@@ -55,60 +55,60 @@ def build_wall_section(case: SteelCase) -> Section:
 
 
 def _plastic_axis(plates, area):
-    """Depth below the top fiber of the line that halves the area: the plastic neutral axis."""
+    """Depth from the +2 fiber of the line that halves the area: the plastic neutral axis."""
     above = 0.0
-    for top, bottom, width in plates:
-        if above + width * (bottom - top) >= area / 2:
-            return top + (area / 2 - above) / width
-        above += width * (bottom - top)
+    for near, far, width in plates:
+        if above + width * (far - near) >= area / 2:
+            return near + (area / 2 - above) / width
+        above += width * (far - near)
     raise ValueError("the plates do not add up to the area")
 
 
 def _first_moments(plates, y):
     """Sum of the absolute first moments of the plates about the horizontal line at depth y."""
     total = 0.0
-    for top, bottom, width in plates:
-        if y > top:
-            edge = min(bottom, y)
-            total += width * (edge - top) * (y - (top + edge) / 2)
-        if y < bottom:
-            edge = max(top, y)
-            total += width * (bottom - edge) * ((edge + bottom) / 2 - y)
+    for near, far, width in plates:
+        if y > near:
+            edge = min(far, y)
+            total += width * (edge - near) * (y - (near + edge) / 2)
+        if y < far:
+            edge = max(near, y)
+            total += width * (far - edge) * ((edge + far) / 2 - y)
     return total
 
 
-def built_up_i_properties(*, d, tw, bf_top, tf_top, bf_bottom, tf_bottom) -> dict:
-    """Plate properties of a welded I (mm). Depths are measured down from the top fiber.
+def built_up_i_properties(*, d, tw, bf_plus2, tf_plus2, bf_minus2, tf_minus2) -> dict:
+    """Plate properties of a welded I (mm). Depths are measured from the +2 fiber toward -2.
 
     J = sum of b*t^3/3 with the clear web height h; Cw = ho^2*Iyt*Iyb/(Iyt + Iyb) and the shear center at ho*Iyb/(Iyt + Iyb)
-    below the top flange centroid, with the flange inertias about y (thin-walled section, Commentary F4 and AISC Design Guide 9).
+    from the centroid of the +2 flange, with the flange inertias about y (thin-walled section, Commentary F4 and AISC Design Guide 9).
     """
-    h = d - tf_top - tf_bottom
-    plates = ((0.0, tf_top, bf_top), (tf_top, d - tf_bottom, tw), (d - tf_bottom, d, bf_bottom))
+    h = d - tf_plus2 - tf_minus2
+    plates = ((0.0, tf_plus2, bf_plus2), (tf_plus2, d - tf_minus2, tw), (d - tf_minus2, d, bf_minus2))
     area = sum(w * (b - t) for t, b, w in plates)
-    y_top = sum(w * (b - t) * (t + b) / 2 for t, b, w in plates) / area
-    ix = sum(w * (b - t) ** 3 / 12 + w * (b - t) * ((t + b) / 2 - y_top) ** 2 for t, b, w in plates)
-    iy_top, iy_bottom = tf_top * bf_top**3 / 12, tf_bottom * bf_bottom**3 / 12
-    iy = iy_top + iy_bottom + h * tw**3 / 12
-    ho = d - tf_top / 2 - tf_bottom / 2
+    y_plus2 = sum(w * (b - t) * (t + b) / 2 for t, b, w in plates) / area
+    ix = sum(w * (b - t) ** 3 / 12 + w * (b - t) * ((t + b) / 2 - y_plus2) ** 2 for t, b, w in plates)
+    iy_plus2, iy_minus2 = tf_plus2 * bf_plus2**3 / 12, tf_minus2 * bf_minus2**3 / 12
+    iy = iy_plus2 + iy_minus2 + h * tw**3 / 12
+    ho = d - tf_plus2 / 2 - tf_minus2 / 2
     y_pna = _plastic_axis(plates, area)
-    y_shear_center = tf_top / 2 + ho * iy_bottom / (iy_top + iy_bottom)
-    yo = y_shear_center - y_top
+    y_shear_center = tf_plus2 / 2 + ho * iy_minus2 / (iy_plus2 + iy_minus2)
+    yo = y_shear_center - y_plus2
     ro = math.sqrt(yo**2 + (ix + iy) / area)
-    return {"area": area, "h": h, "ho": ho, "y_top": y_top, "y_pna": y_pna, "ix": ix, "iy": iy, "iy_top": iy_top,
-            "iy_bottom": iy_bottom, "sx_top": ix / y_top, "sx_bottom": ix / (d - y_top), "zx": _first_moments(plates, y_pna),
-            "sy": iy / (max(bf_top, bf_bottom) / 2), "zy": (tf_top * bf_top**2 + tf_bottom * bf_bottom**2 + h * tw**2) / 4,
-            "j": (bf_top * tf_top**3 + bf_bottom * tf_bottom**3 + h * tw**3) / 3,
-            "cw": ho**2 * iy_top * iy_bottom / (iy_top + iy_bottom), "yo": yo, "ro": ro, "H": 1 - yo**2 / ro**2}
+    return {"area": area, "h": h, "ho": ho, "y_plus2": y_plus2, "y_pna": y_pna, "ix": ix, "iy": iy, "iy_plus2": iy_plus2,
+            "iy_minus2": iy_minus2, "sx_plus2": ix / y_plus2, "sx_minus2": ix / (d - y_plus2), "zx": _first_moments(plates, y_pna),
+            "sy": iy / (max(bf_plus2, bf_minus2) / 2), "zy": (tf_plus2 * bf_plus2**2 + tf_minus2 * bf_minus2**2 + h * tw**2) / 4,
+            "j": (bf_plus2 * tf_plus2**3 + bf_minus2 * tf_minus2**3 + h * tw**3) / 3,
+            "cw": ho**2 * iy_plus2 * iy_minus2 / (iy_plus2 + iy_minus2), "yo": yo, "ro": ro, "H": 1 - yo**2 / ro**2}
 
 
 def singly_symmetric_i(section: Section) -> bool:
     """A built-up I whose flanges differ: symmetric about y only."""
-    return section.bf_bottom is not None and (section.bf_bottom, section.tf_bottom) != (section.bf, section.tf)
+    return section.bf_minus2 is not None and (section.bf_minus2, section.tf_minus2) != (section.bf, section.tf)
 
 
 def i_major_properties(section: Section, compression_flange: str | None) -> dict:
-    """Major-axis properties of an I-shape referred to its compression flange (B4.1b, F4, F5); "top" when it is not given.
+    """Major-axis properties of an I-shape referred to its compression flange, "plus2" or "minus2" (B4.1b, F4, F5).
 
     Rolled shapes take the catalog values: h = (h/tw)*tw, hc = hp = h and Sxc = Sxt = Sx (doubly symmetric, B4.1b(a)).
     Iyc = tfc*bfc^3/12, the compression flange alone (F4.2(c)(2)).
@@ -118,13 +118,13 @@ def i_major_properties(section: Section, compression_flange: str | None) -> dict
         return {"bfc": section.bf, "tfc": section.tf, "bft": section.bf, "tft": section.tf, "tw": section.tw, "h": h, "hc": h,
                 "hp": h, "Sxc": section.sx, "Sxt": section.sx, "Zx": section.zx, "Iyc": section.tf * section.bf**3 / 12,
                 "Iy": section.iy, "ho": section.ho, "J": section.j}
-    p = built_up_i_properties(d=section.d, tw=section.tw, bf_top=section.bf, tf_top=section.tf, bf_bottom=section.bf_bottom,
-                              tf_bottom=section.tf_bottom)
-    top = compression_flange != "bottom"
-    flanges = ((section.bf, section.tf), (section.bf_bottom, section.tf_bottom))
-    (bfc, tfc), (bft, tft) = flanges if top else flanges[::-1]
-    c = p["y_top"] if top else section.d - p["y_top"]            # centroid to the compression fiber
-    plastic = p["y_pna"] if top else section.d - p["y_pna"]      # plastic neutral axis to the compression fiber
+    p = built_up_i_properties(d=section.d, tw=section.tw, bf_plus2=section.bf, tf_plus2=section.tf, bf_minus2=section.bf_minus2,
+                              tf_minus2=section.tf_minus2)
+    plus2 = compression_flange == "plus2"
+    flanges = ((section.bf, section.tf), (section.bf_minus2, section.tf_minus2))
+    (bfc, tfc), (bft, tft) = flanges if plus2 else flanges[::-1]
+    c = p["y_plus2"] if plus2 else section.d - p["y_plus2"]            # centroid to the compression fiber
+    plastic = p["y_pna"] if plus2 else section.d - p["y_pna"]          # plastic neutral axis to the compression fiber
     return {"bfc": bfc, "tfc": tfc, "bft": bft, "tft": tft, "tw": section.tw, "h": p["h"], "hc": 2 * (c - tfc),
             "hp": 2 * (plastic - tfc), "Sxc": p["ix"] / c, "Sxt": p["ix"] / (section.d - c), "Zx": p["zx"],
             "Iyc": tfc * bfc**3 / 12, "Iy": p["iy"], "ho": p["ho"], "J": p["j"]}
@@ -132,14 +132,14 @@ def i_major_properties(section: Section, compression_flange: str | None) -> dict
 
 def _built_up_i(case: SteelCase) -> Section:
     custom = case.custom_section
-    top, bottom = custom.top_flange, custom.bottom_flange
-    if top.t + bottom.t >= custom.d or custom.tw >= min(top.b, bottom.b):
+    plus2, minus2 = custom.flange_plus2, custom.flange_minus2
+    if plus2.t + minus2.t >= custom.d or custom.tw >= min(plus2.b, minus2.b):
         raise ValidationError("Las alas deben dejar una altura de alma positiva y el alma no puede ser más ancha que las alas.",
                               details={"section": case.section_name})
-    p = built_up_i_properties(d=custom.d, tw=custom.tw, bf_top=top.b, tf_top=top.t, bf_bottom=bottom.b, tf_bottom=bottom.t)
+    p = built_up_i_properties(d=custom.d, tw=custom.tw, bf_plus2=plus2.b, tf_plus2=plus2.t, bf_minus2=minus2.b, tf_minus2=minus2.t)
     return Section(name=case.section_name, type=custom.type.value, area=p["area"], d=custom.d, h=p["h"], tw=custom.tw, ho=p["ho"],
-                   bf=top.b, tf=top.t, bf_bottom=bottom.b, tf_bottom=bottom.t, ix=p["ix"], iy=p["iy"],
-                   sx=min(p["sx_top"], p["sx_bottom"]), sy=p["sy"], zx=p["zx"], zy=p["zy"], rx=math.sqrt(p["ix"] / p["area"]),
+                   bf=plus2.b, tf=plus2.t, bf_minus2=minus2.b, tf_minus2=minus2.t, ix=p["ix"], iy=p["iy"],
+                   sx=min(p["sx_plus2"], p["sx_minus2"]), sy=p["sy"], zx=p["zx"], zy=p["zy"], rx=math.sqrt(p["ix"] / p["area"]),
                    ry=math.sqrt(p["iy"] / p["area"]), j=p["j"], cw=p["cw"], ro=p["ro"], H=p["H"], h_tw_ratio=p["h"] / custom.tw)
 
 

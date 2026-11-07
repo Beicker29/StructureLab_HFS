@@ -1,33 +1,88 @@
 {
   "material": "ASTM A572 Gr 50",
-  "lengths": {"ultimate": {"Lx": 9000, "Ly": 3000, "Lz": 3000}},
+  "lengths": {
+    "ultimate": {
+      "Lx_3": 9000,
+      "Ly_2": 3000,
+      "Lz_1": 3000
+    }
+  },
   "cases": [
     {
       "name": "PL900 alas distintas — ala ancha comprimida (F4, alma compacta)",
       "section_name": "PL900-350x22-250x16",
-      "custom_section": {"type": "I_BUILT_UP", "d": 900, "tw": 8, "top_flange": {"b": 350, "t": 22}, "bottom_flange": {"b": 250, "t": 16}},
-      "flexure": {"compression_flange": "top", "tension_flange_holes": false, "Cb": 1.14},
-      "Pu": 500,
-      "Mux": 1200,
-      "Vux": 300
+      "custom_section": {
+        "type": "I_BUILT_UP",
+        "d": 900,
+        "tw": 8,
+        "flange_plus2": {
+          "b": 350,
+          "t": 22
+        },
+        "flange_minus2": {
+          "b": 250,
+          "t": 16
+        }
+      },
+      "P": -500,
+      "Mx_3": 1200,
+      "Vy_2": 300,
+      "flexure": {
+        "tension_flange_holes": false,
+        "Cb": 1.14
+      }
     },
     {
       "name": "PL900 alas distintas — ala angosta comprimida (F4, alma no compacta)",
       "section_name": "PL900-350x22-250x16",
-      "custom_section": {"type": "I_BUILT_UP", "d": 900, "tw": 8, "top_flange": {"b": 350, "t": 22}, "bottom_flange": {"b": 250, "t": 16}},
-      "flexure": {"compression_flange": "bottom", "tension_flange_holes": false},
-      "Mux": 800,
-      "Muy": 40,
-      "Vuy": 80
+      "custom_section": {
+        "type": "I_BUILT_UP",
+        "d": 900,
+        "tw": 8,
+        "flange_plus2": {
+          "b": 350,
+          "t": 22
+        },
+        "flange_minus2": {
+          "b": 250,
+          "t": 16
+        }
+      },
+      "Mx_3": -800,
+      "My_2": 40,
+      "Vx_3": 80,
+      "flexure": {
+        "tension_flange_holes": false
+      }
     },
     {
       "name": "PL1200 alas iguales — alma esbelta y ala no compacta (F5)",
       "section_name": "PL1200-400x20",
-      "custom_section": {"type": "I_BUILT_UP", "d": 1200, "tw": 8, "top_flange": {"b": 400, "t": 20}, "bottom_flange": {"b": 400, "t": 20}},
-      "flexure": {"tension_flange_holes": false},
-      "lengths": {"ultimate": {"Lx": 12000, "Ly": 6000, "Lz": 6000}},
-      "Mux": 2500,
-      "Vux": 400
+      "custom_section": {
+        "type": "I_BUILT_UP",
+        "d": 1200,
+        "tw": 8,
+        "flange_plus2": {
+          "b": 400,
+          "t": 20
+        },
+        "flange_minus2": {
+          "b": 400,
+          "t": 20
+        }
+      },
+      "lengths": {
+        "ultimate": {
+          "Lx_3": 12000,
+          "Ly_2": 6000,
+          "Lz_1": 6000
+        }
+      },
+      "Mx_3": 2500,
+      "Vy_2": 400,
+      "flexure": {
+        "tension_flange_holes": false
+      }
     }
   ]
 }

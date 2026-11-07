@@ -32,7 +32,7 @@ src/steel_design/
 │   ├── requirements.py          requerimientos técnicos de materiales y geometría; uno obligatorio incumplido impide el PASS
 │   ├── coverage.py              obligaciones de D, E, F, G y H derivadas del texto, independientes
 │   └── validation.py            validación de caso y sección
-├── engine.py                    una comprobación por demanda (D/E por Pu, F por Mux/Muy/Mw/Mz, G por Vux/Vuy),
+├── engine.py                    una comprobación por demanda (D/E por P, F por Mx_3/My_2 o w/z, G por Vy_2/Vx_3),
 │                                interacción H si actúan juntas fuerza axial y flexión → estado
 ├── materials.py                 catálogo de aceros src/steel_design/data/Materiales.xlsx (nombre, Fy, Fu)
 ├── execution.py                 ejecución en memoria de un caso o un lote (para CLI y web)
@@ -51,7 +51,7 @@ src/steel_design/
    aplicables, calcula cada uno con `codes/aisc_360_22/compression.py` y conserva
    todos; gobierna el menor Pn (E1).
 4. `coverage.discharge` cruza obligaciones y modos. Si falta alguno, el estado es
-   `INCOMPLETE`; si no, `PASS` o `FAIL` según `Pu / disponible`.
+   `INCOMPLETE`; si no, `PASS` o `FAIL` según `|P| / disponible`.
 
 Los ángulos dobles leen su ángulo simple componente a través de la función
 `catalog` que el motor pasa a `compression_strength` y `flexure_strength` (J del componente en F9).

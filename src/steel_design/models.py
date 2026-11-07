@@ -1,4 +1,9 @@
-"""Input and result models (ANSI/AISC 360-22 Chapters D, E and F, LRFD). Units: N, mm, MPa, kN, kN*m."""
+"""Input and result models (ANSI/AISC 360-22, LRFD). Units: N, mm, MPa, kN, kN*m.
+
+Axes and signs of ETABS (docs/axes.md): axis 1 along the member, axis 2 vertical in the section (AISC y), axis 3 horizontal
+(AISC x), with 1 = 2 x 3. P > 0 is tension; M3 > 0 compresses the +2 face and M2 > 0 the +3 face; shears count by magnitude.
+Names keep both symbols: Mx_3 is the moment about x (axis 3), Lx_3 the unbraced length for buckling about it.
+"""
 from enum import Enum
 from typing import Annotated, Literal
 
@@ -60,17 +65,17 @@ class Material(InputModel):
 
 
 class Lengths(InputModel):
-    Lx: PositiveNumber = Field(..., description="Laterally unbraced length for buckling about x (mm)")
-    Ly: PositiveNumber = Field(..., description="Laterally unbraced length for buckling about y (mm)")
-    Lz: PositiveNumber = Field(..., description="Unbraced length for torsional buckling (mm)")
+    Lx_3: PositiveNumber = Field(..., description="Unbraced length for buckling about x, axis 3 (mm)")
+    Ly_2: PositiveNumber = Field(..., description="Unbraced length for buckling about y, axis 2 (mm)")
+    Lz_1: PositiveNumber = Field(..., description="Unbraced length for torsional buckling about z, axis 1 (mm)")
 
 
 class Factors(InputModel):
-    Kx: PositiveNumber = Field(1.0, description="Effective length factor, x axis (E2)")
-    Ky: PositiveNumber = Field(1.0, description="Effective length factor, y axis (E2)")
-    Kz: PositiveNumber = Field(1.0, description="Effective length factor, torsion (E4)")
-    xa: NonNegativeNumber = Field(0.0, description="Lateral bracing offset from the shear center along x (mm), E4(e)")
-    ya: NonNegativeNumber = Field(0.0, description="Lateral bracing offset from the shear center along y (mm), E4(d)")
+    Kx_3: PositiveNumber = Field(1.0, description="Effective length factor about x, axis 3 (E2)")
+    Ky_2: PositiveNumber = Field(1.0, description="Effective length factor about y, axis 2 (E2)")
+    Kz_1: PositiveNumber = Field(1.0, description="Effective length factor for torsion, axis 1 (E4)")
+    xa_3: NonNegativeNumber = Field(0.0, description="Lateral bracing offset from the shear center along x, axis 3 (mm), E4(e)")
+    ya_2: NonNegativeNumber = Field(0.0, description="Lateral bracing offset from the shear center along y, axis 2 (mm), E4(d)")
 
 
 class SingleAngleE5Basis(InputModel):
@@ -111,9 +116,6 @@ class FlexureBasis(InputModel):
     tension_cb_amplification: StrictBool = Field(
         False, description="H1.2: multiply Cb by sqrt(1 + Pr/Pey) when axial tension acts with flexure "
                            "(doubly symmetric members only)")
-    compression_flange: Literal["top", "bottom"] | None = Field(
-        None, description="I-shapes with unequal flanges (F4, F5), bending about x: flange in flexural compression in this "
-                          "combination; required, it is not deduced from the sign of Mux")
 
     @model_validator(mode="after")
     def holes_need_net_area(self):
@@ -131,15 +133,13 @@ class ShearBasis(InputModel):
                           "without it only G5-2b is used (lower bound)")
 
 
-class AngleFlexure(InputModel):
-    """Which part of an angle is in flexural compression (explicit, per load combination)."""
-    web_legs: Literal["tension", "compression"] | None = Field(
-        None, description="Double angles (F9): legs in the plane of symmetry; 'compression' if compressed anywhere along Lb")
-    toe: Literal["compression", "tension"] | None = Field(
-        None, description="Single angle, geometric axis: toe of the leg perpendicular to the bending axis; "
-                          "principal minor axis (Mz): both toes")
-    leg_in_compression: Literal["long", "short"] | None = Field(
-        None, description="Single angle, major principal axis (Mw): leg whose toe is in compression")
+class AngleHeel(InputModel):
+    """Side of the centroid where the heel of an angle lies; the long leg is parallel to axis 2, the short leg to axis 3.
+
+    Double angles: axis_2 is the side of the back (the legs parallel to axis 3); axis_3 does not apply.
+    """
+    axis_2: Literal["+", "-"] = Field(..., description="Heel (double angles: back) on the + or - side of axis 2")
+    axis_3: Literal["+", "-"] | None = Field(None, description="Single angles: heel on the + or - side of axis 3")
 
 
 class Concrete(InputModel):
@@ -220,8 +220,7 @@ class FormedDeck(InputModel):
 
 
 class CompositeBeamBasis(InputModel):
-    """Composite beam with steel anchors (I3.2, I8.2); the moment sense is explicit, as in Chapter F (DF-9)."""
-    moment: Literal["positive", "negative"] = Field(..., description="Sense of Mux in this load combination")
+    """Composite beam with steel anchors (I3.2, I8.2). The slab is on the +2 face: Mx_3 > 0 is positive flexure."""
     span: PositiveNumber = Field(..., description="Beam span, center-to-center of supports (mm)")
     left_beam_spacing: PositiveNumber | None = Field(None, description="Distance to the adjacent beam on the left (mm)")
     left_edge_distance: PositiveNumber | None = Field(None, description="Distance to the slab edge on the left (mm)")
@@ -298,12 +297,12 @@ class BoxSection(InputModel):
 
 
 class SecondOrderBasis(InputModel):
-    """First-order results of one load combination, amplified with Appendix 8.1 (B1, B2); replaces Pu and Mux or Muy."""
-    axis: Literal["x", "y"] = Field(..., description="Bending axis of Mnt and Mlt")
+    """First-order results of one load combination, amplified with Appendix 8.1 (B1, B2); replaces P and Mx_3 or My_2."""
+    axis: Literal["x_3", "y_2"] = Field(..., description="Bending axis of Mnt and Mlt")
     Mnt: NonNegativeNumber = Field(0.0, description="First-order moment, structure restrained against translation (kN*m)")
     Mlt: NonNegativeNumber = Field(0.0, description="First-order moment due to lateral translation only (kN*m)")
-    Pnt: FiniteNumber = Field(0.0, description="First-order axial force, no translation (kN), compression positive")
-    Plt: FiniteNumber = Field(0.0, description="First-order axial force due to lateral translation (kN), compression positive")
+    Pnt: FiniteNumber = Field(0.0, description="First-order axial force, no translation (kN), tension positive")
+    Plt: FiniteNumber = Field(0.0, description="First-order axial force due to lateral translation (kN), tension positive")
     M1_M2: FiniteNumber | None = Field(
         None, description="A-8-4: M1/M2, positive in reverse curvature; omit with transverse load between supports (Cm = 1)")
     Lc1: PositiveNumber | None = Field(None, description="A-8-5: effective length without translation (mm); default KL")
@@ -324,7 +323,7 @@ class CShapedWall(InputModel):
     b: PositiveNumber = Field(..., description="I1-4: largest clear distance between rows of ties (mm)")
     st: PositiveNumber = Field(..., description="I1.6b: tie spacing (mm)")
     dtie: PositiveNumber = Field(..., description="I1-6: effective diameter of the tie bar (mm)")
-    minor_axis_compression: Literal["flange_tips", "web"] = Field(..., description="Part in compression under Muy")
+    web_side: Literal["+3", "-3"] = Field(..., description="Side of axis 3 where the web wall lies; the flange tips point the other way")
 
 
 class CouplingBeam(InputModel):
@@ -368,7 +367,7 @@ class FireBasis(InputModel):
     """Temperatures of a fire case (Appendix 4, 4.2.4d), from the user's heat transfer analysis (4.2.2), in deg C. Each material
     has its own."""
 
-    steel_temperature: float = Field(..., ge=20, lt=1200, description="Steel temperature, uniform; bottom flange in beams")
+    steel_temperature: float = Field(..., ge=20, lt=1200, description="Steel temperature, uniform; -2 flange in composite beams")
     concrete_temperature: float | None = Field(None, ge=20, lt=1200, description="Uniform concrete temperature")
     concrete_layers: list[ConcreteLayer] | None = Field(
         None, min_length=1, description="Walls and coupling beams: profile from the plate to mid-thickness; adds up to half the concrete"
@@ -416,7 +415,7 @@ class CompositeBasis(InputModel):
     biaxial_shape_factor: StrictBool = Field(
         False, description="M2S with flexure about two axes: Design Guide 6 Equations 2-2a/b instead of C-I5-1")
     flexural_member: StrictBool | None = Field(
-        None, description="I3.3a(e), I3.4a(d): the member is a beam, so it must be tension controlled when Pu < 0.10Pn")
+        None, description="I3.3a(e), I3.4a(d): the member is a beam, so it must be tension controlled when |P| < 0.10Pn")
 
     pour_height: PositiveNumber | None = Field(
         None, description="Height of the wet concrete pour (mm): Design Guide 6, 4.3 and Design Guide 38, 2.2.1.2 and Chapter 6")
@@ -489,16 +488,16 @@ class CustomSection(InputModel):
     diameter: PositiveNumber | None = Field(None, description="Diameter of a solid circular section (mm)")
     H: PositiveNumber | None = Field(None, description="Height of a solid rectangular section (mm)")
     B: PositiveNumber | None = Field(None, description="Width of a solid rectangular section (mm)")
-    d: PositiveNumber | None = Field(None, description="Welded built-up I: total depth (mm)")
+    d: PositiveNumber | None = Field(None, description="Welded built-up I: total depth along axis 2 (mm)")
     tw: PositiveNumber | None = Field(None, description="Welded built-up I: web thickness (mm)")
-    top_flange: FlangePlate | None = Field(None, description="Welded built-up I: top flange plate")
-    bottom_flange: FlangePlate | None = Field(None, description="Welded built-up I: bottom flange plate")
+    flange_plus2: FlangePlate | None = Field(None, description="Welded built-up I: flange plate on the +2 face")
+    flange_minus2: FlangePlate | None = Field(None, description="Welded built-up I: flange plate on the -2 face")
 
     @model_validator(mode="after")
     def validate_dimensions(self):
-        given = {name for name in ("diameter", "H", "B", "d", "tw", "top_flange", "bottom_flange") if getattr(self, name) is not None}
+        given = {name for name in ("diameter", "H", "B", "d", "tw", "flange_plus2", "flange_minus2") if getattr(self, name) is not None}
         needed = {CustomSectionType.SOLID_CIRCULAR: {"diameter"}, CustomSectionType.SOLID_RECTANGULAR: {"H", "B"},
-                  CustomSectionType.I_BUILT_UP: {"d", "tw", "top_flange", "bottom_flange"}}[self.type]
+                  CustomSectionType.I_BUILT_UP: {"d", "tw", "flange_plus2", "flange_minus2"}}[self.type]
         if given != needed:
             raise ValueError(f"{self.type.value} requires {', '.join(sorted(needed))} only.")
         return self
@@ -532,16 +531,14 @@ class SteelCase(InputModel):
     condition: Literal["ultimate", "construction", "fire"] = Field(
         "ultimate", description="Condition of this load case: ultimate, construction (steel section alone, Mu and Vu) or fire")
     serviceability: Serviceability | None = None
-    Pu: FiniteNumber = Field(0.0, description="Required axial strength (kN): > 0 compression (Chapter E), "
-                                               "< 0 tension (Chapter D); LRFD load combination")
-    Mux: FiniteNumber = Field(0.0, description="Required flexural strength about x (kN*m), Chapter F")
-    Muy: FiniteNumber = Field(0.0, description="Required flexural strength about y (kN*m), Chapter F")
-    Mw: FiniteNumber = Field(0.0, description="Single angles: required flexural strength about the major principal axis w (kN*m)")
-    Mz: FiniteNumber = Field(0.0, description="Single angles: required flexural strength about the minor principal axis z (kN*m)")
-    Vux: FiniteNumber = Field(0.0, description="Required shear strength that accompanies Mux, parallel to y "
+    P: FiniteNumber = Field(0.0, description="Required axial strength (kN), ETABS sign: > 0 tension (Chapter D), < 0 compression "
+                                             "(Chapter E); LRFD load combination")
+    Mx_3: FiniteNumber = Field(0.0, description="Required flexural strength about x, axis 3 (kN*m); > 0 compresses the +2 face")
+    My_2: FiniteNumber = Field(0.0, description="Required flexural strength about y, axis 2 (kN*m); > 0 compresses the +3 face")
+    Vy_2: FiniteNumber = Field(0.0, description="Required shear strength along y, axis 2, that accompanies Mx_3 "
                                                 "(web of I-shapes, H walls of HSS) (kN), Chapter G")
-    Vuy: FiniteNumber = Field(0.0, description="Required shear strength that accompanies Muy, parallel to x (kN), Chapter G")
-    angle_flexure: AngleFlexure | None = None
+    Vx_3: FiniteNumber = Field(0.0, description="Required shear strength along x, axis 3, that accompanies My_2 (kN), Chapter G")
+    heel: AngleHeel | None = Field(None, description="Angles with flexure: orientation of the heel (single) or back (double)")
     lengths: Lengths | None = Field(
         None,
         description="Unbraced lengths of this case, or {ultimate, construction}: the one of its condition is taken (fire uses ultimate)",
@@ -569,7 +566,7 @@ class SteelCase(InputModel):
         if not isinstance(lengths, dict) or not {"ultimate", "construction"} & set(lengths):
             return data
         if set(lengths) - {"ultimate", "construction"}:
-            raise ValueError("lengths: indique Lx, Ly, Lz o bien ultimate y construction, no ambos.")
+            raise ValueError("lengths: indique Lx_3, Ly_2, Lz_1 o bien ultimate y construction, no ambos.")
         return {**data, "lengths": lengths.get("construction" if data.get("condition") == "construction" else "ultimate")}
 
     @model_validator(mode="after")
@@ -579,24 +576,24 @@ class SteelCase(InputModel):
         composite = self.composite
         self._data_of_the_condition()
         if composite is not None and composite.second_order is not None:
-            if self.Pu or self.Mux or self.Muy:
-                raise ValueError("Con composite.second_order, Pu, Mux y Muy salen de A-8-1 y A-8-2; no los indique.")
+            if self.P or self.Mx_3 or self.My_2:
+                raise ValueError("Con composite.second_order, P, Mx_3 y My_2 salen de A-8-1 y A-8-2; no los indique.")
             if self.lengths is None:
                 raise ValueError("composite.second_order requiere lengths.")
-        if not any((self.Pu, self.Mux, self.Muy, self.Mw, self.Mz, self.Vux, self.Vuy,
+        if not any((self.P, self.Mx_3, self.My_2, self.Vy_2, self.Vx_3,
                     composite and (composite.anchor or composite.second_order))):
             raise ValueError("La combinación debe tener al menos una demanda distinta de cero "
-                             "(Pu, Mux, Muy, Mw, Mz, Vux, Vuy).")
+                             "(P, Mx_3, My_2, Vy_2, Vx_3).")
         if self.composite is None and self.tau_b not in (None, 1.0):
             raise ValueError("En miembros no compuestos τb es siempre 1.0 (C2.3(c)); no indique otro valor.")
-        if self.Pu > 0 and self.lengths is None:
-            raise ValueError("La compresión requiere lengths (Lx, Ly, Lz).")
+        if self.P < 0 and self.lengths is None:
+            raise ValueError("La compresión requiere lengths (Lx_3, Ly_2, Lz_1).")
         return self
 
     def _data_of_the_condition(self):
         composite = self.composite
-        if self.condition == "construction" and (self.Pu or (composite is not None and composite.second_order)):
-            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique Pu ni second_order.")
+        if self.condition == "construction" and (self.P or (composite is not None and composite.second_order)):
+            raise ValueError("Un case de construcción revisa solo flexión y cortante con el acero solo: no indique P ni second_order.")
         if (self.condition == "fire") != (self.fire is not None):
             raise ValueError("condition = fire y fire (temperaturas, Apéndice 4, 4.2.4d) van juntos.")
         if composite is not None and composite.fire is not None and self.condition != "fire":
@@ -656,10 +653,10 @@ class Obligation(BaseModel):
 
 class Check(BaseModel):
     """One required strength of a load combination (axial, flexure or shear) or their interaction (H)."""
-    id: Literal["axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z", "shear_x", "shear_y", "interaction", "anchor",
+    id: Literal["axial", "flexure_x_3", "flexure_y_2", "flexure_w", "flexure_z", "shear_y_2", "shear_x_3", "interaction", "anchor",
                 "fire"]
     chapter: Literal["D", "E", "F", "G", "H", "I"]
-    demand: float = Field(..., description="|Pu| or |Vu| (kN), |Mu| (kN*m); interaction value for Chapter H")
+    demand: float = Field(..., description="|P| or |V| (kN), |M| (kN*m); interaction value for Chapter H")
     unit: Literal["kN", "kN·m", "–"]
     status: Status
     capacity: float | None = Field(None, description="Design strength phi*Rn (LRFD); 1.0 for Chapter H")

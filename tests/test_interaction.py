@@ -17,8 +17,8 @@ REFERENCE, REFERENCE_H2 = _FIXTURE["cases"], _FIXTURE["h2_cases"]
 
 
 def combined_case(spec):
-    data = {"section_name": spec["name"], "material": {"Fy": spec["fy"]}, "Pu": spec.get("Pu", 0),
-            "Mux": spec.get("Mux", 0), "Muy": spec.get("Muy", 0)}
+    data = {"section_name": spec["name"], "material": {"Fy": spec["fy"]}, "P": spec.get("P", 0),
+            "Mx_3": spec.get("Mx_3", 0), "My_2": spec.get("My_2", 0)}
     flexure = {"Cb": float(spec.get("Cb", 1))}
     if spec["family"] in {"W", "CHANNEL"}:
         flexure["tension_flange_holes"] = spec.get("holes") is not None
@@ -29,7 +29,7 @@ def combined_case(spec):
     data["flexure"] = flexure
     length = spec.get("L") or spec.get("Lb")
     if length:
-        data["lengths"] = {"Lx": length, "Ly": length, "Lz": length}
+        data["lengths"] = {"Lx_3": length, "Ly_2": length, "Lz_1": length}
     if spec.get("tension"):
         t = spec["tension"]
         data["material"]["Fu"] = t["Fu"]
@@ -37,8 +37,8 @@ def combined_case(spec):
     if spec.get("e6"):
         connectors, a = spec["e6"]
         data["double_angle_e6"] = {"connectors": connectors, "a": a, "end_connection_welded_or_pretensioned": True}
-    if spec.get("web_legs"):
-        data["angle_flexure"] = {"web_legs": spec["web_legs"]}
+    if spec.get("heel"):
+        data["heel"] = spec["heel"]
     return SteelCase(tau_b=1.0, **data)
 
 
@@ -68,24 +68,23 @@ def test_reference_bank_covers_equations():
 
 def test_cb_amplification_is_reported(engine):
     result = engine.run(combined_case(REFERENCE["W-H1.2-Cb-amplified"]["spec"]))
-    flexure = result.check("flexure_x").result
+    flexure = result.check("flexure_x_3").result
     assert flexure["inputs"]["Cb"] == pytest.approx(1.14 * float(REFERENCE["W-H1.2-Cb-amplified"]["Cb_factor"]))
     assert any("H1.2" in n for n in flexure["notes"])
 
 
 def test_cb_amplification_only_for_doubly_symmetric_members(engine):
     spec = {**REFERENCE["W-H1.2-Cb-amplified"]["spec"], "family": "CHANNEL", "name": "C15X50"}
-    flexure = engine.run(combined_case(spec)).check("flexure_x").result
+    flexure = engine.run(combined_case(spec)).check("flexure_x_3").result
     assert flexure["inputs"]["Cb"] == 1.14 and any("no aplicado" in n for n in flexure["notes"])
 
 
 def h2_case(spec):
-    data = {"section_name": spec["name"], "material": {"Fy": spec["fy"]}, "Pu": spec.get("Pu", 0),
-            "Mw": spec.get("Mw", 0), "Mz": spec.get("Mz", 0)}
-    data["angle_flexure"] = {"leg_in_compression": spec.get("leg", "long"), "toe": spec.get("toe")}
+    data = {"section_name": spec["name"], "material": {"Fy": spec["fy"]}, "P": spec.get("P", 0),
+            "Mx_3": float(spec["Mx_3"]), "My_2": float(spec["My_2"]), "heel": spec["heel"]}
     length = spec.get("L") or spec.get("Lb")
     if length:
-        data["lengths"] = {"Lx": length, "Ly": length, "Lz": length}
+        data["lengths"] = {"Lx_3": length, "Ly_2": length, "Lz_1": length}
     if spec.get("tension"):
         t = spec["tension"]
         data["material"]["Fu"] = t["Fu"]
@@ -112,25 +111,35 @@ def test_h2_matches_independent_calculation(engine, case_id):
 
 def test_h2_bank_covers_axial_senses_and_a_failure():
     refs = REFERENCE_H2.values()
-    assert {(float(r["spec"].get("Pu", 0)) > 0) - (float(r["spec"].get("Pu", 0)) < 0) for r in refs} == {1, 0, -1}
+    assert {(float(r["spec"].get("P", 0)) > 0) - (float(r["spec"].get("P", 0)) < 0) for r in refs} == {1, 0, -1}
     assert any(float(r["ratio"]) > 1 for r in refs)
     assert {r["governing"] for r in refs} >= {"H2-A", "H2-B", "H2-C"}
 
 
-def test_stress_senses_reproduce_example_e14b(engine):
+def principal_to_geometric(section, mw, mz):
+    """Mx_3, My_2 of the principal components mw, mz (vectors) for the heel at (-2, -3): w = (sin a, cos a), z = (cos a, -sin a)
+    in (2, 3) components; ETABS M3 is the vector along 3 and M2 minus the vector along 2."""
+    a = math.atan(section.tan_alpha)
+    m2 = mw * math.sin(a) + mz * math.cos(a)
+    m3 = mw * math.cos(a) - mz * math.sin(a)
+    return {"Mx_3": m3, "My_2": -m2, "heel": {"axis_2": "-", "axis_3": "-"}}
+
+
+def test_stress_senses_reproduce_example_e14b(engine, sections):
     # Example E.14B: Mw with the long-leg toe in compression, Mz with the toes in tension. Compression positive:
-    # A (-, -), B (-, +), C (+, -).
-    case = SteelCase(tau_b=1.0, section_name="L8X4X1/2", material={"Fy": 345}, Mw=1, Mz=1, lengths={"Lx": 1500, "Ly": 1500, "Lz": 1500},
-                     angle_flexure={"leg_in_compression": "long", "toe": "tension"})
+    # A (-, -), B (-, +), C (+, -). With the heel at (-2, -3), a positive w vector compresses the long-leg toe and a positive
+    # z vector puts the toes in tension.
+    case = SteelCase(tau_b=1.0, section_name="L8X4X1/2", material={"Fy": 345}, lengths={"Lx_3": 1500, "Ly_2": 1500, "Lz_1": 1500},
+                     **principal_to_geometric(sections["L8X4X1/2"], 1, 1))
     modes = engine.run(case).check("interaction").result["modes"]
     signs = {p: (modes[f"H2-{p}"]["Mrw_Mcw"] > 0, modes[f"H2-{p}"]["Mrz_Mcz"] > 0) for p in "ABC"}
     assert signs == {"A": (False, False), "B": (False, True), "C": (True, False)}
 
 
-def test_equal_leg_heel_has_no_major_axis_stress(engine):
+def test_equal_leg_heel_has_no_major_axis_stress(engine, sections):
     # Example F.11C: Mw causes no stress at point B of an equal-leg angle.
-    case = SteelCase(tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345}, Mw=1, Mz=1, lengths={"Lx": 1500, "Ly": 1500, "Lz": 1500},
-                     angle_flexure={"toe": "compression"})
+    case = SteelCase(tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345}, lengths={"Lx_3": 1500, "Ly_2": 1500, "Lz_1": 1500},
+                     **principal_to_geometric(sections["L4X4X1/4"], 1, -1))
     assert engine.run(case).check("interaction").result["modes"]["H2-B"]["Mrw_Mcw"] == 0
 
 
@@ -145,27 +154,18 @@ def test_heel_lies_on_the_short_leg_side_of_w_in_every_unequal_angle(catalog):
         assert heel < 0 and short_toe < 0, s.name
 
 
-def test_h2_needs_principal_axis_moments(engine):
-    result = engine.run(SteelCase(tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345, "Fu": 450}, Pu=-10, Mux=1,
-                                  tension={"An": 1000, "U": 0.8}, flexure={"lateral_torsional_restraint": "continuous"},
-                                  angle_flexure={"toe": "tension"}))
-    error = result.check("interaction").errors[0]
-    assert error["code"] == "INTERACTION_DOMAIN_BLOCKED" and "DH-7" in error["message"]
-    assert result.status.value == "INCOMPLETE"
+def test_geometric_moments_with_axial_force_use_h2_on_the_principal_axes(engine):
+    result = engine.run(SteelCase(tau_b=1.0, section_name="L4X4X1/4", material={"Fy": 345, "Fu": 450}, P=10, Mx_3=1,
+                                  heel={"axis_2": "-", "axis_3": "-"}, tension={"An": 1000, "U": 0.8},
+                                  flexure={"lateral_torsional_restraint": "continuous"}))
+    check = result.check("interaction")
+    assert {c.id for c in result.checks} >= {"flexure_w", "flexure_z"} and set(check.result["modes"]) == {"H2-A", "H2-B", "H2-C"}
 
 
-def test_h2_keeps_a_missing_declaration_incomplete(engine):
-    result = engine.run(
-        SteelCase(
-            tau_b=1.0,
-            section_name="L6X4X3/8",
-            material={"Fy": 345},
-            Mw=1,
-            Mz=1,
-            lengths={"Lx": 1000, "Ly": 1000, "Lz": 1000},
-            angle_flexure={"toe": "tension"},
-        )
-    )                # no leg_in_compression
+def test_h2_without_the_heel_stays_incomplete(engine):
+    result = engine.run(SteelCase(tau_b=1.0, section_name="L6X4X3/8", material={"Fy": 345}, Mx_3=1, My_2=1,
+                                  lengths={"Lx_3": 1000, "Ly_2": 1000, "Lz_1": 1000}))
+    assert result.check("flexure_x_3").errors[0]["details"]["fields"] == ["heel.axis_2", "heel.axis_3"]
     assert result.check("interaction").errors[0]["code"] == "INTERACTION_COMPONENT_MISSING"
     assert result.status.value == "INCOMPLETE"
 
@@ -179,9 +179,9 @@ def test_h2_report_lists_every_point(engine):
 
 
 def test_missing_component_keeps_the_interaction_incomplete(engine):
-    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Pu=100, Mux=10,
-                                  lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000}))
-    assert result.check("flexure_x").status.value == "INCOMPLETE"                 # F13.1 not declared
+    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, P=-100, Mx_3=10,
+                                  lengths={"Lx_3": 3000, "Ly_2": 3000, "Lz_1": 3000}))
+    assert result.check("flexure_x_3").status.value == "INCOMPLETE"                 # F13.1 not declared
     assert result.check("interaction").errors[0]["code"] == "INTERACTION_COMPONENT_MISSING"
 
 

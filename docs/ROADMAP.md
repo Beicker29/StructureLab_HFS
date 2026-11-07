@@ -19,7 +19,9 @@ ANSI/AISC 360-22, solo por LRFD, y contenidos de AISC Design Guide 6 y 38 que no
 - Capítulo F, F4 y F5: perfiles I con alma no compacta o esbelta y de simetría simple, con la entrada de I
   armadas soldadas (`custom_section` `I_BUILT_UP`) y los límites de F13.2.
 - Capítulo F, etapa 2: F9 ángulos dobles (eje x) y F10 ángulos simples en ejes
-  geométricos y principales (`Mw`, `Mz`), verificado con cálculos independientes.
+  geométricos y principales, verificado con cálculos independientes.
+- Ejes y signos de ETABS en entrada, salida y memoria ([axes.md](axes.md)): la parte comprimida sale del signo; los
+  ángulos simples llevan sus momentos geométricos a los ejes principales.
 - Capítulo G (cortante): G2.1 sin rigidizadores, G3, G4, G5 y G6, verificado con
   cálculos independientes ([detalle](chapter-g.md)). Barras y platinas macizas por G4 (DG-4).
 - Capítulo H, etapa 1: H1.1, H1.2 (con amplificación de Cb opcional) y H4, verificado

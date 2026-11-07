@@ -30,9 +30,10 @@ def engine(catalog):
     return SteelDesignEngine(repository)
 
 
-def steel_case(name="W14X90", *, Pu=100, L=3000, Ly=None, Lz=None, Fy=345, **extra):
-    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy}, Pu=Pu,
-                     lengths={"Lx": L, "Ly": Ly or L, "Lz": Lz or L}, **extra)
+def steel_case(name="W14X90", *, P=-100, L=3000, Ly_2=None, Lz_1=None, Fy=345, **extra):
+    """One load case; P < 0 is compression (ETABS signs)."""
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy}, P=P,
+                     lengths={"Lx_3": L, "Ly_2": Ly_2 or L, "Lz_1": Lz_1 or L}, **extra)
 
 
 def calculation_report(case, result, *, title=None):

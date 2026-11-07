@@ -81,9 +81,9 @@ def classify_elements(section: Section, E: float, Fy: float, *, in_contact: bool
         layout = [("long_leg", long_leg / section.t, case, "t", 2, "UNSTIFFENED"),
                   ("short_leg", short_leg / section.t, case, "t", 2, "UNSTIFFENED")]
     elif family == "I_BUILT_UP":   # B4.1a(a): b = bf/2; the web is case 5 when doubly symmetric, case 8 otherwise
-        _require(section, "bf", "tf", "bf_bottom", "tf_bottom", "h_tw_ratio")
-        layout = [("top_flange", section.bf / (2 * section.tf), 2, "tf", 2, "UNSTIFFENED"),
-                  ("bottom_flange", section.bf_bottom / (2 * section.tf_bottom), 2, "tf_bottom", 2, "UNSTIFFENED"),
+        _require(section, "bf", "tf", "bf_minus2", "tf_minus2", "h_tw_ratio")
+        layout = [("flange_plus2", section.bf / (2 * section.tf), 2, "tf", 2, "UNSTIFFENED"),
+                  ("flange_minus2", section.bf_minus2 / (2 * section.tf_minus2), 2, "tf_minus2", 2, "UNSTIFFENED"),
                   ("web", section.h_tw_ratio, 8 if singly_symmetric_i(section) else 5, "tw", 1, "STIFFENED")]
     elif family in _ELEMENTS:
         layout = []
@@ -112,15 +112,15 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     family = section.type.upper()
     E, G = case.material.E, G_STEEL
     f, ln = case.factors, case.lengths
-    offsets = f.xa != 0 or f.ya != 0
+    offsets = f.xa_3 != 0 or f.ya_2 != 0
     notes = []
     _require(section, "area", "rx", "ry")
-    modes = {"FB-x": _flexural_mode("x", E, f.Kx, ln.Lx, section.rx),
-             "FB-y": _flexural_mode("y", E, f.Ky, ln.Ly, section.ry)}
-    lcz = f.Kz * ln.Lz
+    modes = {"FB-x_3": _flexural_mode("x_3", E, f.Kx_3, ln.Lx_3, section.rx),
+             "FB-y_2": _flexural_mode("y_2", E, f.Ky_2, ln.Ly_2, section.ry)}
+    lcz = f.Kz_1 * ln.Lz_1
 
     if family == "I_BUILT_UP" and singly_symmetric_i(section):
-        modes["FTB"] = _singly_symmetric_i_ftb(case, section, modes["FB-y"]["Fe_mpa"], lcz, offsets)
+        modes["FTB"] = _singly_symmetric_i_ftb(case, section, modes["FB-y_2"]["Fe_mpa"], lcz, offsets)
     elif family in {"W", "I_BUILT_UP"}:
         # Table User Note E1.1 lists TB for doubly symmetric I; evaluated in every case.
         if offsets:
@@ -128,13 +128,13 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
             try:
                 offset = eq.torsional_stress_bracing_offset(
                     E=E, G=G, J=section.j, Iy=section.iy, Ix=section.ix, Ag=section.area, rx=section.rx,
-                    ry=section.ry, ho=section.ho, Lcz=lcz, xa=f.xa, ya=f.ya)
+                    ry=section.ry, ho=section.ho, Lcz=lcz, xa=f.xa_3, ya=f.ya_2)
             except ValueError:
                 _blocked("E4(f): un arriostramiento desplazado en ambas direcciones requiere un análisis de pandeo elástico.",
-                         section, xa=f.xa, ya=f.ya)
+                         section, xa_3=f.xa_3, ya_2=f.ya_2)
             modes["TB"] = {"limit_state": "constrained_axis_torsional_buckling", "provision": "E4(d)/(e)",
-                           "axis": "z", "Fe_equation": offset["equation"], "Lcz_mm": lcz, "xa_mm": f.xa,
-                           "ya_mm": f.ya, "ro2_mm2": offset["ro2_mm2"], "Fe_mpa": offset["Fe_mpa"]}
+                           "axis": "z", "Fe_equation": offset["equation"], "Lcz_mm": lcz, "xa_mm": f.xa_3,
+                           "ya_mm": f.ya_2, "ro2_mm2": offset["ro2_mm2"], "Fe_mpa": offset["Fe_mpa"]}
         else:
             _require(section, "j", "ix", "iy")
             if section.cw is None:
@@ -146,15 +146,15 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     elif family == "CHANNEL":
         if offsets:
             _blocked("E4(f): un arriostramiento desplazado en un canal requiere un análisis de pandeo elástico.",
-                     section, xa=f.xa, ya=f.ya)
+                     section, xa_3=f.xa_3, ya_2=f.ya_2)
         _require(section, "j", "ro", "H")
         if section.cw is None:
             _incomplete("E4-7 requiere la constante de alabeo Cw.", section, ["section.cw"])
         fez = eq.torsional_stress(E=E, G=G, Cw=section.cw, J=section.j, Lcz=lcz, Ag=section.area, ro=section.ro)
-        fex = modes["FB-x"]["Fe_mpa"]
+        fex = modes["FB-x_3"]["Fe_mpa"]
         # E4 User Note: x is the channel axis of symmetry, so Fex replaces Fey in E4-3.
         modes["FTB"] = {"limit_state": "flexural_torsional_buckling", "provision": "E4(b)", "axis": "x+z",
-                        "Fe_equation": "E4-3", "symmetry_axis": "x", "Fex_mpa": fex, "Fez_mpa": fez,
+                        "Fe_equation": "E4-3", "symmetry_axis": "x_3", "Fex_mpa": fex, "Fez_mpa": fez,
                         "Fez_equation": "E4-7", "Lcz_mm": lcz, "ro_mm": section.ro, "H": section.H,
                         "Fe_mpa": eq.flexural_torsional_stress_singly_symmetric(fex, fez, section.H)}
     elif family in {"RECTANGULAR_HSS", "CIRCULAR_HSS"}:
@@ -162,8 +162,8 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
         # length exceeds the lateral unbraced length (S22 E4 scope).
         if offsets:
             _blocked("E4(f): un arriostramiento desplazado en un perfil tubular requiere un análisis de pandeo elástico.",
-                     section, xa=f.xa, ya=f.ya)
-        if ln.Lz > min(ln.Lx, ln.Ly):
+                     section, xa_3=f.xa_3, ya_2=f.ya_2)
+        if ln.Lz_1 > min(ln.Lx_3, ln.Ly_2):
             _require(section, "j", "ix", "iy")
             cw = section.cw
             if cw is None and family == "RECTANGULAR_HSS":
@@ -178,7 +178,7 @@ def _global_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
                            "Fe_mpa": eq.torsional_stress_doubly_symmetric(
                                E=E, G=G, Cw=cw, J=section.j, Lcz=lcz, Ix=section.ix, Iy=section.iy)}
         else:
-            notes.append("E4 no aplica: Lz no supera la longitud no arriostrada lateral (alcance de E4).")
+            notes.append("E4 no aplica: Lz_1 no supera la longitud no arriostrada lateral (alcance de E4).")
     return modes, notes
 
 
@@ -186,28 +186,28 @@ def _singly_symmetric_i_ftb(case: SteelCase, section: Section, fey: float, lcz: 
     """E4(b) for an I symmetric about y only: E4-3 with Fey and Fez (E4-7); ro and H of the thin-walled section (DF-17)."""
     if offsets:
         _blocked("E4(f): un arriostramiento desplazado en una I de alas distintas requiere un análisis de pandeo elástico.",
-                 section, xa=case.factors.xa, ya=case.factors.ya)
+                 section, xa_3=case.factors.xa_3, ya_2=case.factors.ya_2)
     _require(section, "j", "ro", "H")
     if section.cw is None:
         _incomplete("E4-7 requiere la constante de alabeo Cw.", section, ["section.cw"])
     fez = eq.torsional_stress(E=case.material.E, G=G_STEEL, Cw=section.cw, J=section.j, Lcz=lcz, Ag=section.area, ro=section.ro)
     return {"limit_state": "flexural_torsional_buckling", "provision": "E4(b)", "axis": "y+z", "Fe_equation": "E4-3",
-            "symmetry_axis": "y", "Fey_mpa": fey, "Fez_mpa": fez, "Fez_equation": "E4-7", "Lcz_mm": lcz, "Cw_mm6": section.cw,
+            "symmetry_axis": "y_2", "Fey_mpa": fey, "Fez_mpa": fez, "Fez_equation": "E4-7", "Lcz_mm": lcz, "Cw_mm6": section.cw,
             "J_mm4": section.j, "ro_mm": section.ro, "H": section.H,
             "Fe_mpa": eq.flexural_torsional_stress_singly_symmetric(fey, fez, section.H)}
 
 
 def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
-    """E5 effective slenderness route, or E3/E7 and E4 with the eccentricity as Mw, Mz in H2 (decision DH-8)."""
+    """E5 effective slenderness route, or E3/E7 and E4 with the eccentricity as moments, combined in H2 (decision DH-8)."""
     basis = case.single_angle_e5
-    principal_moments = bool(case.Mw or case.Mz)
-    if basis is not None and principal_moments:
-        _blocked("E5 evalúa el miembro como cargado axialmente: con Mw o Mz omita single_angle_e5 y la compresión se "
-                 "combina por H2 (decisión DH-8).", section)
+    moments = bool(case.Mx_3 or case.My_2)
+    if basis is not None and moments:
+        _blocked("E5 evalúa el miembro como cargado axialmente: con Mx_3 o My_2 omita single_angle_e5 y la compresión se "
+                 "combina por H2 en los ejes principales (decisión DH-8).", section)
     if basis is None:
-        if principal_moments:
+        if moments:
             return _single_angle_h2_modes(case, section)
-        _blocked("La compresión de un ángulo simple requiere single_angle_e5; fuera de E5 indique los momentos Mw y Mz "
+        _blocked("La compresión de un ángulo simple requiere single_angle_e5; fuera de E5 indique los momentos Mx_3 y My_2 "
                  "de la excentricidad para evaluar el miembro con H2.", section)
     conditions = {"E5(1) cargado en los extremos a través de la misma ala": basis.loaded_at_ends_through_same_leg,
                   "E5(2) soldado o con al menos dos pernos": basis.welded_or_two_bolts_min,
@@ -218,7 +218,7 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     if leg_ratio >= 1.7:
         failed.append("E5(5) relación ala larga/ala corta < 1.7")
     if failed:
-        _blocked("No se cumplen las condiciones de E5: omita single_angle_e5 e indique los momentos Mw y Mz de la "
+        _blocked("No se cumplen las condiciones de E5: omita single_angle_e5 e indique los momentos Mx_3 y My_2 de la "
                  "excentricidad para evaluar el miembro con H2.", section, failed=failed)
     _require(section, "area", "rx", "ry", "rz")
     connected = basis.connected_leg if leg_ratio > 1 else "long"
@@ -231,7 +231,7 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
                                               connected_leg=connected, leg_ratio=leg_ratio,
                                               L_over_rz=basis.L / section.rz)
     if not slenderness["within_200"]:
-        _blocked("E5(4): Lc/r de E5 supera 200: omita single_angle_e5 e indique los momentos Mw y Mz de la "
+        _blocked("E5(4): Lc/r de E5 supera 200: omita single_angle_e5 e indique los momentos Mx_3 y My_2 de la "
                  "excentricidad para evaluar el miembro con H2.", section, Lc_over_r=slenderness["Lc_over_r"])
     lc_r = slenderness["Lc_over_r"]
     mode = {"limit_state": "flexural_buckling", "provision": "E5(" + basis.configuration + ")", "axis": "a",
@@ -250,14 +250,15 @@ def _single_angle_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
 def _single_angle_h2_modes(case: SteelCase, section: Section) -> tuple[dict, list]:
     """E5 first paragraph without its effective slenderness: E3/E7 about z (the least r), E4 per its b/t limit."""
     f, ln = case.factors, case.lengths
-    if ln.Lx != ln.Ly or f.Kx != f.Ky:
-        _blocked("Ángulo simple fuera de E5: el pandeo ocurre respecto de los ejes principales w, z; se requiere Lx = Ly "
-                 "y Kx = Ky para que la longitud efectiva respecto de esos ejes girados esté definida.", section,
-                 Lx=ln.Lx, Ly=ln.Ly, Kx=f.Kx, Ky=f.Ky)
+    if ln.Lx_3 != ln.Ly_2 or f.Kx_3 != f.Ky_2:
+        _blocked("Ángulo simple fuera de E5: el pandeo ocurre respecto de los ejes principales w, z; se requiere Lx_3 = Ly_2 "
+                 "y Kx_3 = Ky_2 para que la longitud efectiva respecto de esos ejes girados esté definida.", section,
+                 Lx_3=ln.Lx_3, Ly_2=ln.Ly_2, Kx_3=f.Kx_3, Ky_2=f.Ky_2)
     _require(section, "area", "rz")
     long_leg, short_leg = _angle_legs(section)
-    modes = {"FB-z": _flexural_mode("z", case.material.E, f.Kx, ln.Lx, section.rz)}
-    notes = ["Ángulo simple fuera de E5: la excentricidad se considera con Mw y Mz en H2 (decisión DH-8)."]
+    modes = {"FB-z": _flexural_mode("z", case.material.E, f.Kx_3, ln.Lx_3, section.rz)}
+    notes = ["Ángulo simple fuera de E5: la excentricidad se considera con Mx_3 y My_2, llevados a los ejes principales, en H2 "
+             "(decisión DH-8)."]
     if long_leg / section.t > 0.71 * math.sqrt(case.material.E / case.material.Fy):
         modes["FTB"] = _single_angle_ftb(case, section, long_leg == short_leg)
     else:
@@ -279,14 +280,14 @@ def angle_shear_center(section: Section) -> tuple[float, float]:
 def _single_angle_ftb(case: SteelCase, section: Section, equal_legs: bool) -> dict:
     """E4 flexural-torsional buckling of a single angle (E5: b/t > 0.71*sqrt(E/Fy)), principal axes."""
     f, ln, E = case.factors, case.lengths, case.material.E
-    if ln.Lx != ln.Ly or f.Kx != f.Ky:
-        _blocked("E4 en ángulo simple: el pandeo ocurre respecto de los ejes principales w, z; se requiere Lx = Ly y "
-                 "Kx = Ky para que la longitud efectiva respecto de esos ejes girados esté definida.", section,
-                 Lx=ln.Lx, Ly=ln.Ly, Kx=f.Kx, Ky=f.Ky)
+    if ln.Lx_3 != ln.Ly_2 or f.Kx_3 != f.Ky_2:
+        _blocked("E4 en ángulo simple: el pandeo ocurre respecto de los ejes principales w, z; se requiere Lx_3 = Ly_2 y "
+                 "Kx_3 = Ky_2 para que la longitud efectiva respecto de esos ejes girados esté definida.", section,
+                 Lx_3=ln.Lx_3, Ly_2=ln.Ly_2, Kx_3=f.Kx_3, Ky_2=f.Ky_2)
     _require(section, "iw", "iz", "rz", "j", "ro")
     if section.cw is None:
         _incomplete("E4-7 requiere la constante de alabeo Cw.", section, ["section.cw"])
-    lc, lcz = f.Kx * ln.Lx, f.Kz * ln.Lz
+    lc, lcz = f.Kx_3 * ln.Lx_3, f.Kz_1 * ln.Lz_1
     rw = math.sqrt(section.iw / section.area)
     few = eq.elastic_flexural_stress(E, lc, rw)
     fez_axis = eq.elastic_flexural_stress(E, lc, section.rz)
@@ -323,31 +324,31 @@ def _double_angle_modes(case: SteelCase, section: Section, component: Section) -
     _require(section, "area", "rx", "ry", "ro", "H")
     _require(component, "rz", "j")
     f, ln, E = case.factors, case.lengths, case.material.E
-    modes = {"FB-x": _flexural_mode("x", E, f.Kx, ln.Lx, section.rx)}  # no shear in connectors
-    lcy = f.Ky * ln.Ly
+    modes = {"FB-x_3": _flexural_mode("x_3", E, f.Kx_3, ln.Lx_3, section.rx)}  # no shear in connectors
+    lcy = f.Ky_2 * ln.Ly_2
     ri = component.rz
     e6 = eq.e6_modified_slenderness(Lc_over_r_o=lcy / section.ry, a_over_ri=basis.a / ri,
                                     connector=basis.connectors, Ki=0.50)  # Ki: angles back-to-back
     lr_m = e6["Lc_over_r_m"]
     fey = math.pi**2 * E / lr_m**2
-    modes["FB-y"] = {"limit_state": "flexural_buckling", "provision": "E3 + E6", "axis": "y", "Lc_mm": lcy,
+    modes["FB-y_2"] = {"limit_state": "flexural_buckling", "provision": "E3 + E6", "axis": "y_2", "Lc_mm": lcy,
                      "r_mm": section.ry, "Lc_over_r_o": lcy / section.ry, "a_over_ri": basis.a / ri, "Ki": 0.50,
                      "slenderness_equation": e6["equation"], "Lc_over_r": lr_m, "Fe_equation": "E3-4",
                      "Fe_mpa": fey}
-    j, lcz = 2 * component.j, f.Kz * ln.Lz
+    j, lcz = 2 * component.j, f.Kz_1 * ln.Lz_1
     # E4 User Note: the Cw term may be omitted for double angles. J = sum of both angles.
     fez = eq.torsional_stress(E=E, G=G_STEEL, Cw=0.0, J=j, Lcz=lcz, Ag=section.area, ro=section.ro)
     modes["FTB"] = {"limit_state": "flexural_torsional_buckling", "provision": "E4(b) + E6", "axis": "y+z",
-                    "Fe_equation": "E4-3", "symmetry_axis": "y", "Fey_mpa": fey, "Fez_mpa": fez,
+                    "Fe_equation": "E4-3", "symmetry_axis": "y_2", "Fey_mpa": fey, "Fez_mpa": fez,
                     "Fez_equation": "E4-7 (Cw term omitted)", "J_mm4": j, "ro_mm": section.ro, "H": section.H,
                     "Fe_mpa": eq.flexural_torsional_stress_singly_symmetric(fey, fez, section.H)}
-    governing_slenderness = max(modes["FB-x"]["Lc_over_r"], lr_m)
+    governing_slenderness = max(modes["FB-x_3"]["Lc_over_r"], lr_m)
     requirement = {"id": "E6.2(a)", "a_over_ri": basis.a / ri, "limit": 0.75 * governing_slenderness,
                    "satisfied": basis.a / ri <= 0.75 * governing_slenderness,
                    "text": "a/ri de cada componente ≤ 3/4 de la esbeltez gobernante del miembro armado"}
     built_up = {"component": component.name, "ri_mm": ri, "J_component_mm4": component.j,
                 "connectors": basis.connectors, "a_mm": basis.a, "requirements": [requirement]}
-    notes = ["E6: esbeltez modificada aplicada al pandeo respecto de y (cortante en conectores); x sin cambio."]
+    notes = ["E6: esbeltez modificada aplicada al pandeo respecto de y (eje 2) (cortante en conectores); x (eje 3) sin cambio."]
     return modes, notes, built_up
 
 
@@ -444,8 +445,8 @@ def compression_strength(case: SteelCase, section: Section,
         "chapter": "E", "code": "ANSI/AISC 360-22",
         "section": section.name, "family": family,
         "inputs": {"Fy_mpa": Fy, "E_mpa": E, "G_mpa": G_STEEL, "Ag_mm2": section.area,
-                   "Kx": case.factors.Kx, "Ky": case.factors.Ky, "Kz": case.factors.Kz,
-                   "Lx_mm": case.lengths.Lx, "Ly_mm": case.lengths.Ly, "Lz_mm": case.lengths.Lz},
+                   "Kx_3": case.factors.Kx_3, "Ky_2": case.factors.Ky_2, "Kz_1": case.factors.Kz_1,
+                   "Lx_mm": case.lengths.Lx_3, "Ly_mm": case.lengths.Ly_2, "Lz_mm": case.lengths.Lz_1},
         "classification": classification,
         "provisions": ["E1"] + provisions,
         "modes": modes,

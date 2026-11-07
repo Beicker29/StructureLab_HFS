@@ -138,8 +138,8 @@ def filled_fire_modes(case, section, hot):
     )
     coefficient = eq.c3_filled(As=section.area, Asr=geometry["Asr"], Ag=section.area + geometry["Afill"])
     modes = {}
-    for axis, Is, Isr, Ec_Ic, K, L in (("x", section.ix, geometry["Isrx"], Ec_Icx, case.factors.Kx, case.lengths.Lx),
-                                       ("y", section.iy, geometry["Isry"], Ec_Icy, case.factors.Ky, case.lengths.Ly)):
+    for axis, Is, Isr, Ec_Ic, K, L in (("x_3", section.ix, geometry["Isrx"], Ec_Icx, case.factors.Kx_3, case.lengths.Lx_3),
+                                       ("y_2", section.iy, geometry["Isry"], Ec_Icy, case.factors.Ky_2, case.lengths.Ly_2)):
         ei = hot["E_T_mpa"] * Is + Es_bars * Isr + coefficient * Ec_Ic                 # I2-12 at temperature
         pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
         out = a4.filled_compression(Pno_T=pno["Pno"], Pe_T=pe)
@@ -169,14 +169,14 @@ def filled_fire_modes(case, section, hot):
 
 
 def tension_control(case, hn, h, bars, Fysr, pno, requirements, provision):
-    """I3.3a(e), I3.4a(d) by Design Guide 6, Section 2.4.1: applies to beam members with Pu < 0.10Pn."""
+    """I3.3a(e), I3.4a(d) by Design Guide 6, Section 2.4.1: applies to beam members with |P| < 0.10Pn."""
     out = dg06_members.tension_control(hn=hn, h=h, v_tension=min(v for _, v in bars), Fysr=Fysr)
     fields = {"epsilon_t": out["epsilon_t"], "epsilon_limit": out["epsilon_limit"]}
     notes = []
-    if abs(case.Pu) * 1000.0 < 0.10 * pno and case.composite.flexural_member is not False:
+    if abs(case.P) * 1000.0 < 0.10 * pno and case.composite.flexural_member is not False:
         if case.composite.flexural_member:
             requirements.append(requirement_row("tension_controlled", provision, out["tension_controlled"],
-                                             "Viga con Pu < 0.10Pn: εt debe alcanzar εy + 0.003 (AISC Design Guide 6, 2.4.1)."))
+                                             "Viga con |P| < 0.10Pn: εt debe alcanzar εy + 0.003 (AISC Design Guide 6, 2.4.1)."))
         else:
             notes.append(f"Si el miembro es una viga, {provision} exige sección controlada por tracción: indique "
                          "composite.flexural_member.")
@@ -197,7 +197,7 @@ def _filled_flexure_strength(case, section, axis, hot):
     fc = m["fc"]
     geometry = filled_geometry(case, section)
     requirement = filled_requirements(case, section, geometry, flexure=True)
-    bars = [(b.area, b.y if axis == "x" else b.x) for b in geometry["bars"]]
+    bars = [(b.area, b.y if axis == "x_3" else b.x) for b in geometry["bars"]]
     Fysr = m["Fysr"]
     if geometry["shape"] == "round":
         lam = geometry["D"] / geometry["t"]
@@ -227,7 +227,7 @@ def _filled_flexure_strength(case, section, axis, hot):
     t = geometry["t"]
     # Elements: the flange is perpendicular to the bending direction, the web is parallel to it.
     H, bi, hi, flange, web, Zs = ((section.h_out, geometry["bi"], geometry["hi"], section.b, section.h, section.zx)
-                                  if axis == "x" else
+                                  if axis == "x_3" else
                                   (section.b_out, geometry["hi"], geometry["bi"], section.h, section.b, section.zy))
     if uses_appendix_2(case, section):
         b_t = max(section.b, section.h) / t
@@ -239,7 +239,7 @@ def _filled_flexure_strength(case, section, axis, hot):
                 "a_mm": out["a_mm"], "Msd_kNm": out["Msd"] / 1e6, "Mn_kNm": out["Mn"] / 1e6}
         return flexure_output(case, section, mn_mode=mode, requirements=requirement, provisions=["Apéndice 2"])
     if not Zs:
-        incomplete("La flexión del relleno requiere Z del perfil.", section, ["section.zx" if axis == "x" else "section.zy"])
+        incomplete("La flexión del relleno requiere Z del perfil.", section, ["section.zx" if axis == "x_3" else "section.zy"])
     rows, candidates = [], {}
     worst = "compact"
     for name, ratio in (("flange", flange / t), ("web", web / t)):

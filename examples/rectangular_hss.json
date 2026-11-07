@@ -2,14 +2,30 @@
   "section_name": "PTE100X100X4MM",
   "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
-    "ultimate": {"Lx": 3000, "Ly": 3000, "Lz": 3000},
-    "construction": {"Lx": 3000, "Ly": 1500, "Lz": 1500}
+    "ultimate": {
+      "Lx_3": 3000,
+      "Ly_2": 3000,
+      "Lz_1": 3000
+    },
+    "construction": {
+      "Lx_3": 3000,
+      "Ly_2": 1500,
+      "Lz_1": 1500
+    }
   },
   "serviceability": {
     "actual_span": 3000,
     "effective_span": 3000,
-    "deflections": {"live_short": 6.0, "dead_short": 7.5, "total_long": 10.0},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 6.0,
+      "dead_short": 7.5,
+      "total_long": 10.0
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "tension": {
     "An": 1350,
@@ -19,21 +35,36 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 150
+      "P": -150
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -200
+      "P": 200
     },
     {
       "name": "Combinación 3 — flexión x",
-      "Mux": 8
+      "Mx_3": 8
     },
     {
       "name": "Combinación 4 — flexión y",
-      "Muy": 8
+      "My_2": 8
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 4.7, "Vux": 12},
-    {"name": "Incendio a 500 °C", "condition": "fire", "fire": {"steel_temperature": 500}, "Pu": 30, "Mux": 2, "Muy": 2, "Vux": 10}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 4.7,
+      "Vy_2": 12
+    },
+    {
+      "name": "Incendio a 500 °C",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 500
+      },
+      "P": -30,
+      "Mx_3": 2,
+      "My_2": 2,
+      "Vy_2": 10
+    }
   ]
 }

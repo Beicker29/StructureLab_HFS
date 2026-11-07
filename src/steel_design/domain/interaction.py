@@ -6,14 +6,14 @@ H1.3 alternative are not implemented. Formulas live in codes/aisc_360_22/interac
 """
 from ..codes.aisc_360_22 import interaction as eq
 from ..codes.aisc_360_22.flexure import PHI_B
-from ..errors import IncompleteSectionDataError, RuleNotImplementedError
+from ..errors import IncompleteSectionDataError
 from ..models import Check, SteelCase
 from ..sections.geometry import singly_symmetric_i
 from ..sections.models import Section
 from .fire import steel_at_temperature, with_fire
-from .flexure import unbraced_length
+from .flexure import angle_bending, unbraced_length
 
-COMBINED = ("axial", "flexure_x", "flexure_y", "flexure_w", "flexure_z")
+COMBINED = ("axial", "flexure_x_3", "flexure_y_2", "flexure_w", "flexure_z")
 DOUBLY_SYMMETRIC = {"W", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SOLID_RECTANGULAR", "SOLID_CIRCULAR"}
 _LIMITATIONS = (
     "Pr y Mr se toman como datos del usuario: se supone que provienen de un análisis de segundo orden según el "
@@ -33,11 +33,11 @@ def tension_cb_factor(case: SteelCase, section: Section) -> dict:
     if family not in DOUBLY_SYMMETRIC and not (family == "I_BUILT_UP" and not singly_symmetric_i(section)):
         return {"applies": False, "reason": "H1.2 solo permite amplificar Cb en miembros doblemente simétricos; "
                                             "se usa Cb sin amplificar."}
-    lb = unbraced_length(case, "x")
+    lb = unbraced_length(case, "x_3")
     if lb is None or not section.iy:
         _incomplete("La amplificación de Cb (H1-2) requiere lengths e Iy.", section, "INTERACTION_DATA_INCOMPLETE",
                     fields=["lengths", "section.iy"])
-    out = eq.tension_cb_factor(Pr_N=-case.Pu * 1000.0, E=case.material.E, Iy=section.iy, Lb=lb)
+    out = eq.tension_cb_factor(Pr_N=case.P * 1000.0, E=case.material.E, Iy=section.iy, Lb=lb)    # P > 0: tension
     return {"applies": True, **out, "Cb_user": case.flexure.Cb, "Cb": case.flexure.Cb * out["factor"]}
 
 
@@ -45,18 +45,6 @@ def amplified_cb_case(case: SteelCase, factor: dict) -> SteelCase:
     """The same combination with Cb multiplied by the H1.2 factor (for the flexure checks)."""
     flexure = case.flexure.model_copy(update={"Cb": factor["Cb"]})
     return case.model_copy(update={"flexure": flexure})
-
-
-def _single_angle_senses(case, section):
-    """Sense of the flexural stress at each point (w, z): +1 compression, -1 tension, 0 none (Example E.14B).
-
-    Mw: the toes have opposite senses and the heel lies on the side of the short-leg toe; with equal legs w is
-    the axis of symmetry and the heel has no stress (Example F.11C). Mz: both toes alike, the heel opposite.
-    """
-    flexure = case.angle_flexure
-    long_toe = -1 if flexure and flexure.leg_in_compression == "short" else 1
-    toes = 1 if flexure and flexure.toe == "compression" else -1
-    return {"A": (-long_toe, toes), "B": (0 if section.d == section.b else -long_toe, -toes), "C": (long_toe, toes)}
 
 
 def _h2_modes(case, section, by_id):
@@ -67,12 +55,13 @@ def _h2_modes(case, section, by_id):
              "Mrz_kNm": fz.demand if fz else 0.0, "Mcz_kNm": fz.capacity if fz else None}
     ax = 0.0
     if axial:
-        ax = (axial.demand if case.Pu > 0 else -axial.demand) / axial.capacity
+        ax = (axial.demand if case.P < 0 else -axial.demand) / axial.capacity
     rw = fw.demand / fw.capacity if fw else None
     rz = fz.demand / fz.capacity if fz else None
-    sense = "compresión" if case.Pu > 0 else ("tracción" if case.Pu < 0 else "sin carga axial")
+    sense = "compresión" if case.P < 0 else ("tracción" if case.P > 0 else "sin carga axial")
     modes = {}
-    for point, (sw, sz) in _single_angle_senses(case, section).items():
+    # Sense of the stress of Mw and Mz at A, B and C from the heel and the signs (+1 compression; Examples E.14B, F.11C)
+    for point, (sw, sz) in angle_bending(case, section)["senses"].items():
         out = eq.h2(axial=ax, w=sw * rw if rw else 0.0, z=sz * rz if rz else 0.0)
         modes[f"H2-{point}"] = {"limit_state": "combined_stress", "provision": "H2", "applies": True, "point": point,
                                 "location": _POINTS[point], **terms, **out, "axial": sense}
@@ -82,17 +71,17 @@ def _h2_modes(case, section, by_id):
 def _h1_h4_modes(case, section, by_id):
     """H1-1a/H1-1b and, for flanges with holes under tension, H4-1."""
     family = section.type.upper()
-    axial, fx, fy = by_id.get("axial"), by_id.get("flexure_x"), by_id.get("flexure_y")
+    axial, fx, fy = by_id.get("axial"), by_id.get("flexure_x_3"), by_id.get("flexure_y_2")
     terms = {"Pr_kN": axial.demand if axial else 0.0, "Pc_kN": axial.capacity if axial else None,
              "Mrx_kNm": fx.demand if fx else 0.0, "Mcx_kNm": fx.capacity if fx else None,
              "Mry_kNm": fy.demand if fy else 0.0, "Mcy_kNm": fy.capacity if fy else None}
     h1 = eq.h1(Pr=terms["Pr_kN"], Pc=terms["Pc_kN"], Mrx=terms["Mrx_kNm"], Mcx=terms["Mcx_kNm"],
                Mry=terms["Mry_kNm"], Mcy=terms["Mcy_kNm"])
-    sense = "compresión" if case.Pu > 0 else ("tracción" if case.Pu < 0 else "sin carga axial")
-    modes = {"H1": {"limit_state": "combined_flexure_axial", "provision": "H1.1" if case.Pu >= 0 else "H1.2",
+    sense = "compresión" if case.P < 0 else ("tracción" if case.P > 0 else "sin carga axial")
+    modes = {"H1": {"limit_state": "combined_flexure_axial", "provision": "H1.1" if case.P <= 0 else "H1.2",
                     "applies": True, **terms, **h1, "axial": sense}}
     flexure = case.flexure
-    if family in {"W", "CHANNEL", "I_BUILT_UP"} and case.Pu < 0 and fx and flexure and flexure.tension_flange_holes:
+    if family in {"W", "CHANNEL", "I_BUILT_UP"} and case.P > 0 and fx and flexure and flexure.tension_flange_holes:
         rupture = axial.result["modes"]["TR"]
         tfr = fx.result["modes"]["TFR"]
         if tfr["applies"]:
@@ -112,17 +101,13 @@ def combined_strength(case: SteelCase, section: Section, checks: list[Check]) ->
     by_id = {c.id: c for c in checks}
     involved = [by_id[i] for i in COMBINED if i in by_id]
     family = section.type.upper()
-    if family == "SINGLE_ANGLE" and ("flexure_x" in by_id or "flexure_y" in by_id):
-        raise RuleNotImplementedError("H2-1 se evalúa en los ejes principales: indique las componentes Mw y Mz en lugar "
-                                      "de Mux y Muy (decisión DH-7).", code="INTERACTION_DOMAIN_BLOCKED",
-                                      details={"section": section.name, "checks": [c.id for c in involved]})
     missing = [c.id for c in involved if c.capacity is None]
     if missing:
         _incomplete("La interacción necesita la resistencia de diseño de cada componente.", section,
                     "INTERACTION_COMPONENT_MISSING", checks=missing)
     modes = _h2_modes(case, section, by_id) if family == "SINGLE_ANGLE" else _h1_h4_modes(case, section, by_id)
     notes = []
-    if case.Pu > 0:
+    if case.P < 0:
         notes.append("Se supone que Pr y Mr incluyen los efectos de segundo orden (Capítulo C, decisión DH-3).")
     governing = max(modes, key=lambda k: modes[k]["ratio"])
     return with_fire({

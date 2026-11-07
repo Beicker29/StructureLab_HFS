@@ -14,7 +14,7 @@ contrastan con los valores del Manual (5,37 in² y Z = 31,0 in³).
 An y U de los ejemplos del Capítulo D se toman del ejemplo (son datos del usuario, DD-1). En H.4 los
 momentos ya amplificados por el ejemplo (B1 del Apéndice 8) se dan como dato (DH-3); en H.3 se pide la
 amplificación de Cb de H1.2 y An = Ag, U = 1 (sin agujeros). En E.14B se evalúa la resistencia que
-imprime el ejemplo, Pu = 85,9 kips, con los momentos amplificados según sus Pe1w y Pe1z; el valor
+imprime el ejemplo, P=−85,9 kips, con los momentos amplificados según sus Pe1w y Pe1z; el valor
 esperado es 1,0 porque esa es la carga que agota H2-1. Los puntos A y C de F.11C son simétricos: el
 ejemplo llama A a la punta comprimida y el programa la rotula C. En I.1 no hay un número entero de pernos que dé los
 386 kips que selecciona el ejemplo: se usan 22 pernos (381 kips). Ese caso da `FAIL` en el estado global porque 3 in y
@@ -65,30 +65,30 @@ razón para el Método 2 completo: el valor esperado se calculó a mano con sus 
 | G.5 | HSS16.000X0.375, Lv = 192 in (G5) | 232 | 232.2 | +0.09 % | V |
 | G.6 | W21X48, cortante en el eje menor (G6) | 189 | 188.9 | -0.08 % | V |
 | G.7 | C9X20, cortante en el eje menor (G6) | 59.1 | 59.15 | +0.08 % | V |
-| H.1B | W14X99, Pu = 400 kips, Mux = 250, Muy = 80 kip-ft, L = 14 ft (H1-1a) | 0.929 | 0.9294 | +0.05 % | H1 |
-| H.3 | W14X82 en tracción, Pu = 174 kips, Mux = 192, Muy = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2) | 0.873 | 0.8732 | +0.02 % | H1 |
-| H.4 | W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft | 0.979 | 0.9808 | +0.19 % | H1 |
+| H.1B | W14X99, P=−400 kips, Mx_3 = 250, My_2 = 80 kip-ft, L = 14 ft (H1-1a) | 0.929 | 0.9294 | +0.05 % | H1 |
+| H.3 | W14X82 en tracción, P=−174 kips, Mx_3 = 192, My_2 = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2) | 0.873 | 0.8732 | +0.02 % | H1 |
+| H.4 | W10X33, P=−30 kips, Mx_3 = 91.8, My_2 = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft | 0.979 | 0.9808 | +0.19 % | H1 |
 | E.14B-Pc | L8X4X1/2 fuera de E5, Lc = 5 ft, ala larga esbelta (E7) | 168 | 168.5 | +0.29 % | FB-z |
 | E.14B-Mcw | L8X4X1/2 eje w, punta del ala larga comprimida, βw del catálogo | 31.25 | 31.22 | -0.11 % | LTB |
 | E.14B-Mcz | L8X4X1/2 eje z, punteras traccionadas, fluencia en A | 10.25 | 10.23 | -0.20 % | Y |
-| E.14B | L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados: H2-1 en B ≈ 1.0 | 1.0 | 1.001 | +0.07 % | H2-B |
+| E.14B | L8X4X1/2, P=−85.9 kips con Mw y Mz amplificados (entrada `Mx_3`, `My_2` con el talón): H2-1 en B ≈ 1.0 | 1.0 | 1.001 | +0.07 % | H2-B |
 | F.11C | L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14 | 0.292 | 0.2936 | +0.56 % | H2-C |
 | I.1 | W21X50, deck de 3 in, 22 pernos de 3/4 in, tc = 4.5 in, f'c = 4 ksi | 769 | 765.4 | -0.46 % | Y |
 | I.4 | HSS10X6X3/8 relleno, f'c = 5 ksi, Lc = 14 ft | 368 | 368.9 | +0.24 % | FB-y |
 | I.5 | HSS10X6X3/8 relleno, tracción | 468 | 468 | +0.00 % | TY |
 | I.6-Mc | HSS10X6X3/8 relleno, flexión compacta (Tabla 4-B) | 141 | 140.5 | -0.35 % | Y |
 | I.6-Vc | HSS10X6X3/8 relleno, cortante I4-1, Kc = 1 | 176 | 175 | -0.58 % | V |
-| I.6-H1 | HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, H1-1a | 1.11 | 1.109 | -0.10 % | H1 |
+| I.6-H1 | HSS10X6X3/8 relleno, P=−129 kips, Mx_3 = 120 kip-ft, H1-1a | 1.11 | 1.109 | -0.10 % | H1 |
 | I.7-noncompact | Cajón 30 x 30 x 1/2 in relleno, no compacto (I3-5b) | 2910 | 2905 | -0.17 % | Y |
 | I.7-slender | Cajón 30 x 30 x 1/4 in relleno, esbelto (Fig. C-I3.8(c)) | 1220 | 1211 | -0.78 % | Y |
 | I.7-slender-Pc | Cajón 30 x 30 x 1/4 in relleno, esbelto, Lc = 30 ft (I2-9e) | 3300 | 3307 | +0.21 % | FB-x |
 | I.9 | W10X45 embebido en 24 x 24 in, 8 barras No. 8, Lc = 14 ft | 2360 | 2368 | +0.33 % | FB-y |
 | I.10 | W10X45 embebido, tracción (I2-8) | 936 | 939.7 | +0.40 % | TY |
 | I.11-Mc | W10X45 embebido, plástico compuesto I3.3a(3) | 673 | 671.7 | -0.20 % | Y |
-| I.11-H1 | W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, H1-1a | 1.38 | 1.381 | +0.06 % | H1 |
-| I.6-M2S | HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, Método 2 simplificado (C-I5-1b) | 0.948 | 0.9422 | -0.61 % | M2 |
+| I.11-H1 | W10X45 embebido, P=−1170 kips, Mx_3 = 670 kip-ft, H1-1a | 1.38 | 1.381 | +0.06 % | H1 |
+| I.6-M2S | HSS10X6X3/8 relleno, P=−129 kips, Mx_3 = 120 kip-ft, Método 2 simplificado (C-I5-1b) | 0.948 | 0.9422 | -0.61 % | M2 |
 | I.6-M2 | igual, Método 2 (valor esperado obtenido de los puntos impresos) | 0.963 | 0.9588 | -0.44 % | M2 |
-| I.11-M2S | W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, Método 2 simplificado (C-I5-1a) | 0.996 | 0.9975 | +0.15 % | M2 |
+| I.11-M2S | W10X45 embebido, P=−1170 kips, Mx_3 = 670 kip-ft, Método 2 simplificado (C-I5-1a) | 0.996 | 0.9975 | +0.15 % | M2 |
 | I.11-M2 | igual, Método 2 (valor esperado obtenido de los puntos impresos) | 0.870 | 0.8699 | -0.01 % | M2 |
 | I.12 | Perno de 3/4 in, Quv = 10.4 kips, Qut = 15.6 kips (I8-5) | 0.962 | 0.9615 | -0.05 % | Q |
 

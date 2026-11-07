@@ -15,7 +15,7 @@ EXPECTED_ELEMENTS = {
     "W": {"flange", "web"}, "CHANNEL": {"flange", "web"},
     "RECTANGULAR_HSS": {"wall_b", "wall_h"}, "CIRCULAR_HSS": {"wall"},
     "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"long_leg", "short_leg"},
-    "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(), "I_BUILT_UP": {"top_flange", "bottom_flange", "web"},
+    "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(), "I_BUILT_UP": {"flange_plus2", "flange_minus2", "web"},
 }
 
 
@@ -25,10 +25,10 @@ FLEXURE_ELEMENTS = {"W": {"flange", "web"}, "CHANNEL": {"flange", "web"}, "I_BUI
                     "CIRCULAR_HSS": {"wall"}, "SOLID_RECTANGULAR": set(), "SOLID_CIRCULAR": set(),
                     "SINGLE_ANGLE": {"long_leg", "short_leg"}, "DOUBLE_ANGLE": {"flange_legs", "web_legs"}}
 FLEXURE_STATES = {
-    ("W", "x"): ("Y", "LTB", "FLB", "TFR"), ("CHANNEL", "x"): ("Y", "LTB", "FLB", "TFR"),
-    ("W", "y"): ("Y", "FLB"), ("CHANNEL", "y"): ("Y", "FLB"), ("I_BUILT_UP", "y"): ("Y", "FLB"),
-    ("RECTANGULAR_HSS", "x"): ("Y", "FLB", "WLB", "LTB"), ("RECTANGULAR_HSS", "y"): ("Y", "FLB", "WLB", "LTB"),
-    ("CIRCULAR_HSS", "x"): ("Y", "LB"), ("CIRCULAR_HSS", "y"): ("Y", "LB"),
+    ("W", "x_3"): ("Y", "LTB", "FLB", "TFR"), ("CHANNEL", "x_3"): ("Y", "LTB", "FLB", "TFR"),
+    ("W", "y_2"): ("Y", "FLB"), ("CHANNEL", "y_2"): ("Y", "FLB"), ("I_BUILT_UP", "y_2"): ("Y", "FLB"),
+    ("RECTANGULAR_HSS", "x_3"): ("Y", "FLB", "WLB", "LTB"), ("RECTANGULAR_HSS", "y_2"): ("Y", "FLB", "WLB", "LTB"),
+    ("CIRCULAR_HSS", "x_3"): ("Y", "LB"), ("CIRCULAR_HSS", "y_2"): ("Y", "LB"),
 }
 _STATE_TEXT = {"Y": ("F1.1", "Fluencia (momento plástico)."), "LTB": ("F1.1", "Pandeo lateral-torsional."),
                "FLB": ("F1.1", "Pandeo local del ala comprimida."), "WLB": ("F1.1", "Pandeo local del alma."),
@@ -40,7 +40,7 @@ _F4_F5_STATES = ("CFY", "LTB", "FLB", "TFY", "TFR")
 
 def _i_beyond_f2_f3(case: SteelCase, section: Section) -> bool:
     """F2 and F3 cover doubly symmetric I-shapes with compact webs (Table B4.1b case 15); the rest is F4 or F5."""
-    if section.bf_bottom is not None and (section.bf_bottom, section.tf_bottom) != (section.bf, section.tf):
+    if section.bf_minus2 is not None and (section.bf_minus2, section.tf_minus2) != (section.bf, section.tf):
         return True
     return bool(section.h_tw_ratio) and section.h_tw_ratio > 3.76 * math.sqrt(case.material.E / case.material.Fy)
 
@@ -48,7 +48,7 @@ def _i_beyond_f2_f3(case: SteelCase, section: Section) -> bool:
 def flexure_obligations(case: SteelCase, section: Section, axis: str) -> list[Obligation]:
     family = section.type.upper()
     states: tuple[str, ...]
-    if family in {"W", "I_BUILT_UP"} and axis == "x" and _i_beyond_f2_f3(case, section):
+    if family in {"W", "I_BUILT_UP"} and axis == "x_3" and _i_beyond_f2_f3(case, section):
         states = _F4_F5_STATES                    # Table User Note F1.1: CFY, LTB, FLB, TFY; plus F13.1
     elif family in {"SOLID_RECTANGULAR", "SOLID_CIRCULAR"}:
         states = ("Y", "LTB")                     # F11
@@ -63,15 +63,15 @@ def flexure_obligations(case: SteelCase, section: Section, axis: str) -> list[Ob
     return out + [Obligation(id=k, provision=_STATE_TEXT[k][0], reason=_STATE_TEXT[k][1]) for k in states]
 
 
-# Chapter G section per family (shear accompanying Mux / Muy).
-SHEAR_PROVISIONS = {("W", "x"): "G2.1", ("CHANNEL", "x"): "G2.1", ("W", "y"): "G6", ("CHANNEL", "y"): "G6",
-                    ("I_BUILT_UP", "x"): "G2.1", ("I_BUILT_UP", "y"): "G6",
-                    ("RECTANGULAR_HSS", "x"): "G4", ("RECTANGULAR_HSS", "y"): "G4",
-                    ("CIRCULAR_HSS", "x"): "G5", ("CIRCULAR_HSS", "y"): "G5",
-                    ("SINGLE_ANGLE", "x"): "G3", ("SINGLE_ANGLE", "y"): "G3",
-                    ("DOUBLE_ANGLE", "x"): "G3", ("DOUBLE_ANGLE", "y"): "G3",
-                    ("SOLID_RECTANGULAR", "x"): "G4", ("SOLID_RECTANGULAR", "y"): "G4",
-                    ("SOLID_CIRCULAR", "x"): "G4", ("SOLID_CIRCULAR", "y"): "G4"}
+# Chapter G section per family and shear axis (Vy_2 along y, Vx_3 along x).
+SHEAR_PROVISIONS = {("W", "y_2"): "G2.1", ("CHANNEL", "y_2"): "G2.1", ("W", "x_3"): "G6", ("CHANNEL", "x_3"): "G6",
+                    ("I_BUILT_UP", "y_2"): "G2.1", ("I_BUILT_UP", "x_3"): "G6",
+                    ("RECTANGULAR_HSS", "y_2"): "G4", ("RECTANGULAR_HSS", "x_3"): "G4",
+                    ("CIRCULAR_HSS", "y_2"): "G5", ("CIRCULAR_HSS", "x_3"): "G5",
+                    ("SINGLE_ANGLE", "y_2"): "G3", ("SINGLE_ANGLE", "x_3"): "G3",
+                    ("DOUBLE_ANGLE", "y_2"): "G3", ("DOUBLE_ANGLE", "x_3"): "G3",
+                    ("SOLID_RECTANGULAR", "y_2"): "G4", ("SOLID_RECTANGULAR", "x_3"): "G4",
+                    ("SOLID_CIRCULAR", "y_2"): "G4", ("SOLID_CIRCULAR", "x_3"): "G4"}
 
 
 def shear_obligations(section: Section, axis: str) -> list[Obligation]:
@@ -84,14 +84,14 @@ def shear_obligations(section: Section, axis: str) -> list[Obligation]:
 def composite_obligations(case: SteelCase, demand: str) -> list[Obligation]:
     """Chapter I limit states of each demand ("axial", "flexure" or "shear"), from I2, I3 and I4."""
     kind = case.composite.kind
-    if demand == "axial" and case.Pu < 0:
+    if demand == "axial" and case.P > 0:
         return [Obligation(id="TY", provision="I2.1c / I2.2c", reason="Fluencia en tracción del acero y del refuerzo.")]
     if demand == "axial" and kind in {"wall", "c_wall"} and is_elevated(case):
         return [Obligation(id="FB", provision="Apéndice 4, 4.2.4d(d)", reason="Pandeo por flexión a temperatura, en el espesor del muro."),
                 Obligation(id="LB", provision="I1.2", reason="Pandeo local: no requerido en muros.")]
     if demand == "axial":
-        return [Obligation(id="FB-x", provision="I2", reason="Pandeo por flexión respecto de x."),
-                Obligation(id="FB-y", provision="I2", reason="Pandeo por flexión respecto de y."),
+        return [Obligation(id="FB-x_3", provision="I2", reason="Pandeo por flexión respecto de x (eje 3)."),
+                Obligation(id="FB-y_2", provision="I2", reason="Pandeo por flexión respecto de y (eje 2)."),
                 Obligation(id="LB", provision="I1.2 / I1.4", reason="Pandeo local: clasificación de rellenos; no requerido "
                                                                     "en embebidos.")]
     if demand == "shear":
@@ -110,10 +110,10 @@ def interaction_obligations(case: SteelCase, section: Section) -> list[Obligatio
     if section.type.upper() == "SINGLE_ANGLE":
         return [Obligation(id=f"H2-{point}", provision="H2", reason=f"H2-1 en el punto {point} del ángulo, con el "
                                                                     "signo de cada tensión.") for point in "ABC"]
-    out = [Obligation(id="H1", provision="H1.1" if case.Pu >= 0 else "H1.2",
+    out = [Obligation(id="H1", provision="H1.1" if case.P <= 0 else "H1.2",
                       reason="Interacción de fuerza axial y flexión (H1-1a/H1-1b).")]
     flexure = case.flexure
-    if (section.type.upper() in {"W", "CHANNEL", "I_BUILT_UP"} and case.Pu < 0 and case.Mux and flexure
+    if (section.type.upper() in {"W", "CHANNEL", "I_BUILT_UP"} and case.P > 0 and case.Mx_3 and flexure
             and flexure.tension_flange_holes):
         out.append(Obligation(id="H4", provision="H4", reason="Rotura del ala traccionada con agujeros bajo tracción "
                                                               "y flexión (H4-1)."))
@@ -122,7 +122,7 @@ def interaction_obligations(case: SteelCase, section: Section) -> list[Obligatio
 
 def required_obligations(case: SteelCase, section: Section) -> list[Obligation]:
     """Obligations of the axial check (Chapter D or E)."""
-    if case.Pu < 0:
+    if case.P > 0:
         # D2: the lower of tensile yielding in the gross section and rupture in the net section.
         return [Obligation(id="TY", provision="D2(a)", reason="Fluencia en tracción en la sección bruta."),
                 Obligation(id="TR", provision="D2(b), D3", reason="Rotura en tracción en la sección neta efectiva.")]
@@ -139,13 +139,13 @@ def required_obligations(case: SteelCase, section: Section) -> list[Obligation]:
             out.append(Obligation(id="FTB", provision="E4 / E5",
                                   reason="Ángulo simple con b/t > 0.71·√(E/Fy): pandeo flexotorsional."))
         return out
-    out += [Obligation(id="FB-x", provision="E3", reason="Pandeo por flexión respecto de x."),
-            Obligation(id="FB-y", provision="E3", reason="Pandeo por flexión respecto de y.")]
-    offsets = f.xa != 0 or f.ya != 0
-    singly_i = family == "I_BUILT_UP" and (section.bf_bottom, section.tf_bottom) != (section.bf, section.tf)
+    out += [Obligation(id="FB-x_3", provision="E3", reason="Pandeo por flexión respecto de x (eje 3)."),
+            Obligation(id="FB-y_2", provision="E3", reason="Pandeo por flexión respecto de y (eje 2).")]
+    offsets = f.xa_3 != 0 or f.ya_2 != 0
+    singly_i = family == "I_BUILT_UP" and (section.bf_minus2, section.tf_minus2) != (section.bf, section.tf)
     if family in {"CHANNEL", "DOUBLE_ANGLE"} or singly_i:
         out.append(Obligation(id="FTB", provision="E4(b)", reason="Miembro con un eje de simetría: pandeo flexotorsional."))
-    elif family in {"W", "I_BUILT_UP", "RECTANGULAR_HSS", "CIRCULAR_HSS"} and (offsets or ln.Lz > min(ln.Lx, ln.Ly)):
+    elif family in {"W", "I_BUILT_UP", "RECTANGULAR_HSS", "CIRCULAR_HSS"} and (offsets or ln.Lz_1 > min(ln.Lx_3, ln.Ly_2)):
         out.append(Obligation(id="TB", provision="E4(a)/(d)/(e)/(f)",
                               reason="Miembro doblemente simétrico con longitud no arriostrada torsional mayor que la lateral, "
                                      "o arriostramiento lateral desplazado del centro de corte."))
@@ -161,10 +161,10 @@ def discharge(obligations: list[Obligation], section: Section, result: dict) -> 
     classification = result.get("classification") or {"elements": [], "slender": False}
     elements = {row["element"] for row in classification["elements"]}
     expected = (FLEXURE_ELEMENTS if result.get("chapter") == "F" else EXPECTED_ELEMENTS).get(family)
-    if result.get("chapter") == "F" and family in {"W", "CHANNEL"} and result.get("axis") == "y":
+    if result.get("chapter") == "F" and family in {"W", "CHANNEL"} and result.get("axis") == "y_2":
         expected = {"flange"}
-    if result.get("chapter") == "F" and family == "I_BUILT_UP" and result.get("axis") == "y":
-        expected = {"top_flange", "bottom_flange"}
+    if result.get("chapter") == "F" and family == "I_BUILT_UP" and result.get("axis") == "y_2":
+        expected = {"flange_plus2", "flange_minus2"}
     for item in obligations:
         if item.id == "classification" and elements == expected:
             item.satisfied_by = "clasificación"

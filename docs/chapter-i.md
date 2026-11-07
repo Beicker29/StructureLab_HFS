@@ -32,7 +32,8 @@ con ese apéndice, incluida I5-1a con A-2-3 y A-2-4, sin barras.
 ## Segundo orden (Apéndice 8.1)
 
 `composite.second_order`: `axis`, `Mnt`, `Mlt`, `Pnt`, `Plt`, `M1_M2` (omitir con carga transversal: Cm = 1), `Lc1`, `Pstory`, `Pmf`,
-`H`, `L`, `drift`. Sustituye a `Pu` y `Mux` o `Muy`, que no se indican. EI* = 0,8·τb·(EI)eff (I1.5(d), (f)), con τb = 0,8 en rellenos y
+`H`, `L`, `drift`; `axis` es `x_3` o `y_2` y `Pnt`, `Plt` llevan el signo de ETABS (tracción positiva). Sustituye a `P` y `Mx_3` o
+`My_2`, que no se indican. EI* = 0,8·τb·(EI)eff (I1.5(d), (f)), con τb = 0,8 en rellenos y
 embebidos y 1,0 en muros; se usa Pr = Pnt + Plt en B1, como permite 8.1.2. El resultado guarda B1, B2, Pe1 y Pestory en `second_order`.
 
 ## Contenidos de las Design Guides
@@ -79,8 +80,9 @@ cortante con tracción en concreto liviano.
   esbeltos con compresión y flexión en un eje, y H1.1 si no; Apéndice 2 en alta resistencia. Se puede pedir `H1`, `I5`, `M2` o `M2S`; en rellenos con barras, `M2` y `M2S` se reemplazan por H1.1. Los muros no lo usan.
 - `composite.encased`: `H`, `B`, `Fysr`, `bars` (`area`, `db`, `x`, `y` desde el centroide), `transverse` (`db`,
   `spacing`), `flexure_method` (`steel` por defecto, o `composite`) y `anchors_provided`.
-- `composite.beam`: `moment` (`positive`, `negative`), `span`, un límite por lado (`left_beam_spacing` o
-  `left_edge_distance`; igual a la derecha), `tc`, `deck`, `studs`, `channels` y `shored`. Sin apuntalar exige un case con `condition = construction` (I3.1b): si falta, INCOMPLETO.
+- `composite.beam`: `span`, un límite por lado (`left_beam_spacing` o
+  `left_edge_distance`; igual a la derecha), `tc`, `deck`, `studs`, `channels` y `shored`. La losa está en la cara +2:
+  `Mx_3 > 0` es flexión positiva y `Mx_3 < 0` negativa, con el acero solo (Capítulo F; [axes.md](axes.md)). Sin apuntalar exige un case con `condition = construction` (I3.1b): si falta, INCOMPLETO.
 - `composite.beam.studs.detailing` y `composite.beam.channels.detailing` (I8.2d, obligatorio con momento positivo; DI-24):
   `longitudinal_spacing`, `free_edge`, `distribution` (`uniform` o `design_documents`) y, según el caso, `transverse_spacing`
   (más de un perno por nervio), `lateral_cover` (sin deck) y `free_edge_distance` (con borde libre). Si falta un dato: INCOMPLETO.
@@ -123,19 +125,19 @@ halla los ejes neutros por bisección. Coincidencia con tolerancia relativa 1e-9
 | beam-partial-flange | W21X50, f'c = 28, deck 76 mm, 30 pernos de 19 mm, PNA en el ala | – | C 2296.58; φbMn 1133.37 |
 | beam-full-steel | W14X30, losa maciza de 120 mm, 60 pernos, PNA en la losa | – | C 1969.95; φbMn 491.30 |
 | beam-partial-web | W21X50, deck 76 mm, 8 pernos, PNA en el alma | – | C 612.42; φbMn 774.65 |
-| i5-high-axial | PTE120X60X2MM, Pu = 120, Mu = 3 (I5-1a) | no compacta | cp 0.172; cm 1.063; 0.944 |
-| i5-low-axial | igual, Pu = 10, Mu = 8 (I5-1b) | no compacta | 0.832 |
-| m2s-filled-high | PTE100X50X3MM, L = 2000, Pu = 100, Mu = 4 (C-I5-1b) | compacta | PA 135.44; PC 42.64; 1.075 |
-| m2s-filled-low | igual, Pu = 10, Mu = 8 (C-I5-1a) | compacta | 0.915 |
-| m2-filled | igual, Pu = 40, Mu = 8 | compacta | MD'' 9.09; 0.922 |
-| m2s-encased | W10X45 embebido, L = 4267, Pu = 5000, Mu = 800 | – | PA 10668.37; PC 7423.71; 0.869 |
+| i5-high-axial | PTE120X60X2MM, P=−120, Mu = 3 (I5-1a) | no compacta | cp 0.172; cm 1.063; 0.944 |
+| i5-low-axial | igual, P=−10, Mu = 8 (I5-1b) | no compacta | 0.832 |
+| m2s-filled-high | PTE100X50X3MM, L = 2000, P=−100, Mu = 4 (C-I5-1b) | compacta | PA 135.44; PC 42.64; 1.075 |
+| m2s-filled-low | igual, P=−10, Mu = 8 (C-I5-1a) | compacta | 0.915 |
+| m2-filled | igual, P=−40, Mu = 8 | compacta | MD'' 9.09; 0.922 |
+| m2s-encased | W10X45 embebido, L = 4267, P=−5000, Mu = 800 | – | PA 10668.37; PC 7423.71; 0.869 |
 | m2-encased | igual | – | MD'' 1296.30; 0.781 |
 | wall-C | L = 3000, tsc = 300, t = 10, tf = 20, Fy = 345, f'c = 35, altura 6000 | – | Pno 49220.80; φcPn 35050.64 |
 | wall-T | igual | – | φtPn 22107.60 |
 | wall-M | igual | – | a 942.91; Mn 26971.36 |
 | wall-V | igual | – | φvVn 16240.26 |
-| wall-PM-compression | igual, Pu = 8000, Mu = 20000 | – | Mc 26983.87; 0.741 |
-| wall-PM-tension | igual, Pu = −3000, Mu = 15000 | – | Mc 22587.07; 0.664 |
+| wall-PM-compression | igual, P=−8000, Mu = 20000 | – | Mc 26983.87; 0.741 |
+| wall-PM-tension | igual, P=3000, Mu = 15000 | – | Mc 22587.07; 0.664 |
 | stud-shear | d = 19, Fu = 450, Qrv = 50 | – | Qcv 82.93; 0.603 |
 | stud-tension | igual, Qrt = 60 | – | Qct 95.69; 0.627 |
 | stud-interaction | igual, Qrv = 40, Qrt = 60 (I8-5) | – | 0.756 |
@@ -160,7 +162,7 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
 - **DI-6** Embebidos a cortante: solo I4.1(a). I4.1(b) e I4.1(c) requieren ACI 318, que no está en el repositorio.
 - **DI-7** Vigas: la losa cuenta sobre el deck en ambas orientaciones (con deck paralelo I3.2c.3 permite más; es
   conservador). Flexión negativa: acero solo; la alternativa compuesta de I3.2b no está implementada. h/tw > 3.76√(E/Fy):
-  INCOMPLETO. Pu o Muy en una viga: INCOMPLETO.
+  INCOMPLETO. P o My_2 en una viga: INCOMPLETO.
 - **DI-8** Ductilidad de la conexión (I3.2d): si no se cumple ninguna condición del Commentary (luz ≤ 9,1 m, acción
   compuesta ≥ 50 %, conectores ≥ 230 kN/m), la memoria lo advierte; no bloquea porque la Specification no da un límite.
 - **DI-9** Compresión: se toma el mayor entre I2 y el acero solo del Capítulo E, como permiten I2.1b e I2.2b.
@@ -177,7 +179,7 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
   diseño conviene `M2S`.
 - **DI-13** I8.1 limita d a 19 mm salvo solo cortante en losa maciza, aunque la Tabla I.12-1 del ejemplo lista 1 in a tracción. Se
   sigue la Specification.
-- **DI-14** Sección controlada por tracción (I3.3a(e), I3.4a(d)): se calcula εt como AISC Design Guide 6, 2.4.1, con Pu < 0,10·Pn. La
+- **DI-14** Sección controlada por tracción (I3.3a(e), I3.4a(d)): se calcula εt como AISC Design Guide 6, 2.4.1, con |P| < 0,10·Pn. La
   Specification no dice qué es una viga en este contexto: es requisito solo con `composite.flexural_member = true`; sin declararlo, la
   memoria lo advierte. No aplica con `false` (confirmado por el usuario, 2026-10-30).
 - **DI-15** C-I1-1 aparece impresa en el Commentary sin el exponente de (b/tp), lo que nunca reduciría Fy dentro de un rango realista.
@@ -189,8 +191,10 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
 - **DI-17** Cajones (Guía 6, 2.5): ri = 0 y Av = 2·H·t, frente a 2·h·t de los PTE. Es la única diferencia de cálculo por declarar
   `composite.box`.
 - **DI-18** Muros en C: st y α de I1-6 con el menor de los espesores tsc,w y tsc,f, porque la Guía 38 no resuelve cuál usar en una sección
-  con dos; es el lado conservador. A.2.3 a A.2.5 definen el lado comprimido por el signo de Pu: otra combinación queda bloqueada.
-- **DI-19** Incendio: se aplica la Ec. 6-6a tal como la imprime la guía, sin la rama de I2-3, y la longitud L = Ly con Lc = Ky·Ly, porque el
+  con dos; es el lado conservador. A.2.3 a A.2.5 fijan el lado comprimido con el signo de P: en tracción, las puntas de las alas;
+  en compresión, el alma; otra combinación queda bloqueada. El lado comprimido sale del signo de `My_2` (cara +3) y de
+  `composite.c_wall.web_side` (decisión del usuario, 2026-11-06; sustituye a `minor_axis_compression`).
+- **DI-19** Incendio: se aplica la Ec. 6-6a tal como la imprime la guía, sin la rama de I2-3, y la longitud L = Ly_2 con Lc = Ky_2·Ly_2, porque el
   ejemplo toma pandeo del espesor. La Ec. 6-5 se usa solo dentro de sus límites; fuera de ellos, la revisión de horas queda `INCOMPLETE`. La resistencia a temperatura es A-4-12 ([Apéndice 4](appendix-4.md)), con esa misma Lc.
 - **DI-20** Rigideces en la memoria (indicaciones del usuario, 2026-10-31).
   - Muros: I1-1 a I1-3 solo se aplican a muros de placas. C2.3 con τb del usuario.
@@ -201,7 +205,7 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
   - Miembros no compuestos: τb = 1,0 siempre, por C2.3(c) (indicación del usuario, 2026-10-31), con la carga ficticia a cargo del modelo; no es un dato y otro valor se rechaza.
   - Miembros compuestos: τb es un dato obligatorio del usuario y no se calcula. El capítulo 4 lo compara con I1.5(d), (f), o con C2.3(c) en tracción neta; una diferencia solo se reporta.
     Sin dato, el estado es INCOMPLETO. B1 del Apéndice 8.1 sigue usando τb de I1.5.
-  - Vigas compuestas y de acoplamiento no tienen rigideces de método directo: τb no aplica y no se exige. La Guía 6 pide P de servicio: el programa toma Pu de la combinación.
+  - Vigas compuestas y de acoplamiento no tienen rigideces de método directo: τb no aplica y no se exige. La Guía 6 pide P de servicio: el programa toma |P| de la combinación si es compresión.
 - **DI-21** Requerimientos técnicos (indicación del usuario, 2026-10-31): memoria con materiales (I1.3, Apéndice 2, A3.1a, E3) y geometría (I1.4, I1.6, I2.1a, I2.2a, I3.4a, E5, E6.2,
   F8, B4.3b). Uno obligatorio incumplido impide PASS aunque no intervenga en la demanda de la combinación; las Notas de D1 y E2 son recomendación y no lo impiden. ACI 318
   (I1.1) y la designación ASTM (A3.1a) se reportan «Falta implementación». En rellenos y embebidos con solo cortante, las cuantías de I2 e I3 no aplican.
@@ -219,7 +223,7 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
   longitudes, Mu y Vu únicamente. Incendio: Apéndice 4, 4.2.4d, con `fire` ([detalle](appendix-4.md)). Deflexiones (`serviceability`): datos del
   usuario frente a L/n con la luz efectiva; exceder un límite se reporta y no cambia el estado. Una sola memoria por sección, con el case de mayor DCR en cada revisión.
 - **DI-25** Colado del concreto (indicación del usuario, 2026-10-31; no es norma). Rellenos rectangulares: σmax ≤ 0,5 Fy y δmax ≤ L/2000 con
-  L = min(Lx, Ly) (DG6 4.3; Commentary C-I2-1, C-I2-2). Redondos: no aplica. Muros planos: altura ≤ 9144 mm con placas que cumplen I1-4
+  L = min(Lx_3, Ly_2) (DG6 4.3; Commentary C-I2-1, C-I2-2). Redondos: no aplica. Muros planos: altura ≤ 9144 mm con placas que cumplen I1-4
   (DG38 2.2.1.2), porque las ecuaciones de DG6 no consideran los tirantes. La altura es obligatoria (sin ella, INCOMPLETO), pero un límite
   incumplido se reporta en 4.2 como recomendación y no cambia el estado. Los agujeros de ventilación usan la misma `composite.pour_height`.
 
@@ -230,4 +234,5 @@ ejemplos de AISC Design Guide 6 y 38, incluidos los muros, en [design-guides.md]
 - Ec usa la fórmula métrica de la Specification; difiere cerca de 5 % de la fórmula en ksi de los ejemplos.
 - I8.2d se comprueba con los datos declarados; el programa no los contrasta con `count` ni con la luz. Tampoco calcula conectores para
   cargas concentradas (I8.2c), la soldadura del canal (I8.2b) ni la alternativa de ACI 318, Capítulo 17, para el borde libre (I8.2d(c)).
-- `Mux`, `Muy` y sus signos no definen el sentido del momento en vigas: se declara en `composite.beam.moment`.
+- El sentido del momento en vigas sale del signo de `Mx_3` con la losa en la cara +2; una losa en la cara −2 no se puede
+  declarar.

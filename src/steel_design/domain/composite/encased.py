@@ -58,7 +58,7 @@ def encased_flexure(case, section, axis):
     e = case.composite.encased
     geometry = encased_geometry(case, section)
     requirements = encased_requirements(case, section, geometry)
-    Zs = section.zx if axis == "x" else section.zy
+    Zs = section.zx if axis == "x_3" else section.zy
     if e.flexure_method == "steel":
         mn = Fy * Zs
         mode = {"provision": "I3.3a(2)", "equation": "Mn = Fy·Z (acero solo)", "Mn_kNm": mn / 1e6}
@@ -67,10 +67,11 @@ def encased_flexure(case, section, axis):
         if not e.anchors_provided:
             incomplete("I3.3a(3) exige conectores: declare composite.encased.anchors_provided = true o use "
                         "flexure_method = steel.", section, ["composite.encased.anchors_provided"])
-        h, b = (e.H, e.B) if axis == "x" else (e.B, e.H)
-        bars = [(bar.area, bar.y if axis == "x" else bar.x) for bar in e.bars]
-        out = eq.encased_plastic_moment(axis=axis, Fy=Fy, Fysr=e.Fysr, fc=case.composite.concrete.fc, b=b, h=h, d=section.d,
-                                        bf=section.bf, tf=section.tf, tw=section.tw, As=section.area, Zs=Zs, bars=bars)
+        h, b = (e.H, e.B) if axis == "x_3" else (e.B, e.H)
+        bars = [(bar.area, bar.y if axis == "x_3" else bar.x) for bar in e.bars]
+        out = eq.encased_plastic_moment(axis="x" if axis == "x_3" else "y", Fy=Fy, Fysr=e.Fysr, fc=case.composite.concrete.fc,
+                                        b=b, h=h, d=section.d, bf=section.bf, tf=section.tf, tw=section.tw, As=section.area, Zs=Zs,
+                                        bars=bars)                              # codes/ keeps the AISC axis names
         pno = eq.pno_encased(Fy=Fy, As=section.area, Fysr=e.Fysr, Asr=geometry["Asr"], fc=case.composite.concrete.fc,
                              Ac=geometry["Ac"])
         control, control_notes = tension_control(case, out["hn_mm"], h, bars, e.Fysr, pno, requirements, "I3.3a(e)")

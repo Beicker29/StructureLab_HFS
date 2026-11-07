@@ -1,8 +1,8 @@
 """Chapter G for one member and one shear direction. LRFD.
 
-Axis convention: "x" is the shear that accompanies bending about x (parallel to y, resisted by the
-web of I-shapes and channels, the H walls of rectangular HSS and the legs parallel to y of angles);
-"y" accompanies bending about y. Families: rolled and welded built-up I-shapes and channels (G2.1, G6), single and
+Axes of ETABS (docs/axes.md): "y_2" is the shear along y, axis 2 (Vy_2, with Mx_3; resisted by the web of I-shapes and
+channels, the H walls of rectangular HSS and the legs parallel to axis 2 of angles); "x_3" is the shear along x, axis 3
+(Vx_3, with My_2). Families: rolled and welded built-up I-shapes and channels (G2.1, G6), single and
 double angles (G3), rectangular HSS and solid bars (G4), round HSS (G5). Webs without transverse
 stiffeners. Formulas live in codes/aisc_360_22/shear.py. Missing data or decisions raise structured errors.
 """
@@ -57,9 +57,9 @@ def _i_web(section, E, Fy):
 
 def _built_up_flanges(section, E, Fy):
     """G6 for a built-up I: each flange with its own bf/2tf and Cv2."""
-    _require(section, "bf", "tf", "bf_bottom", "tf_bottom")
+    _require(section, "bf", "tf", "bf_minus2", "tf_minus2")
     rows, out = [], {"Vn": 0.0, "equation": "G6-1 (2 alas)", "flanges": 2}
-    for name, bf, tf in (("top_flange", section.bf, section.tf), ("bottom_flange", section.bf_bottom, section.tf_bottom)):
+    for name, bf, tf in (("flange_plus2", section.bf, section.tf), ("flange_minus2", section.bf_minus2, section.tf_minus2)):
         cv = eq.cv2(h_tw=bf / (2 * tf), kv=eq.KV_LEG, E=E, Fy=Fy)
         rows.append(_element(name, bf / (2 * tf), cv, eq.KV_LEG))
         one = eq.flange_strength(Fy=Fy, bf=bf, tf=tf, Cv=cv["Cv"])["Vn"]
@@ -84,8 +84,8 @@ def _i_flanges(section, E, Fy):
 
 def _rect_hss(section, E, Fy, axis):
     """G4: Aw = 2ht, h = flat width of the walls parallel to the shear (B4.1b(d))."""
-    _require(section, "tdes", "h" if axis == "x" else "b")
-    h, t = (section.h if axis == "x" else section.b), section.tdes
+    _require(section, "tdes", "h" if axis == "y_2" else "b")
+    h, t = (section.h if axis == "y_2" else section.b), section.tdes
     cv = eq.cv2(h_tw=h / t, kv=eq.KV_HSS, E=E, Fy=Fy)
     out = eq.web_strength(Fy=Fy, Aw=2 * h * t, Cv=cv["Cv"], equation="G4-1")
     return "G4", eq.PHI_V, [_element("walls", h / t, cv, eq.KV_HSS)], {
@@ -112,9 +112,9 @@ def _legs(section, E, Fy, b, count, name):
 def _single_angle(section, E, Fy, axis):
     _require(section, "d", "b", "t")
     long_leg, short_leg = max(section.d, section.b), min(section.d, section.b)
-    # Catalog orientation: the long leg is parallel to y and resists the shear that accompanies Mux.
-    return _legs(section, E, Fy, long_leg if axis == "x" else short_leg, 1,
-                 "long_leg" if axis == "x" else "short_leg")
+    # Catalog orientation: the long leg is parallel to y (axis 2) and resists Vy_2.
+    return _legs(section, E, Fy, long_leg if axis == "y_2" else short_leg, 1,
+                 "long_leg" if axis == "y_2" else "short_leg")
 
 
 def _double_angle(section, E, Fy, axis):
@@ -125,7 +125,7 @@ def _double_angle(section, E, Fy, axis):
         _blocked("Ángulo doble desigual sin LLBB/SLBB: no se puede identificar el ala vertical.", section)
     web = short_leg if configuration == "SLBB" else long_leg          # legs in the plane of symmetry (y)
     flange = long_leg if web == short_leg else short_leg
-    return _legs(section, E, Fy, web if axis == "x" else flange, 2, "web_legs" if axis == "x" else "flange_legs")
+    return _legs(section, E, Fy, web if axis == "y_2" else flange, 2, "web_legs" if axis == "y_2" else "flange_legs")
 
 
 def _solid(section, E, Fy, axis):
@@ -136,7 +136,7 @@ def _solid(section, E, Fy, axis):
         out = eq.web_strength(Fy=Fy, Aw=aw, Cv=1.0, equation="G4-1")
         return "G4", eq.PHI_V, [], {**out, "Aw_mm2": aw, "Cv2": 1.0}
     _require(section, "h", "b")
-    d, t = (section.h, section.b) if axis == "x" else (section.b, section.h)
+    d, t = (section.h, section.b) if axis == "y_2" else (section.b, section.h)
     cv = eq.cv2(h_tw=d / t, kv=eq.KV_HSS, E=E, Fy=Fy)
     out = eq.web_strength(Fy=Fy, Aw=d * t, Cv=cv["Cv"], equation="G4-1")
     return "G4", eq.PHI_V, [_element("bar", d / t, cv, eq.KV_HSS)], {
@@ -151,19 +151,19 @@ def _yielding_at_temperature(section, rows, out, ky):
             "alternativo.",
             section,
         )
-    scaled = ("Vn", "Vn_per_flange_N", "Vn_top_flange_N", "Vn_bottom_flange_N", "Fcr")
+    scaled = ("Vn", "Vn_per_flange_N", "Vn_flange_plus2_N", "Vn_flange_minus2_N", "Fcr")
     return {**out, **{key: ky * out[key] for key in scaled if key in out}}
 
 
 def shear_strength(case: SteelCase, section: Section, axis: str) -> dict:
-    """Nominal and design shear strength in one direction ("x": accompanies Mux; "y": accompanies Muy)."""
+    """Nominal and design shear strength along one axis: "y_2" (Vy_2, with Mx_3) or "x_3" (Vx_3, with My_2)."""
     family = section.type.upper()
     E, Fy = case.material.E, case.material.Fy
     if not is_standard_modulus(E):
         raise IncompleteSectionDataError("El Capítulo G usa E = 200000 MPa.", code="SHEAR_DATA_INCOMPLETE",
                                          details={"section": section.name, "fields": ["material.E"]})
     if family in {"W", "CHANNEL", "I_BUILT_UP"}:
-        provision, phi, rows, out = _i_web(section, E, Fy) if axis == "x" else _i_flanges(section, E, Fy)
+        provision, phi, rows, out = _i_web(section, E, Fy) if axis == "y_2" else _i_flanges(section, E, Fy)
     elif family == "RECTANGULAR_HSS":
         provision, phi, rows, out = _rect_hss(section, E, Fy, axis)
     elif family == "CIRCULAR_HSS":

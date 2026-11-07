@@ -52,7 +52,7 @@ def _common_materials(case):
 
 def _tensile_strength_row(case):
     flexure = case.flexure
-    if case.Pu < 0:
+    if case.P > 0:
         return _limit("Resistencia a tracción indicada (Fu)", case.material.Fu, "dato obligatorio", "D2(b)", case.material.Fu is not None)
     if flexure and flexure.tension_flange_holes:
         return _limit("Resistencia a tracción indicada (Fu)", case.material.Fu, "dato obligatorio", "F13.1", case.material.Fu is not None)
@@ -135,9 +135,9 @@ def _filled_placement(case, section, geometry):
                    binding=False, qualifier=qualifier)]
     description, provision = "Deformación de la pared por el concreto fresco (δmax)", "Guía 6, 4.3; Commentary C-I2-2"
     if case.lengths is None:
-        return rows + [_absent(description, provision, SIN_DATO, "Indique lengths: L = min(Lx, Ly).")]
-    L = min(case.lengths.Lx, case.lengths.Ly)
-    return rows + [_limit(description, wet["delta_max"], f"≤ L/2000 = {L / 2000:.2f} mm (L = min(Lx, Ly) = {L:g} mm)", provision,
+        return rows + [_absent(description, provision, SIN_DATO, "Indique lengths: L = min(Lx_3, Ly_2).")]
+    L = min(case.lengths.Lx_3, case.lengths.Ly_2)
+    return rows + [_limit(description, wet["delta_max"], f"≤ L/2000 = {L / 2000:.2f} mm (L = min(Lx_3, Ly_2) = {L:g} mm)", provision,
                           wet["delta_max"] <= L / 2000, binding=False, qualifier=qualifier)]
 
 
@@ -152,14 +152,14 @@ def _wall_placement(case):
 
 def _composite_geometry(case, section):
     kind = case.composite.kind
-    moments = bool(case.Mux or case.Muy)
-    demand = case.Pu > 0 or moments
+    moments = bool(case.Mx_3 or case.My_2)
+    demand = case.P < 0 or moments
     aci = _absent("Detallado del concreto y del refuerzo según ACI 318", "I1.1", FALTA, "El programa no revisa ACI 318.")
     only_shear = "Requisito de miembros con compresión o flexión; la combinación no las tiene."
     if kind == "filled":
         geometry = filled_geometry(case, section)
         groups = []
-        if case.Pu > 0:
+        if case.P < 0:
             groups.append(filled_requirements(case, section, geometry, flexure=False))
         if moments:
             groups.append(filled_requirements(case, section, geometry, flexure=True))
@@ -176,13 +176,13 @@ def _composite_geometry(case, section):
         return rows + [aci]
     if kind == "wall":
         geometry = wall_geometry(case)
-        return _from_section(wall_requirements(case, section, geometry, compression=case.Pu > 0)) + _wall_placement(case) + [aci]
+        return _from_section(wall_requirements(case, section, geometry, compression=case.P < 0)) + _wall_placement(case) + [aci]
     if kind == "c_wall":
         return _from_section(_c_wall_requirements(case, _c_wall_data(case)[2])) + [aci]
     if kind == "beam":
         beam = case.composite.beam
-        rows = _from_section(beam_requirements(beam, section, case.composite.concrete))
-        missing_fields = missing_anchor_detailing(beam) if beam.moment == "positive" else []
+        rows = _from_section(beam_requirements(beam, section, case.composite.concrete, case.Mx_3 >= 0))
+        missing_fields = missing_anchor_detailing(beam) if case.Mx_3 >= 0 else []
         if missing_fields:
             rows.append(_absent("Detallado de los conectores", "I8.2d", SIN_DATO, f"Indique {', '.join(missing_fields)}."))
         return rows + [aci]
@@ -205,7 +205,7 @@ def _tau_b_row(case):
         return _limit(description, 1.0, "= 1", "C2.3(c)", True, binding=False, qualifier="sin efecto en el estado")
     if kind in {"beam", "coupling_beam"}:
         return _absent(description, "I1.5", NO_APLICA, "Sin rigideces de método directo para este miembro.")
-    if kind in {"filled", "encased"} and case.Pu >= 0:
+    if kind in {"filled", "encased"} and case.P <= 0:
         value, provision = 0.8, "I1.5(d)"
     elif kind in {"wall", "c_wall"}:
         value, provision = 1.0, "I1.5(f)"
@@ -231,18 +231,15 @@ def _proportioning_limits(case, section):
     slender = 5.70 * math.sqrt(E / Fy)                           # Table B4.1b cases 15 and 16
     if not built_up and not (section.h_tw_ratio and section.h_tw_ratio > slender):
         return []                                                # rolled shapes: only a slender web brings F13.2
-    if not case.Mux:
-        return [_absent("Proporciones de la sección I (F13.2)", "F13.2", NO_APLICA, "Sin flexión respecto de x.")]
+    if not case.Mx_3:
+        return [_absent("Proporciones de la sección I (F13.2)", "F13.2", NO_APLICA, "Sin flexión respecto de x (eje 3).")]
     rows = []
     if singly:
-        ratios = [p["Iyc"] / p["Iy"] for p in (i_major_properties(section, "top"), i_major_properties(section, "bottom"))]
-        rows.append(_limit("Inercia del ala comprimida respecto de y (Iyc/Iy), con cualquiera de las dos alas",
-                           f"{ratios[0]:.3f} (superior), {ratios[1]:.3f} (inferior)", "0.1 ≤ Iyc/Iy ≤ 0.9", "F13.2 (F13-2)",
+        ratios = [p["Iyc"] / p["Iy"] for p in (i_major_properties(section, "plus2"), i_major_properties(section, "minus2"))]
+        rows.append(_limit("Inercia del ala comprimida respecto de y (eje 2) (Iyc/Iy), con cualquiera de las dos alas",
+                           f"{ratios[0]:.3f} (ala +2), {ratios[1]:.3f} (ala −2)", "0.1 ≤ Iyc/Iy ≤ 0.9", "F13.2 (F13-2)",
                            all(0.1 <= r <= 0.9 for r in ratios)))
-    compression = case.flexure.compression_flange if case.flexure else None
-    if singly and compression is None:
-        return rows + [_absent("Proporciones del alma esbelta (h/tw, aw)", "F13.2", SIN_DATO,
-                               "Indique flexure.compression_flange para obtener hc y aw.")]
+    compression = "plus2" if case.Mx_3 > 0 else "minus2"         # Mx_3 > 0 compresses the +2 face
     if not built_up and missing_properties(section, ("bf", "tf", "tw")):
         return rows + [_absent("Proporciones del alma esbelta (h/tw, aw)", "F13.2", SIN_DATO, "El catálogo no da bf, tf o tw.")]
     p = i_major_properties(section, compression)
@@ -263,7 +260,7 @@ def _steel_geometry(case, section, checks):
     axial = next((c for c in checks if c.id == "axial"), None)
     result = (axial.result if axial else None) or {}
     modes = result.get("modes") or {}
-    if case.Pu < 0 and case.tension:
+    if case.P > 0 and case.tension:
         rows.append(
             _limit(
                 "Área neta no mayor que el área bruta (An)",
@@ -321,7 +318,7 @@ def _steel_geometry(case, section, checks):
             )
     if family == "CIRCULAR_HSS" and section.d_t_ratio:
         maximum = 0.45 * case.material.E / case.material.Fy
-        if case.Mux or case.Muy:
+        if case.Mx_3 or case.My_2:
             rows.append(
                 _limit(
                     "Relación diámetro-espesor del tubo a flexión (D/t)",

@@ -85,8 +85,8 @@ def composite_compression(case: SteelCase, section: Section, bare_steel=None) ->
         geometry, pno, coefficient, Isrx, Isry = basis["geometry"], basis["pno"], basis["coefficient"], basis["Isrx"], basis["Isry"]
         classification, requirements, c_name, point_c = basis["classification"], basis["requirements"], basis["c_name"], basis["point_c"]
         modes = {}
-        for axis, Is, Isr, Ic, K, L in (("x", section.ix, Isrx, geometry["Icx"], f.Kx, ln.Lx),
-                                        ("y", section.iy, Isry, geometry["Icy"], f.Ky, ln.Ly)):
+        for axis, Is, Isr, Ic, K, L in (("x_3", section.ix, Isrx, geometry["Icx"], f.Kx_3, ln.Lx_3),
+                                        ("y_2", section.iy, Isry, geometry["Icy"], f.Ky_2, ln.Ly_2)):
             ei = (eq.wall_stiffness(Is=Is, Ec=Ec, Ic=Ic) if kind == "wall"
                   else eq.effective_stiffness(Is=Is, Isr=Isr, C=coefficient, Ec=Ec, Ic=Ic))
             pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
@@ -157,14 +157,14 @@ def composite_flexure(case: SteelCase, section: Section, axis: str, flexure_stre
     """I3: flexure about x or y. flexure_strength is the Chapter F calculation of the steel section alone."""
     check_family(case, section)
     kind = case.composite.kind
-    if axis not in {"x", "y"}:
-        blocked("Mw y Mz no se aplican a miembros compuestos.", section, axis=axis)
+    if axis not in {"x_3", "y_2"}:
+        blocked("Los ejes principales w y z no se aplican a miembros compuestos.", section, axis=axis)
     if kind == "wall":
-        if axis != "x":
-            blocked("Muro: solo se calcula la flexión en su plano (Mux); la flexión fuera del plano no está cubierta.", section)
+        if axis != "x_3":
+            blocked("Muro: solo se calcula la flexión en su plano (Mx_3); la flexión fuera del plano no está cubierta.", section)
         return wall_flexure(case, section)
     if kind == "beam":
-        if axis != "x":
+        if axis != "x_3":
             blocked("La viga compuesta se calcula en su eje mayor (I3.2).", section, axis=axis)
         result = beam_flexure(case, section)
         return flexure_strength() if result is None else result
@@ -176,8 +176,8 @@ def composite_shear(case: SteelCase, section: Section, axis: str, shear_strength
     """I4.1(a) and I4.3: steel section alone (Chapter G). I4.2: filled sections with Kc = 1 (DI-4)."""
     check_family(case, section)
     if case.composite.kind == "wall":
-        if axis != "x":
-            blocked("Muro: I4.4 cubre el cortante en su plano (Vux); fuera del plano no está cubierto.", section)
+        if axis != "y_2":
+            blocked("Muro: I4.4 cubre el cortante en su plano (Vy_2); fuera del plano no está cubierto.", section)
         geometry = wall_geometry(case)
         m = composite_materials(case, section)
         out = eq.wall_shear(Asw=geometry["Asw"], Fy=m["Fy"], Ec=m["Ec"], Ac=geometry["Ac"], Es=m["Es"], Gs=m["Gs"])
@@ -194,9 +194,9 @@ def composite_shear(case: SteelCase, section: Section, axis: str, shear_strength
     if geometry["shape"] == "round":
         Av = 2 * section.area / math.pi
     elif case.composite.box:
-        Av = 2 * (section.h_out if axis == "x" else section.b_out) * geometry["t"]   # Design Guide 6, Example 2.5
+        Av = 2 * (section.h_out if axis == "y_2" else section.b_out) * geometry["t"]   # Design Guide 6, Example 2.5
     else:
-        Av = 2 * (section.h if axis == "x" else section.b) * geometry["t"]
+        Av = 2 * (section.h if axis == "y_2" else section.b) * geometry["t"]
     vn = eq.shear_filled(Av=Av, Fy=m["Fy"], Kc=1.0, Ac=geometry["Ac"], fc=m["fc"])
     mode = {"limit_state": "shear", "provision": "I4.2", "applies": True, "equation": "I4-1", "Av_mm2": Av,
             "Ac_mm2": geometry["Ac"], "Kc": 1.0, "Vn_kN": vn / 1000.0, "available_kN": eq.PHI_V_FILLED * vn / 1000.0}
@@ -207,10 +207,13 @@ def composite_shear(case: SteelCase, section: Section, axis: str, shear_strength
 
 
 def second_order_demands(case: SteelCase, section: Section) -> tuple[SteelCase, dict]:
-    """Appendix 8.1: Pu and Mux or Muy from B1 and B2, with EI* = 0.8*tau_b*(EI)eff (I1.5(d), (f))."""
+    """Appendix 8.1: P and Mx_3 or My_2 from B1 and B2, with EI* = 0.8*tau_b*(EI)eff (I1.5(d), (f)).
+
+    Pnt and Plt carry the ETABS sign (tension positive); B1 takes the compression of the first-order analysis (A-8-3).
+    """
     basis = case.composite.second_order
-    first_order = (basis.Pnt + basis.Plt) * 1000.0
-    probe = case.model_copy(update={"Pu": max(first_order / 1000.0, 1.0)})
+    first_order = -(basis.Pnt + basis.Plt) * 1000.0
+    probe = case.model_copy(update={"P": -max(first_order / 1000.0, 1.0)})
     mode = composite_compression(probe, section)["modes"][f"FB-{basis.axis}"]
     tau_b = 1.0 if case.composite.kind == "wall" else 0.8
     ei_star = 0.8 * tau_b * mode["EI_eff"]
@@ -220,6 +223,6 @@ def second_order_demands(case: SteelCase, section: Section) -> tuple[SteelCase, 
     pe_story = a8.story_buckling_load(Pstory=basis.Pstory, Pmf=basis.Pmf, H=basis.H, L=basis.L, drift=basis.drift)
     b2 = a8.b2_factor(Pstory=basis.Pstory, Pe_story=pe_story)
     out = a8.required_strengths(B1=b1, B2=b2, Mnt=basis.Mnt, Mlt=basis.Mlt, Pnt=basis.Pnt, Plt=basis.Plt)
-    update = {"Pu": out["Pr"], "Mux" if basis.axis == "x" else "Muy": out["Mr"]}
-    info = {"Cm": cm, "Pe1_kN": pe1 / 1000.0, "B1": b1, "Pe_story_kN": pe_story, "B2": b2, "Pr_kN": out["Pr"], "Mr_kNm": out["Mr"]}
+    update = {"P": out["Pr"], "Mx_3" if basis.axis == "x_3" else "My_2": out["Mr"]}
+    info = {"Cm": cm, "Pe1_kN": pe1 / 1000.0, "B1": b1, "Pe_story_kN": pe_story, "B2": b2, "P_kN": out["Pr"], "Mr_kNm": out["Mr"]}
     return case.model_copy(update=update), info

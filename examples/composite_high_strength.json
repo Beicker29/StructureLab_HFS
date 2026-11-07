@@ -3,21 +3,53 @@
   "section_name": "PTE200X200X7MM",
   "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
-    "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
-    "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}
+    "ultimate": {
+      "Lx_3": 4000,
+      "Ly_2": 4000,
+      "Lz_1": 4000
+    },
+    "construction": {
+      "Lx_3": 4000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    }
   },
   "serviceability": {
     "actual_span": 4000,
     "effective_span": 4000,
-    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 8.0,
+      "dead_short": 10.0,
+      "total_long": 13.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "composite": {
-    "kind": "filled", "pour_height": 4000, "interaction": null, "second_order": null,
-    "concrete": {"fc": 83, "wc": 2320, "lightweight": false}
+    "kind": "filled",
+    "pour_height": 4000,
+    "interaction": null,
+    "second_order": null,
+    "concrete": {
+      "fc": 83,
+      "wc": 2320,
+      "lightweight": false
+    }
   },
   "cases": [
-    {"name": "Appendix 2: compression and flexure", "Pu": 1400, "Mux": 50},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 33, "Vux": 44}
+    {
+      "name": "Appendix 2: compression and flexure",
+      "P": -1400,
+      "Mx_3": 50
+    },
+    {
+      "name": "Concrete pour",
+      "condition": "construction",
+      "Mx_3": 33,
+      "Vy_2": 44
+    }
   ]
 }

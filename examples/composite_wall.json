@@ -2,37 +2,132 @@
   "tau_b": 1.0,
   "section_name": "MURO-3350X610",
   "material": "ASTM A572 Gr 50",
-  "lengths": {"ultimate": {"Lx": 5180, "Ly": 5180, "Lz": 5180}},
+  "lengths": {
+    "ultimate": {
+      "Lx_3": 5180,
+      "Ly_2": 5180,
+      "Lz_1": 5180
+    }
+  },
   "composite": {
-    "kind": "wall", "pour_height": 4267, "second_order": null,
-    "concrete": {"fc": 40, "wc": 2320, "lightweight": false},
-    "wall": {"length": 3350, "tsc": 610, "t": 14.3, "tf": 14.3, "b": 305, "st": 305, "dtie": 25}
+    "kind": "wall",
+    "pour_height": 4267,
+    "second_order": null,
+    "concrete": {
+      "fc": 40,
+      "wc": 2320,
+      "lightweight": false
+    },
+    "wall": {
+      "length": 3350,
+      "tsc": 610,
+      "t": 14.3,
+      "tf": 14.3,
+      "b": 305,
+      "st": 305,
+      "dtie": 25
+    }
   },
   "cases": [
-    {"name": "Compression, flexure and shear", "Pu": 30000, "Mux": 40000, "Vux": 8000},
+    {
+      "name": "Compression, flexure and shear",
+      "P": -30000,
+      "Mx_3": 40000,
+      "Vy_2": 8000
+    },
     {
       "name": "Fire, Appendix 4, 4.2.4d(d)",
       "condition": "fire",
-      "Pu": 16000,
+      "P": -16000,
       "fire": {
         "steel_temperature": 1004,
         "concrete_layers": [
-          {"thickness": 22.4, "T": 788}, {"thickness": 22.4, "T": 497}, {"thickness": 22.4, "T": 368}, {"thickness": 22.4, "T": 278},
-          {"thickness": 22.4, "T": 208}, {"thickness": 22.4, "T": 152}, {"thickness": 22.4, "T": 109}, {"thickness": 22.4, "T": 78},
-          {"thickness": 22.4, "T": 57}, {"thickness": 22.4, "T": 42}, {"thickness": 22.4, "T": 33}, {"thickness": 22.4, "T": 28},
-          {"thickness": 22.3, "T": 26}
+          {
+            "thickness": 22.4,
+            "T": 788
+          },
+          {
+            "thickness": 22.4,
+            "T": 497
+          },
+          {
+            "thickness": 22.4,
+            "T": 368
+          },
+          {
+            "thickness": 22.4,
+            "T": 278
+          },
+          {
+            "thickness": 22.4,
+            "T": 208
+          },
+          {
+            "thickness": 22.4,
+            "T": 152
+          },
+          {
+            "thickness": 22.4,
+            "T": 109
+          },
+          {
+            "thickness": 22.4,
+            "T": 78
+          },
+          {
+            "thickness": 22.4,
+            "T": 57
+          },
+          {
+            "thickness": 22.4,
+            "T": 42
+          },
+          {
+            "thickness": 22.4,
+            "T": 33
+          },
+          {
+            "thickness": 22.4,
+            "T": 28
+          },
+          {
+            "thickness": 22.3,
+            "T": 26
+          }
         ]
       },
       "composite": {
         "fire": {
           "required_rating_hours": 3,
           "vent": {
-            "s1": 3048, "s2": 3048, "diameter": 25.4, "dry_thickness": 38.1, "heating_time": 1790,
-            "water_content": 0.15, "water_density": 1000
+            "s1": 3048,
+            "s2": 3048,
+            "diameter": 25.4,
+            "dry_thickness": 38.1,
+            "heating_time": 1790,
+            "water_content": 0.15,
+            "water_density": 1000
           }
         }
       }
     },
-    {"name": "First-order loads, Appendix 8.1", "composite": {"second_order": {"axis": "x", "Mnt": 20000, "Mlt": 10000, "Pnt": 20000, "Plt": 5000, "M1_M2": -0.5, "Pstory": 200000, "Pmf": 100000, "H": 10000, "L": 5180, "drift": 10}}}
+    {
+      "name": "First-order loads, Appendix 8.1",
+      "composite": {
+        "second_order": {
+          "axis": "x_3",
+          "Mnt": 20000,
+          "Mlt": 10000,
+          "Pnt": -20000,
+          "Plt": -5000,
+          "M1_M2": -0.5,
+          "Pstory": 200000,
+          "Pmf": 100000,
+          "H": 10000,
+          "L": 5180,
+          "drift": 10
+        }
+      }
+    }
   ]
 }

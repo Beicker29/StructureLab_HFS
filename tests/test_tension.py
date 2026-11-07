@@ -15,9 +15,9 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_d/reference.json").read_t
 REL = 1e-12
 
 
-def tension_case(name, *, Pu=-100, Fy=345, Fu=450, An=None, U=1.0, **extra):
+def tension_case(name, *, P=100, Fy=345, Fu=450, An=None, U=1.0, **extra):
     tension = {"An": An, "U": U} if An is not None else None
-    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "Fu": Fu}, Pu=Pu,
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "Fu": Fu}, P=P,
                      tension=tension, **extra)
 
 
@@ -65,9 +65,9 @@ def test_net_area_above_gross_area_is_blocked(engine):
 
 def test_pass_fail_boundary(engine):
     capacity = engine.run(tension_case("L4X4X1/4", An=1100, U=0.6)).capacity_kN
-    assert engine.run(tension_case("L4X4X1/4", An=1100, U=0.6, Pu=-capacity)).status.value == "PASS"
+    assert engine.run(tension_case("L4X4X1/4", An=1100, U=0.6, P=capacity)).status.value == "PASS"
     beyond = -math.nextafter(capacity, math.inf)
-    assert engine.run(tension_case("L4X4X1/4", An=1100, U=0.6, Pu=beyond)).status.value == "FAIL"
+    assert engine.run(tension_case("L4X4X1/4", An=1100, U=0.6, P=-(beyond))).status.value == "FAIL"
 
 
 def test_tension_obligations_are_yielding_and_rupture(engine):
@@ -88,7 +88,7 @@ def test_tension_does_not_require_lengths_nor_e(engine):
 
 
 def test_tension_report(engine):
-    case = tension_case("W14X90", An=15000, U=0.9, Pu=-2000)
+    case = tension_case("W14X90", An=15000, U=0.9, P=2000)
     text = calculation_report(case, engine.run(case))
     assert "tracción W14X90" in text and "Ae = An·U" in text and "#### Estados límite (D2)" in text
     assert "Obligaciones del Capítulo D" in text and "min(φt·Pn) = 4556.250 kN (TR)" in text

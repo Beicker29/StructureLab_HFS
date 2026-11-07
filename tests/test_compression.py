@@ -18,14 +18,17 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_e/reference.json").read_t
 REL = 1e-9  # float vs 50-digit Decimal of the same closed-form expressions
 
 
-def make_case(name, Fy=345, Lx=3000, Ly=None, Lz=None, xa=0, ya=0, e5=None, e6=None, E=200000, Pu=100, Mw=0, girder=None):
+def make_case(name, Fy=345, Lx_3=3000, Ly_2=None, Lz_1=None, xa_3=0, ya_2=0, e5=None, e6=None, E=200000, P=-100, Mx_3=0,
+              girder=None):
+    """P < 0 is compression; a single angle with Mx_3 (outside E5) is evaluated on its principal axes with H2."""
     custom = None
     if girder:
-        d, tw, top, bottom = girder
-        custom = {"type": "I_BUILT_UP", "d": d, "tw": tw, "top_flange": {"b": top[0], "t": top[1]},
-                  "bottom_flange": {"b": bottom[0], "t": bottom[1]}}
-    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "E": E}, Pu=Pu, Mw=Mw,
-                     lengths={"Lx": Lx, "Ly": Ly or Lx, "Lz": Lz or Lx}, factors={"xa": xa, "ya": ya},
+        d, tw, plus2, minus2 = girder
+        custom = {"type": "I_BUILT_UP", "d": d, "tw": tw, "flange_plus2": {"b": plus2[0], "t": plus2[1]},
+                  "flange_minus2": {"b": minus2[0], "t": minus2[1]}}
+    heel = {"axis_2": "-", "axis_3": "-"} if Mx_3 else None
+    return SteelCase(tau_b=1.0, section_name=name, material={"Fy": Fy, "E": E}, P=P, Mx_3=Mx_3, heel=heel,
+                     lengths={"Lx_3": Lx_3, "Ly_2": Ly_2 or Lx_3, "Lz_1": Lz_1 or Lx_3}, factors={"xa_3": xa_3, "ya_2": ya_2},
                      single_angle_e5=e5, double_angle_e6=e6, custom_section=custom)
 
 
@@ -42,11 +45,11 @@ def e5_basis(configuration, leg, L, **overrides):
 
 def reference_case(ref):
     e5, e6 = ref["e5"], ref["e6"]
-    return make_case(ref["section"], Fy=float(ref["Fy"]), Lx=float(ref["Lx"]), Ly=float(ref["Ly"]),
-                     Lz=float(ref["Lz"]), ya=float(ref["ya"]),
+    return make_case(ref["section"], Fy=float(ref["Fy"]), Lx_3=float(ref["Lx_3"]), Ly_2=float(ref["Ly_2"]),
+                     Lz_1=float(ref["Lz_1"]), ya_2=float(ref["ya_2"]),
                      e5=e5_basis(e5[0], e5[1], float(e5[2])) if e5 else None,
                      e6=e6_basis(e6[0], float(e6[1])) if e6 else None,
-                     Mw=1 if ref["family"] == "SINGLE_ANGLE" and not e5 else 0,     # outside E5 only with H2 (DH-8)
+                     Mx_3=1 if ref["family"] == "SINGLE_ANGLE" and not e5 else 0,   # outside E5 only with H2 (DH-8)
                      girder=ref.get("girder"))
 
 
@@ -71,7 +74,7 @@ def test_reference_bank_covers_every_supported_catalog_family():
     assert {c["family"] for c in REFERENCE.values()} == {
         "W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE", "I_BUILT_UP"}
     governing = {(c["family"], c["governing_mode"]) for c in REFERENCE.values()}
-    assert {("W", "TB"), ("CHANNEL", "FTB"), ("CHANNEL", "FB-y"), ("SINGLE_ANGLE", "FTB"),
+    assert {("W", "TB"), ("CHANNEL", "FTB"), ("CHANNEL", "FB-y_2"), ("SINGLE_ANGLE", "FTB"),
             ("DOUBLE_ANGLE", "FTB"), ("I_BUILT_UP", "FTB"), ("I_BUILT_UP", "TB")} <= governing
     assert all(any(c["family"] == f and c["slender"] for c in REFERENCE.values())
                for f in ("W", "CHANNEL", "RECTANGULAR_HSS", "CIRCULAR_HSS", "SINGLE_ANGLE", "DOUBLE_ANGLE", "I_BUILT_UP"))
@@ -90,7 +93,7 @@ def test_selection_by_family(sections):
 
 
 def test_slender_section_never_uses_gross_area_when_effective_width_reduces(sections):
-    result = compression_strength(make_case("PTE120X60X2MM", Lx=500), sections["PTE120X60X2MM"])
+    result = compression_strength(make_case("PTE120X60X2MM", Lx_3=500), sections["PTE120X60X2MM"])
     assert all(m["area_mm2"] < sections["PTE120X60X2MM"].area for m in result["modes"].values())
     assert result["governing_equation"] == "E7-1"
 
@@ -104,9 +107,9 @@ def test_classification_reports_every_element(sections):
 # --- Blocks: missing data or decisions never produce a strength -----------------------
 
 @pytest.mark.parametrize("name, kwargs, error", [
-    ("C15X50", {"ya": 50}, RuleNotImplementedError),                     # E4(f)
-    ("PTE100X100X4MM", {"xa": 10}, RuleNotImplementedError),             # E4(f)
-    ("W14X90", {"xa": 10, "ya": 10}, RuleNotImplementedError),           # E4(f), both offsets
+    ("C15X50", {"ya_2": 50}, RuleNotImplementedError),                     # E4(f)
+    ("PTE100X100X4MM", {"xa_3": 10}, RuleNotImplementedError),             # E4(f)
+    ("W14X90", {"xa_3": 10, "ya_2": 10}, RuleNotImplementedError),           # E4(f), both offsets
     ("2L4X4X1/4", {}, RuleNotImplementedError),                          # E6 data required
     ("L4X4X1/4", {}, RuleNotImplementedError),                           # no E5 basis -> Chapter H
     ("W14X90", {"E": 210000}, IncompleteSectionDataError),               # E defined as 200000 MPa
@@ -126,21 +129,21 @@ def test_single_angle_outside_e5_is_blocked(sections, overrides):
                              sections["L4X4X1/4"])
 
 
-def test_e5_and_principal_moments_exclude_each_other(sections):
-    case = make_case("L4X4X1/4", Lx=2000, e5=e5_basis("a", "long", 2000), Mw=1)
+def test_e5_and_moments_exclude_each_other(sections):
+    case = make_case("L4X4X1/4", Lx_3=2000, e5=e5_basis("a", "long", 2000), Mx_3=1)
     with pytest.raises(RuleNotImplementedError, match="DH-8"):
         compression_strength(case, sections["L4X4X1/4"])
 
 
 def test_single_angle_outside_e5_needs_coincident_geometric_lengths(sections):
     with pytest.raises(RuleNotImplementedError, match="ejes principales"):
-        compression_strength(make_case("L8X4X1/2", Lx=2000, Ly=1500, Mw=1), sections["L8X4X1/2"])
+        compression_strength(make_case("L8X4X1/2", Lx_3=2000, Ly_2=1500, Mx_3=1), sections["L8X4X1/2"])
 
 
 def test_single_angle_e4_needs_coincident_geometric_lengths(sections):
-    # Principal-axis buckling (E4) is defined only if Lx = Ly and Kx = Ky.
+    # Principal-axis buckling (E4) is defined only if Lx_3 = Ly_2 and Kx_3 = Ky_2.
     with pytest.raises(RuleNotImplementedError, match="ejes principales"):
-        compression_strength(make_case("L4X4X1/4", Fy=450, Lx=2000, Ly=1500, e5=e5_basis("a", "long", 2000)),
+        compression_strength(make_case("L4X4X1/4", Fy=450, Lx_3=2000, Ly_2=1500, e5=e5_basis("a", "long", 2000)),
                              sections["L4X4X1/4"])
 
 
@@ -165,21 +168,21 @@ def test_double_angle_e6_requirements(engine):
     blocked = engine.run(make_case("2L4X4X1/4", e6={**e6_basis("welded", 300),
                                                     "end_connection_welded_or_pretensioned": False}))
     assert blocked.status.value == "INCOMPLETE"                   # E6.1 end connection
-    spaced = engine.run(make_case("2L4X4X1/4", Lx=1000, e6=e6_basis("welded", 900), Pu=1))
+    spaced = engine.run(make_case("2L4X4X1/4", Lx_3=1000, e6=e6_basis("welded", 900), P=-1))
     assert spaced.status.value == "FAIL"                          # E6.2(a): a/ri > 3/4 governing slenderness
     assert spaced.errors[0]["code"] == "REQUIREMENT_NOT_MET"
 
 
 def test_engine_reports_governing_capacity_and_status(engine):
-    result = engine.run(make_case("W14X90", Pu=1000))
+    result = engine.run(make_case("W14X90", P=-1000))
     assert result.capacity_kN == result.compression["available_kN"]
     assert result.ratio == 1000 / result.capacity_kN and result.status.value == "PASS"
     assert all(o.satisfied_by for o in result.obligations)
-    assert engine.run(make_case("W14X90", Pu=10000)).status.value == "FAIL"
+    assert engine.run(make_case("W14X90", P=-10000)).status.value == "FAIL"
 
 
 def test_engine_blocked_compression_is_incomplete(engine):
-    result = engine.run(make_case("2L4X4X1/4", Pu=10))
+    result = engine.run(make_case("2L4X4X1/4", P=-10))
     assert result.status.value == "INCOMPLETE" and result.capacity_kN is None and result.errors
 
 

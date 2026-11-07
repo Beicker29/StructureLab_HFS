@@ -6,7 +6,7 @@ MPa; resultados en kN.
 
 ## Alcance
 
-Se activa con `Pu < 0` (tracción). Aplica a todas las familias del catálogo y a
+Se activa con `P > 0` (tracción, signo de ETABS; [axes.md](axes.md)). Aplica a todas las familias del catálogo y a
 las barras macizas definidas en la entrada.
 
 | Disposición | Tratamiento |
@@ -47,8 +47,8 @@ sin importar el paquete. El software coincide con tolerancia relativa 1e-12.
 - **DD-1** An y U son datos del usuario (indicación del usuario). El programa no
   calcula la disposición de agujeros (B4.3b) ni el caso de la Tabla D3.1; la memoria
   lo declara.
-- **DD-2** La demanda se expresa con `Pu` con signo: Pu > 0 compresión (Capítulo E),
-  Pu < 0 tracción (Capítulo D). Indicación del usuario.
+- **DD-2** La demanda se expresa con `P` con el signo de ETABS: P > 0 tracción (Capítulo D), P < 0 compresión
+  (Capítulo E) (indicación del usuario, 2026-11-06; antes `Pu` con compresión positiva).
 - **DD-3** Para la nota D1 se usa el radio de giro mínimo del catálogo: min(rx, ry)
   y, en ángulos simples, también rz.
 - **DD-4** Solo LRFD (indicación del usuario): φt = 0,90 en fluencia y 0,75 en rotura.

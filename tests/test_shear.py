@@ -15,15 +15,15 @@ REFERENCE = json.loads((ROOT / "tests/fixtures/chapter_g/reference.json").read_t
 
 
 def shear_case(spec, shear=1.0):
-    data = {"material": {"Fy": spec["fy"]}, "Vuy" if spec.get("axis") == "y" else "Vux": shear}
+    data = {"material": {"Fy": spec["fy"]}, "Vx_3" if spec.get("axis") == "x_3" else "Vy_2": shear}
     if spec["kind"] == "bar":
         data.update(section_name="BAR", custom_section={"type": "SOLID_RECTANGULAR", "H": spec["H"], "B": spec["B"]})
     elif spec["kind"] == "round":
         data.update(section_name="ROUND", custom_section={"type": "SOLID_CIRCULAR", "diameter": spec["D_"]})
     elif spec["kind"] == "bui":
         data.update(section_name="PL", custom_section={
-            "type": "I_BUILT_UP", "d": spec["d"], "tw": spec["tw"], "top_flange": {"b": spec["top"][0], "t": spec["top"][1]},
-            "bottom_flange": {"b": spec["bottom"][0], "t": spec["bottom"][1]}})
+            "type": "I_BUILT_UP", "d": spec["d"], "tw": spec["tw"], "flange_plus2": {"b": spec["plus2"][0], "t": spec["plus2"][1]},
+            "flange_minus2": {"b": spec["minus2"][0], "t": spec["minus2"][1]}})
     else:
         data["section_name"] = spec["name"]
     if spec.get("Lv"):
@@ -53,7 +53,7 @@ def test_reference_bank_covers_every_section_and_coefficient():
 ])
 def test_coefficient_branches(engine, name, field, expected):
     fy = 450 if name == "W16X26" else 345
-    check = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": fy}, Vux=1)).checks[0]
+    check = engine.run(SteelCase(tau_b=1.0, section_name=name, material={"Fy": fy}, Vy_2=1)).checks[0]
     assert check.result["modes"]["V"][field] == expected
 
 
@@ -76,15 +76,15 @@ def test_cv2_branches_meet_within_the_rounding_of_the_constants():
     ({"section_name": "IPE 80"}, "CATALOG_DATA_INCONSISTENT"),
 ])
 def test_uncovered_domains_are_incomplete(engine, data, code):
-    result = engine.run(SteelCase(tau_b=1.0, material={"Fy": 345}, Vux=1, **data))
+    result = engine.run(SteelCase(tau_b=1.0, material={"Fy": 345}, Vy_2=1, **data))
     assert result.status.value == "INCOMPLETE" and result.errors[0]["code"] == code
 
 
 # Limits at Fy = 345, kv = 5: 1.10*sqrt(kv*E/Fy) = 59.22, 1.37*sqrt(kv*E/Fy) = 73.76; d/t along the shear.
 @pytest.mark.parametrize("H, B, shear, equation", [
-    (590, 10, "Vux", "G2-9"), (600, 10, "Vux", "G2-10"), (740, 10, "Vux", "G2-11"),
-    (10, 590, "Vuy", "G2-9"), (10, 600, "Vuy", "G2-10"), (10, 740, "Vuy", "G2-11"),
-    (740, 10, "Vuy", "G2-9"), (10, 740, "Vux", "G2-9"),
+    (590, 10, "Vy_2", "G2-9"), (600, 10, "Vy_2", "G2-10"), (740, 10, "Vy_2", "G2-11"),
+    (10, 590, "Vx_3", "G2-9"), (10, 600, "Vx_3", "G2-10"), (10, 740, "Vx_3", "G2-11"),
+    (740, 10, "Vx_3", "G2-9"), (10, 740, "Vy_2", "G2-9"),
 ])
 def test_rectangular_bar_uses_cv2_with_the_ratio_along_the_shear(engine, H, B, shear, equation):
     custom = {"type": "SOLID_RECTANGULAR", "H": H, "B": B}
@@ -94,14 +94,14 @@ def test_rectangular_bar_uses_cv2_with_the_ratio_along_the_shear(engine, H, B, s
 
 
 def test_stocky_bar_uses_its_whole_gross_area(engine):
-    case = SteelCase(tau_b=1.0, section_name="BAR", material={"Fy": 345}, Vux=1,
+    case = SteelCase(tau_b=1.0, section_name="BAR", material={"Fy": 345}, Vy_2=1,
                      custom_section={"type": "SOLID_RECTANGULAR", "H": 100, "B": 20})
     assert engine.run(case).checks[0].result["Vn_kN"] == pytest.approx(414.0)   # 0.6*345*2000/1000, by hand
     assert "G4-1" in calculation_report(case, engine.run(case))
 
 
 def test_round_bar_report_states_the_user_decision(engine):
-    case = SteelCase(tau_b=1.0, section_name="ROUND", material={"Fy": 250}, Vux=1,
+    case = SteelCase(tau_b=1.0, section_name="ROUND", material={"Fy": 250}, Vy_2=1,
                      custom_section={"type": "SOLID_CIRCULAR", "diameter": 50})
     check = engine.run(case).checks[0]
     assert check.result["modes"]["V"]["Cv2"] == 1.0 and check.result["provisions"] == ["G1", "G4"]
@@ -110,13 +110,13 @@ def test_round_bar_report_states_the_user_decision(engine):
 
 
 def test_shear_alone_or_with_flexure_needs_no_interaction(engine):
-    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Mux=200, Vux=300,
-                                  lengths={"Lx": 3000, "Ly": 3000, "Lz": 3000}, flexure={"tension_flange_holes": False}))
-    assert [c.id for c in result.checks] == ["flexure_x", "shear_x"] and result.status.value == "PASS"
+    result = engine.run(SteelCase(tau_b=1.0, section_name="W14X90", material={"Fy": 345}, Mx_3=200, Vy_2=300,
+                                  lengths={"Lx_3": 3000, "Ly_2": 3000, "Lz_1": 3000}, flexure={"tension_flange_holes": False}))
+    assert [c.id for c in result.checks] == ["flexure_x_3", "shear_y_2"] and result.status.value == "PASS"
 
 
 def test_shear_report(engine):
     case = shear_case(REFERENCE["W-G2.1a"]["spec"])
     text = calculation_report(case, engine.run(case))
-    assert "Cortante paralelo a y (con Mux) (Capítulo G)" in text and "G2-2" in text
+    assert "Cortante a lo largo de y, eje 2 (Vy_2) (Capítulo G)" in text and "G2-2" in text
     assert "φv·Vn = 1.00 · Vn" in text

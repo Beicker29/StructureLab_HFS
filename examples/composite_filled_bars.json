@@ -3,32 +3,99 @@
   "section_name": "PTER8\"X5.00MM",
   "material": "ASTM A500 Gr C (SRED)",
   "lengths": {
-    "ultimate": {"Lx": 4000, "Ly": 4000, "Lz": 4000},
-    "construction": {"Lx": 4000, "Ly": 2000, "Lz": 2000}
+    "ultimate": {
+      "Lx_3": 4000,
+      "Ly_2": 4000,
+      "Lz_1": 4000
+    },
+    "construction": {
+      "Lx_3": 4000,
+      "Ly_2": 2000,
+      "Lz_1": 2000
+    }
   },
   "serviceability": {
     "actual_span": 4000,
     "effective_span": 4000,
-    "deflections": {"live_short": 8.0, "dead_short": 10.0, "total_long": 13.3},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 8.0,
+      "dead_short": 10.0,
+      "total_long": 13.3
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "composite": {
-    "kind": "filled", "pour_height": 4000, "interaction": null, "second_order": null,
-    "concrete": {"fc": 35, "wc": 2320, "lightweight": false},
+    "kind": "filled",
+    "pour_height": 4000,
+    "interaction": null,
+    "second_order": null,
+    "concrete": {
+      "fc": 35,
+      "wc": 2320,
+      "lightweight": false
+    },
     "filled": {
       "Fysr": 420,
-      "transverse": {"db": 10, "spacing": 300},
+      "transverse": {
+        "db": 10,
+        "spacing": 300
+      },
       "bars": [
-        {"area": 200, "db": 16, "x": 0, "y": 55},
-        {"area": 200, "db": 16, "x": 0, "y": -55},
-        {"area": 200, "db": 16, "x": 55, "y": 0},
-        {"area": 200, "db": 16, "x": -55, "y": 0}
+        {
+          "area": 200,
+          "db": 16,
+          "x": 0,
+          "y": 55
+        },
+        {
+          "area": 200,
+          "db": 16,
+          "x": 0,
+          "y": -55
+        },
+        {
+          "area": 200,
+          "db": 16,
+          "x": 55,
+          "y": 0
+        },
+        {
+          "area": 200,
+          "db": 16,
+          "x": -55,
+          "y": 0
+        }
       ]
     }
   },
   "cases": [
-    {"name": "Compression, flexure and shear", "Pu": 600, "Mux": 40, "Vux": 100},
-    {"name": "Concrete pour", "condition": "construction", "Mux": 19, "Vux": 29},
-    {"name": "Incendio: acero, concreto y barras", "condition": "fire", "fire": {"steel_temperature": 600, "concrete_temperature": 300, "bar_temperature": 350}, "Pu": 200, "Mux": 12, "Vux": 30}
+    {
+      "name": "Compression, flexure and shear",
+      "P": -600,
+      "Mx_3": 40,
+      "Vy_2": 100
+    },
+    {
+      "name": "Concrete pour",
+      "condition": "construction",
+      "Mx_3": 19,
+      "Vy_2": 29
+    },
+    {
+      "name": "Incendio: acero, concreto y barras",
+      "condition": "fire",
+      "fire": {
+        "steel_temperature": 600,
+        "concrete_temperature": 300,
+        "bar_temperature": 350
+      },
+      "P": -200,
+      "Mx_3": 12,
+      "Vy_2": 30
+    }
   ]
 }

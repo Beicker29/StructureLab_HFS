@@ -2,14 +2,30 @@
   "section_name": "PTE120X60X2MM",
   "material": "ASTM A500 Gr C (SREC)",
   "lengths": {
-    "ultimate": {"Lx": 1500, "Ly": 1500, "Lz": 1500},
-    "construction": {"Lx": 1500, "Ly": 750, "Lz": 750}
+    "ultimate": {
+      "Lx_3": 1500,
+      "Ly_2": 1500,
+      "Lz_1": 1500
+    },
+    "construction": {
+      "Lx_3": 1500,
+      "Ly_2": 750,
+      "Lz_1": 750
+    }
   },
   "serviceability": {
     "actual_span": 1500,
     "effective_span": 1500,
-    "deflections": {"live_short": 3.0, "dead_short": 3.8, "total_long": 5.0},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 3.0,
+      "dead_short": 3.8,
+      "total_long": 5.0
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "tension": {
     "An": 600,
@@ -19,20 +35,25 @@
   "cases": [
     {
       "name": "Combinación 1 — compresión",
-      "Pu": 100
+      "P": -100
     },
     {
       "name": "Combinación 2 — tracción",
-      "Pu": -120
+      "P": 120
     },
     {
       "name": "Combinación 3 — flexión x",
-      "Mux": 5
+      "Mx_3": 5
     },
     {
       "name": "Combinación 4 — flexión y",
-      "Muy": 2.5
+      "My_2": 2.5
     },
-    {"name": "Construcción — montaje", "condition": "construction", "Mux": 2.2, "Vux": 7.6}
+    {
+      "name": "Construcción — montaje",
+      "condition": "construction",
+      "Mx_3": 2.2,
+      "Vy_2": 7.6
+    }
   ]
 }

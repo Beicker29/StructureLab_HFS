@@ -57,7 +57,7 @@ def w_or_channel(name, family, fy, axis, Lb=None, Cb=1, holes=None, Fu=None):
     p, fy, Cb = row(family, name), D(fy), D(Cb)
     rt = sqrt(E / fy)
     modes = {}
-    if axis == "x":
+    if axis == "x_3":
         flange = p["b/t"] if family == "CHANNEL" else p["bf/2tf"]
         lpf, lrf = D("0.38") * rt, D("1.0") * rt                                 # B4.1b case 10
         assert p["h/tw"] <= D("3.76") * rt                                      # compact web (case 15)
@@ -103,7 +103,7 @@ def rect_hss(name, fy, axis, Lb=None, Cb=1):
     rt = sqrt(E / fy)
     t = p["tdes"]
     # B4.1b(d): flat widths are the outside dimension less 3t (catalog b, h columns)
-    if axis == "x":
+    if axis == "x_3":
         bf, hw, S, Z, inertia, depth = p["b"], p["h"], p["Sx"], p["Zx"], p["Ix"], p["Ht"]
     else:
         bf, hw, S, Z, inertia, depth = p["h"], p["b"], p["Sy"], p["Zy"], p["Iy"], p["B"]
@@ -125,7 +125,7 @@ def rect_hss(name, fy, axis, Lb=None, Cb=1):
     assert lw <= lrw
     if lpw < lw:
         modes["WLB"] = min(interp(mp, fy * S, lw, lpw, lrw), mp)                 # F7-6
-    if axis == "x" and p["Ht"] > p["B"]:
+    if axis == "x_3" and p["Ht"] > p["B"]:
         Lb = D(Lb)
         root = sqrt(p["J"] * p["A"])
         lp = D("0.13") * E * p["ry"] * root / mp                                 # F7-10
@@ -150,7 +150,7 @@ def round_hss(name, fy):
 
 def solid_rect(H, B, fy, axis, Lb=None, Cb=1):
     H, B, fy, Cb = D(H), D(B), D(fy), D(Cb)
-    d, t = (H, B) if axis == "x" else (B, H)
+    d, t = (H, B) if axis == "x_3" else (B, H)
     S, Z = t * d**2 / 6, t * d**2 / 4
     modes = {"Y": min(fy * Z, D("1.5") * fy * S)}                                # F11-1
     if d > t:
@@ -182,8 +182,11 @@ def leg_buckling(b, t, sc, fy):
     return D("0.71") * E / lam**2 * sc                                            # F10-7, F10-8
 
 
-def double_angle(name, fy, Lb, web_legs):
+def double_angle(name, fy, Lb, Mx_3, heel):
+    """F9. The web legs point away from the back (heel["axis_2"]); Mx_3 > 0 compresses the +2 face (ETABS)."""
     import re
+    back = 1 if heel["axis_2"] == "+" else -1
+    web_legs = "compression" if Mx_3 * -back > 0 else "tension"
     p, fy, Lb = row("DOUBLE_ANGLE", name), D(fy), D(Lb)
     m = re.match(r"^2L([^X]+)X([^X]+)X([^X]+?)(?:X([^X]+?))?(LLBB|SLBB)?$", name)
     comp = row("SINGLE_ANGLE", f"L{m[1]}X{m[2]}X{m[3]}")
@@ -216,11 +219,15 @@ def double_angle(name, fy, Lb, web_legs):
     return modes
 
 
-def single_angle_geometric(name, fy, axis, restraint, toe, Lb=None, Cb=1):
+def single_angle_geometric(name, fy, axis, restraint, heel, M, Lb=None, Cb=1):
+    """F10.2(2). Long leg parallel to axis 2: its toe lies opposite the heel along 2, the short-leg toe opposite it along 3.
+    Mx_3 > 0 compresses the +2 face and My_2 > 0 the +3 face (ETABS)."""
+    side = -(1 if heel["axis_2" if axis == "x_3" else "axis_3"] == "+" else -1)
+    toe = "compression" if M * side > 0 else "tension"
     p, fy, Cb = row("SINGLE_ANGLE", name), D(fy), D(Cb)
     legs = sorted([p["d"], p["b"]])
     short, long_, t = legs[0], legs[1], p["t"]
-    inertia, perp, par, cen = ((p["Ix"], long_, short, p["y"]) if axis == "x" else (p["Iy"], short, long_, p["x"]))
+    inertia, perp, par, cen = ((p["Ix"], long_, short, p["y"]) if axis == "x_3" else (p["Iy"], short, long_, p["x"]))
     s_toe, s_face = inertia / (perp - cen), inertia / cen
     k = D("0.80") if restraint == "none" else D(1)                               # F10.2(2)(i): LTB and LLB only
     my = k * fy * s_toe
@@ -241,7 +248,41 @@ def single_angle_geometric(name, fy, axis, restraint, toe, Lb=None, Cb=1):
     return modes
 
 
-def single_angle_principal(name, fy, axis, Lb=None, Cb=1, leg=None, toe=None):
+def angle_principal_input(name, heel, mw=0, leg="long", mz=0, toe=None):
+    """Mx_3 and My_2 whose principal components are |Mw| = mw and |Mz| = mz, with the intended parts in compression:
+    the toe of the leg `leg` under Mw, both toes (toe = "compression") or the heel under Mz.
+
+    The quadrant of w and z comes from the product of inertia of the two legs as rectangles (no fillets), not from the
+    catalog: z is the direction at alpha from axis 2 with the larger second moment of area of the points. A moment vector m
+    compresses the side -(e1 x u) of each principal component u; ETABS M3 is the vector along 3 and M2 minus the vector along 2.
+    """
+    p = row("SINGLE_ANGLE", name)
+    s2, s3 = (1 if heel[k] == "+" else -1 for k in ("axis_2", "axis_3"))
+    short, long_ = sorted([p["d"], p["b"]])
+    t, xb, yb = p["t"], p["x"], p["y"]
+    rects = [(long_ * t, s2 * (yb - long_ / 2), s3 * (xb - t / 2)),                     # (area, c2, c3) about the centroid
+             ((short - t) * t, s2 * (yb - t / 2), s3 * (xb - t - (short - t) / 2))]
+    S22, S33, S23 = (sum(a * c2 * c2 for a, c2, _ in rects), sum(a * c3 * c3 for a, _, c3 in rects),
+                     sum(a * c2 * c3 for a, c2, c3 in rects))
+    ca = 1 / sqrt(1 + p["tan(α)"] ** 2)
+    sa = p["tan(α)"] * ca
+    q = {sign: S22 * ca * ca + 2 * sign * S23 * ca * sa + S33 * sa * sa for sign in (1, -1)}
+    z = (ca, sa) if q[1] >= q[-1] else (ca, -sa)
+    w = (-z[1], z[0])
+    points = {"A": (s2 * yb, -s3 * (short - xb)), "C": (-s2 * (long_ - yb), s3 * xb)}
+
+    def compressed(u, point):                       # for a positive component along u
+        lever = point[0] * -u[1] + point[1] * u[0]  # p . (e1 x u), e1 x u = (-u3, u2)
+        return lever < 0
+
+    sw = 1 if compressed(w, points["C" if leg == "long" else "A"]) else -1
+    sz = 1 if compressed(z, points["C"]) == (toe == "compression") else -1
+    m2 = sw * D(mw) * w[0] + sz * D(mz) * z[0]
+    m3 = sw * D(mw) * w[1] + sz * D(mz) * z[1]
+    return {"Mx_3": m3, "My_2": -m2}
+
+
+def single_angle_principal(name, fy, axis, heel, Lb=None, Cb=1, leg=None, toe=None):
     p, fy = row("SINGLE_ANGLE", name), D(fy)
     legs = sorted([p["d"], p["b"]])
     short, long_, t = legs[0], legs[1], p["t"]
@@ -267,10 +308,10 @@ def single_angle_principal(name, fy, axis, Lb=None, Cb=1, leg=None, toe=None):
     return modes
 
 
-def plate_girder(d, tw, top, bottom, comp="top"):
+def plate_girder(d, tw, plus2, minus2, comp="plus2"):
     """Welded I from its plates, flipped so that the compression flange is on top. Centroid measured up from the bottom."""
     d, tw = D(d), D(tw)
-    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in ((top, bottom) if comp == "top" else (bottom, top))]
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in ((plus2, minus2) if comp == "plus2" else (minus2, plus2))]
     h = d - tt - tb
     parts = [(bb * tb, tb / 2, bb, tb), (h * tw, tb + h / 2, tw, h), (bt * tt, d - tt / 2, bt, tt)]
     A = sum(a for a, _, _, _ in parts)
@@ -295,9 +336,10 @@ def plate_girder(d, tw, top, bottom, comp="top"):
             "J": (bt * tt**3 + bb * tb**3 + h * tw**3) / 3, "Cw": ho**2 * It * Ib / (It + Ib), "singly": (bt, tt) != (bb, tb)}
 
 
-def built_up_i(d, tw, top, bottom, fy, Lb, Cb=1, comp="top"):
-    """F2/F3 for doubly symmetric compact webs; F4 or F5 otherwise. Table B4.1b cases 11, 15, 16; kc of note [a]."""
-    g, fy, Cb, Lb = plate_girder(d, tw, top, bottom, comp), D(fy), D(Cb), D(Lb)
+def built_up_i(d, tw, plus2, minus2, fy, Lb, Cb=1, Mx_3=1):
+    """F2/F3 for doubly symmetric compact webs; F4 or F5 otherwise. Table B4.1b cases 11, 15, 16; kc of note [a].
+    Mx_3 > 0 compresses the +2 face (ETABS)."""
+    g, fy, Cb, Lb = plate_girder(d, tw, plus2, minus2, "plus2" if Mx_3 > 0 else "minus2"), D(fy), D(Cb), D(Lb)
     root = sqrt(E / fy)
     h_tw, hc_tw, lam_f = g["h"] / g["tw"], g["hc"] / g["tw"], g["bfc"] / (2 * g["tfc"])
     mp_full = fy * g["Zx"]
@@ -377,10 +419,10 @@ def built_up_i(d, tw, top, bottom, fy, Lb, Cb=1, comp="top"):
     return modes
 
 
-def built_up_i_minor(d, tw, top, bottom, fy, axis="y"):
+def built_up_i_minor(d, tw, plus2, minus2, fy, axis="y_2"):
     """F6 with the more slender flange (decision DF-19), Sy to the tip of the wider flange."""
     d, tw, fy = D(d), D(tw), D(fy)
-    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (top, bottom)]
+    (bt, tt), (bb, tb) = [(D(b), D(t)) for b, t in (plus2, minus2)]
     h = d - tt - tb
     sy = (tt * bt**3 + tb * bb**3 + h * tw**3) / 12 / (max(bt, bb) / 2)
     mp = min(fy * (tt * bt**2 + tb * bb**2 + h * tw**2) / 4, D("1.6") * fy * sy)   # F6-1
@@ -401,61 +443,68 @@ def summarize(modes):
 
 
 CASES = {
-    "W-F2-yielding": dict(kind="w", name="W18X50", family="W", fy=345, axis="x", Lb=1500),
-    "W-F2-inelastic-LTB": dict(kind="w", name="W18X50", family="W", fy=345, axis="x", Lb=4000),
-    "W-F2-elastic-LTB-Cb": dict(kind="w", name="W18X50", family="W", fy=345, axis="x", Lb=12000, Cb="1.3"),
-    "W-F3-FLB": dict(kind="w", name="W14X90", family="W", fy=345, axis="x", Lb=3000),
-    "W-F3-LTB": dict(kind="w", name="W14X90", family="W", fy=345, axis="x", Lb=8000, Cb="1.14"),
-    "W-F13-holes": dict(kind="w", name="W14X90", family="W", fy=345, axis="x", Lb=3000, holes=4500, Fu=450),
-    "W-F6-minor": dict(kind="w", name="W14X90", family="W", fy=345, axis="y"),
-    "C-F2-inelastic-LTB": dict(kind="w", name="C15X50", family="CHANNEL", fy=345, axis="x", Lb=2000),
-    "C-F2-elastic-LTB": dict(kind="w", name="C15X50", family="CHANNEL", fy=345, axis="x", Lb=6000),
-    "C-F6-minor": dict(kind="w", name="C15X50", family="CHANNEL", fy=345, axis="y"),
-    "RHSS-F7-LTB": dict(kind="rhss", name="PTE100X50X3MM", fy=345, axis="x", Lb=3000),
-    "RHSS-F7-noncompact": dict(kind="rhss", name="PTE120X60X2MM", fy=345, axis="x", Lb=500),
-    "RHSS-F7-minor": dict(kind="rhss", name="PTE120X60X2MM", fy=345, axis="y"),
-    "RHSS-F7-3-slender-flange": dict(kind="rhss", name="PTE100X40X1.5MM", fy=345, axis="y"),
+    "W-F2-yielding": dict(kind="w", name="W18X50", family="W", fy=345, axis="x_3", Lb=1500),
+    "W-F2-inelastic-LTB": dict(kind="w", name="W18X50", family="W", fy=345, axis="x_3", Lb=4000),
+    "W-F2-elastic-LTB-Cb": dict(kind="w", name="W18X50", family="W", fy=345, axis="x_3", Lb=12000, Cb="1.3"),
+    "W-F3-FLB": dict(kind="w", name="W14X90", family="W", fy=345, axis="x_3", Lb=3000),
+    "W-F3-LTB": dict(kind="w", name="W14X90", family="W", fy=345, axis="x_3", Lb=8000, Cb="1.14"),
+    "W-F13-holes": dict(kind="w", name="W14X90", family="W", fy=345, axis="x_3", Lb=3000, holes=4500, Fu=450),
+    "W-F6-minor": dict(kind="w", name="W14X90", family="W", fy=345, axis="y_2"),
+    "C-F2-inelastic-LTB": dict(kind="w", name="C15X50", family="CHANNEL", fy=345, axis="x_3", Lb=2000),
+    "C-F2-elastic-LTB": dict(kind="w", name="C15X50", family="CHANNEL", fy=345, axis="x_3", Lb=6000),
+    "C-F6-minor": dict(kind="w", name="C15X50", family="CHANNEL", fy=345, axis="y_2"),
+    "RHSS-F7-LTB": dict(kind="rhss", name="PTE100X50X3MM", fy=345, axis="x_3", Lb=3000),
+    "RHSS-F7-noncompact": dict(kind="rhss", name="PTE120X60X2MM", fy=345, axis="x_3", Lb=500),
+    "RHSS-F7-minor": dict(kind="rhss", name="PTE120X60X2MM", fy=345, axis="y_2"),
+    "RHSS-F7-3-slender-flange": dict(kind="rhss", name="PTE100X40X1.5MM", fy=345, axis="y_2"),
     "CHSS-F8-noncompact": dict(kind="chss", name='PTER4"X3.00MM', fy=345),
     "CHSS-F8-compact": dict(kind="chss", name='PTER2"X4.00MM', fy=345),
-    "BAR-F11-LTB": dict(kind="bar", H=100, B=20, fy=250, axis="x", Lb=1500),
-    "BAR-F11-minor": dict(kind="bar", H=100, B=20, fy=250, axis="y", Lb=1500),
+    "BAR-F11-LTB": dict(kind="bar", H=100, B=20, fy=250, axis="x_3", Lb=1500),
+    "BAR-F11-minor": dict(kind="bar", H=100, B=20, fy=250, axis="y_2", Lb=1500),
     "ROUND-F11": dict(kind="round", D_=50, fy=250),
-    "2L-F9-web-tension": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=2000, web_legs="tension"),
-    "2L-F9-web-compression": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=2000, web_legs="compression"),
-    "2L-F9-LLBB-tension": dict(kind="2l", name="2L6X4X3/8LLBB", fy=345, Lb=3000, web_legs="tension"),
-    "2L-F9-SLBB-compression": dict(kind="2l", name="2L6X4X3/8SLBB", fy=345, Lb=3000, web_legs="compression"),
-    "2L-F9-elastic-LTB": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=9000, web_legs="tension"),
-    "L-F10-geom-none-toe-comp": dict(kind="lg", name="L4X4X1/4", fy=345, axis="x", restraint="none",
-                                     toe="compression", Lb=2000),
-    "L-F10-geom-none-toe-tens": dict(kind="lg", name="L4X4X1/4", fy=345, axis="x", restraint="none",
-                                     toe="tension", Lb=2000),
-    "L-F10-geom-at-max": dict(kind="lg", name="L4X4X1/4", fy=345, axis="y", restraint="at_max_moment",
-                              toe="compression", Lb=2000, Cb="1.2"),
-    "L-F10-geom-continuous-unequal": dict(kind="lg", name="L6X4X3/8", fy=345, axis="x", restraint="continuous",
-                                          toe="compression"),
-    "L-F10-w-short-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="short"),
-    "L-F10-w-long-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="long"),
-    "L-F10-w-equal-Cb-capped": dict(kind="lp", name="L4X4X1/4", fy=345, axis="w", Lb=3000, Cb="1.8", leg="long"),
-    "L-F10-z-toes-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="z", toe="compression"),
-    "BUI-F2-compact": dict(kind="bui", d=600, tw=10, top=(250, 20), bottom=(250, 20), fy=345, Lb=4000),
-    "BUI-F3-noncompact-flange": dict(kind="bui", d=600, tw=10, top=(300, 14), bottom=(300, 14), fy=345, Lb=3000),
-    "BUI-F4-wide-flange-compressed": dict(kind="bui", d=900, tw=8, top=(350, 22), bottom=(250, 16), fy=345, Lb=3000, comp="top"),
-    "BUI-F4-narrow-flange-compressed-J0": dict(kind="bui", d=900, tw=8, top=(350, 22), bottom=(250, 16), fy=345, Lb=9000,
-                                               comp="bottom"),
-    "BUI-F4-noncompact-web-and-flange": dict(kind="bui", d=1000, tw=9, top=(300, 16), bottom=(300, 16), fy=345, Lb=4000),
-    "BUI-F4-14-slender-flange": dict(kind="bui", d=1000, tw=9, top=(500, 12), bottom=(300, 25), fy=345, Lb=2500, Cb="1.2",
-                                     comp="top"),
-    "BUI-F4-9b-16b-noncompact-web": dict(kind="bui", d=1100, tw=7, top=(350, 22), bottom=(250, 18), fy=345, Lb=3000, comp="top"),
-    "BUI-F5-noncompact-flange": dict(kind="bui", d=1200, tw=8, top=(400, 20), bottom=(400, 20), fy=345, Lb=6000),
-    "BUI-F5-elastic-LTB": dict(kind="bui", d=1200, tw=8, top=(400, 20), bottom=(400, 20), fy=345, Lb=16000),
-    "BUI-F5-tension-flange-yielding": dict(kind="bui", d=1400, tw=8, top=(450, 25), bottom=(300, 16), fy=345, Lb=2000, comp="top"),
-    "BUI-F6-unequal-flanges": dict(kind="buiy", d=900, tw=8, top=(350, 22), bottom=(300, 10), fy=345, axis="y"),
+    "2L-F9-web-tension": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=2000, Mx_3=1, heel={"axis_2": "+"}),
+    "2L-F9-web-compression": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=2000, Mx_3=-1, heel={"axis_2": "+"}),
+    "2L-F9-LLBB-tension": dict(kind="2l", name="2L6X4X3/8LLBB", fy=345, Lb=3000, Mx_3=-1, heel={"axis_2": "-"}),
+    "2L-F9-SLBB-compression": dict(kind="2l", name="2L6X4X3/8SLBB", fy=345, Lb=3000, Mx_3=1, heel={"axis_2": "-"}),
+    "2L-F9-elastic-LTB": dict(kind="2l", name="2L4X4X1/4", fy=345, Lb=9000, Mx_3=1, heel={"axis_2": "+"}),
+    "L-F10-geom-none-toe-comp": dict(kind="lg", name="L4X4X1/4", fy=345, axis="x_3", restraint="none",
+                                     heel={"axis_2": "+", "axis_3": "-"}, M=-1, Lb=2000),
+    "L-F10-geom-none-toe-tens": dict(kind="lg", name="L4X4X1/4", fy=345, axis="x_3", restraint="none",
+                                     heel={"axis_2": "-", "axis_3": "-"}, M=-1, Lb=2000),
+    "L-F10-geom-at-max": dict(kind="lg", name="L4X4X1/4", fy=345, axis="y_2", restraint="at_max_moment",
+                              heel={"axis_2": "-", "axis_3": "+"}, M=-1, Lb=2000, Cb="1.2"),
+    "L-F10-geom-continuous-unequal": dict(kind="lg", name="L6X4X3/8", fy=345, axis="x_3", restraint="continuous",
+                                          heel={"axis_2": "-", "axis_3": "-"}, M=1),
+    "L-F10-w-short-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="short",
+                               heel={"axis_2": "+", "axis_3": "-"}),
+    "L-F10-w-long-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="w", Lb=2000, leg="long",
+                              heel={"axis_2": "-", "axis_3": "+"}),
+    "L-F10-w-equal-Cb-capped": dict(kind="lp", name="L4X4X1/4", fy=345, axis="w", Lb=3000, Cb="1.8", leg="long",
+                                    heel={"axis_2": "-", "axis_3": "-"}),
+    "L-F10-z-toes-comp": dict(kind="lp", name="L6X4X3/8", fy=345, axis="z", toe="compression", heel={"axis_2": "+", "axis_3": "+"}),
+    "BUI-F2-compact": dict(kind="bui", d=600, tw=10, plus2=(250, 20), minus2=(250, 20), fy=345, Lb=4000),
+    "BUI-F3-noncompact-flange": dict(kind="bui", d=600, tw=10, plus2=(300, 14), minus2=(300, 14), fy=345, Lb=3000),
+    "BUI-F4-wide-flange-compressed": dict(kind="bui", d=900, tw=8, plus2=(350, 22), minus2=(250, 16), fy=345, Lb=3000, Mx_3=1),
+    "BUI-F4-narrow-flange-compressed-J0": dict(kind="bui", d=900, tw=8, plus2=(350, 22), minus2=(250, 16), fy=345, Lb=9000,
+                                               Mx_3=-1),
+    "BUI-F4-noncompact-web-and-flange": dict(kind="bui", d=1000, tw=9, plus2=(300, 16), minus2=(300, 16), fy=345, Lb=4000),
+    "BUI-F4-14-slender-flange": dict(kind="bui", d=1000, tw=9, plus2=(500, 12), minus2=(300, 25), fy=345, Lb=2500, Cb="1.2",
+                                     Mx_3=1),
+    "BUI-F4-9b-16b-noncompact-web": dict(kind="bui", d=1100, tw=7, plus2=(350, 22), minus2=(250, 18), fy=345, Lb=3000, Mx_3=1),
+    "BUI-F5-noncompact-flange": dict(kind="bui", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, Lb=6000),
+    "BUI-F5-elastic-LTB": dict(kind="bui", d=1200, tw=8, plus2=(400, 20), minus2=(400, 20), fy=345, Lb=16000),
+    "BUI-F5-tension-flange-yielding": dict(kind="bui", d=1400, tw=8, plus2=(450, 25), minus2=(300, 16), fy=345, Lb=2000, Mx_3=1),
+    "BUI-F6-unequal-flanges": dict(kind="buiy", d=900, tw=8, plus2=(350, 22), minus2=(300, 10), fy=345, axis="y_2"),
 }
 
 
 def build(spec):
     kind = spec["kind"]
     args = {k: v for k, v in spec.items() if k != "kind"}
+    if kind == "lp":           # the input of the program: geometric moments with the ETABS signs
+        spec = {**spec, **angle_principal_input(spec["name"], spec["heel"], mw=1 if spec["axis"] == "w" else 0,
+                                                leg=spec.get("leg") or "long", mz=1 if spec["axis"] == "z" else 0,
+                                                toe=spec.get("toe"))}
     modes = {"w": w_or_channel, "rhss": rect_hss, "chss": round_hss, "bar": solid_rect, "round": solid_round,
              "2l": double_angle, "lg": single_angle_geometric, "lp": single_angle_principal, "bui": built_up_i,
              "buiy": built_up_i_minor}[kind](**args)

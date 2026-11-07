@@ -56,7 +56,7 @@ def _c_wall_fire_compression(case, section, hot):
     wall, _, props = _c_wall_data(case)
     _c_wall_slender_at_temperature(case, section)
     composite_materials(case, section, "web")                                             # the limits of 4.2.3b
-    Lc = case.factors.Ky * case.lengths.Ly
+    Lc = case.factors.Ky_2 * case.lengths.Ly_2
     web = wall_strip_at_temperature(case, hot, st=wall.st, t=wall.tp, tsc=wall.tsc_w, layers=concrete_profile(case, section, "web"), Lc=Lc)
     flange = wall_strip_at_temperature(
         case, hot, st=wall.st, t=wall.tp, tsc=wall.tsc_f, layers=concrete_profile(case, section, "flange"), Lc=Lc
@@ -111,7 +111,8 @@ def c_wall_compression(case: SteelCase, section: Section) -> dict:
     pno = eq.pno_wall(Fy=case.material.Fy, As=props["As"], fc=fc, Ac=props["Ac"])
     f, ln = case.factors, case.lengths
     modes = {}
-    for axis, Is, Ic, K, L in (("x", props["Is_x"], props["Ic_x"], f.Kx, ln.Lx), ("y", props["Is_y"], props["Ic_y"], f.Ky, ln.Ly)):
+    for axis, Is, Ic, K, L in (("x_3", props["Is_x"], props["Ic_x"], f.Kx_3, ln.Lx_3),
+                               ("y_2", props["Is_y"], props["Ic_y"], f.Ky_2, ln.Ly_2)):
         ei = eq.wall_stiffness(Is=Is, Ec=Ec, Ic=Ic)
         pe = eq.elastic_buckling_load(EI_eff=ei, Lc=K * L)
         out = eq.nominal_compression(Pno=pno, Pe=pe)
@@ -119,7 +120,7 @@ def c_wall_compression(case: SteelCase, section: Section) -> dict:
                                "Pno_kN": pno / 1000.0, "EI_eff": ei, "Lc_mm": K * L, "Pe_kN": pe / 1000.0,
                                "Pn_kN": out["Pn"] / 1000.0, "available_kN": eq.PHI_C_WALL * out["Pn"] / 1000.0}
     modes["LB"] = {"limit_state": "local_buckling", "provision": "I1.2", "applies": True, "equation": "No requerido en muros (I1.2)"}
-    governing = min(("FB-x", "FB-y"), key=lambda k: modes[k]["Pn_kN"])
+    governing = min(("FB-x_3", "FB-y_2"), key=lambda k: modes[k]["Pn_kN"])
     return composite_result(case, section, modes=modes, governing=governing, provisions=["I1", "I2.3a"],
                    requirements=_c_wall_requirements(case, props), notes=[_GUIDE_NOTE], Pn_kN=modes[governing]["Pn_kN"],
                    phi_c=eq.PHI_C_WALL, available_kN=modes[governing]["available_kN"], y_mm=props["y"])
@@ -148,6 +149,12 @@ def c_wall_tension(case: SteelCase, section: Section) -> dict:
     )
 
 
+def _flange_tips_compressed(case):
+    """My_2 > 0 compresses the +3 face; the flange tips point away from the web (web_side)."""
+    tips = -1 if case.composite.c_wall.web_side == "+3" else 1
+    return case.My_2 * tips > 0
+
+
 def _c_wall_moment(case, section, axis, P_N, props):
     wall = case.composite.c_wall
     web, flange = composite_materials(case, section, "web"), composite_materials(case, section, "flange")
@@ -157,19 +164,19 @@ def _c_wall_moment(case, section, axis, P_N, props):
         props = dg38.c_wall_properties(
             L=wall.L, W=wall.W, tsc_w=wall.tsc_w, tsc_f=wall.tsc_f, tp=wall.tp, n=web["Ec"] / web["Es"], n_f=flange["Ec"] / flange["Es"]
         )
-    if axis == "x":
+    if axis == "x_3":
         if P_N:
             blocked("Muro en C: la Guía 38 no da la flexión en el eje mayor con fuerza axial (A.2.6 es sin axial).", section)
         out = dg38.major_axis(**common)
     elif P_N < 0:
-        if wall.minor_axis_compression != "flange_tips":
+        if not _flange_tips_compressed(case):
             blocked("Muro en C en tracción: la Guía 38 (A.2.3) solo cubre las puntas de las alas en compresión.", section)
         out = dg38.flange_tips_in_compression(**common, T=-P_N, y=props["y"])
     elif P_N > 0:
-        if wall.minor_axis_compression != "web":
+        if _flange_tips_compressed(case):
             blocked("Muro en C en compresión: la Guía 38 (A.2.4, A.2.5) solo cubre el alma en compresión.", section)
         out = dg38.web_in_compression_with_axial(**common, P=P_N, y=props["y"])
-    elif wall.minor_axis_compression == "web":
+    elif not _flange_tips_compressed(case):
         out = dg38.web_in_compression(**common)
     else:
         out = dg38.flange_tips_in_compression(**common)
@@ -207,10 +214,10 @@ def c_wall_flexure(case: SteelCase, section: Section, axis: str) -> dict:
 def c_wall_shear(case: SteelCase, section: Section, axis: str) -> dict:
     """I4.4 with the shear areas of Example 2.3, for shear along the flange walls."""
     check_family(case, section)
-    if axis != "y":
-        blocked("Muro en C: la Guía 38 da las áreas para cortante a lo largo de las alas (Vuy).", section)
+    if axis != "x_3":
+        blocked("Muro en C: la Guía 38 da las áreas para cortante a lo largo de las alas (Vx_3).", section)
     _, _, props = _c_wall_data(case)
-    m = composite_materials(case, section, "flange")               # Vuy runs along the flange walls
+    m = composite_materials(case, section, "flange")               # Vx_3 runs along the flange walls
     out = eq.wall_shear(Asw=props["Asw"], Fy=m["Fy"], Ec=m["Ec"], Ac=props["Acw"], Es=m["Es"], Gs=m["Gs"])
     vn = out["Vn"] / 1000.0
     mode = {"limit_state": "shear", "provision": "I4.4", "applies": True, "equation": "I4-2", "Asw_mm2": props["Asw"],
@@ -238,15 +245,15 @@ def c_wall_interaction(case: SteelCase, section: Section, checks: list) -> dict:
         raise IncompleteSectionDataError("La interacción necesita la resistencia de diseño de cada componente.",
                                          code="INTERACTION_COMPONENT_MISSING", details={"section": section.name, "checks": missing})
     flexures = [c for c in checks if c.id.startswith("flexure")]
-    if not case.Pu or len(flexures) != 1 or flexures[0].id != "flexure_y":
-        blocked("Muro en C: la interacción se calcula con fuerza axial y flexión en el eje menor (Muy), sin Mux.", section)
+    if not case.P or len(flexures) != 1 or flexures[0].id != "flexure_y_2":
+        blocked("Muro en C: la interacción se calcula con fuerza axial y flexión en el eje menor (My_2), sin Mx_3.", section)
     flexure = flexures[0]
     _, _, props = _c_wall_data(case)
-    out = _c_wall_moment(case, section, "y", case.Pu * 1000.0, props)
+    out = _c_wall_moment(case, section, "y_2", -case.P * 1000.0, props)       # compression positive (Design Guide 38)
     capacity = eq.PHI_B * out["Mp"] / 1e6
     ratio = flexure.demand / capacity if capacity > 0 else float("inf")
     mode = {"limit_state": "combined_flexure_axial", "provision": "I5(c)", "applies": True, "equation": out["equation"],
-            "Pr_kN": case.Pu, "Mr_kNm": flexure.demand, "C_mm": out["C"], "Mn_at_Pr_kNm": out["Mp"] / 1e6, "Mc_at_Pr_kNm": capacity,
+            "P_kN": case.P, "Mr_kNm": flexure.demand, "C_mm": out["C"], "Mn_at_Pr_kNm": out["Mp"] / 1e6, "Mc_at_Pr_kNm": capacity,
             "ratio": ratio}
     return with_fire_extension(
         composite_result(
@@ -275,8 +282,8 @@ def coupling_beam_axial(case: SteelCase, section: Section) -> dict:
 def coupling_beam_flexure(case: SteelCase, section: Section, axis: str) -> dict:
     """I3.4b(a) by Design Guide 38, A.3. Noncompact and slender boxes have no equation in the guide: they are blocked."""
     check_family(case, section)
-    if axis != "x":
-        blocked("Viga de acoplamiento: se calcula en su eje mayor (Mux).", section)
+    if axis != "x_3":
+        blocked("Viga de acoplamiento: se calcula en su eje mayor (Mx_3).", section)
     beam, Fy = case.composite.coupling_beam, case.material.Fy
     root = math.sqrt(eq.E_STEEL / Fy)
     flange, web = (beam.b - 2 * beam.tw) / beam.tf, (beam.h - 2 * beam.tf) / beam.tw
@@ -310,8 +317,8 @@ def coupling_beam_flexure(case: SteelCase, section: Section, axis: str) -> dict:
 def coupling_beam_shear(case: SteelCase, section: Section, axis: str) -> dict:
     """I4-1 (Design Guide 38, Equation 2-19), with Kc = 1 as in DI-4."""
     check_family(case, section)
-    if axis != "x":
-        blocked("Viga de acoplamiento: se calcula el cortante en el plano de flexión (Vux).", section)
+    if axis != "y_2":
+        blocked("Viga de acoplamiento: se calcula el cortante en el plano de flexión (Vy_2).", section)
     beam = case.composite.coupling_beam
     Av = 2 * beam.h * beam.tw
     Ac = (beam.b - 2 * beam.tw) * (beam.h - 2 * beam.tf)
@@ -339,9 +346,9 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
     """Optional reviews of Design Guide 38, Chapter 6, on the unit-width column (6.2.2): rating and vent holes. The strength is
     A-4-12 (domain/composite/wall.py)."""
     check_family(case, section)
-    if case.Pu <= 0 or case.lengths is None:
-        incomplete("El incendio de la Guía 38 se calcula en compresión (Pu > 0) y con la longitud del miembro.", section,
-                    ["Pu", "lengths"])
+    if case.P >= 0 or case.lengths is None:
+        incomplete("El incendio de la Guía 38 se calcula en compresión (P < 0) y con la longitud del miembro.", section,
+                    ["P", "lengths"])
     wall, concrete, fire = case.composite.wall, case.composite.concrete, case.composite.fire
     Fy, fc = case.material.Fy, concrete.fc
     Ec = eq.concrete_modulus(wc=concrete.wc, fc=fc)
@@ -349,10 +356,10 @@ def wall_fire(case: SteelCase, section: Section) -> dict:
     As, Ac = 2 * st * t, (tsc - 2 * t) * st
     Ic = st * (tsc - 2 * t) ** 3 / 12
     Is = st * tsc**3 / 12 - Ic
-    L, Lc = case.lengths.Ly, case.factors.Ky * case.lengths.Ly
+    L, Lc = case.lengths.Ly_2, case.factors.Ky_2 * case.lengths.Ly_2
     pno = eq.pno_wall(Fy=Fy, As=As, fc=fc, Ac=Ac)
     pn = dg38_fire.ambient_strength(Pno=pno, EI_eff=eq.wall_stiffness(Is=Is, Ec=Ec, Ic=Ic), Lc=Lc)
-    pu_unit = case.Pu * 1000.0 * st / wall.length
+    pu_unit = -case.P * 1000.0 * st / wall.length
     mode = {"limit_state": "fire", "provision": "AISC Design Guide 38, 6.2", "applies": True, "equation": "DG38 Ec. 6-5",
             "Pu_unit_kN": pu_unit / 1000.0, "Pno_kN": pno / 1000.0, "Pn_kN": pn / 1000.0, "L_over_tsc": L / tsc, "Pu_over_Pn": pu_unit / pn}
     ratio, requirements = 0.0, []

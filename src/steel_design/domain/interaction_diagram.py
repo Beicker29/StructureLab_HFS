@@ -23,7 +23,7 @@ def _filled_points(case, section, geometry, axis):
     Fy, fc = m["Fy"], m["fc"]
     if geometry["shape"] == "round":
         return "6-4", tables.table_6_4(Fy=Fy, fc=fc, d=geometry["D"], t=geometry["t"])
-    bi, hi, H, Zs = ((geometry["bi"], geometry["hi"], section.h_out, section.zx) if axis == "x"
+    bi, hi, H, Zs = ((geometry["bi"], geometry["hi"], section.h_out, section.zx) if axis == "x_3"
                      else (geometry["hi"], geometry["bi"], section.b_out, section.zy))
     return "6-3", tables.table_6_3(
         Fy=Fy, fc=fc, As=section.area, Ac=geometry["Ac"], bi=bi, hi=hi, r=geometry["r"], H=H, t=geometry["t"], Zs=Zs
@@ -34,13 +34,13 @@ def _encased_points(case, section, geometry, axis):
     """(table, points), or (None, reason) when the bars do not follow the arrangement that the table assumes."""
     e = case.composite.encased
     Fy, fc = case.material.Fy, case.composite.concrete.fc
-    distances = [abs(bar.y if axis == "x" else bar.x) for bar in e.bars]
+    distances = [abs(bar.y if axis == "x_3" else bar.x) for bar in e.bars]
     outer = max(distances)
     if any(TOLERANCE_MM < v < outer - TOLERANCE_MM for v in distances):
         return None, "hay barras entre la línea central y las barras extremas; la tabla no cubre esa disposición."
     Asr = geometry["Asr"]
     Asr_center = sum(bar.area for bar, v in zip(e.bars, distances) if v <= TOLERANCE_MM)
-    if axis == "x":
+    if axis == "x_3":
         h1, h2 = e.B, e.H
         return "6-2a", tables.table_6_2a(
             Fy=Fy,
@@ -85,7 +85,7 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
     if composite is None or composite.kind not in {"filled", "encased"} or not any(c.id == "interaction" for c in checks):
         return []
     by_id: dict[str, Check] = {c.id: c for c in checks}
-    flexures = {axis: by_id[f"flexure_{axis}"] for axis in ("x", "y") if f"flexure_{axis}" in by_id}
+    flexures = {axis: by_id[f"flexure_{axis}"] for axis in ("x_3", "y_2") if f"flexure_{axis}" in by_id}
     axial = by_id.get("axial")
     out = []
     for axis, flexure in flexures.items():
@@ -113,7 +113,7 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
             out.append({**entry, "reason": reason})
             continue
         lam, note = 1.0, "Sin compresión: sin reducción por longitud (λ = 1)."
-        if axial is not None and case.Pu > 0:
+        if axial is not None and case.P < 0:
             mode = axial.result["modes"][axial.result["governing_mode"]]
             lam, note = mode["Pn_kN"] / mode.get("Pno_kN", mode.get("Pno_T_kN")), "λ = Pn/Pno (Commentary I5)."
         if case.condition == "fire" and case.fire.steel_temperature > 200:
@@ -121,5 +121,5 @@ def interaction_diagrams(case: SteelCase, section: Section, checks: list[Check])
         rows = [{"point": name, "P_kN": P / 1000.0, "M_kNm": M / 1e6, "lambda_P_kN": lam * P / 1000.0,
                  "design_P_kN": eq.PHI_C * lam * P / 1000.0, "design_M_kNm": eq.PHI_B * M / 1e6} for name, (P, M) in points.items()]
         out.append({**entry, "table": TITLES[table], "lambda": lam, "note": note, "phi_c": eq.PHI_C, "phi_b": eq.PHI_B, "points": rows,
-                    "Pr_kN": case.Pu if case.Pu > 0 else None, "Mr_kNm": flexure.demand})
+                    "Pr_kN": -case.P if case.P < 0 else None, "Mr_kNm": flexure.demand})
     return out

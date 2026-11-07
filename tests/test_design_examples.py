@@ -8,9 +8,11 @@ properties printed in the example, converted to SI; nothing else is assumed.
 import math
 
 import pytest
+from conftest import CATALOG
 
 from steel_design.engine import SteelDesignEngine
 from steel_design.models import SteelCase
+from steel_design.sections.loader import load_sections_from_excel
 from steel_design.sections.models import Section
 from steel_design.sections.repository import SectionRepository
 
@@ -74,31 +76,45 @@ E5_LONG = dict(configuration="a", connected_leg="long", L=5 * FT, loaded_at_ends
 
 
 def tension(name, Fy, Fu, An, U):
-    return dict(section_name=name, material={"Fy": Fy * KSI, "Fu": Fu * KSI}, Pu=-1.0,
+    return dict(section_name=name, material={"Fy": Fy * KSI, "Fu": Fu * KSI}, P=1.0,
                 tension={"An": An * IN**2, "U": U})
 
 
 def column(name, Fy, Lx, Ly, Lz, K=1.0, **extra):
-    return dict(section_name=name, material={"Fy": Fy}, Pu=1.0,
-                lengths={"Lx": Lx * FT, "Ly": Ly * FT, "Lz": Lz * FT}, factors={"Kx": K, "Ky": K, "Kz": K}, **extra)
+    return dict(section_name=name, material={"Fy": Fy}, P=-1.0,
+                lengths={"Lx_3": Lx * FT, "Ly_2": Ly * FT, "Lz_1": Lz * FT}, factors={"Kx_3": K, "Ky_2": K, "Kz_1": K}, **extra)
 
 
-def beam(name, Fy, Lb=None, Cb=1.0, axis="Mux", holes=False, **extra):
+def beam(name, Fy, Lb=None, Cb=1.0, axis="Mx_3", holes=False, **extra):
     flexure = {"Cb": Cb, **({"tension_flange_holes": False} if holes is False else {})}
     flexure.update(extra.pop("flexure", {}))
     if Lb:
-        extra.setdefault("lengths", {"Lx": Lb * FT, "Ly": Lb * FT, "Lz": Lb * FT})
-    return dict(section_name=name, material={"Fy": Fy}, flexure=flexure, **{axis: 1.0}, **extra)
+        extra.setdefault("lengths", {"Lx_3": Lb * FT, "Ly_2": Lb * FT, "Lz_1": Lb * FT})
+    moments = principal(name, *axis) if isinstance(axis, tuple) else {axis: 1.0}
+    return dict(section_name=name, material={"Fy": Fy}, flexure=flexure, **moments, **extra)
 
 
-def shear(name, Fy, axis="Vux", **extra):
+HEEL = {"axis_2": "-", "axis_3": "-"}        # long leg toward +2, short leg toward +3
+_TAN_ALPHA = {s.name: s.tan_alpha for s in load_sections_from_excel(str(CATALOG)) if s.name in {"L8X4X1/2", "L4X4X1/4"}}
+
+
+def principal(name, mw, mz):
+    """Mx_3, My_2 of the principal components mw, mz (vectors, kN*m) with the heel at (-2, -3): w = (sin a, cos a) and
+    z = (cos a, -sin a) in (2, 3) components; ETABS M3 is the vector along 3 and M2 minus the vector along 2. A positive w
+    vector compresses the long-leg toe; a positive z vector puts both toes in tension."""
+    a = math.atan(_TAN_ALPHA[name])
+    m2, m3 = mw * math.sin(a) + mz * math.cos(a), mw * math.cos(a) - mz * math.sin(a)
+    return {"Mx_3": m3, "My_2": -m2, "heel": HEEL}
+
+
+def shear(name, Fy, axis="Vy_2", **extra):
     return dict(section_name=name, material={"Fy": Fy}, **{axis: 1.0}, **extra)
 
 
 def combined(name, Fy, L, Pu, Mux, Muy, Cb=1.0, **extra):
     flexure = {"Cb": Cb, "tension_flange_holes": False, **extra.pop("flexure", {})}
-    return dict(section_name=name, material={"Fy": Fy, **extra.pop("material", {})}, Pu=Pu * KIP, Mux=Mux * KIPFT,
-                Muy=Muy * KIPFT, lengths={"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}, flexure=flexure, **extra)
+    return dict(section_name=name, material={"Fy": Fy, **extra.pop("material", {})}, P=-(Pu * KIP), Mx_3=Mux * KIPFT,
+                My_2=Muy * KIPFT, lengths={"Lx_3": L * FT, "Ly_2": L * FT, "Lz_1": L * FT}, flexure=flexure, **extra)
 
 
 CONTINUOUS = 0.5   # ft: continuously braced (Lb below Lp)
@@ -111,7 +127,7 @@ def filled_member(name, fc_ksi, L=None, interaction="H1", **demands):
                 composite={"kind": "filled", "interaction": interaction,
                            "concrete": {"fc": fc_ksi * KSI, "wc": WC, "lightweight": False}})
     if L:
-        data["lengths"] = {"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}
+        data["lengths"] = {"Lx_3": L * FT, "Ly_2": L * FT, "Lz_1": L * FT}
     return data
 
 
@@ -127,27 +143,28 @@ def encased_member(L=None, method="steel", interaction="H1", anchor=None, **dema
                                        "transverse": {"db": 10, "spacing": 300}, "flexure_method": method,
                                        "anchors_provided": method == "composite"}})
     if L:
-        data["lengths"] = {"Lx": L * FT, "Ly": L * FT, "Lz": L * FT}
+        data["lengths"] = {"Lx_3": L * FT, "Ly_2": L * FT, "Lz_1": L * FT}
     return data
 
 
 def composite_beam(name):
     """Example I.1: 22 studs give ΣQn = 381 kips; the example selects PNA 5 with 386 kips (no integer stud count)."""
-    beam = {"moment": "positive", "span": 45 * FT, "left_beam_spacing": 10 * FT, "right_beam_spacing": 10 * FT,
+    beam = {"span": 45 * FT, "left_beam_spacing": 10 * FT, "right_beam_spacing": 10 * FT,
             "tc": 4.5 * IN, "shored": True,
             "deck": {"orientation": "perpendicular", "hr": 3 * IN, "wr": 6 * IN, "emid_ht_at_least_50": False},
             "studs": {"count": 22, "d": 0.75 * IN, "Fu": 65 * KSI, "length": 4.5 * IN, "over_web": True,
                       "detailing": {"longitudinal_spacing": 12 * IN, "free_edge": False, "distribution": "uniform"}}}
-    return dict(section_name=name, material={"Fy": FY50}, Mux=1.0,
+    return dict(section_name=name, material={"Fy": FY50}, Mx_3=1.0,
                 composite={"kind": "beam", "concrete": {"fc": 4 * KSI, "wc": WC, "lightweight": False}, "beam": beam})
 
 
 # Example E.14B at the strength it prints, Pu = 85.9 kips: Mr = Pu*e*B1, with B1 from its Pe1w and Pe1z (kip-in).
 E14B_PU = 85.9
-E14B = dict(section_name="L8X4X1/2", material={"Fy": FY50}, Pu=E14B_PU * KIP,
-            Mw=1.44 * E14B_PU / (1 - E14B_PU / 3260) * KIPFT / 12, Mz=0.889 * E14B_PU / (1 - E14B_PU / 343) * KIPFT / 12,
-            lengths={"Lx": 5 * FT, "Ly": 5 * FT, "Lz": 5 * FT},
-            angle_flexure={"leg_in_compression": "long", "toe": "tension"})
+# Mw compresses the long-leg toe and Mz puts the toes in tension (positive vectors with the heel at (-2, -3)).
+E14B = dict(section_name="L8X4X1/2", material={"Fy": FY50}, P=-(E14B_PU * KIP),
+            **principal("L8X4X1/2", 1.44 * E14B_PU / (1 - E14B_PU / 3260) * KIPFT / 12,
+                        0.889 * E14B_PU / (1 - E14B_PU / 343) * KIPFT / 12),
+            lengths={"Lx_3": 5 * FT, "Ly_2": 5 * FT, "Lz_1": 5 * FT})
 
 # id: (example, page, case data, check id, LRFD design strength printed in the example, unit, note)
 EXAMPLES = {
@@ -174,80 +191,80 @@ EXAMPLES = {
              "axial", 221, "kip"),
     "E.14A": ("L5X3X1/2, E5(a) ala larga, L = 5 ft", column("L5X3X1/2", FY50, 5, 5, 5, single_angle_e5=E5_LONG),
               "axial", 52.3, "kip"),
-    "F.1-1B": ("W18X50, arriostramiento continuo", beam("W18X50", FY50, CONTINUOUS), "flexure_x", 379, "kip-ft"),
-    "F.1-2B": ("W18X50, Lb = 11.67 ft, Cb = 1.01", beam("W18X50", FY50, 35 / 3, 1.01), "flexure_x", 304, "kip-ft"),
-    "F.1-3B": ("W18X50, Lb = 17.5 ft, Cb = 1.30", beam("W18X50", FY50, 17.5, 1.30), "flexure_x", 288, "kip-ft"),
-    "F.2-1B": ("C15X33.9, arriostramiento continuo", beam("C15X33.9", FY50, CONTINUOUS), "flexure_x", 191, "kip-ft"),
-    "F.2-2B": ("C15X33.9, Lb = 5 ft", beam("C15X33.9", FY50, 5), "flexure_x", 173, "kip-ft"),
-    "F.3B": ("W21X48 ala no compacta (F3)", beam("W21X48", FY50, CONTINUOUS), "flexure_x", 398, "kip-ft"),
-    "F.5": ("W12X58, eje menor (F6)", beam("W12X58", FY50, axis="Muy", holes=None), "flexure_y", 122, "kip-ft"),
+    "F.1-1B": ("W18X50, arriostramiento continuo", beam("W18X50", FY50, CONTINUOUS), "flexure_x_3", 379, "kip-ft"),
+    "F.1-2B": ("W18X50, Lb = 11.67 ft, Cb = 1.01", beam("W18X50", FY50, 35 / 3, 1.01), "flexure_x_3", 304, "kip-ft"),
+    "F.1-3B": ("W18X50, Lb = 17.5 ft, Cb = 1.30", beam("W18X50", FY50, 17.5, 1.30), "flexure_x_3", 288, "kip-ft"),
+    "F.2-1B": ("C15X33.9, arriostramiento continuo", beam("C15X33.9", FY50, CONTINUOUS), "flexure_x_3", 191, "kip-ft"),
+    "F.2-2B": ("C15X33.9, Lb = 5 ft", beam("C15X33.9", FY50, 5), "flexure_x_3", 173, "kip-ft"),
+    "F.3B": ("W21X48 ala no compacta (F3)", beam("W21X48", FY50, CONTINUOUS), "flexure_x_3", 398, "kip-ft"),
+    "F.5": ("W12X58, eje menor (F6)", beam("W12X58", FY50, axis="My_2", holes=None), "flexure_y_2", 122, "kip-ft"),
     "F.7B": ("HSS10X6X3/16 ala no compacta, Lb = 21 ft, Cb = 1.14", beam("HSS10X6X3/16", FY50, 21, 1.14, holes=None),
-             "flexure_x", 59.7, "kip-ft"),
-    "F.8B": ("HSS8X8X3/16 ala esbelta (F7-3)", beam("HSS8X8X3/16", FY50, holes=None), "flexure_x", 45.4, "kip-ft"),
-    "F.9B": ("Pipe 8 XS, Fy = 35 ksi", beam("PIPE8XS", FY35, holes=None), "flexure_x", 81.4, "kip-ft"),
+             "flexure_x_3", 59.7, "kip-ft"),
+    "F.8B": ("HSS8X8X3/16 ala esbelta (F7-3)", beam("HSS8X8X3/16", FY50, holes=None), "flexure_x_3", 45.4, "kip-ft"),
+    "F.9B": ("Pipe 8 XS, Fy = 35 ksi", beam("PIPE8XS", FY35, holes=None), "flexure_x_3", 81.4, "kip-ft"),
     "F.11A": ("L4X4X1/4 eje x, sin restricción, Lb = 6 ft, Cb = 1.14",
               beam("L4X4X1/4", FY50, 6, 1.14, holes=None, flexure={"lateral_torsional_restraint": "none"},
-                   angle_flexure={"toe": "compression"}), "flexure_x", 3.69, "kip-ft"),
+                   heel=HEEL), "flexure_x_3", 3.69, "kip-ft"),
     "F.11B": ("L4X4X1/4 eje x, restricción en Mmáx, Lb = 3 ft, Cb = 1.30",
               beam("L4X4X1/4", FY50, 3, 1.30, holes=None, flexure={"lateral_torsional_restraint": "at_max_moment"},
-                   angle_flexure={"toe": "compression"}), "flexure_x", 3.98, "kip-ft"),
+                   heel=HEEL), "flexure_x_3", 3.98, "kip-ft"),
     "F.11C-z": ("L4X4X1/4 eje z, punteras comprimidas",
-                beam("L4X4X1/4", FY50, 6, 1.14, axis="Mz", holes=None, angle_flexure={"toe": "compression"}),
+                beam("L4X4X1/4", FY50, 6, 1.14, axis=(0.0, -1.0), holes=None),
                 "flexure_z", 4.13, "kip-ft"),
     "F.11C-w": ("L4X4X1/4 eje w, Lb = 6 ft, Cb = 1.14",
-                beam("L4X4X1/4", FY50, 6, 1.14, axis="Mw", holes=None), "flexure_w", 7.49, "kip-ft"),
+                beam("L4X4X1/4", FY50, 6, 1.14, axis=(1.0, 0.0), holes=None), "flexure_w", 7.49, "kip-ft"),
     "F.12": ("Barra 5 x 3 in, Lb = 6 ft", beam("BAR", FY50, 6, holes=None,
-             custom_section={"type": "SOLID_RECTANGULAR", "H": 5 * IN, "B": 3 * IN}), "flexure_x", 70.4, "kip-ft"),
+             custom_section={"type": "SOLID_RECTANGULAR", "H": 5 * IN, "B": 3 * IN}), "flexure_x_3", 70.4, "kip-ft"),
     "F.13": ("Barra redonda D = 1 in, Lb = 2.5 ft", beam("ROUND", FY50, 2.5, holes=None,
-             custom_section={"type": "SOLID_CIRCULAR", "diameter": 1 * IN}), "flexure_x", 0.590, "kip-ft"),
-    "G.1B": ("W24X62, cortante en el alma, G2.1(a) φv = 1.00", shear("W24X62", FY50), "shear_x", 306, "kip"),
-    "G.2B": ("C15X33.9, cortante en el alma, G2.1(b)", shear("C15X33.9", FY50), "shear_x", 162, "kip"),
-    "G.3": ("L5X3X1/4, ala larga vertical (G3)", shear("L5X3X1/4", FY50), "shear_x", 33.8, "kip"),
-    "G.4": ("HSS6X4X3/8, paredes anchas verticales (G4)", shear("HSS6X4X3/8", FY50), "shear_x", 93.6, "kip"),
+             custom_section={"type": "SOLID_CIRCULAR", "diameter": 1 * IN}), "flexure_x_3", 0.590, "kip-ft"),
+    "G.1B": ("W24X62, cortante en el alma, G2.1(a) φv = 1.00", shear("W24X62", FY50), "shear_y_2", 306, "kip"),
+    "G.2B": ("C15X33.9, cortante en el alma, G2.1(b)", shear("C15X33.9", FY50), "shear_y_2", 162, "kip"),
+    "G.3": ("L5X3X1/4, ala larga vertical (G3)", shear("L5X3X1/4", FY50), "shear_y_2", 33.8, "kip"),
+    "G.4": ("HSS6X4X3/8, paredes anchas verticales (G4)", shear("HSS6X4X3/8", FY50), "shear_y_2", 93.6, "kip"),
     "G.5": ("HSS16.000X0.375, Lv = 192 in (G5)", shear("HSS16.000X0.375", FY50, shear={"Lv": 192 * IN}),
-            "shear_x", 232, "kip"),
-    "G.6": ("W21X48, cortante en el eje menor (G6)", shear("W21X48", FY50, "Vuy"), "shear_y", 189, "kip"),
-    "G.7": ("C9X20, cortante en el eje menor (G6)", shear("C9X20", FY50, "Vuy"), "shear_y", 59.1, "kip"),
-    "H.1B": ("W14X99, Pu = 400 kips, Mux = 250, Muy = 80 kip-ft, L = 14 ft (H1-1a)",
+            "shear_y_2", 232, "kip"),
+    "G.6": ("W21X48, cortante en el eje menor (G6)", shear("W21X48", FY50, "Vx_3"), "shear_x_3", 189, "kip"),
+    "G.7": ("C9X20, cortante en el eje menor (G6)", shear("C9X20", FY50, "Vx_3"), "shear_x_3", 59.1, "kip"),
+    "H.1B": ("W14X99, Pu = 400 kips, Mx_3 = 250, My_2 = 80 kip-ft, L = 14 ft (H1-1a)",
              combined("W14X99", FY50, 14, 400, 250, 80), "interaction", 0.929, "ratio"),
-    "H.3": ("W14X82 en tracción, Pu = 174 kips, Mux = 192, Muy = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2)",
+    "H.3": ("W14X82 en tracción, Pu = 174 kips, Mx_3 = 192, My_2 = 67.6 kip-ft, Lb = 30 ft, Cb amplificado (H1.2)",
             combined("W14X82", FY50, 30, -174, 192, 67.6, Cb=1.14, flexure={"tension_cb_amplification": True},
                      material={"Fu": 65 * KSI}, tension={"An": 24.0 * IN**2, "U": 1.0}), "interaction", 0.873, "ratio"),
-    "H.4": ("W10X33, Pu = 30 kips, Mux = 91.8, Muy = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft",
+    "H.4": ("W10X33, Pu = 30 kips, Mx_3 = 91.8, My_2 = 13.1 kip-ft (amplificados por el ejemplo), L = 14 ft",
             combined("W10X33", FY50, 14, 30, 91.8, 13.1, Cb=1.14), "interaction", 0.979, "ratio"),
     "I.1": ("W21X50, deck de 3 in perpendicular, 22 pernos de 3/4 in, tc = 4.5 in, f'c = 4 ksi (ejemplo: ΣQn = 386 kips)",
-            composite_beam("W21X50"), "flexure_x", 769, "kip-ft"),
-    "I.4": ("HSS10X6X3/8 relleno, f'c = 5 ksi, Lc = 14 ft", filled_member("HSS10X6X3/8", 5, Pu=1.0, L=14),
+            composite_beam("W21X50"), "flexure_x_3", 769, "kip-ft"),
+    "I.4": ("HSS10X6X3/8 relleno, f'c = 5 ksi, Lc = 14 ft", filled_member("HSS10X6X3/8", 5, P=-1.0, L=14),
             "axial", 368, "kip"),
-    "I.5": ("HSS10X6X3/8 relleno, tracción", filled_member("HSS10X6X3/8", 5, Pu=-1.0), "axial", 468, "kip"),
-    "I.6-Mc": ("HSS10X6X3/8 relleno, flexión compacta (Tabla 4-B)", filled_member("HSS10X6X3/8", 5, Mux=1.0),
-               "flexure_x", 141, "kip-ft"),
-    "I.6-Vc": ("HSS10X6X3/8 relleno, cortante I4-1, Kc = 1", filled_member("HSS10X6X3/8", 5, Vux=1.0), "shear_x", 176, "kip"),
-    "I.6-H1": ("HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, H1-1a",
-               filled_member("HSS10X6X3/8", 5, Pu=129 * KIP, Mux=120 * KIPFT, L=14), "interaction", 1.11, "ratio"),
-    "I.7-noncompact": ("Cajón 30 x 30 x 1/2 in relleno, no compacto (I3-5b)", filled_member("BOX30X30X1/2", 7, Mux=1.0),
-                       "flexure_x", 2910, "kip-ft"),
-    "I.7-slender": ("Cajón 30 x 30 x 1/4 in relleno, esbelto (Fig. C-I3.8(c))", filled_member("BOX30X30X1/4", 7, Mux=1.0),
-                    "flexure_x", 1220, "kip-ft"),
+    "I.5": ("HSS10X6X3/8 relleno, tracción", filled_member("HSS10X6X3/8", 5, P=1.0), "axial", 468, "kip"),
+    "I.6-Mc": ("HSS10X6X3/8 relleno, flexión compacta (Tabla 4-B)", filled_member("HSS10X6X3/8", 5, Mx_3=1.0),
+               "flexure_x_3", 141, "kip-ft"),
+    "I.6-Vc": ("HSS10X6X3/8 relleno, cortante I4-1, Kc = 1", filled_member("HSS10X6X3/8", 5, Vy_2=1.0), "shear_y_2", 176, "kip"),
+    "I.6-H1": ("HSS10X6X3/8 relleno, Pu = 129 kips, Mx_3 = 120 kip-ft, H1-1a",
+               filled_member("HSS10X6X3/8", 5, P=-(129 * KIP), Mx_3=120 * KIPFT, L=14), "interaction", 1.11, "ratio"),
+    "I.7-noncompact": ("Cajón 30 x 30 x 1/2 in relleno, no compacto (I3-5b)", filled_member("BOX30X30X1/2", 7, Mx_3=1.0),
+                       "flexure_x_3", 2910, "kip-ft"),
+    "I.7-slender": ("Cajón 30 x 30 x 1/4 in relleno, esbelto (Fig. C-I3.8(c))", filled_member("BOX30X30X1/4", 7, Mx_3=1.0),
+                    "flexure_x_3", 1220, "kip-ft"),
     "I.7-slender-Pc": ("Cajón 30 x 30 x 1/4 in relleno, esbelto, Lc = 30 ft (I2-9e)",
-                       filled_member("BOX30X30X1/4", 7, Pu=1.0, L=30), "axial", 3300, "kip"),
-    "I.9": ("W10X45 embebido en 24 x 24 in, 8 barras No. 8, Lc = 14 ft", encased_member(Pu=1.0, L=14), "axial", 2360, "kip"),
-    "I.10": ("W10X45 embebido, tracción (I2-8)", encased_member(Pu=-1.0), "axial", 936, "kip"),
-    "I.11-Mc": ("W10X45 embebido, plástico compuesto I3.3a(3)", encased_member(Mux=1.0, method="composite"),
-                "flexure_x", 673, "kip-ft"),
-    "I.11-H1": ("W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, H1-1a",
-                encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite"), "interaction", 1.38, "ratio"),
-    "I.6-M2S": ("HSS10X6X3/8 relleno, Pu = 129 kips, Mux = 120 kip-ft, Método 2 simplificado (C-I5-1b)",
-                filled_member("HSS10X6X3/8", 5, Pu=129 * KIP, Mux=120 * KIPFT, L=14, interaction="M2S"),
+                       filled_member("BOX30X30X1/4", 7, P=-1.0, L=30), "axial", 3300, "kip"),
+    "I.9": ("W10X45 embebido en 24 x 24 in, 8 barras No. 8, Lc = 14 ft", encased_member(P=-1.0, L=14), "axial", 2360, "kip"),
+    "I.10": ("W10X45 embebido, tracción (I2-8)", encased_member(P=1.0), "axial", 936, "kip"),
+    "I.11-Mc": ("W10X45 embebido, plástico compuesto I3.3a(3)", encased_member(Mx_3=1.0, method="composite"),
+                "flexure_x_3", 673, "kip-ft"),
+    "I.11-H1": ("W10X45 embebido, Pu = 1170 kips, Mx_3 = 670 kip-ft, H1-1a",
+                encased_member(P=-(1170 * KIP), Mx_3=670 * KIPFT, L=14, method="composite"), "interaction", 1.38, "ratio"),
+    "I.6-M2S": ("HSS10X6X3/8 relleno, Pu = 129 kips, Mx_3 = 120 kip-ft, Método 2 simplificado (C-I5-1b)",
+                filled_member("HSS10X6X3/8", 5, P=-(129 * KIP), Mx_3=120 * KIPFT, L=14, interaction="M2S"),
                 "interaction", 0.948, "ratio"),
     "I.6-M2": ("HSS10X6X3/8 relleno, igual, Método 2 (razón obtenida con los puntos impresos en el ejemplo)",
-               filled_member("HSS10X6X3/8", 5, Pu=129 * KIP, Mux=120 * KIPFT, L=14, interaction="M2"),
+               filled_member("HSS10X6X3/8", 5, P=-(129 * KIP), Mx_3=120 * KIPFT, L=14, interaction="M2"),
                "interaction", 0.963, "ratio"),
-    "I.11-M2S": ("W10X45 embebido, Pu = 1170 kips, Mux = 670 kip-ft, Método 2 simplificado (C-I5-1a)",
-                 encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite", interaction="M2S"),
+    "I.11-M2S": ("W10X45 embebido, Pu = 1170 kips, Mx_3 = 670 kip-ft, Método 2 simplificado (C-I5-1a)",
+                 encased_member(P=-(1170 * KIP), Mx_3=670 * KIPFT, L=14, method="composite", interaction="M2S"),
                  "interaction", 0.996, "ratio"),
     "I.11-M2": ("W10X45 embebido, igual, Método 2 (razón obtenida con los puntos impresos en el ejemplo)",
-                encased_member(Pu=1170 * KIP, Mux=670 * KIPFT, L=14, method="composite", interaction="M2"),
+                encased_member(P=-(1170 * KIP), Mx_3=670 * KIPFT, L=14, method="composite", interaction="M2"),
                 "interaction", 0.870, "ratio"),
     "I.12": ("Perno de 3/4 in, Quv = 10.4 kips, Qut = 15.6 kips (I8-5)",
              encased_member(anchor={"type": "stud", "Qrv": 10.4 * KIP, "Qrt": 15.6 * KIP, "spacing": 24 * IN, "d": 0.75 * IN,
@@ -259,8 +276,8 @@ EXAMPLES = {
     "E.14B-Mcz": ("L8X4X1/2 eje z, punteras traccionadas, fluencia en A", E14B, "flexure_z", 123 / 12, "kip-ft"),
     "E.14B": ("L8X4X1/2, Pu = 85.9 kips con Mw y Mz amplificados: H2-1 en B ≈ 1.0", E14B, "interaction", 1.0, "ratio"),
     "F.11C": ("L4X4X1/4, Muw = 0.286, Muz = 1.05 kip-ft, Lb = 6 ft, Cb = 1.14: H2-1 en la punta comprimida",
-              dict(section_name="L4X4X1/4", material={"Fy": FY50}, Mw=0.286 * KIPFT, Mz=1.05 * KIPFT,
-                   lengths={"Lx": 6 * FT, "Ly": 6 * FT, "Lz": 6 * FT}, flexure={"Cb": 1.14}, angle_flexure={"toe": "compression"}),
+              dict(section_name="L4X4X1/4", material={"Fy": FY50}, **principal("L4X4X1/4", 0.286 * KIPFT, -1.05 * KIPFT),
+                   lengths={"Lx_3": 6 * FT, "Ly_2": 6 * FT, "Lz_1": 6 * FT}, flexure={"Cb": 1.14}),
               "interaction", 0.292, "ratio"),
 }
 

@@ -4,17 +4,55 @@
   "serviceability": {
     "actual_span": 2000,
     "effective_span": 2000,
-    "deflections": {"live_short": 4.0, "dead_short": 5.0, "total_long": 6.7},
-    "limit_divisors": {"live_short": 360, "dead_short": 240, "total_long": 240}
+    "deflections": {
+      "live_short": 4.0,
+      "dead_short": 5.0,
+      "total_long": 6.7
+    },
+    "limit_divisors": {
+      "live_short": 360,
+      "dead_short": 240,
+      "total_long": 240
+    }
   },
   "composite": {
     "kind": "coupling_beam",
-    "concrete": {"fc": 40, "wc": 2320, "lightweight": false},
-    "coupling_beam": {"b": 450, "h": 600, "tf": 20, "tw": 12}
+    "concrete": {
+      "fc": 40,
+      "wc": 2320,
+      "lightweight": false
+    },
+    "coupling_beam": {
+      "b": 450,
+      "h": 600,
+      "tf": 20,
+      "tw": 12
+    }
   },
   "cases": [
-    {"name": "Design Guide 38, A.3 and Equation 2-19", "Mux": 1800, "Vux": 1500},
-    {"name": "Incendio con perfil de concreto", "condition": "fire", "Mux": 300, "Vux": 300,
-     "fire": {"steel_temperature": 700, "concrete_layers": [{"thickness": 100, "T": 400}, {"thickness": 113, "T": 150}]}}
+    {
+      "name": "Design Guide 38, A.3 and Equation 2-19",
+      "Mx_3": 1800,
+      "Vy_2": 1500
+    },
+    {
+      "name": "Incendio con perfil de concreto",
+      "condition": "fire",
+      "Mx_3": 300,
+      "Vy_2": 300,
+      "fire": {
+        "steel_temperature": 700,
+        "concrete_layers": [
+          {
+            "thickness": 100,
+            "T": 400
+          },
+          {
+            "thickness": 113,
+            "T": 150
+          }
+        ]
+      }
+    }
   ]
 }
